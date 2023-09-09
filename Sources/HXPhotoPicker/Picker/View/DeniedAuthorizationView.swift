@@ -12,64 +12,58 @@ class DeniedAuthorizationView: UIView {
     
     let config: NotAuthorizedConfiguration
     
-    lazy var navigationBar: UINavigationBar = {
-        let navigationBar = UINavigationBar.init()
-        navigationBar.setBackgroundImage(
-            UIImage.image(
-                for: UIColor.clear,
-                havingSize: CGSize.zero
-            ),
-            for: UIBarMetrics.default
-        )
-        navigationBar.shadowImage = UIImage.init()
-        let navigationItem = UINavigationItem.init()
-        navigationItem.leftBarButtonItem = UIBarButtonItem.init(customView: closeBtn)
-        navigationBar.pushItem(navigationItem, animated: false)
-        return navigationBar
-    }()
-    
-    lazy var closeBtn: UIButton = {
-        let closeBtn = UIButton.init(type: .custom)
-        closeBtn.size = CGSize(width: 50, height: 40)
-        closeBtn.addTarget(self, action: #selector(didCloseClick), for: .touchUpInside)
-        closeBtn.contentHorizontalAlignment = .left
-        return closeBtn
-    }()
-    
-    lazy var titleLb: UILabel = {
-        let titleLb = UILabel.init()
-        titleLb.textAlignment = .center
-        titleLb.numberOfLines = 0
-        return titleLb
-    }()
-    
-    lazy var subTitleLb: UILabel = {
-        let subTitleLb = UILabel.init()
-        subTitleLb.textAlignment = .center
-        subTitleLb.numberOfLines = 0
-        return subTitleLb
-    }()
-    
-    lazy var jumpBtn: UIButton = {
-        let jumpBtn = UIButton.init(type: .custom)
-        jumpBtn.layer.cornerRadius = 5
-        jumpBtn.addTarget(self, action: #selector(jumpSetting), for: .touchUpInside)
-        return jumpBtn
-    }()
+    private var navigationBar: UINavigationBar!
+    private var closeBtn: UIButton!
+    private var titleLb: UILabel!
+    private var subTitleLb: UILabel!
+    private var jumpBtn: UIButton!
     
     init(config: NotAuthorizedConfiguration) {
         self.config = config
         super.init(frame: CGRect.zero)
-        configView()
+        initViews()
+        configViews()
     }
     
-    func configView() {
+    private func initViews() {
         if !config.isHiddenCloseButton {
+            closeBtn = UIButton(type: .custom)
+            closeBtn.size = CGSize(width: 50, height: 40)
+            closeBtn.addTarget(self, action: #selector(didCloseClick), for: .touchUpInside)
+            closeBtn.contentHorizontalAlignment = .left
+            
+            navigationBar = UINavigationBar()
+            navigationBar.setBackgroundImage(
+                UIImage.image(
+                    for: UIColor.clear,
+                    havingSize: CGSize.zero
+                ),
+                for: UIBarMetrics.default
+            )
+            navigationBar.shadowImage = UIImage()
+            let navigationItem = UINavigationItem()
+            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeBtn)
+            navigationBar.pushItem(navigationItem, animated: false)
             addSubview(navigationBar)
         }
+        
+        titleLb = UILabel()
+        titleLb.textAlignment = .center
+        titleLb.numberOfLines = 0
         addSubview(titleLb)
+        
+        subTitleLb = UILabel()
+        subTitleLb.textAlignment = .center
+        subTitleLb.numberOfLines = 0
         addSubview(subTitleLb)
+        
+        jumpBtn = UIButton(type: .custom)
+        jumpBtn.layer.cornerRadius = 5
+        jumpBtn.addTarget(self, action: #selector(jumpSetting), for: .touchUpInside)
         addSubview(jumpBtn)
+    }
+    
+    private func configViews() {
         
         titleLb.text = "无法访问相册中照片".localized
         titleLb.font = UIFont.semiboldPingFang(ofSize: 20)
@@ -82,21 +76,37 @@ class DeniedAuthorizationView: UIView {
         
         configColor()
     }
-    func configColor() {
+    
+    private func configColor() {
         let closeButtonImageName = config.closeButtonImageName
         let closeButtonDarkImageName = config.closeButtonDarkImageName
         let isDark = PhotoManager.isDark
-        closeBtn.setImage(UIImage.image(for: isDark ? closeButtonDarkImageName : closeButtonImageName), for: .normal)
+        let closeBtnColor = isDark ? config.closeButtonDarkColor : config.closeButtonColor
+        if let closeBtnColor = closeBtnColor {
+            closeBtn.setImage(UIImage.image(for: isDark ? closeButtonDarkImageName : closeButtonImageName)?.withRenderingMode(.alwaysTemplate), for: .normal)
+            closeBtn.tintColor = closeBtnColor
+        }else {
+            closeBtn.setImage(UIImage.image(for: isDark ? closeButtonDarkImageName : closeButtonImageName), for: .normal)
+        }
         backgroundColor = isDark ? config.darkBackgroundColor : config.backgroundColor
         titleLb.textColor = isDark ? config.titleDarkColor : config.titleColor
         subTitleLb.textColor = isDark ? config.darkSubTitleColor : config.subTitleColor
-        jumpBtn.backgroundColor = isDark ? config.jumpButtonDarkBackgroundColor : config.jumpButtonBackgroundColor
+        let jumpBackgroundColor = isDark ? config.jumpButtonDarkBackgroundColor : config.jumpButtonBackgroundColor
+        let labelWidth = jumpBtn.currentTitle?.width(ofFont: jumpBtn.titleLabel!.font, maxHeight: 40) ?? 10
+        let jumpBtnWidth: CGFloat = max(labelWidth + 10, 150)
+        jumpBtn.setBackgroundImage(.image(for: jumpBackgroundColor, havingSize: .init(width: jumpBtnWidth, height: 40), radius: 5), for: .normal)
         jumpBtn.setTitleColor(isDark ? config.jumpButtonTitleDarkColor : config.jumpButtonTitleColor, for: .normal)
     }
-    @objc func didCloseClick() {
-        self.viewController?.dismiss(animated: true, completion: nil)
+    @objc
+    private func didCloseClick() {
+        guard let pickerController = viewController as? PhotoPickerController else {
+            viewController?.dismiss(animated: true)
+            return
+        }
+        pickerController.cancelCallback()
     }
-    @objc func jumpSetting() {
+    @objc
+    private func jumpSetting() {
         PhotoTools.openSettingsURL()
     }
     
@@ -137,13 +147,8 @@ class DeniedAuthorizationView: UIView {
         titleLb.y = subTitleLb.y - 15 - titleHeight
         
         let jumpBtnBottomMargin: CGFloat = UIDevice.isPortrait ? 120 : 50
-        var jumpBtnWidth: CGFloat = 10
-        if let labelWidth = jumpBtn.currentTitle?.width(ofFont: jumpBtn.titleLabel!.font, maxHeight: 40) {
-            jumpBtnWidth = labelWidth + 10
-        }
-        if jumpBtnWidth < 150 {
-            jumpBtnWidth = 150
-        }
+        let labelWidth = jumpBtn.currentTitle?.width(ofFont: jumpBtn.titleLabel!.font, maxHeight: 40) ?? 10
+        let jumpBtnWidth: CGFloat = max(labelWidth + 10, 150)
         let jumpY: CGFloat
         if barHeight == 0 {
             jumpY = height - UIDevice.bottomMargin - 50

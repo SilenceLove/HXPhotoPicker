@@ -13,7 +13,7 @@ class PickerControllerTransition: NSObject, UIViewControllerAnimatedTransitionin
         case pop
         case dismiss
     }
-    let type: TransitionType
+    private let type: TransitionType
     
     init(type: TransitionType) {
         self.type = type
@@ -31,7 +31,7 @@ class PickerControllerTransition: NSObject, UIViewControllerAnimatedTransitionin
         return 0.25
     }
     
-    var transitionContext: UIViewControllerContextTransitioning?
+    private var transitionContext: UIViewControllerContextTransitioning?
     
     public func animateTransition(
         using transitionContext: UIViewControllerContextTransitioning

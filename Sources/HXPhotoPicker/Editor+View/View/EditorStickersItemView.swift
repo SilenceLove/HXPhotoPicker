@@ -24,53 +24,13 @@ protocol EditorStickersItemViewDelegate: AnyObject {
 }
 class EditorStickersItemView: EditorStickersItemBaseView {
     weak var delegate: EditorStickersItemViewDelegate?
-    lazy var mirrorView: UIView = {
-        let view = UIView()
-        return view
-    }()
-    lazy var contentView: EditorStickersContentView = {
-        if item.isAudio {
-            let view = EditorStickersContentAudioView(item: item)
-            view.center = center
-            return view
-        }
-        let view = EditorStickersContentImageView(item: item)
-        view.center = center
-        return view
-    }()
-    lazy var externalBorder: CALayer = {
-        let externalBorder = CALayer()
-        externalBorder.shadowOpacity = 0.3
-        externalBorder.shadowOffset = CGSize(width: 0, height: 0)
-        externalBorder.shadowRadius = 1
-        externalBorder.contentsScale = UIScreen.main.scale
-        return externalBorder
-    }()
-    lazy var deleteBtn: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setBackgroundImage("hx_editor_view_sticker_item_delete".image, for: .normal)
-        button.addTarget(self, action: #selector(didDeleteButtonClick), for: .touchUpInside)
-        button.isHidden = true
-        return button
-    }()
-    lazy var scaleBtn: UIImageView = {
-        let image: UIImage?
-        if !item.isAudio {
-            image = "hx_editor_view_sticker_item_scale".image
-        }else {
-            image = "hx_editor_view_sticker_item_rotate".image
-        }
-        let button = UIImageView(image: image)
-        button.isUserInteractionEnabled = true
-        button.addGestureRecognizer(
-            PhotoPanGestureRecognizer(
-                target: self,
-                action: #selector(dragScaleButtonClick(pan:))
-            )
-        )
-        button.isHidden = true
-        return button
-    }()
+    private var mirrorView: UIView!
+    private var externalBorder: CALayer!
+    
+    var contentView: EditorStickersContentView!
+    var deleteBtn: UIButton!
+    var scaleBtn: UIImageView!
+    
     var isEnabled: Bool = true {
         didSet {
             isUserInteractionEnabled = isEnabled
@@ -109,26 +69,26 @@ class EditorStickersItemView: EditorStickersItemBaseView {
             }
         }
     }
-    
-    var itemMargin: CGFloat = 20
-    var initialScale: CGFloat = 1
-    var initialPoint: CGPoint = .zero
-    var initialRadian: CGFloat = 0
-    
+    var didRemoveFromSuperview: ((EditorStickersItemView) -> Void)?
     var initialMirrorScale: CGPoint = .init(x: 1, y: 1)
     var editMirrorScale: CGPoint = .init(x: 1, y: 1)
-    
-    var initialScalePoint: CGPoint = .zero
-    var scaleR: CGFloat = 1
-    var scaleA: CGFloat = 0
-    var firstTouch: Bool = false
     var radian: CGFloat = 0
     var pinchScale: CGFloat = 1
     var mirrorScale: CGPoint = .init(x: 1, y: 1)
+    var firstTouch: Bool = false
     
-    var lastTransform: CGAffineTransform = .identity
-    var lastMirrorTransform: CGAffineTransform = .identity
-    var lastScaleTransform: CGAffineTransform = .identity
+    private var itemMargin: CGFloat = 20
+    private var initialScale: CGFloat = 1
+    private var initialPoint: CGPoint = .zero
+    private var initialRadian: CGFloat = 0
+    
+    private var initialScalePoint: CGPoint = .zero
+    private var scaleR: CGFloat = 1
+    private var scaleA: CGFloat = 0
+    
+    private var lastTransform: CGAffineTransform = .identity
+    private var lastMirrorTransform: CGAffineTransform = .identity
+    private var lastScaleTransform: CGAffineTransform = .identity
     
     init(
         item: EditorStickerItem,
@@ -143,6 +103,7 @@ class EditorStickersItemView: EditorStickersItemBaseView {
         )
         super.init(frame: rect)
         self.item = item
+        initViews()
         mirrorView.frame = bounds
         addSubview(mirrorView)
         let margin = itemMargin / scale
@@ -165,28 +126,45 @@ class EditorStickersItemView: EditorStickersItemBaseView {
         initGestures()
     }
     
-    var didRemoveFromSuperview: ((EditorStickersItemView) -> Void)?
-    override func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        if superview == nil {
-            didRemoveFromSuperview?(self)
+    private func initViews() {
+        mirrorView = UIView()
+        
+        if item.isAudio {
+            contentView = EditorStickersContentAudioView(item: item)
+        }else {
+            contentView = EditorStickersContentImageView(item: item)
         }
-    }
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let view = super.hitTest(point, with: event)
-        if bounds.contains(point) {
-            return contentView
+        contentView.center = center
+        
+        externalBorder = CALayer()
+        externalBorder.shadowOpacity = 0.3
+        externalBorder.shadowOffset = CGSize(width: 0, height: 0)
+        externalBorder.shadowRadius = 1
+        externalBorder.contentsScale = UIScreen.main.scale
+        
+        deleteBtn = UIButton(type: .custom)
+        deleteBtn.setBackgroundImage("hx_editor_view_sticker_item_delete".image, for: .normal)
+        deleteBtn.addTarget(self, action: #selector(didDeleteButtonClick), for: .touchUpInside)
+        deleteBtn.isHidden = true
+        
+        let image: UIImage?
+        if !item.isAudio {
+            image = "hx_editor_view_sticker_item_scale".image
+        }else {
+            image = "hx_editor_view_sticker_item_rotate".image
         }
-        return view
+        scaleBtn = UIImageView(image: image)
+        scaleBtn.isUserInteractionEnabled = true
+        scaleBtn.addGestureRecognizer(
+            PhotoPanGestureRecognizer(
+                target: self,
+                action: #selector(dragScaleButtonClick(pan:))
+            )
+        )
+        scaleBtn.isHidden = true
     }
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-extension EditorStickersItemView {
     
-    func initGestures() {
+    private func initGestures() {
         contentView.isUserInteractionEnabled = true
         let tapGR = UITapGestureRecognizer(target: self, action: #selector(contentViewTapClick(tapGR:)))
         contentView.addGestureRecognizer(tapGR)
@@ -202,17 +180,28 @@ extension EditorStickersItemView {
         )
         contentView.addGestureRecognizer(rotationGR)
     }
-}
-
-extension EditorStickersItemView {
+    
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        if superview == nil {
+            didRemoveFromSuperview?(self)
+        }
+    }
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let view = super.hitTest(point, with: event)
+        if bounds.contains(point) {
+            return contentView
+        }
+        return view
+    }
     
     @objc
-    func didDeleteButtonClick() {
+    private func didDeleteButtonClick() {
         delegate?.stickerItemView(didDeleteClick: self)
     }
     
     @objc
-    func dragScaleButtonClick(pan: UIPanGestureRecognizer) {
+    private func dragScaleButtonClick(pan: UIPanGestureRecognizer) {
         switch pan.state {
         case .began:
             touching = true
@@ -266,7 +255,7 @@ extension EditorStickersItemView {
         }
     }
     @objc
-    func contentViewTapClick(tapGR: UITapGestureRecognizer) {
+    private func contentViewTapClick(tapGR: UITapGestureRecognizer) {
         if isDelete {
             return
         }
@@ -286,7 +275,7 @@ extension EditorStickersItemView {
     }
     
     @objc
-    func contentViewPanClick(panGR: UIPanGestureRecognizer) {
+    private func contentViewPanClick(panGR: UIPanGestureRecognizer) {
         if isDelete {
             return
         }
@@ -336,7 +325,7 @@ extension EditorStickersItemView {
     }
     
     @objc
-    func contentViewPinchClick(pinchGR: UIPinchGestureRecognizer) {
+    private func contentViewPinchClick(pinchGR: UIPinchGestureRecognizer) {
         if isDelete {
             return
         }
@@ -383,7 +372,7 @@ extension EditorStickersItemView {
     }
     
     @objc
-    func contentViewRotationClick(rotationGR: UIRotationGestureRecognizer) {
+    private func contentViewRotationClick(rotationGR: UIRotationGestureRecognizer) {
         if isDelete {
             return
         }
@@ -418,9 +407,7 @@ extension EditorStickersItemView {
             break
         }
     }
-}
-
-extension EditorStickersItemView {
+    
     func update(
         pinchScale: CGFloat,
         rotation: CGFloat? = nil,
@@ -612,9 +599,7 @@ extension EditorStickersItemView {
             isWindow: isWindow
         )
     }
-}
-
-extension EditorStickersItemView {
+    
     func videoReset(_ isReset: Bool) {
         var currentTransform: CGAffineTransform = .identity
         var currentMirrorTransform: CGAffineTransform = .identity
@@ -656,5 +641,9 @@ extension EditorStickersItemView {
         }
         transform = currentTransform
         mirrorView.transform = currentMirrorTransform
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

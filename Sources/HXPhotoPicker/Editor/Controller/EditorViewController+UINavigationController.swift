@@ -99,7 +99,7 @@ extension EditorViewController {
     func showMasks() {
         if UIDevice.isPortrait {
             if isToolsDisplay {
-                if config.buttonPostion == .bottom {
+                if config.buttonType == .bottom {
                     topMaskView.alpha = 0
                 }else {
                     topMaskView.alpha = 1

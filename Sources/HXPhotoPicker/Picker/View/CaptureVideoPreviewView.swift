@@ -6,26 +6,40 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 #if !targetEnvironment(macCatalyst)
-class CaptureVideoPreviewView: UIView {
+class CaptureVideoPreviewView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
     override class var layerClass: AnyClass {
         return AVCaptureVideoPreviewLayer.self
     }
-    lazy var imageMaskView: UIImageView = {
-        let view = UIImageView(image: PhotoManager.shared.cameraPreviewImage)
-        view.contentMode = .scaleAspectFill
-        view.clipsToBounds = true
-        return view
-    }()
-    lazy var shadeView: UIVisualEffectView = {
+    var sessionCompletion = false
+    var previewLayer: AVCaptureVideoPreviewLayer?
+    
+    private var imageMaskView: UIImageView!
+    private var shadeView: UIVisualEffectView!
+    private var videoOutput: AVCaptureVideoDataOutput!
+    private let isCell: Bool
+    private var canAddOutput = false
+    
+    init(isCell: Bool = false) {
+        self.isCell = isCell
+        super.init(frame: .zero)
+        initViews()
+        previewLayer = layer as? AVCaptureVideoPreviewLayer
+        previewLayer?.videoGravity = .resizeAspectFill
+        addSubview(imageMaskView)
+        addSubview(shadeView)
+    }
+    private func initViews() {
+        imageMaskView = UIImageView(image: PhotoManager.shared.cameraPreviewImage)
+        imageMaskView.contentMode = .scaleAspectFill
+        imageMaskView.clipsToBounds = true
+        
         let effect = UIBlurEffect(style: .light)
-        let view = UIVisualEffectView(effect: effect)
-        return view
-    }()
-    lazy var videoOutput: AVCaptureVideoDataOutput = {
-        let videoOutput = AVCaptureVideoDataOutput()
+        shadeView = UIVisualEffectView(effect: effect)
+        
+        videoOutput = AVCaptureVideoDataOutput()
         videoOutput.videoSettings = [
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
         ]
@@ -34,19 +48,6 @@ class CaptureVideoPreviewView: UIView {
             queue: DispatchQueue(label: "com.HXPhotoPicker.cellcamerapreview")
         )
         videoOutput.alwaysDiscardsLateVideoFrames = true
-        return videoOutput
-    }()
-    let isCell: Bool
-    var canAddOutput = false
-    var sessionCompletion = false
-    var previewLayer: AVCaptureVideoPreviewLayer?
-    init(isCell: Bool = false) {
-        self.isCell = isCell
-        super.init(frame: .zero)
-        previewLayer = layer as? AVCaptureVideoPreviewLayer
-        previewLayer?.videoGravity = .resizeAspectFill
-        addSubview(imageMaskView)
-        addSubview(shadeView)
     }
     func startSession(completion: ((Bool) -> Void)? = nil) {
         if sessionCompletion {
@@ -127,18 +128,7 @@ class CaptureVideoPreviewView: UIView {
         imageMaskView.removeFromSuperview()
         shadeView.removeFromSuperview()
     }
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        imageMaskView.frame = bounds
-        shadeView.frame = bounds
-    }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-extension CaptureVideoPreviewView: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(
         _ output: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,
@@ -151,6 +141,16 @@ extension CaptureVideoPreviewView: AVCaptureVideoDataOutputSampleBufferDelegate 
                 PhotoManager.shared.cameraPreviewImage = image
             }
         }
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        imageMaskView.frame = bounds
+        shadeView.frame = bounds
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 #endif

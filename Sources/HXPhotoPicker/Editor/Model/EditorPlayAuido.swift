@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 class EditorPlayAuido: NSObject, AVAudioPlayerDelegate {
     

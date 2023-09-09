@@ -7,20 +7,13 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 #if !targetEnvironment(macCatalyst)
 class PickerCameraViewCell: UICollectionViewCell {
     
-    lazy var captureView: CaptureVideoPreviewView = {
-        let view = CaptureVideoPreviewView(isCell: true)
-        return view
-    }()
-    
-    lazy var imageView: UIImageView = {
-        let imageView = UIImageView()
-        return imageView
-    }()
+    private var captureView: CaptureVideoPreviewView!
+    private var imageView: UIImageView!
     
     var config: PhotoListConfiguration.CameraCell? {
         didSet {
@@ -30,7 +23,9 @@ class PickerCameraViewCell: UICollectionViewCell {
     var allowPreview = true
     override init(frame: CGRect) {
         super.init(frame: frame)
+        captureView = CaptureVideoPreviewView(isCell: true)
         contentView.addSubview(captureView)
+        imageView = UIImageView()
         contentView.addSubview(imageView)
     }
     

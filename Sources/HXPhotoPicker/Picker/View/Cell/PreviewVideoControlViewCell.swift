@@ -9,28 +9,20 @@ import UIKit
 
 open class PreviewVideoControlViewCell: PreviewVideoViewCell, VideoPlaySliderViewDelegate {
     
-    public lazy var maskLayer: CAGradientLayer = {
-        let layer = PhotoTools.getGradientShadowLayer(false)
-        return layer
-    }()
-    
-    public lazy var maskBackgroundView: UIView = {
-        let view = UIView()
-        view.layer.addSublayer(maskLayer)
-        view.alpha = 0
-        return view
-    }()
-    
-    public lazy var sliderView: VideoPlaySliderView = {
-        let view = VideoPlaySliderView()
-        view.delegate = self
-        view.alpha = 0
-        return view
-    }()
+    public var maskLayer: CAGradientLayer!
+    public var maskBackgroundView: UIView!
+    public var sliderView: VideoPlaySliderView!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        maskBackgroundView = UIView()
+        maskBackgroundView.alpha = 0
+        maskLayer = PhotoTools.getGradientShadowLayer(false)
+        maskBackgroundView.layer.addSublayer(maskLayer)
         contentView.addSubview(maskBackgroundView)
+        sliderView = VideoPlaySliderView()
+        sliderView.delegate = self
+        sliderView.alpha = 0
         contentView.addSubview(sliderView)
     }
     

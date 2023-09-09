@@ -43,7 +43,18 @@ extension EditorViewController: EditorToolsViewDelegate {
             showMusicView()
             return
         case .cropSize:
-            editorView.startEdit(true)
+            if let selectType = scaleSwitchSelectType {
+                scaleSwitchLeftBtn.isSelected = selectType == 0
+                scaleSwitchRightBtn.isSelected = selectType == 1
+            }
+            editorView.startEdit(true) { [weak self] in
+                guard let self = self else {
+                    return
+                }
+                if let ratio = self.ratioToolView.selectedRatio?.ratio, !ratio.equalTo(.zero) {
+                    self.ratioToolView(self.ratioToolView, didSelectedRatioAt: ratio)
+                }
+            }
             showCropSizeToolsView()
             checkFinishButtonState()
             return
@@ -93,7 +104,7 @@ extension EditorViewController: EditorToolsViewDelegate {
             self.toolsView.alpha = 1
             self.cancelButton.alpha = 1
             self.finishButton.alpha = 1
-            if !UIDevice.isPortrait || self.config.buttonPostion == .top {
+            if !UIDevice.isPortrait || self.config.buttonType == .top {
                 self.topMaskView.alpha = 1
             }
             self.bottomMaskView.alpha = 1
@@ -391,7 +402,15 @@ extension EditorViewController: EditorToolsViewDelegate {
         rightRotateButton.isHidden = false
         mirrorVerticallyButton.isHidden = false
         mirrorHorizontallyButton.isHidden = false
-        maskListButton.isHidden = false
+        
+        var isShowMaskList: Bool = true
+        if let ratio = ratioToolView.selectedRatio?.ratio, (ratio.width < 0 || ratio.height < 0) {
+            isShowMaskList = false
+        }
+        if isShowMaskList {
+            maskListButton.isHidden = false
+        }
+        showScaleSwitchView()
         UIView.animate(withDuration: 0.2) {
             if !self.config.cropSize.aspectRatios.isEmpty {
                 self.ratioToolView.alpha = 1
@@ -402,7 +421,9 @@ extension EditorViewController: EditorToolsViewDelegate {
             self.rightRotateButton.alpha = 1
             self.mirrorVerticallyButton.alpha = 1
             self.mirrorHorizontallyButton.alpha = 1
-            self.maskListButton.alpha = 1
+            if isShowMaskList {
+                self.maskListButton.alpha = 1
+            }
             self.toolsView.alpha = 0
             self.hideMasks()
         } completion: {
@@ -419,6 +440,7 @@ extension EditorViewController: EditorToolsViewDelegate {
             return
         }
         toolsView.isHidden = false
+        hideScaleSwitchView()
         UIView.animate(withDuration: 0.2) {
             if !self.config.cropSize.aspectRatios.isEmpty {
                 self.ratioToolView.alpha = 0
@@ -444,6 +466,48 @@ extension EditorViewController: EditorToolsViewDelegate {
                 self.mirrorVerticallyButton.isHidden = true
                 self.mirrorHorizontallyButton.isHidden = true
                 self.maskListButton.isHidden = true
+            }
+        }
+    }
+    
+    func showScaleSwitchView(_ isRatioClick: Bool = false) {
+        if config.cropSize.aspectRatios.isEmpty {
+            return
+        }
+        if let ratio = ratioToolView.selectedRatio?.ratio, (ratio.width < 0 || ratio.height < 0) {
+            scaleSwitchView.isHidden = false
+        }else {
+            return
+        }
+        UIView.animate(withDuration: 0.2) {
+            if !self.config.cropSize.aspectRatios.isEmpty {
+                self.scaleSwitchView.alpha = 1
+            }
+            if isRatioClick {
+                self.maskListButton.alpha = 0
+            }
+        } completion: {
+            if $0, isRatioClick {
+                self.maskListButton.isHidden = true
+            }
+        }
+    }
+    
+    func hideScaleSwitchView(_ isRatioClick: Bool = false) {
+        if config.cropSize.aspectRatios.isEmpty {
+            return
+        }
+        if isRatioClick {
+            maskListButton.isHidden = false
+        }
+        UIView.animate(withDuration: 0.2) {
+            self.scaleSwitchView.alpha = 0
+            if isRatioClick {
+                self.maskListButton.alpha = 1
+            }
+        } completion: {
+            if $0 {
+                self.scaleSwitchView.isHidden = true
             }
         }
     }

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 public struct VideoExportParameter {
     /// 视频导出的分辨率

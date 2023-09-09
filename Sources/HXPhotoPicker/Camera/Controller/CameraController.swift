@@ -80,7 +80,7 @@ open class CameraController: UINavigationController {
     ///   - completion: 拍摄完成
     /// - Returns: 相机对应的 CameraController
     @discardableResult
-    public class func capture(
+    public static func capture(
         config: CameraConfiguration,
         type: CaptureType = .all,
         fromVC: UIViewController? = nil,
@@ -99,6 +99,8 @@ open class CameraController: UINavigationController {
     
     public var phAssetcompletion: CapturePHAssetCompletion?
     
+    public var cancelHandler: ((CameraController) -> Void)?
+    
     /// 跳转相机 config.isSaveSystemAlbum = true 时才会触发闭包
     /// - Parameters:
     ///   - config: 相机配置
@@ -106,7 +108,7 @@ open class CameraController: UINavigationController {
     ///   - completion: 拍摄完成
     /// - Returns: 相机对应的 CameraController
     @discardableResult
-    public class func captureAsset(
+    public static func captureAsset(
         config: CameraConfiguration,
         type: CaptureType = .all,
         fromVC: UIViewController? = nil,
@@ -130,6 +132,22 @@ open class CameraController: UINavigationController {
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         config.supportedInterfaceOrientations
     }
+    
+    var isDismissed: Bool = false
+    open override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if let vcs = navigationController?.viewControllers {
+            if !vcs.contains(self) {
+                if !isDismissed {
+                    cancelHandler?(self)
+                }
+            }
+        }else if presentingViewController == nil {
+            if !isDismissed {
+                cancelHandler?(self)
+            }
+        }
+    }
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -141,6 +159,7 @@ extension CameraController: CameraViewControllerDelegate {
         didFinishWithResult result: CameraController.Result,
         location: CLLocation?
     ) {
+        isDismissed = true
         completion?(result, location)
         cameraDelegate?.cameraController(
             self,
@@ -154,6 +173,7 @@ extension CameraController: CameraViewControllerDelegate {
         phAsset: PHAsset,
         location: CLLocation?
     ) {
+        isDismissed = true
         phAssetcompletion?(result, phAsset, location)
         cameraDelegate?.cameraController(
             self,
@@ -163,6 +183,8 @@ extension CameraController: CameraViewControllerDelegate {
         )
     }
     public func cameraViewController(didCancel cameraViewController: CameraViewController) {
+        isDismissed = true
+        cancelHandler?(self)
         cameraDelegate?.cameraController(didCancel: self)
     }
     public func cameraViewController(
@@ -185,4 +207,75 @@ extension CameraController: CameraViewControllerDelegate {
     }
 }
 
+@available(iOS 13.0.0, *)
+public extension CameraController {
+    
+    struct CaptureResult {
+        
+        public let result: Result
+        
+        /// config.isSaveSystemAlbum = true 才有值
+        public let phAsset: PHAsset?
+        
+        public let localtion: CLLocation?
+    }
+    
+    static func capture(
+        _ config: CameraConfiguration = .init(),
+        type: CameraController.CaptureType = .all,
+        delegate: CameraControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) async throws -> CaptureResult {
+        let vc = show(config, type: type, delegate: delegate, fromVC: fromVC)
+        return try await vc.takePhotograph()
+    }
+    
+    static func show(
+        _ config: CameraConfiguration = .init(),
+        type: CameraController.CaptureType = .all,
+        delegate: CameraControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) -> CameraController {
+        let topVC = fromVC ?? UIViewController.topViewController
+        let vc = CameraController(config: config, type: type, delegate: delegate)
+        topVC?.present(vc, animated: true)
+        return vc
+    }
+    
+    func takePhotograph() async throws -> CaptureResult {
+        try await withCheckedThrowingContinuation { continuation in
+            var isDimissed: Bool = false
+            completion = {
+                if isDimissed { return }
+                isDimissed = true
+                continuation.resume(with: .success(CaptureResult(result: $0, phAsset: nil, localtion: $1)))
+            }
+            phAssetcompletion = {
+                if isDimissed { return }
+                isDimissed = true
+                continuation.resume(with: .success(CaptureResult(result: $0, phAsset: $1, localtion: $2)))
+            }
+            cancelHandler = { _ in
+                if isDimissed { return }
+                isDimissed = true
+                continuation.resume(with: .failure(CaptureError.canceled))
+            }
+        }
+    }
+    
+    enum CaptureError: Error, LocalizedError, CustomStringConvertible {
+        case canceled
+        
+        public var errorDescription: String? {
+            switch self {
+            case .canceled:
+                return "canceled：取消拍照"
+            }
+        }
+        
+        public var description: String {
+            errorDescription ?? "nil"
+        }
+    }
+}
 #endif

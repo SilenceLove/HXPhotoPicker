@@ -9,22 +9,9 @@
 import UIKit
 
 class EmptyView: UIView {
-    lazy var titleLb: UILabel = {
-        let titleLb = UILabel.init()
-        titleLb.text = "没有照片".localized
-        titleLb.numberOfLines = 0
-        titleLb.textAlignment = .center
-        titleLb.font = UIFont.semiboldPingFang(ofSize: 20)
-        return titleLb
-    }()
-    lazy var subTitleLb: UILabel = {
-        let subTitleLb = UILabel.init()
-        subTitleLb.text = "你可以使用相机拍些照片".localized
-        subTitleLb.numberOfLines = 0
-        subTitleLb.textAlignment = .center
-        subTitleLb.font = UIFont.mediumPingFang(ofSize: 16)
-        return subTitleLb
-    }()
+    private var titleLb: UILabel!
+    private var subTitleLb: UILabel!
+    
     var config: EmptyViewConfiguration? {
         didSet {
             configColor()
@@ -32,11 +19,23 @@ class EmptyView: UIView {
     }
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        titleLb = UILabel()
+        titleLb.text = "没有照片".localized
+        titleLb.numberOfLines = 0
+        titleLb.textAlignment = .center
+        titleLb.font = UIFont.semiboldPingFang(ofSize: 20)
         addSubview(titleLb)
+        
+        subTitleLb = UILabel()
+        subTitleLb.text = "你可以使用相机拍些照片".localized
+        subTitleLb.numberOfLines = 0
+        subTitleLb.textAlignment = .center
+        subTitleLb.font = UIFont.mediumPingFang(ofSize: 16)
         addSubview(subTitleLb)
     }
     
-    func configColor() {
+    private func configColor() {
         titleLb.textColor = PhotoManager.isDark ? config?.titleDarkColor : config?.titleColor
         subTitleLb.textColor = PhotoManager.isDark ? config?.subTitleDarkColor : config?.subTitleColor
     }

@@ -10,52 +10,27 @@ import AVFoundation
 
 #if !targetEnvironment(macCatalyst)
 class CameraManager: NSObject {
-    var config: CameraConfiguration
-    
-    lazy var session: AVCaptureSession = {
-        AVCaptureSession()
-    }()
-    
-    lazy var photoOutput: AVCapturePhotoOutput = {
-        let output = AVCapturePhotoOutput()
-        return output
-    }()
-    
-    var didAddVideoOutput = false
-    let outputQueue: DispatchQueue = DispatchQueue(label: "com.HXPhotoPicker.cameraoutput")
-    lazy var videoOutput: AVCaptureVideoDataOutput = {
-        let videoOutput = AVCaptureVideoDataOutput()
-        videoOutput.videoSettings = [
-            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
-        ]
-        videoOutput.setSampleBufferDelegate(
-            self,
-            queue: outputQueue
-        )
-        videoOutput.alwaysDiscardsLateVideoFrames = true
-        return videoOutput
-    }()
-    var didAddAudioOutput = false
-    lazy var audioOutput: AVCaptureAudioDataOutput = {
-        let audioOutput = AVCaptureAudioDataOutput()
-        audioOutput.setSampleBufferDelegate(
-            self,
-            queue: outputQueue
-        )
-        return audioOutput
-    }()
-    
-    var assetWriter: AVAssetWriter?
-    var assetWriterVideoInput: AVAssetWriterInputPixelBufferAdaptor?
-    var assetWriterAudioInput: AVAssetWriterInput?
+    let config: CameraConfiguration
     
     let sessionQueue: DispatchQueue = .init(
         label: "com.phpicker.sessionQueue",
         qos: .background
     )
+    var session: AVCaptureSession = .init()
+    var photoOutput: AVCapturePhotoOutput = .init()
+    
+    let outputQueue: DispatchQueue = DispatchQueue(label: "com.HXPhotoPicker.cameraoutput")
+    var videoOutput: AVCaptureVideoDataOutput!
+    var audioOutput: AVCaptureAudioDataOutput!
+    
+    var assetWriter: AVAssetWriter?
+    var assetWriterVideoInput: AVAssetWriterInputPixelBufferAdaptor?
+    var assetWriterAudioInput: AVAssetWriterInput?
     
     var activeVideoInput: AVCaptureDeviceInput?
     
+    var didAddVideoOutput = false
+    var didAddAudioOutput = false
     var isRecording: Bool = false
     var flashModeDidChanged: ((AVCaptureDevice.FlashMode) -> Void)?
     var captureDidOutput: ((CVPixelBuffer) -> Void)?
@@ -102,6 +77,22 @@ class CameraManager: NSObject {
         self.photoFilter = .init(photoFilters, index)
         self.videoFilter = .init(videoFilters, index)
         super.init()
+        videoOutput = AVCaptureVideoDataOutput()
+        videoOutput.videoSettings = [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
+        ]
+        videoOutput.setSampleBufferDelegate(
+            self,
+            queue: outputQueue
+        )
+        videoOutput.alwaysDiscardsLateVideoFrames = true
+        
+        audioOutput = AVCaptureAudioDataOutput()
+        audioOutput.setSampleBufferDelegate(
+            self,
+            queue: outputQueue
+        )
+        
         DeviceOrientationHelper.shared.startDeviceOrientationNotifier()
     }
     

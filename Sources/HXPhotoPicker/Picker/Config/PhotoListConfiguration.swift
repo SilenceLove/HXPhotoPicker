@@ -203,7 +203,7 @@ extension PhotoListConfiguration {
         
         /// Allow camera preview
         /// 允许相机预览
-        public var allowPreview: Bool = false
+        public var allowPreview: Bool = true
         
         /// 背景颜色
         public var backgroundColor: UIColor? = "#f1f1f1".hx.color
@@ -252,7 +252,7 @@ extension PhotoListConfiguration {
         
         /// text title
         /// 文字标题
-        public var title: String? = "更多".hx.localized
+        public var title: String? = "更多"
         
         /// title color
         /// 标题颜色
@@ -264,9 +264,11 @@ extension PhotoListConfiguration {
         
         /// title font
         /// 标题字体
-        public var titleFont: UIFont = HXPickerWrapper<UIFont>.mediumPingFang(ofSize: 14)
+        public var titleFont: UIFont
         
-        public init() { }
+        public init() {
+            titleFont = .mediumPingFang(ofSize: 14)
+        }
     }
 }
 
@@ -275,13 +277,16 @@ extension PhotoListConfiguration {
     public struct AssetNumber {
         public var textColor: UIColor = "#333333".hx.color
         public var textDarkColor: UIColor = "#ffffff".hx.color
-        public var textFont: UIFont = HXPickerWrapper<UIFont>.mediumPingFang(ofSize: 15)
+        public var textFont: UIFont
         
         public var filterTitleColor: UIColor = "#555555".hx.color
         public var filterTitleDarkColor: UIColor = "#ffffff".hx.color
-        public var filterContentColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
-        public var filterContentDarkColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
-        public var filterFont: UIFont = .systemFont(ofSize: 13)
-        public init() { }
+        public var filterContentColor: UIColor = .systemBlue
+        public var filterContentDarkColor: UIColor = .systemBlue
+        public var filterFont: UIFont
+        public init() {
+            textFont = .mediumPingFang(ofSize: 15)
+            filterFont = .regularPingFang(ofSize: 13)
+        }
     }
 }

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 class VideoPlayerView: UIView {
     
@@ -14,10 +14,8 @@ class VideoPlayerView: UIView {
         return AVPlayerLayer.self
     }
     
-    lazy var player: AVPlayer = {
-        let player = AVPlayer()
-        return player
-    }()
+    var player: AVPlayer!
+    
     var playerLayer: AVPlayerLayer {
         return layer as! AVPlayerLayer
     }
@@ -25,6 +23,7 @@ class VideoPlayerView: UIView {
     var avAsset: AVAsset?
     
     init() {
+        player = AVPlayer()
         super.init(frame: .zero)
     }
     

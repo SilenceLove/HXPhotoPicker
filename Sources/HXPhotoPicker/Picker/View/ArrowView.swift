@@ -8,25 +8,26 @@
 import UIKit
 
 class ArrowView: UIView {
-    var config: ArrowViewConfiguration
-    lazy var backgroundLayer: CAShapeLayer = {
-        let backgroundLayer = CAShapeLayer.init()
-        backgroundLayer.contentsScale = UIScreen.main.scale
-        return backgroundLayer
-    }()
-    lazy var arrowLayer: CAShapeLayer = {
-        let arrowLayer = CAShapeLayer.init()
-        arrowLayer.contentsScale = UIScreen.main.scale
-        return arrowLayer
-    }()
+    private let config: ArrowViewConfiguration
+    private var backgroundLayer: CAShapeLayer!
+    private var arrowLayer: CAShapeLayer!
+    
     init(frame: CGRect, config: ArrowViewConfiguration) {
         self.config = config
         super.init(frame: frame)
+        initViews()
         drawContent()
         configColor()
     }
     
-    func drawContent() {
+    private func initViews() {
+        arrowLayer = CAShapeLayer()
+        arrowLayer.contentsScale = UIScreen.main.scale
+        backgroundLayer = CAShapeLayer()
+        backgroundLayer.contentsScale = UIScreen.main.scale
+    }
+    
+    private func drawContent() {
         let circlePath = UIBezierPath(
             arcCenter: CGPoint(
                 x: width * 0.5,
@@ -40,7 +41,7 @@ class ArrowView: UIView {
         backgroundLayer.path = circlePath.cgPath
         layer.addSublayer(backgroundLayer)
         
-        let arrowPath = UIBezierPath.init()
+        let arrowPath = UIBezierPath()
         arrowPath.move(to: CGPoint(x: 5, y: 8))
         arrowPath.addLine(to: CGPoint(x: width / 2, y: height - 7))
         arrowPath.addLine(to: CGPoint(x: width - 5, y: 8))
@@ -50,7 +51,7 @@ class ArrowView: UIView {
         layer.addSublayer(arrowLayer)
     }
     
-    func configColor() {
+    private func configColor() {
         backgroundLayer.fillColor = PhotoManager.isDark ?
             config.backgroudDarkColor.cgColor :
             config.backgroundColor.cgColor

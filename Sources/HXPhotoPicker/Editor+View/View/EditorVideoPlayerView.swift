@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 protocol EditorVideoPlayerViewDelegate: AnyObject {
     func playerView(_ playerView: EditorVideoPlayerView, didPlayAt time: CMTime)
@@ -33,10 +33,7 @@ class EditorVideoPlayerView: VideoPlayerView {
     var playbackLikelyToKeepUpObservation: NSKeyValueObservation?
     var videoSize: CGSize = .zero
     
-    lazy var coverImageView: UIImageView = {
-        let imageView = UIImageView.init()
-        return imageView
-    }()
+    var coverImageView: UIImageView!
     
     var volume: CGFloat {
         get {
@@ -98,6 +95,7 @@ class EditorVideoPlayerView: VideoPlayerView {
     override init() {
         super.init()
         playerLayer.videoGravity = .resizeAspectFill
+        coverImageView = UIImageView()
         addSubview(coverImageView)
     }
     var autoPlay: Bool = false

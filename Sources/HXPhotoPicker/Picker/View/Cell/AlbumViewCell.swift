@@ -12,43 +12,17 @@ import Photos
 open class AlbumViewCell: UITableViewCell {
     
     /// 封面图片
-    public lazy var albumCoverView: UIImageView = {
-        let albumCoverView = UIImageView.init()
-        albumCoverView.contentMode = .scaleAspectFill
-        albumCoverView.clipsToBounds = true
-        return albumCoverView
-    }()
-    
+    public var albumCoverView: UIImageView!
     /// 相册名称
-    public lazy var albumNameLb: UILabel = {
-        let albumNameLb = UILabel.init()
-        return albumNameLb
-    }()
-    
+    public var albumNameLb: UILabel!
     /// 相册里的照片数量
-    public lazy var photoCountLb: UILabel = {
-        let photoCountLb = UILabel.init()
-        return photoCountLb
-    }()
-    
+    public var photoCountLb: UILabel!
     /// 底部线
-    public lazy var bottomLineView: UIView = {
-        let bottomLineView = UIView.init()
-        bottomLineView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.15)
-        return bottomLineView
-    }()
-    
+    public var bottomLineView: UIView!
     /// 选中时勾勾的颜色
-    public lazy var tickView: AlbumTickView = {
-        let tickView = AlbumTickView.init(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
-        return tickView
-    }()
-    
+    public var tickView: AlbumTickView!
     /// 选中时的背景视图
-    public lazy var selectedBgView: UIView = {
-        let selectedBgView = UIView.init()
-        return selectedBgView
-    }()
+    public var selectedBgView: UIView!
     
     /// 配置
     public var config: AlbumListConfiguration? {
@@ -80,10 +54,24 @@ open class AlbumViewCell: UITableViewCell {
     public var requestID: PHImageRequestID?
     
     open func initView() {
+        selectedBgView = UIView()
+        
+        albumCoverView = UIImageView()
+        albumCoverView.contentMode = .scaleAspectFill
+        albumCoverView.clipsToBounds = true
         contentView.addSubview(albumCoverView)
+        
+        albumNameLb = UILabel()
         contentView.addSubview(albumNameLb)
+        
+        photoCountLb = UILabel()
         contentView.addSubview(photoCountLb)
+        
+        bottomLineView = UIView()
+        bottomLineView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.15)
         contentView.addSubview(bottomLineView)
+        
+        tickView = AlbumTickView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
         contentView.addSubview(tickView)
     }
     
@@ -172,9 +160,11 @@ open class AlbumViewCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         initView()
     }
+    
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     deinit {
         cancelRequest()
     }

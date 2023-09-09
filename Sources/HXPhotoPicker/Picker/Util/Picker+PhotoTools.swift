@@ -285,7 +285,6 @@ extension PhotoTools {
     ) -> PickerConfiguration {
         // swiftlint:enable function_body_length
         var config = PickerConfiguration()
-        PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
         if isMoment {
             config.maximumSelectedCount = 9
             config.maximumSelectedVideoCount = 1
@@ -409,6 +408,8 @@ extension PhotoTools {
         #endif
         
         config.notAuthorized.closeButtonImageName = "hx_picker_notAuthorized_close_dark"
+        config.notAuthorized.closeButtonColor = nil
+        config.notAuthorized.closeButtonDarkColor = nil
         config.notAuthorized.backgroundColor = "#2E2F30".color
         config.notAuthorized.titleColor = .white
         config.notAuthorized.subTitleColor = .white

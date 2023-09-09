@@ -47,9 +47,9 @@ public extension AssetManager {
         options: PHFetchOptions?,
         usingBlock: @escaping (PHAssetCollection, Int, UnsafeMutablePointer<ObjCBool>) -> Void
     ) {
-        let smartAlbums = fetchSmartAlbums(options: nil)
-        let userAlbums = fetchUserAlbums(options: nil)
-        let albums = [smartAlbums, userAlbums]
+        let smartAlbums: PHFetchResult<PHAssetCollection> = fetchSmartAlbums(options: nil)
+        let userAlbums: PHFetchResult<PHAssetCollection> = fetchUserAlbums(options: nil)
+        let albums: [PHFetchResult<PHAssetCollection>] = [smartAlbums, userAlbums]
         var stopAblums: Bool = false
         for result in albums {
             result.enumerateObjects { (collection, index, stop) in
@@ -81,7 +81,7 @@ public extension AssetManager {
     static func fetchCameraRollAlbum(
         options: PHFetchOptions?
     ) -> PHAssetCollection? {
-        let smartAlbums = fetchSmartAlbums(options: options)
+        let smartAlbums: PHFetchResult<PHAssetCollection> = fetchSmartAlbums(options: options)
         var assetCollection: PHAssetCollection?
         smartAlbums.enumerateObjects { (collection, _, stop) in
             if  !collection.isKind(of: PHAssetCollection.self) ||

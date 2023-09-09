@@ -10,7 +10,7 @@ import Foundation
 import Kingfisher
 #endif
 
-extension URL: HXPickerCompatibleValue {
+extension URL {
     var isGif: Bool {
         absoluteString.hasSuffix("gif") || absoluteString.hasSuffix("GIF")
     }
@@ -33,12 +33,4 @@ extension URL: HXPickerCompatibleValue {
         }
         return fileData.fileType
     }
-}
-
-public extension HXPickerWrapper where Base == URL {
-    #if canImport(Kingfisher)
-    var isCache: Bool {
-        base.isCache
-    }
-    #endif
 }

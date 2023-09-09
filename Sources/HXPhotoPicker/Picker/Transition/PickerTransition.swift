@@ -20,18 +20,16 @@ public enum PickerTransitionType {
 }
 
 class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
-    let type: PickerTransitionType
-    var requestID: PHImageRequestID?
-    lazy var pushImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        return imageView
-    }()
+    private let type: PickerTransitionType
+    private var requestID: PHImageRequestID?
+    private var pushImageView: UIImageView!
     
     init(type: PickerTransitionType) {
         self.type = type
         super.init()
+        pushImageView = UIImageView()
+        pushImageView.contentMode = .scaleAspectFill
+        pushImageView.clipsToBounds = true
     }
     
     func transitionDuration(
@@ -186,7 +184,13 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             }else {
                 imageSize = .zero
             }
-            if UIDevice.isPad && photoAsset?.mediaType == .video {
+            let isiOSAppOnMac: Bool
+            if #available(iOS 14.0, *) {
+                isiOSAppOnMac = ProcessInfo.processInfo.isiOSAppOnMac
+            } else {
+                isiOSAppOnMac = false
+            }
+            if UIDevice.isPad && photoAsset?.mediaType == .video && !isiOSAppOnMac {
                 rect = PhotoTools.transformImageSize(
                     imageSize,
                     toViewSize: toVC.view.size,

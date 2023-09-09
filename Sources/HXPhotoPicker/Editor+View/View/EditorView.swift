@@ -119,17 +119,8 @@ open class EditorView: UIScrollView {
     var reloadContent: Bool = false
     var operates: [Operate] = []
     var reloadOperates: [Operate] = []
-    
-    // MARK: views
-    lazy var adjusterView: EditorAdjusterView = {
-        let adjusterView = EditorAdjusterView(maskColor: maskColor)
-        adjusterView.delegate = self
-        adjusterView.setContentInsets = { [weak self] in
-            guard let self = self else { return .zero }
-            return self.editContentInset?(self) ?? .zero
-        }
-        return adjusterView
-    }()
+     
+    var adjusterView: EditorAdjusterView!
     
     // MARK: layoutViews
     open override func layoutSubviews() {
@@ -184,6 +175,12 @@ extension EditorView {
         scrollsToTop = false
         if #available(iOS 11.0, *) {
             contentInsetAdjustmentBehavior = .never
+        }
+        adjusterView = EditorAdjusterView(maskColor: maskColor)
+        adjusterView.delegate = self
+        adjusterView.setContentInsets = { [weak self] in
+            guard let self = self else { return .zero }
+            return self.editContentInset?(self) ?? .zero
         }
         addSubview(adjusterView)
     }

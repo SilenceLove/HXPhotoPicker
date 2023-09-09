@@ -1,39 +1,39 @@
 PODS:
-  - HXPhotoPicker (4.0.5.1):
-    - HXPhotoPicker/Full (= 4.0.5.1)
-  - HXPhotoPicker/Camera (4.0.5.1):
-    - HXPhotoPicker/Camera/Lite (= 4.0.5.1)
-    - HXPhotoPicker/Camera/Location (= 4.0.5.1)
-  - HXPhotoPicker/Camera/Lite (4.0.5.1):
+  - HXPhotoPicker (4.0.6):
+    - HXPhotoPicker/Full (= 4.0.6)
+  - HXPhotoPicker/Camera (4.0.6):
+    - HXPhotoPicker/Camera/Lite (= 4.0.6)
+    - HXPhotoPicker/Camera/Location (= 4.0.6)
+  - HXPhotoPicker/Camera/Lite (4.0.6):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Camera/Location (4.0.5.1):
+  - HXPhotoPicker/Camera/Location (4.0.6):
     - HXPhotoPicker/Camera/Lite
-  - HXPhotoPicker/Core (4.0.5.1)
-  - HXPhotoPicker/Editor (4.0.5.1):
-    - HXPhotoPicker/Editor/KF (= 4.0.5.1)
-    - HXPhotoPicker/Editor/Lite (= 4.0.5.1)
-  - HXPhotoPicker/Editor/KF (4.0.5.1):
+  - HXPhotoPicker/Core (4.0.6)
+  - HXPhotoPicker/Editor (4.0.6):
+    - HXPhotoPicker/Editor/KF (= 4.0.6)
+    - HXPhotoPicker/Editor/Lite (= 4.0.6)
+  - HXPhotoPicker/Editor/KF (4.0.6):
     - HXPhotoPicker/Editor/Lite
     - HXPhotoPicker/EditorView/KF
     - Kingfisher (~> 7.0)
-  - HXPhotoPicker/Editor/Lite (4.0.5.1):
+  - HXPhotoPicker/Editor/Lite (4.0.6):
     - HXPhotoPicker/EditorView/Lite
-  - HXPhotoPicker/EditorView/KF (4.0.5.1):
+  - HXPhotoPicker/EditorView/KF (4.0.6):
     - HXPhotoPicker/EditorView/Lite
     - Kingfisher (~> 7.0)
-  - HXPhotoPicker/EditorView/Lite (4.0.5.1):
+  - HXPhotoPicker/EditorView/Lite (4.0.6):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Full (4.0.5.1):
+  - HXPhotoPicker/Full (4.0.6):
     - HXPhotoPicker/Camera
     - HXPhotoPicker/Editor
     - HXPhotoPicker/Picker
-  - HXPhotoPicker/Picker (4.0.5.1):
-    - HXPhotoPicker/Picker/KF (= 4.0.5.1)
-    - HXPhotoPicker/Picker/Lite (= 4.0.5.1)
-  - HXPhotoPicker/Picker/KF (4.0.5.1):
+  - HXPhotoPicker/Picker (4.0.6):
+    - HXPhotoPicker/Picker/KF (= 4.0.6)
+    - HXPhotoPicker/Picker/Lite (= 4.0.6)
+  - HXPhotoPicker/Picker/KF (4.0.6):
     - HXPhotoPicker/Picker/Lite
     - Kingfisher (~> 7.0)
-  - HXPhotoPicker/Picker/Lite (4.0.5.1):
+  - HXPhotoPicker/Picker/Lite (4.0.6):
     - HXPhotoPicker/Core
   - Kingfisher (7.8.0)
 
@@ -49,9 +49,9 @@ EXTERNAL SOURCES:
     :path: "./"
 
 SPEC CHECKSUMS:
-  HXPhotoPicker: c95ecd3a043a315cc56f9c7a8ef7782ca3544c80
+  HXPhotoPicker: dab0b577d709879b3873f2ccd74ae821a45eabf3
   Kingfisher: 0656e1b064bfc1ca1cd04e033f617a86559696e9
 
-PODFILE CHECKSUM: 576bacf77cf4ff94e5d1c0f663045b965805de0a
+PODFILE CHECKSUM: bce73e7448d2f51f15368a69060f888ab3a91e03
 
 COCOAPODS: 1.12.1

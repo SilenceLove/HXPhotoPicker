@@ -102,7 +102,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.0.5"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.0.6"))
 ]
 ```
 
@@ -169,7 +169,7 @@ class ViewController: UIViewController {
         // 方法一：async/await
         let images: [UIImage] = try await Photo.picker(config)
         let urls: [URL] = try await Photo.picker(config)
-        let results: [AssetURLResult] = try await Photo.picker(config)
+        let urlResult: [AssetURLResult] = try await Photo.picker(config)
         
         let pickerResult = try await Photo.picker(config)
         let images: [UIImage] = try await pickerResult.objects()
@@ -247,7 +247,7 @@ extension ViewController: PhotoPickerControllerDelegate {
 // compression: 压缩参数，不传则不压缩 
 let image: UIImage = try await photoAsset.object(compression)
 
-/// compressionQuality: 压缩参数，不传则不压缩 
+// compressionQuality: 压缩参数，不传则不压缩 
 photoAsset.getImage(compressionQuality: compressionQuality) { image in
     print(image)
 }
@@ -259,9 +259,9 @@ photoAsset.getImage(compressionQuality: compressionQuality) { image in
 // async/await 
 // compression: 压缩参数，不传则不压缩 
 let url: URL = try await photoAsset.object(compression)
-let result: AssetURLResult = try await photoAsset.object(compression)
+let urlResult: AssetURLResult = try await photoAsset.object(compression)
 
-/// compression: 压缩参数，不传则不压缩
+// compression: 压缩参数，不传则不压缩
 photoAsset.getURL(compression: compression) { result in
     switch result {
     case .success(let urlResult):
@@ -298,6 +298,7 @@ photoAsset.getURL(compression: compression) { result in
 
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v4.0.6](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#406) | 2023-09-09 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.5](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#405) | 2023-08-12 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.4](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#404) | 2023-07-30 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.3](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#403) | 2023-07-06 | 14.3.0 | 5.7.0 | 12.0+ |

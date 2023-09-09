@@ -15,6 +15,8 @@ extension EditorViewController {
         if let selectedTool = selectedTool {
             switch selectedTool.type {
             case .cropSize:
+                scaleSwitchSelectType = finishScaleSwitchSelectType
+                rotateScaleView.stopScroll()
                 if config.isFixedCropSizeState {
                     backClick(true)
                     return
@@ -59,7 +61,9 @@ extension EditorViewController {
         if let selectedTool = selectedTool {
             switch selectedTool.type {
             case .cropSize:
+                rotateScaleView.stopScroll()
                 finishScaleAngle = rotateScaleView.angle
+                finishScaleSwitchSelectType = scaleSwitchSelectType
                 if !config.cropSize.aspectRatios.isEmpty {
                     finishRatioIndex = ratioToolView.selectedIndex
                 }
@@ -103,7 +107,9 @@ extension EditorViewController {
         lastScaleAngle = 0
         rotateScaleView.reset()
         if !config.cropSize.aspectRatios.isEmpty {
+            scaleSwitchSelectType = nil
             ratioToolView.scrollToFree(animated: true)
+            hideScaleSwitchView(true)
         }
         button.isEnabled = false
     }
@@ -150,6 +156,38 @@ extension EditorViewController {
             }else {
                 finishButton.isEnabled = true
             }
+        }
+    }
+    
+    @objc
+    func didScaleSwitchLeftBtn(button: UIButton) {
+        if !button.isSelected {
+            button.isSelected = true
+            scaleSwitchRightBtn.isSelected = false
+            let ratio = editorView.originalAspectRatio
+            if ratio.width > ratio.height {
+                editorView.setAspectRatio(.init(width: ratio.height, height: ratio.width), animated: true)
+            }else {
+                editorView.setAspectRatio(ratio, animated: true)
+            }
+            resetButton.isEnabled = isReset
+            scaleSwitchSelectType = 0
+        }
+    }
+    
+    @objc
+    func didScaleSwitchRightBtn(button: UIButton) {
+        if !button.isSelected {
+            button.isSelected = true
+            scaleSwitchLeftBtn.isSelected = false
+            let ratio = editorView.originalAspectRatio
+            if ratio.width > ratio.height {
+                editorView.setAspectRatio(ratio, animated: true)
+            }else {
+                editorView.setAspectRatio(.init(width: ratio.height, height: ratio.width), animated: true)
+            }
+            resetButton.isEnabled = isReset
+            scaleSwitchSelectType = 1
         }
     }
 }

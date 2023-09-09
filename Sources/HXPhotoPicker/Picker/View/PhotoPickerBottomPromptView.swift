@@ -16,31 +16,28 @@ class PhotoPickerBottomPromptView: UIToolbar {
         initView()
     }
     
-    lazy var promptLb: UILabel = {
-        let promptLb = UILabel.init(frame: CGRect(x: 0, y: 0, width: 0, height: 60))
+    private var promptLb: UILabel!
+    private var promptIcon: UIImageView!
+    private var promptArrow: UIImageView!
+    
+    private func initView() {
+        let promptIconImage = UIImage.image(for: "hx_picker_photolist_bottom_prompt")?.withRenderingMode(.alwaysTemplate)
+        promptIcon = UIImageView(image: promptIconImage)
+        promptIcon.size = promptIcon.image?.size ?? CGSize.zero
+        addSubview(promptIcon)
+        
+        promptLb = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 60))
         promptLb.text = "无法访问相册中所有照片，\n请允许访问「照片」中的「所有照片」".localized
-        promptLb.font = UIFont.systemFont(ofSize: 15)
+        promptLb.font = .systemFont(ofSize: 15)
         promptLb.numberOfLines = 0
         promptLb.adjustsFontSizeToFitWidth = true
-        return promptLb
-    }()
-    lazy var promptIcon: UIImageView = {
-        let image = UIImage.image(for: "hx_picker_photolist_bottom_prompt")?.withRenderingMode(.alwaysTemplate)
-        let promptIcon = UIImageView.init(image: image)
-        promptIcon.size = promptIcon.image?.size ?? CGSize.zero
-        return promptIcon
-    }()
-    lazy var promptArrow: UIImageView = {
-        let image = UIImage.image(for: "hx_picker_photolist_bottom_prompt_arrow")?.withRenderingMode(.alwaysTemplate)
-        let promptArrow = UIImageView.init(image: image)
-        promptArrow.size = promptArrow.image?.size ?? CGSize.zero
-        return promptArrow
-    }()
-    
-    func initView() {
-        addSubview(promptIcon)
         addSubview(promptLb)
+        
+        let promptArrowImage = UIImage.image(for: "hx_picker_photolist_bottom_prompt_arrow")?.withRenderingMode(.alwaysTemplate)
+        promptArrow = UIImageView(image: promptArrowImage)
+        promptArrow.size = promptArrow.image?.size ?? CGSize.zero
         addSubview(promptArrow)
+        
         addGestureRecognizer(
             UITapGestureRecognizer(
                 target: self,
@@ -51,11 +48,11 @@ class PhotoPickerBottomPromptView: UIToolbar {
     }
     
     @objc
-    func didPromptViewClick() {
+    private func didPromptViewClick() {
         PhotoTools.openSettingsURL()
     }
     
-    func configColor() {
+    private func configColor() {
         if PhotoManager.isDark {
             backgroundColor = config.backgroundDarkColor
             barTintColor = config.barTintDarkColor

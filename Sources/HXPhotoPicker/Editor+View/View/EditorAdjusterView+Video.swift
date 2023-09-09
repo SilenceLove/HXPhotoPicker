@@ -83,7 +83,7 @@ extension EditorAdjusterView {
         completion: @escaping (Result<VideoEditedResult, EditorError>) -> Void
     ) {
         // swiftlint:enable function_body_length
-        if !DispatchQueue.isMain {
+        if !Thread.isMainThread {
             DispatchQueue.main.async {
                 self.cropVideo(
                     factor: factor,

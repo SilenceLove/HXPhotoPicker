@@ -31,77 +31,15 @@ protocol EditorChartletViewControllerDelegate: AnyObject {
 class EditorChartletViewController: BaseViewController {
     
     weak var delegate: EditorChartletViewControllerDelegate?
-    lazy var loadingView: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .white)
-        view.hidesWhenStopped = true
-        return view
-    }()
-    lazy var titleBgView: UIVisualEffectView = {
-        let effect = UIBlurEffect(style: .dark)
-        let view = UIVisualEffectView(effect: effect)
-        return view
-    }()
-    lazy var bgView: UIVisualEffectView = {
-        let effect = UIBlurEffect(style: .dark)
-        let view = UIVisualEffectView(effect: effect)
-        return view
-    }()
-    lazy var backButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.tintColor = .white
-        button.setImage("hx_photo_edit_pull_down".image, for: .normal)
-        button.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
-        return button
-    }()
-    @objc func didBackButtonClick() {
-        dismiss(animated: true)
-    }
-    lazy var titleFlowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.scrollDirection = .horizontal
-        flowLayout.minimumLineSpacing = 15
-        flowLayout.minimumInteritemSpacing = 0
-        return flowLayout
-    }()
-    lazy var titleView: UICollectionView = {
-        let view = UICollectionView(frame: .zero, collectionViewLayout: titleFlowLayout)
-        view.backgroundColor = .clear
-        view.dataSource = self
-        view.delegate = self
-        view.showsVerticalScrollIndicator = false
-        view.showsHorizontalScrollIndicator = false
-        if #available(iOS 11.0, *) {
-            view.contentInsetAdjustmentBehavior = .never
-        }
-        view.register(EditorChartletViewCell.self, forCellWithReuseIdentifier: "EditorChartletViewCellTitleID")
-        return view
-    }()
+    private var loadingView: UIActivityIndicatorView!
+    private var titleBgView: UIVisualEffectView!
+    private var bgView: UIVisualEffectView!
+    private var backButton: UIButton!
+    private var titleFlowLayout: UICollectionViewFlowLayout!
+    private var titleView: UICollectionView!
+    private var listFlowLayout: UICollectionViewFlowLayout!
+    private var listView: UICollectionView!
     
-    lazy var listFlowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.scrollDirection = .horizontal
-        flowLayout.minimumLineSpacing = 0
-        flowLayout.minimumInteritemSpacing = 0
-        return flowLayout
-    }()
-    
-    lazy var listView: UICollectionView = {
-        let view = UICollectionView.init(frame: .zero, collectionViewLayout: listFlowLayout)
-        view.backgroundColor = .clear
-        view.dataSource = self
-        view.delegate = self
-        view.showsVerticalScrollIndicator = false
-        view.showsHorizontalScrollIndicator = false
-        view.isPagingEnabled = true
-        if #available(iOS 11.0, *) {
-            view.contentInsetAdjustmentBehavior = .never
-        }
-        view.register(EditorChartletViewListCell.self, forCellWithReuseIdentifier: "EditorChartletViewListCell_ID")
-        
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressClick(longPress:)))
-        view.addGestureRecognizer(longPress)
-        return view
-    }()
     var editorType: EditorContentViewType
     var previewView: EditorChartletPreviewView?
     var previewIndex: Int = -1
@@ -118,6 +56,7 @@ class EditorChartletViewController: BaseViewController {
         self.config = editorConfig.chartlet
         self.editorType = editorType
         super.init(nibName: nil, bundle: nil)
+        initViews()
     }
     
     override func viewDidLoad() {
@@ -130,6 +69,61 @@ class EditorChartletViewController: BaseViewController {
         view.addSubview(titleView)
         view.addSubview(backButton)
         view.addSubview(loadingView)
+    }
+    
+    private func initViews() {
+        loadingView = UIActivityIndicatorView(style: .white)
+        loadingView.hidesWhenStopped = true
+        
+        let effect = UIBlurEffect(style: .dark)
+        titleBgView = UIVisualEffectView(effect: effect)
+        bgView = UIVisualEffectView(effect: effect)
+        
+        backButton = UIButton(type: .system)
+        backButton.tintColor = .white
+        backButton.setImage("hx_photo_edit_pull_down".image, for: .normal)
+        backButton.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
+        
+        titleFlowLayout = UICollectionViewFlowLayout()
+        titleFlowLayout.scrollDirection = .horizontal
+        titleFlowLayout.minimumLineSpacing = 15
+        titleFlowLayout.minimumInteritemSpacing = 0
+        
+        titleView = UICollectionView(frame: .zero, collectionViewLayout: titleFlowLayout)
+        titleView.backgroundColor = .clear
+        titleView.dataSource = self
+        titleView.delegate = self
+        titleView.showsVerticalScrollIndicator = false
+        titleView.showsHorizontalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            titleView.contentInsetAdjustmentBehavior = .never
+        }
+        titleView.register(EditorChartletViewCell.self, forCellWithReuseIdentifier: "EditorChartletViewCellTitleID")
+        
+        listFlowLayout = UICollectionViewFlowLayout()
+        listFlowLayout.scrollDirection = .horizontal
+        listFlowLayout.minimumLineSpacing = 0
+        listFlowLayout.minimumInteritemSpacing = 0
+        
+        listView = UICollectionView.init(frame: .zero, collectionViewLayout: listFlowLayout)
+        listView.backgroundColor = .clear
+        listView.dataSource = self
+        listView.delegate = self
+        listView.showsVerticalScrollIndicator = false
+        listView.showsHorizontalScrollIndicator = false
+        listView.isPagingEnabled = true
+        if #available(iOS 11.0, *) {
+            listView.contentInsetAdjustmentBehavior = .never
+        }
+        listView.register(EditorChartletViewListCell.self, forCellWithReuseIdentifier: "EditorChartletViewListCell_ID")
+        
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressClick(longPress:)))
+        listView.addGestureRecognizer(longPress)
+    }
+    
+    @objc
+    private func didBackButtonClick() {
+        dismiss(animated: true)
     }
     
     func setupTitles(_ titleChartlets: [EditorChartlet]) {

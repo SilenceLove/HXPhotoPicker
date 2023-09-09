@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 #if canImport(Kingfisher)
 import Kingfisher
 #endif
@@ -24,6 +24,7 @@ extension EditorViewController {
         initAssetType(asset.type)
     }
     func initAssetType(_ type: EditorAsset.`Type`) {
+        let viewSize = UIDevice.screenSize
         switch type {
         case .image(let image):
             if !isTransitionCompletion {
@@ -32,7 +33,7 @@ extension EditorViewController {
             }
             editorView.setImage(image)
             DispatchQueue.global().async {
-                self.loadThumbnailImage(image)
+                self.loadThumbnailImage(image, viewSize: viewSize)
             }
             loadCompletion()
             loadLastEditedData()
@@ -44,7 +45,7 @@ extension EditorViewController {
             editorView.setImageData(imageData)
             let image = self.editorView.image
             DispatchQueue.global().async {
-                self.loadThumbnailImage(image)
+                self.loadThumbnailImage(image, viewSize: viewSize)
             }
             loadCompletion()
             loadLastEditedData()
@@ -549,8 +550,9 @@ extension EditorViewController {
                 self.editorView.setImage(image)
                 self.loadCompletion()
                 self.loadLastEditedData()
+                let viewSize = UIDevice.screenSize
                 DispatchQueue.global().async {
-                    self.loadThumbnailImage(image)
+                    self.loadThumbnailImage(image, viewSize: viewSize)
                 }
                 ProgressHUD.hide(forView: self.view, animated: true)
             }else {
@@ -598,6 +600,7 @@ extension EditorViewController {
         if isTransitionCompletion {
             ProgressHUD.showLoading(addedTo: view, animated: true)
         }
+        let viewSize = UIDevice.screenSize
         DispatchQueue.global().async {
             if photoAsset.mediaType == .photo {
                 var image: UIImage?
@@ -642,7 +645,7 @@ extension EditorViewController {
                         self.loadCompletion()
                         self.loadLastEditedData()
                         DispatchQueue.global().async {
-                            self.loadThumbnailImage(image)
+                            self.loadThumbnailImage(image, viewSize: viewSize)
                         }
                     }else {
                         if !self.isTransitionCompletion {
@@ -663,8 +666,9 @@ extension EditorViewController {
                     self.editorView.setImage(image)
                     self.loadCompletion()
                     self.loadLastEditedData()
+                    let viewSize = UIDevice.screenSize
                     DispatchQueue.global().async {
-                        self.loadThumbnailImage(image)
+                        self.loadThumbnailImage(image, viewSize: viewSize)
                     }
                     ProgressHUD.hide(forView: self.view, animated: true)
                 }
@@ -700,8 +704,9 @@ extension EditorViewController {
                 self.editorView.setImage(image)
                 self.loadCompletion()
                 self.loadLastEditedData()
+                let viewSize = UIDevice.screenSize
                 DispatchQueue.global().async {
-                    self.loadThumbnailImage(image)
+                    self.loadThumbnailImage(image, viewSize: viewSize)
                 }
             }else {
                 if !self.isTransitionCompletion {
@@ -758,8 +763,9 @@ extension EditorViewController {
                         self.editorView.setImage(image)
                         self.loadCompletion()
                         self.loadLastEditedData()
+                        let viewSize = UIDevice.screenSize
                         DispatchQueue.global().async {
-                            self.loadThumbnailImage(image)
+                            self.loadThumbnailImage(image, viewSize: viewSize)
                         }
                         ProgressHUD.hide(forView: self.view, animated: true)
                     }
@@ -802,8 +808,9 @@ extension EditorViewController {
                             self.editorView.setImageData(imageData)
                             self.loadCompletion()
                             self.loadLastEditedData()
+                            let viewSize = UIDevice.screenSize
                             DispatchQueue.global().async {
-                                self.loadThumbnailImage(.init(contentsOfFile: imageURL.path))
+                                self.loadThumbnailImage(.init(contentsOfFile: imageURL.path), viewSize: viewSize)
                             }
                             ProgressHUD.hide(forView: self.view, animated: true)
                         }
@@ -819,8 +826,9 @@ extension EditorViewController {
                             self.editorView.setImage(image)
                             self.loadCompletion()
                             self.loadLastEditedData()
+                            let viewSize = UIDevice.screenSize
                             DispatchQueue.global().async {
-                                self.loadThumbnailImage(image)
+                                self.loadThumbnailImage(image, viewSize: viewSize)
                             }
                             ProgressHUD.hide(forView: self.view, animated: true)
                         }
@@ -900,12 +908,12 @@ extension EditorViewController {
         view.bringSubviewToFront(filterParameterView)
     }
     
-    func loadThumbnailImage(_ image: UIImage?) {
+    func loadThumbnailImage(_ image: UIImage?, viewSize: CGSize) {
         guard let image = image else {
             selectedThumbnailImage = selectedOriginalImage
             return
         }
-        var maxSize: CGFloat = max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+        var maxSize: CGFloat = max(viewSize.width, viewSize.height)
         DispatchQueue.main.sync {
             if !view.size.equalTo(.zero) {
                 maxSize = min(view.width, view.height) * 2

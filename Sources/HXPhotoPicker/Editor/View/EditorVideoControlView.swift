@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 protocol EditorVideoControlViewDelegate: AnyObject {
     func controlView(_ controlView: EditorVideoControlView, didPlayAt isSelected: Bool)
@@ -28,21 +28,25 @@ class EditorVideoControlView: UIView {
     weak var delegate: EditorVideoControlViewDelegate?
     let config: EditorConfiguration.Video.CropTime
     
-    lazy var playView: UIVisualEffectView = {
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        view.contentView.addSubview(playButton)
-        view.layer.cornerRadius = 4
-        view.layer.masksToBounds = true
-        return view
-    }()
-    
-    lazy var playButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage("hx_editor_video_control_play".image, for: .normal)
-        button.setImage("hx_editor_video_control_pause".image, for: .selected)
-        button.addTarget(self, action: #selector(didPlayButtonClick), for: .touchUpInside)
-        return button
-    }()
+    private var playView: UIVisualEffectView!
+    private var playButton: UIButton!
+    private var frameMaskView: EditorVideoControlMaskView!
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var bgView: UIVisualEffectView!
+    private var collectionView: UICollectionView!
+    private var beginLineFrame: CGRect = .zero
+    private var progressLineView: UIView!
+    private var currentLineView: UIView!
+    private var currentTimeView: UIVisualEffectView!
+    private var currentTimeLb: UILabel!
+    private var startLineView: UIView!
+    private var endLineView: UIView!
+    private var startTimeView: UIVisualEffectView!
+    private var startTimeLb: UILabel!
+    private var endTimeView: UIVisualEffectView!
+    private var endTimeLb: UILabel!
+    private var totalTimeView: UIVisualEffectView!
+    private var totalTimeLb: UILabel!
     
     var isPlaying: Bool {
         get {
@@ -58,45 +62,18 @@ class EditorVideoControlView: UIView {
         }
     }
     
-    @objc
-    func didPlayButtonClick() {
-        playButton.isSelected = !playButton.isSelected
-        delegate?.controlView(self, didPlayAt: playButton.isSelected)
-        if playButton.isSelected {
-            startLineAnimation()
-        }else {
-            stopLineAnimation()
-        }
+    init(config: EditorConfiguration.Video.CropTime) {
+        self.config = config
+        super.init(frame: .zero)
+        initViews()
     }
     
-    lazy var frameMaskView: EditorVideoControlMaskView = {
-        let frameMaskView = EditorVideoControlMaskView()
-        frameMaskView.frameHighlightedColor = config.frameHighlightedColor
-        frameMaskView.arrowNormalColor = config.arrowNormalColor
-        frameMaskView.arrowHighlightedColor = config.arrowHighlightedColor
-        frameMaskView.delegate = self
-        return frameMaskView
-    }()
-    
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
+    private func initViews() {
+        flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal
         flowLayout.minimumLineSpacing = 0
         flowLayout.minimumInteritemSpacing = 0
-        return flowLayout
-    }()
-    
-    lazy var bgView: UIVisualEffectView = {
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        view.contentView.addSubview(collectionView)
-        view.contentView.addSubview(frameMaskView)
-        view.layer.cornerRadius = 4
-        view.layer.masksToBounds = true
-        return view
-    }()
-    
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -109,151 +86,177 @@ class EditorVideoControlView: UIView {
             EditorVideoControlViewCell.self,
             forCellWithReuseIdentifier: "EditorVideoControlViewCellID"
         )
-        return collectionView
-    }()
-    
-    var beginLineFrame: CGRect = .zero
-    lazy var progressLineView: UIView = {
-        let lineView = UIView()
-        lineView.backgroundColor = .white
+        
+        frameMaskView = EditorVideoControlMaskView()
+        frameMaskView.frameHighlightedColor = config.frameHighlightedColor
+        frameMaskView.arrowNormalColor = config.arrowNormalColor
+        frameMaskView.arrowHighlightedColor = config.arrowHighlightedColor
+        frameMaskView.delegate = self
+        
+        bgView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        bgView.contentView.addSubview(collectionView)
+        bgView.contentView.addSubview(frameMaskView)
+        bgView.layer.cornerRadius = 4
+        bgView.layer.masksToBounds = true
+        addSubview(bgView)
+        
+        playButton = UIButton(type: .custom)
+        playButton.setImage("hx_editor_video_control_play".image, for: .normal)
+        playButton.setImage("hx_editor_video_control_pause".image, for: .selected)
+        playButton.addTarget(self, action: #selector(didPlayButtonClick), for: .touchUpInside)
+        playView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        playView.contentView.addSubview(playButton)
+        playView.layer.cornerRadius = 4
+        playView.layer.masksToBounds = true
+        addSubview(playView)
+        
+        progressLineView = UIView()
+        progressLineView.backgroundColor = .white
         if #available(iOS 11.0, *) {
-            lineView.cornersRound(radius: 2, corner: .allCorners)
+            progressLineView.cornersRound(radius: 2, corner: .allCorners)
         }
-        lineView.layer.borderColor = UIColor.black.cgColor
-        lineView.layer.borderWidth = 0.25
-        lineView.alpha = 0
-        lineView.addGestureRecognizer(
+        progressLineView.layer.borderColor = UIColor.black.cgColor
+        progressLineView.layer.borderWidth = 0.25
+        progressLineView.alpha = 0
+        progressLineView.addGestureRecognizer(
             PhotoPanGestureRecognizer(
                 target: self,
                 action: #selector(progressLinePanGestureClick(pan:))
             )
         )
-        return lineView
-    }()
-     
-    lazy var currentLineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.size = .init(width: 1, height: 10)
-        view.cornersRound(radius: 0.5, corner: .allCorners)
-        view.alpha = 0
-        return view
-    }()
-    
-    lazy var currentTimeView: UIVisualEffectView = {
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        view.contentView.addSubview(currentTimeLb)
-        view.layer.cornerRadius = 4
-        view.layer.masksToBounds = true
-        view.alpha = 0
-        return view
-    }()
-    
-    lazy var currentTimeLb: UILabel = {
-        let currentTimeLb = UILabel()
-        currentTimeLb.font = .systemFont(ofSize: 12)
-        currentTimeLb.textColor = .white
-        return currentTimeLb
-    }()
-    
-    lazy var startLineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.size = .init(width: 1, height: 10)
-        view.cornersRound(radius: 0.5, corner: .allCorners)
-        view.alpha = 0
-        return view
-    }()
-    
-    lazy var endLineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.size = .init(width: 1, height: 10)
-        view.cornersRound(radius: 0.5, corner: .allCorners)
-        view.alpha = 0
-        return view
-    }()
-    
-    lazy var startTimeView: UIVisualEffectView = {
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        view.contentView.addSubview(startTimeLb)
-        view.layer.cornerRadius = 4
-        view.layer.masksToBounds = true
-        view.alpha = 0
-        return view
-    }()
-    
-    lazy var startTimeLb: UILabel = {
-        let startTimeLb = UILabel()
+        addSubview(progressLineView)
+        
+        startTimeLb = UILabel()
         startTimeLb.font = .systemFont(ofSize: 12)
         startTimeLb.textColor = .white
-        return startTimeLb
-    }()
-    
-    lazy var endTimeView: UIVisualEffectView = {
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        view.contentView.addSubview(endTimeLb)
-        view.layer.cornerRadius = 4
-        view.layer.masksToBounds = true
-        view.alpha = 0
-        return view
-    }()
-    
-    lazy var endTimeLb: UILabel = {
-        let endTimeLb = UILabel()
+        startTimeView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        startTimeView.contentView.addSubview(startTimeLb)
+        startTimeView.layer.cornerRadius = 4
+        startTimeView.layer.masksToBounds = true
+        startTimeView.alpha = 0
+        addSubview(startTimeView)
+        
+        startLineView = UIView()
+        startLineView.backgroundColor = .white
+        startLineView.size = .init(width: 1, height: 10)
+        startLineView.cornersRound(radius: 0.5, corner: .allCorners)
+        startLineView.alpha = 0
+        addSubview(startLineView)
+        
+        endTimeLb = UILabel()
         endTimeLb.textAlignment = .right
         endTimeLb.font = .systemFont(ofSize: 12)
         endTimeLb.textColor = .white
-        return endTimeLb
-    }()
-    
-    lazy var totalTimeView: UIVisualEffectView = {
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        view.contentView.addSubview(totalTimeLb)
-        view.layer.cornerRadius = 4
-        view.layer.masksToBounds = true
-        view.alpha = 0
-        return view
-    }()
-    
-    lazy var totalTimeLb: UILabel = {
-        let totalTimeLb = UILabel.init()
+        endTimeView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        endTimeView.contentView.addSubview(endTimeLb)
+        endTimeView.layer.cornerRadius = 4
+        endTimeView.layer.masksToBounds = true
+        endTimeView.alpha = 0
+        addSubview(endTimeView)
+        
+        endLineView = UIView()
+        endLineView.backgroundColor = .white
+        endLineView.size = .init(width: 1, height: 10)
+        endLineView.cornersRound(radius: 0.5, corner: .allCorners)
+        endLineView.alpha = 0
+        addSubview(endLineView)
+        
+        currentTimeLb = UILabel()
+        currentTimeLb.font = .systemFont(ofSize: 12)
+        currentTimeLb.textColor = .white
+        currentTimeView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        currentTimeView.contentView.addSubview(currentTimeLb)
+        currentTimeView.layer.cornerRadius = 4
+        currentTimeView.layer.masksToBounds = true
+        currentTimeView.alpha = 0
+        addSubview(currentTimeView)
+        
+        currentLineView = UIView()
+        currentLineView.backgroundColor = .white
+        currentLineView.size = .init(width: 1, height: 10)
+        currentLineView.cornersRound(radius: 0.5, corner: .allCorners)
+        currentLineView.alpha = 0
+        addSubview(currentLineView)
+        
+        totalTimeLb = UILabel.init()
         totalTimeLb.textAlignment = .center
         totalTimeLb.font = .systemFont(ofSize: 12)
         totalTimeLb.textColor = .white
-        return totalTimeLb
-    }()
-    
-    init(config: EditorConfiguration.Video.CropTime) {
-        self.config = config
-        super.init(frame: .zero)
-        addSubview(bgView)
-        addSubview(playView)
-        addSubview(progressLineView)
-        addSubview(startTimeView)
-        addSubview(startLineView)
-        addSubview(endTimeView)
-        addSubview(endLineView)
-        addSubview(currentTimeView)
-        addSubview(currentLineView)
+        totalTimeView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        totalTimeView.contentView.addSubview(totalTimeLb)
+        totalTimeView.layer.cornerRadius = 4
+        totalTimeView.layer.masksToBounds = true
+        totalTimeView.alpha = 0
         addSubview(totalTimeView)
     }
     
-    let controlWidth: CGFloat = 18
-    var contentWidth: CGFloat = 0
-    var videoFrameCount: Int = 0
+    @objc
+    private func didPlayButtonClick() {
+        playButton.isSelected = !playButton.isSelected
+        delegate?.controlView(self, didPlayAt: playButton.isSelected)
+        if playButton.isSelected {
+            startLineAnimation()
+        }else {
+            stopLineAnimation()
+        }
+    }
     
-    lazy var videoFrameMap: [Int: CGImage] = [:]
+    private let controlWidth: CGFloat = 18
+    private var contentWidth: CGFloat = 0
+    private var videoFrameCount: Int = 0
+    
+    private var videoFrameMap: [Int: CGImage] = [:]
     var videoSize: CGSize = .zero
     /// 一个item代表多少秒
-    var interval: CGFloat = -1
-    var itemWidth: CGFloat = 0
-    var imageGenerator: AVAssetImageGenerator?
-    var assetDuration: TimeInterval = 0
-    
-    weak var timeLabelsTimer: Timer?
-    
-    var avAsset: AVAsset?
+    private var interval: CGFloat = -1
+    private var itemWidth: CGFloat = 0
+    private var imageGenerator: AVAssetImageGenerator?
+    private var assetDuration: TimeInterval = 0
+    private weak var timeLabelsTimer: Timer?
+    private var avAsset: AVAsset?
+    private var margin: CGFloat {
+        var leftMargin: CGFloat = 15 + UIDevice.leftMargin
+        var rightMargin: CGFloat = UIDevice.rightMargin + 15
+        if (width - leftMargin - rightMargin) > 450 {
+            let maxWidth = max(width * 0.5, 450)
+            leftMargin = (width - maxWidth) * 0.5
+            rightMargin = leftMargin
+        }
+        return leftMargin - UIDevice.leftMargin
+    }
+    private var bgWidth: CGFloat {
+        if UIDevice.isPortrait {
+            return width - UIDevice.rightMargin - margin - (margin + UIDevice.leftMargin + playWidth) - 1
+        }else {
+            return width - UIDevice.rightMargin - margin - (margin + UIDevice.leftMargin + playWidth) - 1
+        }
+    }
+    private var isBeginScrolling: Bool = false
+    private var isFirstLoad: Bool = true
+    private var playWidth: CGFloat {
+        if UIDevice.isPortrait {
+            return height
+        }else {
+            return height * 1.5
+        }
+    }
+    var currentDuration: Double {
+        let lineFrame = progressLineView.layer.presentation()?.frame ?? progressLineView.frame
+        let scale = (
+            lineFrame.minX - bgView.x - frameMaskView.validRect.minX
+        ) / (
+            frameMaskView.validRect.width - lineFrame.width
+        )
+        let totalDuration = endDuration - startDuration
+        let time = startDuration + totalDuration * scale
+        return time
+    }
+    private var currentTime: CMTime {
+        CMTimeMakeWithSeconds(
+            Float64(currentDuration),
+            preferredTimescale: 1000
+        )
+    }
     
     func loadData(_ avAsset: AVAsset) {
         self.avAsset = avAsset
@@ -382,37 +385,6 @@ class EditorVideoControlView: UIView {
         loadVideoFrame(avAsset)
     }
     
-    var isFirstLoad: Bool = true
-    
-    var playWidth: CGFloat {
-        if UIDevice.isPortrait {
-            return height
-        }else {
-            return height * 1.5
-        }
-    }
-    
-    var margin: CGFloat {
-        var leftMargin: CGFloat = 15 + UIDevice.leftMargin
-        var rightMargin: CGFloat = UIDevice.rightMargin + 15
-        if (width - leftMargin - rightMargin) > 450 {
-            let maxWidth = max(width * 0.5, 450)
-            leftMargin = (width - maxWidth) * 0.5
-            rightMargin = leftMargin
-        }
-        return leftMargin - UIDevice.leftMargin
-    }
-    
-    var bgWidth: CGFloat {
-        if UIDevice.isPortrait {
-            return width - UIDevice.rightMargin - margin - (margin + UIDevice.leftMargin + playWidth) - 1
-        }else {
-            return width - UIDevice.rightMargin - margin - (margin + UIDevice.leftMargin + playWidth) - 1
-        }
-    }
-    
-    var isBeginScrolling: Bool = false
-    
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let lineFrame = progressLineView.layer.presentation()?.frame ?? progressLineView.frame
         let rect = lineFrame.inset(by: .init(top: 4, left: 10, bottom: 4, right: 10))
@@ -468,7 +440,7 @@ class EditorVideoControlView: UIView {
 
 extension EditorVideoControlView {
     @objc
-    func progressLinePanGestureClick(pan: UIPanGestureRecognizer) {
+    private func progressLinePanGestureClick(pan: UIPanGestureRecognizer) {
         if isHidden {
             return
         }
@@ -500,23 +472,6 @@ extension EditorVideoControlView {
         default:
             break
         }
-    }
-    var currentDuration: Double {
-        let lineFrame = progressLineView.layer.presentation()?.frame ?? progressLineView.frame
-        let scale = (
-            lineFrame.minX - bgView.x - frameMaskView.validRect.minX
-        ) / (
-            frameMaskView.validRect.width - lineFrame.width
-        )
-        let totalDuration = endDuration - startDuration
-        let time = startDuration + totalDuration * scale
-        return time
-    }
-    var currentTime: CMTime {
-        CMTimeMakeWithSeconds(
-            Float64(currentDuration),
-            preferredTimescale: 1000
-        )
     }
     func updateCurrentTime() {
         currentTimeLb.text = currentDuration.time

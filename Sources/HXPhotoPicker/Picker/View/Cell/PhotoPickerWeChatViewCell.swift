@@ -9,17 +9,15 @@ import UIKit
 
 open class PhotoPickerWeChatViewCell: PhotoPickerSelectableViewCell {
     
-    lazy var titleLb: UILabel = {
-        let titleLb = UILabel()
+    public var titleLb: UILabel!
+    
+    open override func initView() {
+        super.initView()
+        titleLb = UILabel()
         titleLb.textAlignment = .center
         titleLb.textColor = .white
         titleLb.font = .semiboldPingFang(ofSize: 15)
         titleLb.isHidden = true
-        return titleLb
-    }()
-    
-    open override func initView() {
-        super.initView()
         contentView.insertSubview(titleLb, belowSubview: selectControl)
     }
     

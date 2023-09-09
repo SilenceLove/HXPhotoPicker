@@ -13,9 +13,13 @@ extension PhotoPickerController {
     
     func fetchData(status: PHAuthorizationStatus) {
         if status.rawValue >= 3 {
-            PHPhotoLibrary.shared().register(self)
             // 有权限
-            ProgressHUD.showLoading(addedTo: view, afterDelay: 0.15, animated: true)
+            PHPhotoLibrary.shared().register(self)
+            if !PhotoManager.shared.didRegisterObserver {
+                ProgressHUD.showLoading(addedTo: view, animated: true)
+            }else {
+                ProgressHUD.showLoading(addedTo: view, afterDelay: 0.15, animated: true)
+            }
             fetchCameraAssetCollection()
         }else if status.rawValue >= 1 {
             // 无权限

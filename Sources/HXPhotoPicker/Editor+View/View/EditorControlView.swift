@@ -17,54 +17,15 @@ class EditorControlView: UIView {
     
     weak var delegate: EditorControlViewDelegate?
     
-    lazy var topControl: UIView = {
-        let view = UIView()
-        let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
-        view.addGestureRecognizer(pan)
-        return view
-    }()
-    lazy var bottomControl: UIView = {
-        let view = UIView.init()
-        let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
-        view.addGestureRecognizer(pan)
-        return view
-    }()
-    lazy var leftControl: UIView = {
-        let view = UIView.init()
-        let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
-        view.addGestureRecognizer(pan)
-        return view
-    }()
-    lazy var rightControl: UIView = {
-        let view = UIView.init()
-        let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
-        view.addGestureRecognizer(pan)
-        return view
-    }()
-    lazy var leftTopControl: UIView = {
-        let view = UIView.init()
-        let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
-        view.addGestureRecognizer(pan)
-        return view
-    }()
-    lazy var rightTopControl: UIView = {
-        let view = UIView.init()
-        let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
-        view.addGestureRecognizer(pan)
-        return view
-    }()
-    lazy var rightBottomControl: UIView = {
-        let view = UIView.init()
-        let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
-        view.addGestureRecognizer(pan)
-        return view
-    }()
-    lazy var leftBottomControl: UIView = {
-        let view = UIView.init()
-        let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
-        view.addGestureRecognizer(pan)
-        return view
-    }()
+    private var topControl: UIView!
+    private var bottomControl: UIView!
+    private var leftControl: UIView!
+    private var rightControl: UIView!
+    private var leftTopControl: UIView!
+    private var rightTopControl: UIView!
+    private var rightBottomControl: UIView!
+    private var leftBottomControl: UIView!
+    
     var factor: Factor = .init()
     
     var maxSize: CGSize = .init(width: 38, height: 38)
@@ -76,6 +37,7 @@ class EditorControlView: UIView {
     var controls: [ UIGestureRecognizer ] = []
     init() {
         super.init(frame: .zero)
+        initViews()
         addSubview(topControl)
         addSubview(bottomControl)
         addSubview(leftControl)
@@ -93,6 +55,35 @@ class EditorControlView: UIView {
         controls.append(rightTopControl.gestureRecognizers!.first!)
         controls.append(rightBottomControl.gestureRecognizers!.first!)
     }
+    
+    func initViews() {
+        let sel = #selector(panGestureRecognizerHandler(pan:))
+        
+        topControl = UIView()
+        topControl.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: sel))
+        
+        bottomControl = UIView()
+        bottomControl.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: sel))
+        
+        leftControl = UIView()
+        leftControl.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: sel))
+        
+        rightControl = UIView()
+        rightControl.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: sel))
+        
+        leftTopControl = UIView()
+        leftTopControl.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: sel))
+        
+        rightTopControl = UIView()
+        rightTopControl.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: sel))
+        
+        rightBottomControl = UIView()
+        rightBottomControl.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: sel))
+        
+        leftBottomControl = UIView()
+        leftBottomControl.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: sel))
+    }
+    
     
     func changeControl(enabled: Bool, index: Int) {
         for (item, control) in controls.enumerated() where item != index {

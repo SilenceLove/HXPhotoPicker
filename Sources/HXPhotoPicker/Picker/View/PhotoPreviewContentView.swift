@@ -42,37 +42,26 @@ open class PhotoPreviewContentView: UIView {
     }
     public weak var delegate: PhotoPreviewContentViewDelete?
     
-    lazy var imageView: ImageView = {
-        let view = ImageView()
-        view.size = size
-        view.imageView.size = size
-        return view
-    }()
+    var videoView: PhotoPreviewVideoView!
+    var imageView: ImageView!
+    var livePhotoView: PHLivePhotoView!
+    var requestCompletion: Bool = false
     
-    lazy var livePhotoView: PHLivePhotoView = {
-        let livePhotoView = PHLivePhotoView()
-        livePhotoView.delegate = self
-        return livePhotoView
-    }()
+    private var type: `Type` = .photo
+    private var requestID: PHImageRequestID?
+    private var requestNetworkCompletion: Bool = false
+    private var networkVideoLoading: Bool = false
+    private var localLivePhotoRequest: PhotoAsset.LocalLivePhotoRequest?
+    private var imageTask: Any?
+    private var currentLoadAssetLocalIdentifier: String?
     
-    lazy var videoView: PhotoPreviewVideoView = {
-        let videoView = PhotoPreviewVideoView.init()
-        videoView.alpha = 0
-        return videoView
-    }()
+    private var loadingView: ProgressHUD?
+    private var setAnimatedImageCompletion: Bool = false
     
+    var livePhotoPlayType: PhotoPreviewViewController.PlayType = .once
     var livePhotoIsAnimating: Bool = false
-    
     var isBacking: Bool = false
     var isPeek = false
-    
-    var type: `Type` = .photo
-    var requestID: PHImageRequestID?
-    var requestCompletion: Bool = false
-    var requestNetworkCompletion: Bool = false
-    var networkVideoLoading: Bool = false
-    var localLivePhotoRequest: PhotoAsset.LocalLivePhotoRequest?
-    var imageTask: Any?
     var videoPlayType: PhotoPreviewViewController.PlayType = .normal {
         didSet {
             if type == .video {
@@ -80,8 +69,7 @@ open class PhotoPreviewContentView: UIView {
             }
         }
     }
-    var livePhotoPlayType: PhotoPreviewViewController.PlayType = .once
-    var currentLoadAssetLocalIdentifier: String?
+    
     public var photoAsset: PhotoAsset! {
         didSet {
             #if canImport(Kingfisher)
@@ -118,8 +106,8 @@ open class PhotoPreviewContentView: UIView {
             requestID = photoAsset.requestThumbnailImage(
                 localType: .original,
                 targetWidth: min(
-                    UIScreen.main.bounds.width,
-                    UIScreen.main.bounds.height
+                    UIDevice.screenSize.width,
+                    UIDevice.screenSize.height
                 ),
                 completion: { [weak self] (image, asset, info) in
                 guard let self = self else { return }
@@ -129,6 +117,26 @@ open class PhotoPreviewContentView: UIView {
                     self.imageView.image = image
                 }
             })
+        }
+    }
+    
+    init(type: `Type`) {
+        super.init(frame: CGRect.zero)
+        self.type = type
+        imageView = ImageView()
+        imageView.size = size
+        imageView.imageView.size = size
+        addSubview(imageView)
+        if type == .livePhoto {
+            if #available(iOS 9.1, *) {
+                livePhotoView = PHLivePhotoView()
+                livePhotoView.delegate = self
+                addSubview(livePhotoView)
+            }
+        }else if type == .video {
+            videoView = PhotoPreviewVideoView()
+            videoView.alpha = 0
+            addSubview(videoView)
         }
     }
     
@@ -144,23 +152,6 @@ open class PhotoPreviewContentView: UIView {
         let needUpdate = (width / height) != (size.width / size.height)
         if needUpdate {
             delegate?.contentView(updateContentSize: self)
-        }
-    }
-    
-    var loadingView: ProgressHUD?
-    
-    var setAnimatedImageCompletion: Bool = false
-    
-    init(type: `Type`) {
-        super.init(frame: CGRect.zero)
-        self.type = type
-        addSubview(imageView)
-        if type == .livePhoto {
-            if #available(iOS 9.1, *) {
-                addSubview(livePhotoView)
-            }
-        }else if type == .video {
-            addSubview(videoView)
         }
     }
     

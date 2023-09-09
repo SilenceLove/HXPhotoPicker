@@ -8,34 +8,10 @@
 import UIKit
 
 class EditorStickersTrashView: UIView {
-    lazy var bgView: UIVisualEffectView = {
-        let effect = UIBlurEffect(style: .dark)
-        let view = UIVisualEffectView(effect: effect)
-        return view
-    }()
-    
-    lazy var redView: UIView = {
-        let view = UIView()
-        view.isHidden = true
-        view.backgroundColor = "FF5653".color
-        return view
-    }()
-    
-    lazy var imageView: UIImageView = {
-        let imageView = UIImageView(image: "hx_editor_photo_trash_close".image)
-        imageView.size = imageView.image?.size ?? .zero
-        return imageView
-    }()
-    
-    lazy var textLb: UILabel = {
-        let textLb = UILabel()
-        textLb.text = "拖动到此处删除".localized
-        textLb.textColor = .white
-        textLb.textAlignment = .center
-        textLb.font = UIFont.systemFont(ofSize: 14)
-        textLb.adjustsFontSizeToFitWidth = true
-        return textLb
-    }()
+    private var bgView: UIVisualEffectView!
+    private var redView: UIView! 
+    private var imageView: UIImageView!
+    private var textLb: UILabel!
     
     var inArea: Bool = false {
         didSet {
@@ -49,12 +25,32 @@ class EditorStickersTrashView: UIView {
     }
     override init(frame: CGRect) {
         super.init(frame: frame)
+        initViews()
         addSubview(bgView)
         addSubview(redView)
         addSubview(imageView)
         addSubview(textLb)
         layer.cornerRadius = 10
         layer.masksToBounds = true
+    }
+    
+    private func initViews() {
+        let effect = UIBlurEffect(style: .dark)
+        bgView = UIVisualEffectView(effect: effect)
+        
+        redView = UIView()
+        redView.isHidden = true
+        redView.backgroundColor = "FF5653".color
+        
+        imageView = UIImageView(image: "hx_editor_photo_trash_close".image)
+        imageView.size = imageView.image?.size ?? .zero
+        
+        textLb = UILabel()
+        textLb.text = "拖动到此处删除".localized
+        textLb.textColor = .white
+        textLb.textAlignment = .center
+        textLb.font = UIFont.systemFont(ofSize: 14)
+        textLb.adjustsFontSizeToFitWidth = true
     }
     
     override func layoutSubviews() {

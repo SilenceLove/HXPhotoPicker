@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 protocol PhotoPreviewVideoViewDelegate: AnyObject {
     func videoView(startPlay videoView: VideoPlayerView)
@@ -45,8 +45,6 @@ extension PhotoPreviewVideoViewDelegate {
 
 class PhotoPreviewVideoView: VideoPlayerView {
     weak var delegate: PhotoPreviewVideoViewDelegate?
-    var isNetwork: Bool = false
-    var playerTime: CGFloat = 0
     override var avAsset: AVAsset? {
         didSet {
             guard let avAsset = avAsset else {
@@ -65,15 +63,24 @@ class PhotoPreviewVideoView: VideoPlayerView {
             addedPlayerObservers()
         }
     }
-    var loadingView: ProgressHUD?
-    var isPlaying: Bool = false
-    var didEnterBackground: Bool = false
-    var enterPlayGroundShouldPlay: Bool = false
-    var canRemovePlayerObservers: Bool = false
-    var videoPlayType: PhotoPreviewViewController.PlayType = .normal
     
-    var playbackTimeObserver: Any?
-    var readyForDisplayObservation: NSKeyValueObservation?
+    var videoPlayType: PhotoPreviewViewController.PlayType = .normal
+    var isNetwork: Bool = false
+    var playerTime: CGFloat = 0
+    
+    private var loadingView: ProgressHUD?
+    private var isPlaying: Bool = false
+    private var didEnterBackground: Bool = false
+    private var enterPlayGroundShouldPlay: Bool = false
+    private var canRemovePlayerObservers: Bool = false
+    
+    private var playbackTimeObserver: Any?
+    private var readyForDisplayObservation: NSKeyValueObservation?
+    private var statusObservation: NSKeyValueObservation?
+    private var loadedTimeRangesObservation: NSKeyValueObservation?
+    private var playbackLikelyToKeepUpObservation: NSKeyValueObservation?
+    private var presentationSizeObservation: NSKeyValueObservation?
+    
     override init() {
         super.init()
         layer.masksToBounds = true
@@ -108,14 +115,16 @@ class PhotoPreviewVideoView: VideoPlayerView {
             object: nil
         )
     }
-    @objc func appDidEnterBackground() {
+    @objc
+    private func appDidEnterBackground() {
         didEnterBackground = true
         if isPlaying {
             enterPlayGroundShouldPlay = true
             stopPlay()
         }
     }
-    @objc  func appDidEnterPlayGround() {
+    @objc
+    private func appDidEnterPlayGround() {
         didEnterBackground = false
         if enterPlayGroundShouldPlay {
             startPlay()
@@ -228,7 +237,9 @@ class PhotoPreviewVideoView: VideoPlayerView {
             }
         }
     }
-    @objc func playerItemDidPlayToEndTimeNotification(notifi: Notification) {
+    
+    @objc
+    private func playerItemDidPlayToEndTimeNotification(notifi: Notification) {
         stopPlay()
         player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
         if videoPlayType == .auto {
@@ -236,11 +247,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
         }
     }
     
-    var statusObservation: NSKeyValueObservation?
-    var loadedTimeRangesObservation: NSKeyValueObservation?
-    var playbackLikelyToKeepUpObservation: NSKeyValueObservation?
-    var presentationSizeObservation: NSKeyValueObservation?
-    func addedPlayerObservers() {
+    private func addedPlayerObservers() {
         if canRemovePlayerObservers {
             return
         }
@@ -333,7 +340,8 @@ class PhotoPreviewVideoView: VideoPlayerView {
         )
         canRemovePlayerObservers = true
     }
-    func removePlayerObservers() {
+    
+    private func removePlayerObservers() {
         if !canRemovePlayerObservers {
             return
         }
@@ -352,9 +360,11 @@ class PhotoPreviewVideoView: VideoPlayerView {
         )
         canRemovePlayerObservers = false
     }
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
+    
     deinit {
         readyForDisplayObservation = nil
         NotificationCenter.default.removeObserver(self)

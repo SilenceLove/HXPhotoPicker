@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension FileManager: HXPickerCompatible {
+extension FileManager {
     class var documentPath: String {
         guard let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last else {
             return ""
@@ -22,17 +22,5 @@ extension FileManager: HXPickerCompatible {
     }
     class var tempPath: String {
         NSTemporaryDirectory()
-    }
-}
-
-public extension HXPickerWrapper where Base: FileManager {
-    static var documentPath: String {
-        Base.documentPath
-    }
-    static var cachesPath: String {
-        Base.cachesPath
-    }
-    static var tempPath: String {
-        Base.tempPath
     }
 }

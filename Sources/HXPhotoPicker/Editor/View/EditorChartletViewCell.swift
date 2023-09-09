@@ -11,20 +11,9 @@ import Kingfisher
 #endif
 
 class EditorChartletViewCell: UICollectionViewCell {
-    lazy var selectedBgView: UIVisualEffectView = {
-        let effect = UIBlurEffect(style: .dark)
-        let view = UIVisualEffectView(effect: effect)
-        view.isHidden = true
-        view.layer.cornerRadius = 5
-        view.layer.masksToBounds = true
-        return view
-    }()
+    private var selectedBgView: UIVisualEffectView!
     
-    lazy var imageView: ImageView = {
-        let view = ImageView()
-        view.imageView.contentMode = .scaleAspectFit
-        return view
-    }()
+    var imageView: ImageView!
     var editorType: EditorContentViewType = .image
     var downloadCompletion = false
     
@@ -110,7 +99,14 @@ class EditorChartletViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        let effect = UIBlurEffect(style: .dark)
+        selectedBgView = UIVisualEffectView(effect: effect)
+        selectedBgView.isHidden = true
+        selectedBgView.layer.cornerRadius = 5
+        selectedBgView.layer.masksToBounds = true
         contentView.addSubview(selectedBgView)
+        imageView = ImageView()
+        imageView.imageView.contentMode = .scaleAspectFit
         contentView.addSubview(imageView)
     }
     override func layoutSubviews() {

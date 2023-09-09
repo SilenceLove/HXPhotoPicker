@@ -169,7 +169,7 @@ public extension AssetManager {
                 let sureOrientation = self.transformImageOrientation(
                     orientation: imageOrientation
                 )
-                if DispatchQueue.isMain || options.isSynchronous {
+                if Thread.isMainThread || options.isSynchronous {
                     result(
                         imageData: imageData,
                         dataUTI: dataUTI,
@@ -193,7 +193,7 @@ public extension AssetManager {
                 for: asset,
                 options: options
             ) { (imageData, dataUTI, imageOrientation, info) in
-                if DispatchQueue.isMain || options.isSynchronous {
+                if Thread.isMainThread || options.isSynchronous {
                     result(
                         imageData: imageData,
                         dataUTI: dataUTI,

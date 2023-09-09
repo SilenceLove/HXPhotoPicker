@@ -142,11 +142,11 @@ public struct PickerConfiguration: IndicatorTypeConfig {
     public var isDeselectVideoRemoveEdited: Bool = true
     
     /// 编辑器配置
-    public lazy var editor: EditorConfiguration = .init()
+    public var editor: EditorConfiguration = .init()
     
     /// Jump edit interface style
     /// 跳转编辑界面样式
-    public lazy var editorJumpStyle: EditorJumpStyle = .push()
+    public var editorJumpStyle: EditorJumpStyle = .push()
     #endif
     
     /// Allow custom transition animations when jumping
@@ -196,19 +196,19 @@ public struct PickerConfiguration: IndicatorTypeConfig {
     
     /// Album list configuration
     /// 相册列表配置
-    public lazy var albumList: AlbumListConfiguration = .init()
+    public var albumList: AlbumListConfiguration = .init()
     
     /// Photo list configuration
     /// 照片列表配置
-    public lazy var photoList: PhotoListConfiguration = .init()
+    public var photoList: PhotoListConfiguration = .init()
     
     /// Preview interface configuration
     /// 预览界面配置
-    public lazy var previewView: PreviewViewConfiguration = .init()
+    public var previewView: PreviewViewConfiguration = .init()
     
     /// Unauthorized prompt interface related configuration
     /// 未授权提示界面相关配置
-    public lazy var notAuthorized: NotAuthorizedConfiguration = .init()
+    public var notAuthorized: NotAuthorizedConfiguration = .init()
     
     /// Whether to cache the [Camera Roll/All Photos] album
     /// 是否缓存[相机胶卷/所有照片]相册

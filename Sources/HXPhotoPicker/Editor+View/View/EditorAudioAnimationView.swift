@@ -114,14 +114,12 @@ public class EditorAudioAnimationLayer: CALayer {
 }
 
 public class EditorAudioAnimationView: UIView {
-    lazy var animationLayer: EditorAudioAnimationLayer = {
-        let animationLayer = EditorAudioAnimationLayer(hexColor: hexColor)
-        return animationLayer
-    }()
-    let hexColor: String
+    private var animationLayer: EditorAudioAnimationLayer!
+    private let hexColor: String
     public init(hexColor: String = "#333333") {
         self.hexColor = hexColor
         super.init(frame: .zero)
+        animationLayer = EditorAudioAnimationLayer(hexColor: hexColor)
         layer.addSublayer(animationLayer)
     }
     public func changeColor(hex: String) {

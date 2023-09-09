@@ -13,93 +13,15 @@ protocol EditorVolumeViewDelegate: AnyObject {
 
 class EditorVolumeView: UIView {
     weak var delegate: EditorVolumeViewDelegate?
-    lazy var bgColorView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .black.withAlphaComponent(0.2)
-        if #available(iOS 11.0, *) {
-            view.cornersRound(radius: 12, corner: .allCorners)
-        }
-        return view
-    }()
-    lazy var bgView: UIVisualEffectView = {
-        let visualEffect = UIBlurEffect.init(style: .light)
-        let view = UIVisualEffectView.init(effect: visualEffect)
-        view.layer.cornerRadius = 12
-        view.layer.masksToBounds = true
-        return view
-    }()
-
-    lazy var musicTitleLb: UILabel = {
-        let label = UILabel()
-        label.text = "配乐".localized
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 15)
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
+    private var bgColorView: UIView!
+    private var bgView: UIVisualEffectView!
+    private var musicTitleLb: UILabel!
+    private var musicVolumeSlider: UISlider!
+    private var musicVolumeNumberLb: UILabel!
+    private var originalTitleLb: UILabel!
+    private var originalVolumeSlider: UISlider!
+    private var originalVolumeNumberLb: UILabel!
     
-    lazy var musicVolumeSlider: UISlider = {
-        let slider = UISlider()
-        let image = UIImage.image(for: .white, havingSize: .init(width: 15, height: 15), radius: 7.5)
-        slider.setThumbImage(image, for: .normal)
-        slider.setThumbImage(image, for: .highlighted)
-        slider.value = 1
-        slider.addTarget(
-            self,
-            action: #selector(sliderDidChanged(_:)),
-            for: .valueChanged
-        )
-        return slider
-    }()
-    
-    lazy var musicVolumeNumberLb: UILabel = {
-        let label = UILabel()
-        label.text = "100"
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 15)
-        return label
-    }()
-    
-    lazy var originalTitleLb: UILabel = {
-        let label = UILabel()
-        label.text = "视频原声".localized
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 15)
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
-    
-    lazy var originalVolumeSlider: UISlider = {
-        let slider = UISlider()
-        let image = UIImage.image(for: .white, havingSize: .init(width: 15, height: 15), radius: 7.5)
-        slider.setThumbImage(image, for: .normal)
-        slider.setThumbImage(image, for: .highlighted)
-        slider.value = 1
-        slider.addTarget(
-            self,
-            action: #selector(sliderDidChanged(_:)),
-            for: .valueChanged
-        )
-        return slider
-    }()
-    
-    lazy var originalVolumeNumberLb: UILabel = {
-        let label = UILabel()
-        label.text = "100"
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 15)
-        return label
-    }()
-    
-    @objc
-    func sliderDidChanged(_ slider: UISlider) {
-        if slider == musicVolumeSlider {
-            musicVolume = slider.value
-        }else {
-            originalVolume = slider.value
-        }
-        delegate?.volumeView(didChanged: self)
-    }
     var hasOriginalSound: Bool = true {
         didSet {
             originalTitleLb.alpha = hasOriginalSound ? 1 : 0.3
@@ -135,16 +57,80 @@ class EditorVolumeView: UIView {
     
     init(_ color: UIColor) {
         super.init(frame: .zero)
+        
+        bgColorView = UIView()
+        bgColorView.backgroundColor = .black.withAlphaComponent(0.2)
+        if #available(iOS 11.0, *) {
+            bgColorView.cornersRound(radius: 12, corner: .allCorners)
+        }
         addSubview(bgColorView)
+        
+        bgView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        bgView.layer.cornerRadius = 12
+        bgView.layer.masksToBounds = true
         addSubview(bgView)
+        
+        musicTitleLb = UILabel()
+        musicTitleLb.text = "配乐".localized
+        musicTitleLb.textColor = .white
+        musicTitleLb.font = .systemFont(ofSize: 15)
+        musicTitleLb.adjustsFontSizeToFitWidth = true
         addSubview(musicTitleLb)
+        
+        musicVolumeSlider = UISlider()
+        let musicVolumeImage = UIImage.image(for: .white, havingSize: .init(width: 15, height: 15), radius: 7.5)
+        musicVolumeSlider.setThumbImage(musicVolumeImage, for: .normal)
+        musicVolumeSlider.setThumbImage(musicVolumeImage, for: .highlighted)
+        musicVolumeSlider.value = 1
+        musicVolumeSlider.addTarget(
+            self,
+            action: #selector(sliderDidChanged(_:)),
+            for: .valueChanged
+        )
         addSubview(musicVolumeSlider)
         musicVolumeSlider.minimumTrackTintColor = color
+        
+        musicVolumeNumberLb = UILabel()
+        musicVolumeNumberLb.text = "100"
+        musicVolumeNumberLb.textColor = .white
+        musicVolumeNumberLb.font = .systemFont(ofSize: 15)
         addSubview(musicVolumeNumberLb)
+        
+        originalTitleLb = UILabel()
+        originalTitleLb.text = "视频原声".localized
+        originalTitleLb.textColor = .white
+        originalTitleLb.font = .systemFont(ofSize: 15)
+        originalTitleLb.adjustsFontSizeToFitWidth = true
         addSubview(originalTitleLb)
+        
+        originalVolumeSlider = UISlider()
+        let originalVolumeImage = UIImage.image(for: .white, havingSize: .init(width: 15, height: 15), radius: 7.5)
+        originalVolumeSlider.setThumbImage(originalVolumeImage, for: .normal)
+        originalVolumeSlider.setThumbImage(originalVolumeImage, for: .highlighted)
+        originalVolumeSlider.value = 1
+        originalVolumeSlider.addTarget(
+            self,
+            action: #selector(sliderDidChanged(_:)),
+            for: .valueChanged
+        )
         addSubview(originalVolumeSlider)
         originalVolumeSlider.minimumTrackTintColor = color
+        
+        originalVolumeNumberLb = UILabel()
+        originalVolumeNumberLb.text = "100"
+        originalVolumeNumberLb.textColor = .white
+        originalVolumeNumberLb.font = .systemFont(ofSize: 15)
         addSubview(originalVolumeNumberLb)
+    }
+    
+    @objc
+    private func sliderDidChanged(_ slider: UISlider) {
+        if slider == musicVolumeSlider {
+            musicVolume = slider.value
+        }else {
+            originalVolume = slider.value
+        }
+        delegate?.volumeView(didChanged: self)
     }
     
     override func layoutSubviews() {
@@ -162,7 +148,7 @@ class EditorVolumeView: UIView {
         musicVolumeNumberLb.centerY = musicTitleLb.centerY
         
         let sliderWidth: CGFloat = 130.0 / 375.0
-        musicVolumeSlider.size = .init(width: UIScreen.main.bounds.width * sliderWidth, height: 20)
+        musicVolumeSlider.size = .init(width: UIDevice.screenSize.width * sliderWidth, height: 20)
         musicVolumeSlider.x = musicVolumeNumberLb.x - 15 - musicVolumeSlider.width
         musicVolumeSlider.centerY = musicTitleLb.centerY
         

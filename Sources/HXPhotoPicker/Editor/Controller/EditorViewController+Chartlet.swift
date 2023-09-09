@@ -57,7 +57,7 @@ extension EditorViewController: EditorChartletViewControllerDelegate {
     ) {
         deselectedDrawTool()
         if let tool = selectedTool,
-           tool.type == .graffiti || tool.type == .graffiti {
+           tool.type == .graffiti || tool.type == .mosaic {
             selectedTool = nil
             updateBottomMaskLayer()
         }

@@ -82,34 +82,8 @@ class EditorFilterEditView: UIView {
     
     weak var delegate: EditorFilterEditViewDelegate?
     
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout.init()
-        flowLayout.scrollDirection = .horizontal
-        flowLayout.minimumLineSpacing = 10
-        flowLayout.minimumInteritemSpacing = 0
-        flowLayout.itemSize = CGSize(width: 60, height: 90)
-        return flowLayout
-    }()
-    
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(
-            frame: CGRect(x: 0, y: 0, width: 0, height: 50),
-            collectionViewLayout: flowLayout
-        )
-        collectionView.backgroundColor = .clear
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .never
-        }
-        collectionView.register(
-            EditorFilterEditViewCell.self,
-            forCellWithReuseIdentifier: "EditorFilterEditViewCellID"
-        )
-        return collectionView
-    }()
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var collectionView: UICollectionView!
     
     func reloadData() {
         collectionView.reloadData()
@@ -149,6 +123,27 @@ class EditorFilterEditView: UIView {
             )
         ]
         super.init(frame: .zero)
+        flowLayout = UICollectionViewFlowLayout.init()
+        flowLayout.scrollDirection = .horizontal
+        flowLayout.minimumLineSpacing = 10
+        flowLayout.minimumInteritemSpacing = 0
+        flowLayout.itemSize = CGSize(width: 60, height: 90)
+        collectionView = UICollectionView(
+            frame: CGRect(x: 0, y: 0, width: 0, height: 50),
+            collectionViewLayout: flowLayout
+        )
+        collectionView.backgroundColor = .clear
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        }
+        collectionView.register(
+            EditorFilterEditViewCell.self,
+            forCellWithReuseIdentifier: "EditorFilterEditViewCellID"
+        )
         addSubview(collectionView)
     }
     
@@ -212,37 +207,10 @@ extension EditorFilterEditView: UICollectionViewDataSource, UICollectionViewDele
 
 class EditorFilterEditViewCell: UICollectionViewCell {
     
-    lazy var bgView: UIVisualEffectView = {
-        let visualEffect = UIBlurEffect.init(style: .dark)
-        let view = UIVisualEffectView.init(effect: visualEffect)
-        view.contentView.addSubview(imageView)
-        view.layer.masksToBounds = true
-        return view
-    }()
-    
-    lazy var imageView: UIImageView = {
-        let view = UIImageView()
-        return view
-    }()
-    
-    lazy var titleLb: UILabel = {
-        let label = UILabel.init()
-        label.textColor = .white
-        label.font = .regularPingFang(ofSize: 13)
-        label.textAlignment = .center
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
-    
-    lazy var parameterLb: UILabel = {
-        let label = UILabel()
-        label.text = "0"
-        label.textColor = .white
-        label.font = .regularPingFang(ofSize: 11)
-        label.textAlignment = .center
-        label.isHidden = true
-        return label
-    }()
+    private var bgView: UIVisualEffectView!
+    private var imageView: UIImageView!
+    private var titleLb: UILabel!
+    private var parameterLb: UILabel!
     
     var model: EditorFilterEditModel? {
         didSet {
@@ -262,8 +230,24 @@ class EditorFilterEditViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        imageView = UIImageView()
+        let visualEffect = UIBlurEffect.init(style: .dark)
+        bgView = UIVisualEffectView.init(effect: visualEffect)
+        bgView.contentView.addSubview(imageView)
+        bgView.layer.masksToBounds = true
         contentView.addSubview(bgView)
+        titleLb = UILabel()
+        titleLb.textColor = .white
+        titleLb.font = .regularPingFang(ofSize: 13)
+        titleLb.textAlignment = .center
+        titleLb.adjustsFontSizeToFitWidth = true
         contentView.addSubview(titleLb)
+        parameterLb = UILabel()
+        parameterLb.text = "0"
+        parameterLb.textColor = .white
+        parameterLb.font = .regularPingFang(ofSize: 11)
+        parameterLb.textAlignment = .center
+        parameterLb.isHidden = true
         contentView.addSubview(parameterLb)
     }
     

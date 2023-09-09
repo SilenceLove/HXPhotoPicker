@@ -296,15 +296,15 @@ public enum PickerError: Error, LocalizedError, CustomStringConvertible {
     public var errorDescription: String? {
         switch self {
         case .imageFetchFaild:
-            return "获取 UIImage 失败"
+            return "imageFetchFaild：获取 UIImage 失败"
         case .urlFetchFaild(let error):
-            return "获取 URL 失败: \(error)"
+            return "urlFetchFaild：获取 URL 失败: \(error)"
         case .urlResultFetchFaild(let error):
-            return "获取 AssetURLResult 失败: \(error)"
+            return "urlResultFetchFaild：获取 AssetURLResult 失败: \(error)"
         case .objsFetchFaild(let photoAsset, let index, let error):
-            return "PickerResult.photoAssets获取到第\(index + 1)失败，photoAsset: \(photoAsset), error: \(error)"
+            return "objsFetchFaild：PickerResult.photoAssets获取到第\(index + 1)失败，photoAsset: \(photoAsset), error: \(error)"
         case .canceled:
-            return "取消选择"
+            return "canceled：取消选择"
         }
     }
     

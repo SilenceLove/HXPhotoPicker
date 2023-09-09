@@ -14,8 +14,44 @@ protocol AlbumViewDelegate: AnyObject {
 
 class AlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     weak var delegate: AlbumViewDelegate?
-    lazy var tableView: UITableView = {
-        let tableView = UITableView.init(frame: CGRect.init(), style: .plain)
+    let config: AlbumListConfiguration
+    var tableView: UITableView!
+    
+    private var promptLb: UILabel!
+    private var currentSelectedRow: Int = 0
+    
+    var assetCollectionsArray: [PhotoAssetCollection] = [] {
+        didSet {
+            tableView.reloadData()
+        }
+    }
+    
+    var currentSelectedAssetCollection: PhotoAssetCollection? {
+        didSet {
+            guard let collection = currentSelectedAssetCollection,
+                  let index = assetCollectionsArray.firstIndex(of: collection) else {
+                return
+            }
+            currentSelectedRow = index
+        }
+    }
+    
+    init(config: AlbumListConfiguration) {
+        self.config = config
+        super.init(frame: CGRect.zero)
+        initViews()
+        addSubview(tableView)
+        configColor()
+    }
+    private func initViews() {
+        promptLb = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 40))
+        promptLb.text = "只能查看允许访问的照片和相关相册".localized
+        promptLb.textAlignment = .center
+        promptLb.font = UIFont.systemFont(ofSize: 14)
+        promptLb.adjustsFontSizeToFitWidth = true
+        promptLb.numberOfLines = 0
+        
+        tableView = UITableView(frame: .init(), style: .plain)
         if AssetManager.authorizationStatusIsLimited() {
             tableView.tableHeaderView = promptLb
         }
@@ -30,40 +66,11 @@ class AlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
         if #available(iOS 11.0, *) {
             tableView.contentInsetAdjustmentBehavior = .never
         }
-        return tableView
-    }()
-    lazy var promptLb: UILabel = {
-        let promptLb = UILabel.init(frame: CGRect(x: 0, y: 0, width: 0, height: 40))
-        promptLb.text = "只能查看允许访问的照片和相关相册".localized
-        promptLb.textAlignment = .center
-        promptLb.font = UIFont.systemFont(ofSize: 14)
-        promptLb.adjustsFontSizeToFitWidth = true
-        promptLb.numberOfLines = 0
-        return promptLb
-    }()
-    var config: AlbumListConfiguration
-    var assetCollectionsArray: [PhotoAssetCollection] = [] {
-        didSet {
-            tableView.reloadData()
-        }
     }
-    
-    private var currentSelectedRow: Int = 0
-    var currentSelectedAssetCollection: PhotoAssetCollection? {
-        didSet {
-            guard let collection = currentSelectedAssetCollection,
-                  let index = assetCollectionsArray.firstIndex(of: collection) else {
-                return
-            }
-            currentSelectedRow = index
-        }
-    }
-    
-    init(config: AlbumListConfiguration) {
-        self.config = config
-        super.init(frame: CGRect.zero)
-        addSubview(tableView)
-        configColor()
+    private func configColor() {
+        tableView.backgroundColor = PhotoManager.isDark ? config.backgroundDarkColor : config.backgroundColor
+        backgroundColor = PhotoManager.isDark ? config.backgroundDarkColor : config.backgroundColor
+        promptLb.textColor = PhotoManager.isDark ? config.limitedStatusPromptDarkColor : config.limitedStatusPromptColor
     }
     func scrollToMiddle() {
         if assetCollectionsArray.isEmpty {
@@ -71,11 +78,6 @@ class AlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
         }
         let indexPath = IndexPath(row: currentSelectedRow, section: 0)
         tableView.scrollToRow(at: indexPath, at: .middle, animated: false)
-    }
-    func configColor() {
-        tableView.backgroundColor = PhotoManager.isDark ? config.backgroundDarkColor : config.backgroundColor
-        backgroundColor = PhotoManager.isDark ? config.backgroundDarkColor : config.backgroundColor
-        promptLb.textColor = PhotoManager.isDark ? config.limitedStatusPromptDarkColor : config.limitedStatusPromptColor
     }
     func updatePrompt() {
         if AssetManager.authorizationStatusIsLimited() {

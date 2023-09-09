@@ -20,61 +20,20 @@ class EditorMaskListViewController: BaseViewController {
     
     weak var delegate: EditorMaskListViewControllerDelegate?
     
-    var config: EditorConfiguration.CropSize
+    private var bgView: UIVisualEffectView!
+    private var finishButton: UIButton!
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var collectionView: UICollectionView!
+    
+    let config: EditorConfiguration.CropSize
     init(config: EditorConfiguration.CropSize) {
         self.config = config
         super.init(nibName: nil, bundle: nil)
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    lazy var bgView: UIVisualEffectView = {
-        let visualEffect = UIBlurEffect.init(style: .dark)
-        let view = UIVisualEffectView.init(effect: visualEffect)
-        return view
-    }()
-    
-    lazy var finishButton: UIButton = {
-        let button = UIButton(type: .system)
-        let title = "完成".localized
-        let font = UIFont.systemFont(ofSize: 17)
-        button.setTitle(title, for: .normal)
-        button.setTitleColor(config.angleScaleColor, for: .normal)
-        button.titleLabel?.font = font
-        button.isEnabled = false
-        button.addTarget(self, action: #selector(didFinishButtonClick), for: .touchUpInside)
-        return button
-    }()
-    @objc func didFinishButtonClick() {
-        dismiss(animated: true)
-    }
-    
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout.init()
-        flowLayout.minimumLineSpacing = 10
-        flowLayout.minimumInteritemSpacing = 10
-        return flowLayout
-    }()
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(
-            frame: view.bounds,
-            collectionViewLayout: flowLayout
-        )
-        collectionView.backgroundColor = .clear
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.showsHorizontalScrollIndicator = false
-        if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .never
-        }
-        collectionView.register(EditorMaskListViewCell.self, forCellWithReuseIdentifier: "EditorMaskListViewCellID")
-        return collectionView
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        initViews()
         view.backgroundColor = .clear
         title = "蒙版素材".localized
         let finishButtonWidth = finishButton.currentTitle?.width(
@@ -86,6 +45,42 @@ class EditorMaskListViewController: BaseViewController {
         navigationItem.rightBarButtonItem = .init(customView: finishButton)
         view.addSubview(bgView)
         view.addSubview(collectionView)
+    }
+    
+    private func initViews() {
+        let visualEffect = UIBlurEffect.init(style: .dark)
+        bgView = UIVisualEffectView.init(effect: visualEffect)
+        
+        finishButton = UIButton(type: .system)
+        let title = "完成".localized
+        let font = UIFont.systemFont(ofSize: 17)
+        finishButton.setTitle(title, for: .normal)
+        finishButton.setTitleColor(config.angleScaleColor, for: .normal)
+        finishButton.titleLabel?.font = font
+        finishButton.isEnabled = false
+        finishButton.addTarget(self, action: #selector(didFinishButtonClick), for: .touchUpInside)
+        
+        flowLayout = UICollectionViewFlowLayout.init()
+        flowLayout.minimumLineSpacing = 10
+        flowLayout.minimumInteritemSpacing = 10
+        
+        collectionView = UICollectionView(
+            frame: view.bounds,
+            collectionViewLayout: flowLayout
+        )
+        collectionView.backgroundColor = .clear
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.showsHorizontalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        }
+        collectionView.register(EditorMaskListViewCell.self, forCellWithReuseIdentifier: "EditorMaskListViewCellID")
+    }
+    
+    @objc
+    private func didFinishButtonClick() {
+        dismiss(animated: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -114,6 +109,10 @@ class EditorMaskListViewController: BaseViewController {
         
         let navHeight = navigationController?.navigationBar.frame.maxY ?? UIDevice.navigationBarHeight
         collectionView.frame = .init(x: 0, y: navHeight, width: view.width, height: view.height - navHeight)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 

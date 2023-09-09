@@ -93,9 +93,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
                 location: location
             )
         }
-        if autoDismiss {
-            dismiss(animated: true, completion: nil)
-        }
+        backClick()
     }
     
     func saveCameraImage(_ image: UIImage) {

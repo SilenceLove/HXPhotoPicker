@@ -7,7 +7,7 @@
 
 import Photos
 
-extension PHAsset: HXPickerCompatible {
+extension PHAsset {
     
     var isImageAnimated: Bool {
         var isAnimated: Bool = false
@@ -97,33 +97,5 @@ extension PHAsset: HXPickerCompatible {
             }
             completion(isAdjusted)
         }
-    }
-}
-
-public extension HXPickerWrapper where Base: PHAsset {
-    
-    var isImageAnimated: Bool {
-        base.isImageAnimated
-    }
-    
-    var isLivePhoto: Bool {
-        base.isLivePhoto
-    }
-    
-    var inICloud: Bool {
-        base.inICloud
-    }
-    var isCloudPlaceholder: Bool? {
-        base.isCloudPlaceholder
-    }
-    var isLocallayAvailable: Bool {
-        base.isLocallayAvailable
-    }
-    
-    @discardableResult
-    func checkAdjustmentStatus(
-        completion: @escaping (Bool) -> Void
-    ) -> PHContentEditingInputRequestID {
-        base.checkAdjustmentStatus(completion: completion)
     }
 }

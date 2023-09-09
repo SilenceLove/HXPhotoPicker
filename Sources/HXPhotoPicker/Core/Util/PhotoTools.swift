@@ -26,7 +26,7 @@ public struct PhotoTools {
             width *= 0.5
         }
         var height = width / aspectRatio
-        let maxHeight = UIScreen.main.bounds.size.height
+        let maxHeight = UIDevice.screenSize.height
         if height > maxHeight {
             width = maxHeight / height * width * scale
             height = maxHeight * scale
@@ -144,8 +144,7 @@ public struct PhotoTools {
         guard let videoURL = videoURL else {
             return nil
         }
-        let urlAsset = AVURLAsset(url: videoURL)
-        return urlAsset.getImage(at: atTime)
+        return getVideoThumbnailImage(avAsset: .init(url: videoURL), atTime: atTime)
     }
     
     /// 根据视频地址获取视频封面
@@ -177,8 +176,6 @@ public struct PhotoTools {
             }
             let generator = AVAssetImageGenerator(asset: asset)
             generator.appliesPreferredTrackTransform = true
-//            generator.requestedTimeToleranceAfter = .zero
-//            generator.requestedTimeToleranceBefore = .zero
             let time = CMTime(value: CMTimeValue(atTime), timescale: asset.duration.timescale)
             let array = [NSValue(time: time)]
             generator.generateCGImagesAsynchronously(
@@ -343,20 +340,6 @@ public struct PhotoTools {
             size = content.0
             center = content.1
         }
-//        if UIDevice.isPortrait {
-//            let aspectRatio = viewSize.width / imageSize.width
-//            let contentWidth = viewSize.width
-//            let contentHeight = imageSize.height * aspectRatio
-//            imageSize = CGSize(width: contentWidth, height: contentHeight)
-//            if contentHeight < viewSize.height {
-//                imageCenter = CGPoint(x: viewSize.width * 0.5, y: viewSize.height * 0.5)
-//            }
-//        }else {
-//            let aspectRatio = viewSize.height / imageSize.height
-//            let contentWidth = imageSize.width * aspectRatio
-//            let contentHeight = viewSize.height
-//            imageSize = CGSize(width: contentWidth, height: contentHeight)
-//        }
         var rectY: CGFloat
         if center.equalTo(.zero) {
             rectY = 0

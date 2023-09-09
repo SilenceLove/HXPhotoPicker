@@ -9,11 +9,15 @@ import UIKit
 
 class PhotoPickerBottomNumberView: UICollectionReusableView {
     
-    lazy var contentLb: UILabel = {
-        let label = UILabel()
-        label.textAlignment = .center
-        return label
-    }()
+    private var contentLb: UILabel!
+    private var filterLb: UILabel!
+    
+    var didFilterHandler: (() -> Void)?
+    var filterOptions: PhotoPickerFilterSection.Options = .any {
+        didSet {
+            updateFilter()
+        }
+    }
     
     var photoCount: Int = 0
     var videoCount: Int = 0
@@ -26,7 +30,17 @@ class PhotoPickerBottomNumberView: UICollectionReusableView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        contentLb = UILabel()
+        contentLb.textAlignment = .center
         addSubview(contentLb)
+        
+        filterLb = UILabel()
+        filterLb.textAlignment = .center
+        filterLb.numberOfLines = 0
+        filterLb.isHidden = true
+        filterLb.isUserInteractionEnabled = true
+        filterLb.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didFilterLabelClick)))
         addSubview(filterLb)
     }
     
@@ -54,30 +68,12 @@ class PhotoPickerBottomNumberView: UICollectionReusableView {
         }
     }
     
-    lazy var filterLb: UILabel = {
-        let label = UILabel()
-        label.textAlignment = .center
-        label.numberOfLines = 0
-        label.isHidden = true
-        label.isUserInteractionEnabled = true
-        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didFilterLabelClick)))
-        return label
-    }()
-    
-    var didFilterHandler: (() -> Void)?
-    
     @objc
-    func didFilterLabelClick() {
+    private func didFilterLabelClick() {
         didFilterHandler?()
     }
     
-    var filterOptions: PhotoPickerFilterSection.Options = .any {
-        didSet {
-            updateFilter()
-        }
-    }
-    
-    func updateFilter() {
+    private func updateFilter() {
         if filterOptions == .any {
             filterLb.isHidden = true
             return
@@ -160,8 +156,8 @@ class PhotoPickerBottomNumberView: UICollectionReusableView {
     }
 }
 
-extension String {
-    fileprivate var intervalNumber: String {
+fileprivate extension String {
+    var intervalNumber: String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         return formatter.string(from: NSNumber(value: Int(self) ?? 0)) ?? self

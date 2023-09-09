@@ -146,15 +146,15 @@ public extension PickerResult {
 
 extension PickerResult {
     /// (image, PhotoAsset object, index)
-    /// (图片、PhotoAsset 对象, 索引)
+    /// (图片、PhotoAsset 对象, 下标)
     public typealias ImageHandler = (UIImage?, PhotoAsset, Int) -> Void
     /// (corresponding AVAssetExportSession object, PhotoAsset object, index when exporting video)
-    /// (导出视频时对应的 AVAssetExportSession 对象, PhotoAsset 对象, 索引)
+    /// (导出视频时对应的 AVAssetExportSession 对象, PhotoAsset 对象, 下标)
     public typealias AVAssetExportSessionHandler = (AVAssetExportSession, PhotoAsset, Int) -> Void
     /// (Result of getting URL, PhotoAsset object, index)
-    /// (获取URL的结果、PhotoAsset 对象, 索引)
+    /// (获取URL的结果、PhotoAsset 对象, 下标)
     public typealias URLHandler = (Result<AssetURLResult, AssetError>, PhotoAsset, Int) -> Void
-    /// (PhotoAsset 对象, 索引)
+    /// (PhotoAsset 对象, 下标)
     public typealias FileConfigHandler = (PhotoAsset, Int) -> PhotoAsset.FileConfig
 }
 

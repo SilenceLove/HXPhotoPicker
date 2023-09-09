@@ -15,13 +15,31 @@ class EditorRatioToolView: UIView {
     
     weak var delegate: EditorRatioToolViewDelegate?
     
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
-        return flowLayout
-    }()
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var collectionView: EditorCollectionView!
     
-    lazy var collectionView: EditorCollectionView = {
-        let collectionView = EditorCollectionView(
+    let ratios: [EditorRatioToolConfig]
+    var selectedIndex: Int
+    var selectedRatio: EditorRatioToolConfig? {
+        if selectedIndex > ratios.count - 1 || selectedIndex < 0 {
+            return nil
+        }
+        return ratios[selectedIndex]
+    }
+    init(
+        ratios: [EditorRatioToolConfig],
+        selectedIndex: Int = 0
+    ) {
+        self.ratios = ratios
+        self.selectedIndex = selectedIndex
+        super.init(frame: .zero)
+        initViews()
+    }
+    
+    var isFirst: Bool = true
+    func initViews() {
+        flowLayout = UICollectionViewFlowLayout()
+        collectionView = EditorCollectionView(
             frame: CGRect(x: 0, y: 0, width: 0, height: 50),
             collectionViewLayout: flowLayout
         )
@@ -35,22 +53,6 @@ class EditorRatioToolView: UIView {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
         collectionView.register(EditorRatioToolViewCell.self, forCellWithReuseIdentifier: "EditorRatioToolViewCellID")
-        return collectionView
-    }()
-    let ratios: [EditorRatioToolConfig]
-    var selectedIndex: Int
-    init(
-        ratios: [EditorRatioToolConfig],
-        selectedIndex: Int = 0
-    ) {
-        self.ratios = ratios
-        self.selectedIndex = selectedIndex
-        super.init(frame: .zero)
-        initViews()
-    }
-    
-    var isFirst: Bool = true
-    func initViews() {
         addSubview(collectionView)
     }
     
@@ -95,7 +97,7 @@ class EditorRatioToolView: UIView {
         if UIDevice.isPortrait {
             var contentWidth = UIDevice.rightMargin + 24
             for (index, ratio) in ratios.enumerated() {
-                let itemWidth = ratio.title.width(ofFont: .systemFont(ofSize: 14), maxHeight: .max) + 12
+                let itemWidth = ratio.title.width(ofFont: .systemFont(ofSize: UIDevice.isPad ? 16 : 14), maxHeight: .max) + 12
                 contentWidth += itemWidth
                 if index < ratios.count - 1 {
                     contentWidth += 12
@@ -207,7 +209,7 @@ extension EditorRatioToolView: UICollectionViewDelegate, UICollectionViewDelegat
     ) -> CGSize {
         if UIDevice.isPortrait {
             let config = ratios[indexPath.item]
-            let itemWidth = config.title.width(ofFont: .systemFont(ofSize: 14), maxHeight: .max) + 12
+            let itemWidth = config.title.width(ofFont: .systemFont(ofSize: UIDevice.isPad ? 16 : 14), maxHeight: .max) + 12
             return .init(width: itemWidth, height: collectionView.height)
         }
         return .init(width: collectionView.width, height: 25)

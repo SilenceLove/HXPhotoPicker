@@ -29,7 +29,7 @@ protocol EditorStickersViewDelegate: AnyObject {
     func stickerView(resetVideoRotate stickerView: EditorStickersView)
 }
 
-class EditorStickersView: UIView {
+class EditorStickersView: UIView, EditorStickersItemViewDelegate {
     weak var delegate: EditorStickersViewDelegate?
     var scale: CGFloat = 1 {
         didSet {
@@ -42,20 +42,13 @@ class EditorStickersView: UIView {
     }
     var isTouching: Bool = false
     var isEnabled: Bool {
-        get {
-            isUserInteractionEnabled
-        }
+        get { isUserInteractionEnabled }
         set {
-            if !newValue {
-                deselectedSticker()
-            }
+            if !newValue { deselectedSticker() }
             isUserInteractionEnabled = newValue
         }
     }
-    var count: Int {
-        subviews.count
-    }
-    
+    var count: Int { subviews.count }
     var selectView: EditorStickersItemView? {
         willSet {
             if let selectView = selectView,
@@ -65,26 +58,39 @@ class EditorStickersView: UIView {
             }
         }
     }
-    
-    lazy var trashView: EditorStickersTrashView = {
-        let view = EditorStickersTrashView(frame: CGRect(x: 0, y: 0, width: 180, height: 80))
-        view.centerX = UIScreen.main.bounds.width * 0.5
-        view.y = UIScreen.main.bounds.height
-        view.alpha = 0
-        return view
-    }()
-    
-    var isShowTrash: Bool = true
-    
-    var trashViewDidRemove: Bool = false
-    var trashViewIsVisible: Bool = false
-    
     var isVideoMark: Bool = false
+    var mirrorScale: CGPoint = .init(x: 1, y: 1) {
+        didSet {
+            for subView in subviews {
+                if let itemView = subView as? EditorStickersItemView {
+                    itemView.initialMirrorScale = itemView.editMirrorScale
+                }
+            }
+        }
+    }
+    var isShowTrash: Bool = true
+    var angle: CGFloat = 0
+    
+    private var trashView: EditorStickersTrashView!
+    private var trashViewDidRemove: Bool = false
+    private var trashViewIsVisible: Bool = false
+    private var isDragging: Bool = false
+    private var beforeItemArg: CGFloat = 0
+    private var currentItemArg: CGFloat = 0
+    private var currentItemDegrees: CGFloat = 0
+    private var hasImpactFeedback: Bool = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        initViews()
         clipsToBounds = true
         isUserInteractionEnabled = true
+    }
+    private func initViews() {
+        trashView = EditorStickersTrashView(frame: CGRect(x: 0, y: 0, width: 180, height: 80))
+        trashView.centerX = UIDevice.screenSize.width * 0.5
+        trashView.y = UIDevice.screenSize.height
+        trashView.alpha = 0
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -155,21 +161,6 @@ class EditorStickersView: UIView {
             }
         }
         return view
-    }
-    var isDragging: Bool = false
-    var beforeItemArg: CGFloat = 0
-    var currentItemArg: CGFloat = 0
-    var angle: CGFloat = 0
-    var currentItemDegrees: CGFloat = 0
-    var hasImpactFeedback: Bool = false
-    var mirrorScale: CGPoint = .init(x: 1, y: 1) {
-        didSet {
-            for subView in subviews {
-                if let itemView = subView as? EditorStickersItemView {
-                    itemView.initialMirrorScale = itemView.editMirrorScale
-                }
-            }
-        }
     }
     
     func getStickerItem() -> Item? {
@@ -293,12 +284,6 @@ class EditorStickersView: UIView {
         return infos
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-extension EditorStickersView {
     @discardableResult
     func add(
         sticker item: EditorStickerItem,
@@ -323,11 +308,11 @@ extension EditorStickersView {
             let ratio: CGFloat = 0.5
             var width = self.width * self.scale
             var height = self.height * self.scale
-            if width > UIScreen.main.bounds.width {
-                width = UIScreen.main.bounds.width
+            if width > UIDevice.screenSize.width {
+                width = UIDevice.screenSize.width
             }
-            if height > UIScreen.main.bounds.height {
-                height = UIScreen.main.bounds.height
+            if height > UIDevice.screenSize.height {
+                height = UIDevice.screenSize.height
             }
             pScale = min(ratio * width / itemView.width, ratio * height / itemView.height)
         }else if item.isText {
@@ -409,9 +394,6 @@ extension EditorStickersView {
         isVideoMark = false
         selectView?.update(text: text)
     }
-}
-
-extension EditorStickersView {
     
     func startDragging(_ itemView: EditorStickersItemView) {
         isVideoMark = false
@@ -478,9 +460,6 @@ extension EditorStickersView {
             rotation: rotation
         )
     }
-}
-
-extension EditorStickersView {
     
     func mirrorVerticallyHandler() {
         mirrorHandler(.init(x: -1, y: 1))
@@ -519,20 +498,18 @@ extension EditorStickersView {
             }
         }
     }
-}
-
-extension EditorStickersView {
     
     func showTrashView() {
         trashViewDidRemove = false
         trashViewIsVisible = true
+        let viewSize = UIDevice.screenSize
         UIView.animate(withDuration: 0.25) {
-            self.trashView.centerX = UIScreen.main.bounds.width * 0.5
-            self.trashView.y = UIScreen.main.bounds.height - UIDevice.bottomMargin - 20 - self.trashView.height
+            self.trashView.centerX = viewSize.width * 0.5
+            self.trashView.y = viewSize.height - UIDevice.bottomMargin - 20 - self.trashView.height
             self.trashView.alpha = 1
         } completion: { _ in
             if !self.trashViewIsVisible {
-                self.trashView.y = UIScreen.main.bounds.height
+                self.trashView.y = viewSize.height
                 self.trashView.alpha = 0
             }
         }
@@ -545,9 +522,10 @@ extension EditorStickersView {
         }
         trashViewIsVisible = false
         trashViewDidRemove = true
+        let viewSize = UIDevice.screenSize
         UIView.animate(withDuration: 0.25) {
-            self.trashView.centerX = UIScreen.main.bounds.width * 0.5
-            self.trashView.y = UIScreen.main.bounds.height
+            self.trashView.centerX = viewSize.width * 0.5
+            self.trashView.y = viewSize.height
             self.trashView.alpha = 0
             self.selectView?.alpha = 1
         } completion: { _ in
@@ -555,15 +533,12 @@ extension EditorStickersView {
                 self.trashView.removeFromSuperview()
                 self.trashView.inArea = false
             }else {
-                self.trashView.y = UIScreen.main.bounds.height - UIDevice.bottomMargin - 20 - self.trashView.height
+                self.trashView.y = viewSize.height - UIDevice.bottomMargin - 20 - self.trashView.height
                 self.trashView.alpha = 1
             }
         }
-
     }
-}
-
-extension EditorStickersView: EditorStickersItemViewDelegate {
+    
     func stickerItemView(
         _ itemView: EditorStickersItemView,
         didTapSticker item: EditorStickerItem
@@ -748,9 +723,7 @@ extension EditorStickersView: EditorStickersItemViewDelegate {
         itemView.removeFromSuperview()
         delegate?.stickerView(self, didRemoveItem: itemView)
     }
-}
-
-extension EditorStickersView {
+    
     struct Item: Codable {
         let items: [Info]
         let mirrorScale: CGPoint
@@ -787,5 +760,10 @@ extension EditorStickersView {
             let center: CGPoint
             let size: CGSize
         }
+    }
+    
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

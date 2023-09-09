@@ -20,42 +20,11 @@ protocol CameraPreviewViewDelegate: AnyObject {
 class CameraPreviewView: UIView {
     weak var delegate: CameraPreviewViewDelegate?
     
-    lazy var metalView: PreviewMetalView = {
-        let metalView = PreviewMetalView()
-        return metalView
-    }()
-    lazy var filterNameLb: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.textAlignment = .center
-        label.font = .boldSystemFont(ofSize: 45)
-        label.shadowColor = .black.withAlphaComponent(0.4)
-        label.shadowOffset = .init(width: -1, height: 1)
-        label.isUserInteractionEnabled = false
-        label.alpha = 0
-        label.isHidden = true
-        return label
-    }()
-    lazy var imageMaskView: UIImageView = {
-        let view = UIImageView(image: PhotoManager.shared.cameraPreviewImage)
-        view.contentMode = .scaleAspectFill
-        view.clipsToBounds = true
-        return view
-    }()
-    lazy var shadeView: UIVisualEffectView = {
-        let effect = UIBlurEffect(style: .light)
-        let view = UIVisualEffectView(effect: effect)
-        return view
-    }()
-    lazy var focusView: CameraFocusView = {
-        let focusView = CameraFocusView(
-            size: CGSize(width: 80, height: 80),
-            color: config.tintColor
-        )
-        focusView.layer.opacity = 0
-        focusView.isUserInteractionEnabled = false
-        return focusView
-    }()
+    var metalView: PreviewMetalView = .init()
+    private var filterNameLb: UILabel!
+    private var imageMaskView: UIImageView!
+    private var shadeView: UIVisualEffectView!
+    private var focusView: CameraFocusView!
     let config: CameraConfiguration
     var maxScale: CGFloat {
         config.videoMaxZoomScale
@@ -84,10 +53,35 @@ class CameraPreviewView: UIView {
                 self.delegate?.previewView(didPreviewing: self)
             }
         }
+        initViews()
+    }
+    private func initViews() {
+        filterNameLb = UILabel()
+        filterNameLb.textColor = .white
+        filterNameLb.textAlignment = .center
+        filterNameLb.font = .boldSystemFont(ofSize: 45)
+        filterNameLb.shadowColor = .black.withAlphaComponent(0.4)
+        filterNameLb.shadowOffset = .init(width: -1, height: 1)
+        filterNameLb.isUserInteractionEnabled = false
+        filterNameLb.alpha = 0
+        filterNameLb.isHidden = true
         addSubview(filterNameLb)
-        addSubview(focusView)
+        
+        imageMaskView = UIImageView(image: PhotoManager.shared.cameraPreviewImage)
+        imageMaskView.contentMode = .scaleAspectFill
+        imageMaskView.clipsToBounds = true
         addSubview(imageMaskView)
+        
+        shadeView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         addSubview(shadeView)
+        
+        focusView = CameraFocusView(
+            size: CGSize(width: 80, height: 80),
+            color: config.tintColor
+        )
+        focusView.layer.opacity = 0
+        focusView.isUserInteractionEnabled = false
+        addSubview(focusView)
     }
     
     func setupGestureRecognizer() {
@@ -146,7 +140,7 @@ class CameraPreviewView: UIView {
     }
     func showFilterName(_ filterName: String, _ isRight: Bool) {
         filterNameLb.layer.removeAllAnimations()
-        filterNameLb.text = filterName
+        filterNameLb.text = filterName.localized
         filterNameLb.isHidden = false
         filterNameLb.alpha = 0
         filterNameLb.centerX = !isRight ? width * 0.5 + 50 :  width * 0.5 - 50
@@ -269,51 +263,48 @@ extension CameraPreviewView: UIGestureRecognizerDelegate {
 }
 
 class CameraFocusView: UIView {
-    lazy var rectLayer: CAShapeLayer = {
-        let rectLayer = CAShapeLayer()
-        rectLayer.lineWidth = 2
-        rectLayer.lineJoin = .round
-        rectLayer.lineCap = .round
-        rectLayer.strokeColor = color.cgColor
-        rectLayer.fillColor = UIColor.clear.cgColor
-        rectLayer.contentsScale = UIScreen.main.scale
-        let path = UIBezierPath(rect: bounds)
-        rectLayer.path = path.cgPath
-        return rectLayer
-    }()
-    
-    lazy var lineLayer: CAShapeLayer = {
-        let lineLayer = CAShapeLayer()
-        lineLayer.lineWidth = 1
-        lineLayer.lineJoin = .round
-        lineLayer.lineCap = .round
-        lineLayer.strokeColor = color.cgColor
-        lineLayer.fillColor = UIColor.clear.cgColor
-        let path = UIBezierPath()
-        let lineLength: CGFloat = 10
-        path.move(to: CGPoint(x: width * 0.5, y: 0))
-        path.addLine(to: CGPoint(x: width * 0.5, y: lineLength))
-        
-        path.move(to: CGPoint(x: width * 0.5, y: height - lineLength))
-        path.addLine(to: CGPoint(x: width * 0.5, y: height))
-        
-        path.move(to: CGPoint(x: 0, y: height * 0.5))
-        path.addLine(to: CGPoint(x: lineLength, y: height * 0.5))
-        
-        path.move(to: CGPoint(x: width - lineLength, y: height * 0.5))
-        path.addLine(to: CGPoint(x: width, y: height * 0.5))
-        
-        lineLayer.path = path.cgPath
-        return lineLayer
-    }()
-    let color: UIColor
+    private var rectLayer: CAShapeLayer!
+    private var lineLayer: CAShapeLayer!
+    private let color: UIColor
     init(
         size: CGSize,
         color: UIColor
     ) {
         self.color = color
         super.init(frame: CGRect(origin: .zero, size: size))
+        
+        rectLayer = CAShapeLayer()
+        rectLayer.lineWidth = 2
+        rectLayer.lineJoin = .round
+        rectLayer.lineCap = .round
+        rectLayer.strokeColor = color.cgColor
+        rectLayer.fillColor = UIColor.clear.cgColor
+        rectLayer.contentsScale = UIScreen.main.scale
+        let rectPath = UIBezierPath(rect: bounds)
+        rectLayer.path = rectPath.cgPath
         layer.addSublayer(rectLayer)
+        
+        lineLayer = CAShapeLayer()
+        lineLayer.lineWidth = 1
+        lineLayer.lineJoin = .round
+        lineLayer.lineCap = .round
+        lineLayer.strokeColor = color.cgColor
+        lineLayer.fillColor = UIColor.clear.cgColor
+        let linePath = UIBezierPath()
+        let lineLength: CGFloat = 10
+        linePath.move(to: CGPoint(x: width * 0.5, y: 0))
+        linePath.addLine(to: CGPoint(x: width * 0.5, y: lineLength))
+        
+        linePath.move(to: CGPoint(x: width * 0.5, y: height - lineLength))
+        linePath.addLine(to: CGPoint(x: width * 0.5, y: height))
+        
+        linePath.move(to: CGPoint(x: 0, y: height * 0.5))
+        linePath.addLine(to: CGPoint(x: lineLength, y: height * 0.5))
+        
+        linePath.move(to: CGPoint(x: width - lineLength, y: height * 0.5))
+        linePath.addLine(to: CGPoint(x: width, y: height * 0.5))
+        
+        lineLayer.path = linePath.cgPath
         layer.addSublayer(lineLayer)
     }
     

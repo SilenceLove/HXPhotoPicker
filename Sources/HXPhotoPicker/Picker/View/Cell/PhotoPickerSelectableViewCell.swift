@@ -10,13 +10,7 @@ import UIKit
 open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
     
     /// 选择按钮
-    public lazy var selectControl: SelectBoxView = {
-        let selectControl = SelectBoxView()
-        selectControl.isHidden = true
-        selectControl.backgroundColor = .clear
-        selectControl.addTarget(self, action: #selector(didSelectControlClick(control:)), for: .touchUpInside)
-        return selectControl
-    }()
+    public var selectControl: SelectBoxView!
     
     /// 配置颜色
     open override func configColor() {
@@ -29,7 +23,12 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
     /// 添加视图
     open override func initView() {
         super.initView()
+        selectControl = SelectBoxView(.init())
+        selectControl.isHidden = true
+        selectControl.backgroundColor = .clear
+        selectControl.addTarget(self, action: #selector(didSelectControlClick(control:)), for: .touchUpInside)
         contentView.addSubview(selectControl)
+        
         contentView.layer.addSublayer(disableMaskLayer)
         contentView.addSubview(iCloudMarkView)
     }

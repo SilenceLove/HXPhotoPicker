@@ -45,7 +45,7 @@ extension EditorAdjusterView {
         delegate?.editorAdjusterView(willBeginEditing: self)
         let beforeZoomScale = scrollView.zoomScale / scrollView.minimumZoomScale
         // 获取当前裁剪框位置大小
-        let controlView = frameView.controlView
+        let controlView = frameView.controlView!
         let controlBeforeRect = getControlInContentRect()
         var autoZoom = false
         if !frameView.isFixedRatio && isOverall {
@@ -102,7 +102,7 @@ extension EditorAdjusterView {
         controlBeforeRect: CGRect,
         autoZoom: Bool
     ) {
-        let controlView = frameView.controlView
+        let controlView = frameView.controlView!
         setScrollViewTransform(angle: angle)
         setScrollViewContentInset(controlView.frame)
         let minimumZoomScale = getScrollViewMinimumZoomScale(controlView.frame)
@@ -196,7 +196,7 @@ extension EditorAdjusterView {
         angle: CGFloat,
         controlBeforeRect: CGRect
     ) {
-        let controlView = frameView.controlView
+        let controlView = frameView.controlView!
         setScrollViewTransform(angle: angle)
         setScrollViewContentInset(controlView.frame)
         let controlAfterRect = getControlInContentRect()

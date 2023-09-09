@@ -19,6 +19,7 @@ public class PhotoPreviewViewController: BaseViewController {
     public var previewAssets: [PhotoAsset] = []
     /// 是否是外部预览
     public var isExternalPreview: Bool = false
+    public var collectionView: UICollectionView!
     
     var isPreviewSelect: Bool = false
     
@@ -49,84 +50,11 @@ public class PhotoPreviewViewController: BaseViewController {
     var firstLayoutSubviews: Bool = true
     var interactiveTransition: PickerInteractiveTransition?
     weak var beforeNavDelegate: UINavigationControllerDelegate?
-    lazy var selectBoxControl: SelectBoxView = {
-        let boxControl = SelectBoxView(
-            frame: CGRect(
-                origin: .zero,
-                size: config.selectBox.size
-            )
-        )
-        boxControl.backgroundColor = .clear
-        boxControl.config = config.selectBox
-        boxControl.addTarget(self, action: #selector(didSelectBoxControlClick), for: UIControl.Event.touchUpInside)
-        return boxControl
-    }()
-    
-    lazy var collectionViewLayout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout.init()
-        layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 0
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        return layout
-    }()
-    
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView.init(frame: view.bounds, collectionViewLayout: collectionViewLayout)
-        collectionView.backgroundColor = .clear
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.isPagingEnabled = true
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .never
-        } else {
-            // Fallback on earlier versions
-            self.automaticallyAdjustsScrollViewInsets = false
-        }
-        collectionView.register(
-            PreviewPhotoViewCell.self,
-            forCellWithReuseIdentifier: NSStringFromClass(PreviewPhotoViewCell.self)
-        )
-        collectionView.register(
-            PreviewLivePhotoViewCell.self,
-            forCellWithReuseIdentifier: NSStringFromClass(PreviewLivePhotoViewCell.self)
-        )
-        if let customVideoCell = config.customVideoCellClass {
-            collectionView.register(
-                customVideoCell,
-                forCellWithReuseIdentifier: NSStringFromClass(PreviewVideoViewCell.self)
-            )
-        }else {
-            collectionView.register(
-                PreviewVideoViewCell.self,
-                forCellWithReuseIdentifier: NSStringFromClass(PreviewVideoViewCell.self)
-            )
-        }
-        return collectionView
-    }()
+    var selectBoxControl: SelectBoxView!
+    private var collectionViewLayout: UICollectionViewFlowLayout!
     var isMultipleSelect: Bool = false
     var allowLoadPhotoLibrary: Bool = true
-    lazy var bottomView: PhotoPickerBottomView = {
-        let bottomView = PhotoPickerBottomView(
-            config: config.bottomView,
-            allowLoadPhotoLibrary: allowLoadPhotoLibrary,
-            isMultipleSelect: isMultipleSelect,
-            sourceType: isExternalPreview ? .browser : .preview
-        )
-        bottomView.hx_delegate = self
-        if config.bottomView.isShowSelectedView && (isMultipleSelect || isExternalPreview) {
-            bottomView.selectedView.reloadData(
-                photoAssets: pickerController!.selectedAssetArray
-            )
-        }
-        if !isExternalPreview {
-            bottomView.boxControl.isSelected = pickerController!.isOriginal
-            bottomView.requestAssetBytes()
-        }
-        return bottomView
-    }()
+    var bottomView: PhotoPickerBottomView!
     var requestPreviewTimer: Timer?
     
     init(config: PreviewViewConfiguration) {
@@ -275,11 +203,75 @@ public class PhotoPreviewViewController: BaseViewController {
 extension PhotoPreviewViewController {
      
     private func initView() {
+        collectionViewLayout = UICollectionViewFlowLayout()
+        collectionViewLayout.scrollDirection = .horizontal
+        collectionViewLayout.minimumLineSpacing = 0
+        collectionViewLayout.minimumInteritemSpacing = 0
+        collectionViewLayout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: collectionViewLayout)
+        collectionView.backgroundColor = .clear
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.isPagingEnabled = true
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        } else {
+            // Fallback on earlier versions
+            self.automaticallyAdjustsScrollViewInsets = false
+        }
+        collectionView.register(
+            PreviewPhotoViewCell.self,
+            forCellWithReuseIdentifier: NSStringFromClass(PreviewPhotoViewCell.self)
+        )
+        collectionView.register(
+            PreviewLivePhotoViewCell.self,
+            forCellWithReuseIdentifier: NSStringFromClass(PreviewLivePhotoViewCell.self)
+        )
+        if let customVideoCell = config.customVideoCellClass {
+            collectionView.register(
+                customVideoCell,
+                forCellWithReuseIdentifier: NSStringFromClass(PreviewVideoViewCell.self)
+            )
+        }else {
+            collectionView.register(
+                PreviewVideoViewCell.self,
+                forCellWithReuseIdentifier: NSStringFromClass(PreviewVideoViewCell.self)
+            )
+        }
         view.addSubview(collectionView)
+        
+        bottomView = PhotoPickerBottomView(
+            config: config.bottomView,
+            allowLoadPhotoLibrary: allowLoadPhotoLibrary,
+            isMultipleSelect: isMultipleSelect,
+            sourceType: isExternalPreview ? .browser : .preview
+        )
+        bottomView.hx_delegate = self
+        if config.bottomView.isShowSelectedView && (isMultipleSelect || isExternalPreview) {
+            bottomView.selectedView.reloadData(
+                photoAssets: pickerController!.selectedAssetArray
+            )
+        }
+        if !isExternalPreview {
+            bottomView.boxControl.isSelected = pickerController!.isOriginal
+            bottomView.requestAssetBytes()
+        }
         if config.isShowBottomView {
             view.addSubview(bottomView)
             bottomView.updateFinishButtonTitle()
         }
+        selectBoxControl = SelectBoxView(
+            config.selectBox,
+            frame: CGRect(
+                origin: .zero,
+                size: config.selectBox.size
+            )
+        )
+        selectBoxControl.backgroundColor = .clear
+        selectBoxControl.addTarget(self, action: #selector(didSelectBoxControlClick), for: UIControl.Event.touchUpInside)
+        
         if let pickerController = pickerController, (isExternalPreview || isExternalPickerPreview) {
 //            statusBarShouldBeHidden = pickerController.config.prefersStatusBarHidden
             if pickerController.modalPresentationStyle != .custom {

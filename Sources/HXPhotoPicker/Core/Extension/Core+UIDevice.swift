@@ -71,10 +71,26 @@ extension UIDevice {
         safeAreaInsets.right
     }
     class var bottomMargin: CGFloat {
-        safeAreaInsets.bottom
+        if UIDevice.isPad {
+            #if HXPICKER_ENABLE_PICKER
+            if let controller = UIViewController.topViewController?.navigationController as? PhotoPickerController, controller.modalPresentationStyle == .pageSheet {
+                return 0
+            }
+            #endif
+        }
+        return safeAreaInsets.bottom
     }
     class var isPad: Bool {
         current.userInterfaceIdiom == .pad
+    }
+    class var screenSize: CGSize {
+        if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+            if !Thread.isMainThread {
+                return UIScreen.main.bounds.size
+            }
+            return UIApplication._keyWindow?.size ?? UIScreen.main.bounds.size
+        }
+        return UIScreen.main.bounds.size
     }
     class var isAllIPhoneX: Bool {
         let safeArea = safeAreaInsets

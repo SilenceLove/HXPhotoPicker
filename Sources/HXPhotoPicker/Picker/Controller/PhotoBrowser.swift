@@ -9,6 +9,10 @@ import UIKit
 
 open class PhotoBrowser: PhotoPickerController {
     
+    public var collectionView: UICollectionView {
+        previewViewController!.collectionView
+    }
+    
     /// 当前页面
     public var pageIndex: Int {
         get { currentPreviewIndex }
@@ -32,6 +36,9 @@ open class PhotoBrowser: PhotoPickerController {
         if previewAssets.isEmpty {
             return assetForIndex?(pageIndex)
         }else {
+            if pageIndex >= previewAssets.count || pageIndex < 0 {
+                return nil
+            }
             return previewAssets[pageIndex]
         }
     }
@@ -52,13 +59,7 @@ open class PhotoBrowser: PhotoPickerController {
     public var pageIndicatorType: PageIndicatorType = .bottom
     
     /// 页面指示器，nil则不显示
-    public lazy var pageIndicator: PhotoBrowserPageIndicator? = {
-        let indicator = PhotoBrowserPageControlIndicator(frame: .init(x: 0, y: 0, width: 0, height: 30))
-        indicator.pageControlChanged = { [weak self] index in
-            self?.pageIndex = index
-        }
-        return indicator
-    }()
+    public var pageIndicator: PhotoBrowserPageIndicator?
     
     /// 获取页数
     /// 动态设置数据时必须实现（assets.isEmpty）
@@ -121,7 +122,7 @@ open class PhotoBrowser: PhotoPickerController {
     }
     
     @discardableResult
-    public class func show(
+    open class func show(
         _ config: Configuration = .init(),
         pageIndex: Int = 0,
         fromVC: UIViewController? = nil,
@@ -165,7 +166,7 @@ open class PhotoBrowser: PhotoPickerController {
     ///   - longPressHandler: 长按事件
     /// - Returns: 对应的 PhotoBrowser
     @discardableResult
-    public class func show(
+    open class func show(
         _ previewAssets: [PhotoAsset],
         pageIndex: Int = 0,
         config: Configuration = .init(),
@@ -302,25 +303,14 @@ open class PhotoBrowser: PhotoPickerController {
         
         previewConfig.previewView = pConfig
         previewConfig.navigationTintColor = browserConfig.tintColor
+        previewConfig.modalPresentationStyle = browserConfig.modalPresentationStyle
         
         return (previewConfig, browserConfig)
     }
     
     let hideSourceView: Bool
     
-    fileprivate lazy var gradualShadowImageView: UIImageView = {
-        let navHeight = navigationBar.height
-        let view = UIImageView(
-            image: UIImage.gradualShadowImage(
-                CGSize(
-                    width: view.width,
-                    height: UIDevice.isAllIPhoneX ? navHeight + 60 : navHeight + 30
-                )
-            )
-        )
-        view.alpha = 0
-        return view
-    }()
+    fileprivate var gradualShadowImageView: UIImageView!
     
     fileprivate var didHidden: Bool = false
     
@@ -342,6 +332,8 @@ open class PhotoBrowser: PhotoPickerController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        initViews()
+        
         if previewAssets.isEmpty {
             assert(
                 numberOfPages != nil &&
@@ -369,7 +361,9 @@ open class PhotoBrowser: PhotoPickerController {
             if pageIndicatorType == .titleView {
                 previewViewController?.navigationItem.titleView = pageIndicator
             }else if pageIndicatorType == .bottom {
-                pageIndicator.alpha = 0
+                if config.modalPresentationStyle == .custom {
+                    pageIndicator.alpha = 0
+                }
                 view.addSubview(pageIndicator)
             }
         }
@@ -383,6 +377,28 @@ open class PhotoBrowser: PhotoPickerController {
             name: UIApplication.didChangeStatusBarOrientationNotification,
             object: nil
         )
+    }
+    
+    private func initViews() {
+        
+        let indicator = PhotoBrowserPageControlIndicator(frame: .init(x: 0, y: 0, width: 0, height: 30))
+        indicator.pageControlChanged = { [weak self] index in
+            self?.pageIndex = index
+        }
+        pageIndicator = indicator
+        
+        let navHeight = navigationBar.height
+        gradualShadowImageView = UIImageView(
+            image: UIImage.gradualShadowImage(
+                CGSize(
+                    width: view.width,
+                    height: UIDevice.isAllIPhoneX ? navHeight + 60 : navHeight + 30
+                )
+            )
+        )
+        if config.modalPresentationStyle == .custom {
+            gradualShadowImageView.alpha = 0
+        }
     }
     
     @objc open func deviceOrientationDidChanged(notify: Notification) {
@@ -670,13 +686,7 @@ public protocol PhotoBrowserPageIndicator: UIView {
 
 open class PhotoBrowserDefaultPageIndicator: UIView, PhotoBrowserPageIndicator {
     
-    public lazy var titleLabel: UILabel = {
-        let titleLabel = UILabel()
-        titleLabel.textColor = .white
-        titleLabel.font = UIFont.semiboldPingFang(ofSize: 17)
-        titleLabel.textAlignment = .center
-        return titleLabel
-    }()
+    public var titleLabel: UILabel!
     
     public var numberOfPages: Int = 0
     public var pageIndex: Int = 0 {
@@ -687,6 +697,10 @@ open class PhotoBrowserDefaultPageIndicator: UIView, PhotoBrowserPageIndicator {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        titleLabel = UILabel()
+        titleLabel.textColor = .white
+        titleLabel.font = UIFont.semiboldPingFang(ofSize: 17)
+        titleLabel.textAlignment = .center
         addSubview(titleLabel)
     }
     
@@ -711,31 +725,24 @@ open class PhotoBrowserDefaultPageIndicator: UIView, PhotoBrowserPageIndicator {
 
 open class PhotoBrowserPageControlIndicator: UIView, PhotoBrowserPageIndicator {
     
-    public lazy var maskLayer: CAGradientLayer = {
-        let layer = PhotoTools.getGradientShadowLayer(
-            false
-        )
-        return layer
-    }()
+    public var maskLayer: CAGradientLayer!
     
-    public lazy var pageControl: UIPageControl = {
-        let pageControl = UIPageControl()
-        pageControl.addTarget(self, action: #selector(pageControlDidChanged), for: .valueChanged)
-        pageControl.hidesForSinglePage = true
-        return pageControl
-    }()
+    public var pageControl: UIPageControl!
     
     public var pageControlChanged: ((Int) -> Void)?
     
-    @objc
-    func pageControlDidChanged() {
-        pageControlChanged?(pageControl.currentPage)
-    }
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
+        maskLayer = PhotoTools.getGradientShadowLayer(false)
         layer.addSublayer(maskLayer)
+        pageControl = UIPageControl()
+        pageControl.addTarget(self, action: #selector(pageControlDidChanged), for: .valueChanged)
         addSubview(pageControl)
+    }
+    
+    @objc
+    private func pageControlDidChanged() {
+        pageControlChanged?(pageControl.currentPage)
     }
     
     required public init?(coder: NSCoder) {
@@ -767,12 +774,14 @@ open class PhotoBrowserVideoCell: PreviewVideoControlViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        maskLayer.colors = [UIColor.black.withAlphaComponent(0).cgColor,
-                            UIColor.black.withAlphaComponent(0.1).cgColor,
-                            UIColor.black.withAlphaComponent(0.2).cgColor,
-                            UIColor.black.withAlphaComponent(0.2).cgColor,
-                            UIColor.black.withAlphaComponent(0.1).cgColor,
-                            UIColor.black.withAlphaComponent(0).cgColor]
+        maskLayer.colors = [
+            UIColor.black.withAlphaComponent(0).cgColor,
+            UIColor.black.withAlphaComponent(0.1).cgColor,
+            UIColor.black.withAlphaComponent(0.2).cgColor,
+            UIColor.black.withAlphaComponent(0.2).cgColor,
+            UIColor.black.withAlphaComponent(0.1).cgColor,
+            UIColor.black.withAlphaComponent(0).cgColor
+        ]
         maskLayer.locations = [0.1, 0.2, 0.4, 0.5, 0.7, 1]
     }
     

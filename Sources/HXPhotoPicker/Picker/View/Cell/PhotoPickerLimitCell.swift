@@ -9,20 +9,8 @@ import UIKit
 
 class PhotoPickerLimitCell: UICollectionViewCell {
     
-    lazy var lineLayer: CAShapeLayer = {
-        let lineLayer = CAShapeLayer()
-        lineLayer.contentsScale = UIScreen.main.scale
-        lineLayer.fillColor = UIColor.clear.cgColor
-        lineLayer.lineCap = .round
-        return lineLayer
-    }()
-    
-    lazy var titleLb: UILabel = {
-        let label = UILabel()
-        label.textAlignment = .center
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
+    private var lineLayer: CAShapeLayer!
+    private var titleLb: UILabel!
     
     var config: PhotoListConfiguration.LimitCell? {
         didSet {
@@ -32,7 +20,16 @@ class PhotoPickerLimitCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        lineLayer = CAShapeLayer()
+        lineLayer.contentsScale = UIScreen.main.scale
+        lineLayer.fillColor = UIColor.clear.cgColor
+        lineLayer.lineCap = .round
         contentView.layer.addSublayer(lineLayer)
+        
+        titleLb = UILabel()
+        titleLb.textAlignment = .center
+        titleLb.adjustsFontSizeToFitWidth = true
         contentView.addSubview(titleLb)
     }
     
@@ -50,7 +47,7 @@ class PhotoPickerLimitCell: UICollectionViewCell {
         guard let config = config else {
             return
         }
-        titleLb.text = config.title
+        titleLb.text = config.title?.localized
         let isDark = PhotoManager.isDark
         backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
         lineLayer.strokeColor = isDark ? config.lineDarkColor.cgColor : config.lineColor.cgColor
@@ -62,7 +59,7 @@ class PhotoPickerLimitCell: UICollectionViewCell {
     func setLineLayerPath() {
         let path = UIBezierPath()
         let centerX = width * 0.5
-        let margin: CGFloat = config?.title == nil ? 0 : 20
+        let margin: CGFloat = config?.title?.localized == nil ? 0 : 20
         let centerY = (height - margin) * 0.5
         let linelength = (config?.lineLength ?? 30) * 0.5
         path.move(to: CGPoint(x: centerX - linelength, y: centerY))

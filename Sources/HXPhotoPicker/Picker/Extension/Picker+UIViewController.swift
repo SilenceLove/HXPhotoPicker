@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension UIViewController {
+extension UIViewController: HXPickerCompatible {
     var pickerController: PhotoPickerController? {
         guard let controller = navigationController as? PhotoPickerController else {
             return nil
@@ -16,6 +16,7 @@ extension UIViewController {
         return controller
     }
 }
+
 public extension HXPickerWrapper where Base: UIViewController {
     
     @available(iOS 13.0, *)

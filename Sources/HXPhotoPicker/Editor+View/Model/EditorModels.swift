@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 #if canImport(Kingfisher)
 import Kingfisher
 #endif

@@ -11,10 +11,10 @@ import Photos
 public class PickerManager: NSObject {
     
     /// 配置
-    public lazy var config: PickerConfiguration = .init()
+    public var config: PickerConfiguration = .init()
     
     /// fetch Assets 时的选项配置
-    public lazy var options: PHFetchOptions = .init()
+    public var options: PHFetchOptions = .init()
     
     /// 默认0，不限制
     public var fetchLimit: Int = 0
@@ -50,16 +50,8 @@ public class PickerManager: NSObject {
     fileprivate var selectedPhotoAssetArray: [PhotoAsset] = []
     fileprivate var selectedVideoAssetArray: [PhotoAsset] = []
     fileprivate var canAddAsset: Bool = true
-    fileprivate lazy var requestAssetBytesQueue: OperationQueue = {
-        let requestAssetBytesQueue = OperationQueue.init()
-        requestAssetBytesQueue.maxConcurrentOperationCount = 1
-        return requestAssetBytesQueue
-    }()
-    fileprivate lazy var fetchAssetQueue: OperationQueue = {
-        let fetchAssetQueue = OperationQueue.init()
-        fetchAssetQueue.maxConcurrentOperationCount = 1
-        return fetchAssetQueue
-    }()
+    fileprivate var requestAssetBytesQueue: OperationQueue!
+    fileprivate var fetchAssetQueue: OperationQueue!
     
     var fetchAssetsCompletion: (([PhotoAsset], PhotoAsset?) -> Void)?
     var reloadAssetCollection: (() -> Void)?
@@ -67,6 +59,15 @@ public class PickerManager: NSObject {
     var didSelectAsset: ((PhotoAsset, Int) -> Void)?
     var willDeselectAsset: ((PhotoAsset, Int) -> Void)?
     var didDeselectAsset: ((PhotoAsset, Int) -> Void)?
+    
+    public override init() {
+        super.init()
+        requestAssetBytesQueue = OperationQueue()
+        requestAssetBytesQueue.maxConcurrentOperationCount = 1
+        
+        fetchAssetQueue = OperationQueue()
+        fetchAssetQueue.maxConcurrentOperationCount = 1
+    }
     
     deinit {
         cancelFetchAssetQueue()
@@ -235,11 +236,7 @@ extension PickerManager {
                 .enumerateAssets(
                     options: self.fetchLimit > 0 ? .reverse : .concurrent,
                     usingBlock: { [weak self] (photoAsset, index, stop) in
-                guard let self = self else {
-                    stop.pointee = true
-                    return
-                }
-                if operation.isCancelled {
+                guard let self = self, !operation.isCancelled else {
                     stop.pointee = true
                     return
                 }

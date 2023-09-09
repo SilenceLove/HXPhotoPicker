@@ -187,7 +187,7 @@ open class PhotoAsset: Equatable {
     }
     
     /// 本地/网络Asset的唯一标识符
-    public private(set) lazy var localAssetIdentifier: String = UUID().uuidString
+    public private(set) var localAssetIdentifier: String = UUID().uuidString
     
     #if canImport(Kingfisher)
     /// 初始化网络图片

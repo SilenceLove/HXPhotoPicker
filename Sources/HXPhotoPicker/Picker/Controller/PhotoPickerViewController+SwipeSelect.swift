@@ -13,7 +13,7 @@ extension PhotoPickerViewController: UIGestureRecognizerDelegate {
         if gestureRecognizer != swipeSelectPanGR {
             return true
         }
-        guard var config = pickerController?.config else {
+        guard let config = pickerController?.config else {
             return true
         } 
         let point = gestureRecognizer.location(in: view)

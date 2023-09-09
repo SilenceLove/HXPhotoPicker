@@ -219,11 +219,8 @@ public extension EditorView {
     var contentView: UIView {
         adjusterView
     }
-}
-
-// MARK: 绘画
-public extension EditorView {
     
+    // MARK: 绘画
     /// The drawing function cannot be opened in the editing state
     /// It will be automatically closed when entering the editing mode, and it needs to be opened manually after editing
     /// 绘画功能，编辑状态下无法开启
@@ -263,12 +260,9 @@ public extension EditorView {
     func undoAllDraw() {
         adjusterView.undoAllDraw()
     }
-}
-
-// MARK: 马赛克涂抹
-//  视频不支持马赛克涂抹
-public extension EditorView {
     
+    // MARK: 马赛克涂抹
+    //  视频不支持马赛克涂抹
     /// 马赛克图片
     var mosaicImage: UIImage? {
         get { adjusterView.mosaicOriginalImage }
@@ -327,9 +321,6 @@ public extension EditorView {
     func undoAllMosaic() {
         adjusterView.undoAllMosaic()
     }
-}
-
-public extension EditorView {
     
     /// Whether to allow dragging of textures
     /// It will be automatically closed when entering the editing mode, and it needs to be opened manually after editing
@@ -435,11 +426,8 @@ public extension EditorView {
     func hideStickersView() {
         adjusterView.hideStickersView()
     }
-}
-
-// MARK: 自定义遮罩
-public extension EditorView {
     
+    // MARK: 自定义遮罩
     /// 遮罩类型
     var maskType: MaskType {
         get {
@@ -469,11 +457,8 @@ public extension EditorView {
     func setMaskImage(_ image: UIImage?, animated: Bool) {
         adjusterView.setMaskImage(image, animated: animated)
     }
-}
-
-// MARK: 编辑调整
-public extension EditorView {
     
+    // MARK: 编辑调整
     /// 原始宽高比
     var originalAspectRatio: CGSize {
         adjusterView.originalAspectRatio
@@ -720,11 +705,8 @@ public extension EditorView {
     func removeVideoURLCache() {
         adjusterView.lastVideoFator = nil
     }
-}
-
-// MARK: 旋转
-public extension EditorView {
     
+    // MARK: 旋转
     /// current rotation angle
     /// 当前旋转的角度
     var angle: CGFloat {
@@ -781,11 +763,8 @@ public extension EditorView {
         }
         adjusterView.rotateRight(animated, completion: completion)
     }
-}
-
-// MARK: 镜像
-public extension EditorView {
     
+    // MARK: 镜像
     /// horizontal mirror
     /// 水平镜像
     func mirrorHorizontally(_ animated: Bool, completion: (() -> Void)? = nil) {
@@ -813,11 +792,8 @@ public extension EditorView {
         }
         adjusterView.mirrorVertically(animated: animated, completion: completion)
     }
-}
-
-// MARK: 重置编辑
-public extension EditorView {
     
+    // MARK: 重置编辑
     /// Is it possible to reset edit
     /// 是否可以重置编辑
     var canReset: Bool {
@@ -837,11 +813,8 @@ public extension EditorView {
         }
         adjusterView.reset(animated, completion: completion)
     }
-}
-
-// MARK: 修改frame后更新视图
-public extension EditorView {
     
+    // MARK: 修改frame后更新视图
     /// Update Views
     /// 更新内部视图的frame
     func update() {

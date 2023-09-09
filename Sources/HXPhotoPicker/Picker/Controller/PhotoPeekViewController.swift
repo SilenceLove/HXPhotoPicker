@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 public protocol PhotoPeekViewControllerDelegate: AnyObject {
     func photoPeekViewController(requestSucceed photoPeekViewController: PhotoPeekViewController)
@@ -20,43 +20,11 @@ public extension PhotoPeekViewControllerDelegate {
 
 public class PhotoPeekViewController: UIViewController {
     weak var delegate: PhotoPeekViewControllerDelegate?
-    lazy var contentView: PhotoPreviewContentView = {
-        let type: PhotoPreviewContentView.`Type`
-        if photoAsset.mediaType == .photo {
-            if photoAsset.mediaSubType == .livePhoto ||
-                photoAsset.mediaSubType == .localLivePhoto {
-                type = .livePhoto
-            }else {
-                type = .photo
-            }
-        }else {
-            type = .video
-        }
-        let view = PhotoPreviewContentView(type: type)
-        view.isPeek = true
-        if let photoAsset = photoAsset {
-            view.photoAsset = photoAsset
-        }
-        view.livePhotoPlayType = .auto
-        view.videoPlayType = .auto
-        view.delegate = self
-        if type == .video {
-            view.videoView.delegate = self
-        }
-        return view
-    }()
     
-    lazy var progressView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        return view
-    }()
-    
+    private var contentView: PhotoPreviewContentView!
+    private var progressView: UIView!
     #if !targetEnvironment(macCatalyst)
-    lazy var captureView: CaptureVideoPreviewView = {
-        let view = CaptureVideoPreviewView()
-        return view
-    }()
+    private var captureView: CaptureVideoPreviewView!
     #endif
     
     var photoAsset: PhotoAsset!
@@ -76,11 +44,37 @@ public class PhotoPeekViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         if photoAsset != nil {
+            let type: PhotoPreviewContentView.`Type`
+            if photoAsset.mediaType == .photo {
+                if photoAsset.mediaSubType == .livePhoto ||
+                    photoAsset.mediaSubType == .localLivePhoto {
+                    type = .livePhoto
+                }else {
+                    type = .photo
+                }
+            }else {
+                type = .video
+            }
+            contentView = PhotoPreviewContentView(type: type)
+            contentView.isPeek = true
+            if let photoAsset = photoAsset {
+                contentView.photoAsset = photoAsset
+            }
+            contentView.livePhotoPlayType = .auto
+            contentView.videoPlayType = .auto
+            contentView.delegate = self
+            if type == .video {
+                contentView.videoView.delegate = self
+            }
             view.addSubview(contentView)
+            
+            progressView = UIView()
+            progressView.backgroundColor = .white
             view.addSubview(progressView)
         }
         #if !targetEnvironment(macCatalyst)
         if isCamera {
+            captureView = CaptureVideoPreviewView()
             view.addSubview(captureView)
         }
         #endif

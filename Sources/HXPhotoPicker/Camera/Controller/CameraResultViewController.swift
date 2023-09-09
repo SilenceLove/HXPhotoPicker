@@ -32,63 +32,58 @@ class CameraResultViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    lazy var topMaskLayer: CAGradientLayer = {
-        let layer = PhotoTools.getGradientShadowLayer(true)
-        return layer
-    }()
-    
-    lazy var imageView: UIImageView = {
-        let view = UIImageView(image: image)
-        view.clipsToBounds = true
-        view.contentMode = .scaleAspectFill
-        return view
-    }()
-    
-    lazy var playerView: CameraResultVideoView = {
-        let view = CameraResultVideoView()
-        if let videoURL = videoURL {
-            view.avAsset = AVAsset(url: videoURL)
-        }
-        return view
-    }()
-    
-    lazy var doneButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("完成".localized, for: .normal)
-        button.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
-        button.layer.cornerRadius = 3
-        button.layer.masksToBounds = true
-        button.addTarget(self, action: #selector(didDoneButtonClick(button:)), for: .touchUpInside)
-        button.backgroundColor = color
-        button.setTitleColor(.white, for: .normal)
-        return button
-    }()
-    
-    @objc
-    func didDoneButtonClick(button: UIButton) {
-        delegate?.cameraResultViewController(didDone: self)
-    }
+    private var topMaskLayer: CAGradientLayer!
+    private var imageView: UIImageView!
+    private var playerView: CameraResultVideoView!
+    private var doneButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
-        if type == .photo {
-            view.addSubview(imageView)
-        }else {
-            view.addSubview(playerView)
-        }
-        view.addSubview(doneButton)
-        view.layer.addSublayer(topMaskLayer)
         view.addGestureRecognizer(
             UITapGestureRecognizer(
                 target: self,
                 action: #selector(didViewClick)
             )
         )
+        initViews()
+    }
+    
+    private func initViews() {
+        topMaskLayer = PhotoTools.getGradientShadowLayer(true)
+        view.layer.addSublayer(topMaskLayer)
+        
+        if type == .photo {
+            imageView = UIImageView(image: image)
+            imageView.clipsToBounds = true
+            imageView.contentMode = .scaleAspectFill
+            view.addSubview(imageView)
+        }else {
+            playerView = CameraResultVideoView()
+            if let videoURL = videoURL {
+                playerView.avAsset = AVAsset(url: videoURL)
+            }
+            view.addSubview(playerView)
+        }
+        
+        doneButton = UIButton(type: .system)
+        doneButton.setTitle("完成".localized, for: .normal)
+        doneButton.titleLabel?.font = .mediumPingFang(ofSize: 16)
+        doneButton.layer.cornerRadius = 3
+        doneButton.layer.masksToBounds = true
+        doneButton.addTarget(self, action: #selector(didDoneButtonClick(button:)), for: .touchUpInside)
+        doneButton.backgroundColor = color
+        doneButton.setTitleColor(.white, for: .normal)
+        view.addSubview(doneButton)
     }
     
     @objc
-    func didViewClick() {
+    private func didDoneButtonClick(button: UIButton) {
+        delegate?.cameraResultViewController(didDone: self)
+    }
+    
+    @objc
+    private func didViewClick() {
         if doneButton.alpha == 1 {
             navigationController?.setNavigationBarHidden(true, animated: true)
             UIView.animate(withDuration: 0.25) {

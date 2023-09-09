@@ -44,122 +44,17 @@ protocol EditorMusicListViewControllerDelegate: AnyObject {
 
 class EditorMusicListViewController: BaseViewController {
     weak var delegate: EditorMusicListViewControllerDelegate?
-    lazy var loadBgView: UIView = {
-        let view = UIView()
-        view.addSubview(loadingView)
-        return view
-    }()
-    lazy var loadingView: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .white)
-        view.hidesWhenStopped = true
-        return view
-    }()
-    lazy var bgView: UIVisualEffectView = {
-        let visualEffect = UIBlurEffect.init(style: .dark)
-        let view = UIVisualEffectView.init(effect: visualEffect)
-        return view
-    }()
-    lazy var finishButton: UIButton = {
-        let button = UIButton(type: .system)
-        let title = "完成".localized
-        let font = UIFont.systemFont(ofSize: 17)
-        button.setTitle(title, for: .normal)
-        button.setTitleColor(config.finishButtonTitleColor, for: .normal)
-        if config.finishButtonBackgroundColor != .clear {
-            let image = UIImage.image(
-                for: config.finishButtonBackgroundColor,
-                havingSize: CGSize(
-                    width: title.width(ofFont: font, maxHeight: 35),
-                    height: 30
-                ),
-                radius: 3
-            )
-            button.setBackgroundImage(image, for: .normal)
-        }else {
-        }
-        button.titleLabel?.font = font
-        button.isEnabled = false
-        button.addTarget(self, action: #selector(didFinishButtonClick), for: .touchUpInside)
-        return button
-    }()
-    @objc func didFinishButtonClick() {
-        dismiss(animated: true)
-    }
-    lazy var searchBgView: UIVisualEffectView = {
-        let visualEffect = UIBlurEffect.init(style: .light)
-        let view = UIVisualEffectView.init(effect: visualEffect)
-        view.layer.cornerRadius = 10
-        view.layer.masksToBounds = true
-        view.alpha = 0.5
-        return view
-    }()
-    lazy var searchView: SearchView = {
-        let view = SearchView()
-        view.textColor = .white
-        view.tintColor = config.tintColor
-        view.attributedPlaceholder = NSAttributedString(
-            string: config.placeholder.isEmpty ?
-                "搜索歌名".localized :
-                config.placeholder,
-            attributes: [
-                .font: UIFont.systemFont(ofSize: 17),
-                .foregroundColor: UIColor.white.withAlphaComponent(0.4)
-            ]
-        )
-        view.font = .systemFont(ofSize: 17)
-        view.clearButtonMode = .whileEditing
-        view.returnKeyType = .search
-        let searchIcon = UIImageView()
-        searchIcon.image = "hx_editor_video_music_search".image?.withRenderingMode(.alwaysTemplate)
-        searchIcon.tintColor = .white.withAlphaComponent(0.4)
-        searchIcon.size = searchIcon.image?.size ?? .zero
-        view.leftView = searchIcon
-        view.leftViewMode = .always
-        view.layer.cornerRadius = 10
-        view.layer.masksToBounds = true
-        view.delegate = self
-        return view
-    }()
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout.init()
-        flowLayout.scrollDirection = .vertical
-        flowLayout.minimumLineSpacing = 15
-        flowLayout.minimumInteritemSpacing = 0
-        return flowLayout
-    }()
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(
-            frame: CGRect(
-                x: 0, y: 0,
-                width: 0, height: 90
-            ),
-            collectionViewLayout: flowLayout
-        )
-        collectionView.backgroundColor = .clear
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.showsHorizontalScrollIndicator = false
-        if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .never
-        }
-        collectionView.register(EditorMusicViewCell.self, forCellWithReuseIdentifier: "EditorMusicViewCellID")
-        return collectionView
-    }()
-    lazy var noMoreView: UIView = {
-        let view = UIView()
-        view.layer.addSublayer(noMoreLine)
-        return view
-    }()
-    lazy var noMoreLine: CAShapeLayer = {
-        let noMoreLine = CAShapeLayer()
-        noMoreLine.contentsScale = UIScreen.main.scale
-        noMoreLine.fillColor = UIColor.white.withAlphaComponent(0.5).cgColor
-        noMoreLine.strokeColor = UIColor.white.withAlphaComponent(0.5).cgColor
-        noMoreLine.lineCap = .round
-        noMoreLine.lineJoin = .round
-        noMoreLine.lineWidth = 1
-        return noMoreLine
-    }()
+    private var loadBgView: UIView!
+    private var loadingView: UIActivityIndicatorView!
+    private var bgView: UIVisualEffectView!
+    private var finishButton: UIButton!
+    private var searchBgView: UIVisualEffectView!
+    private var searchView: SearchView!
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var collectionView: UICollectionView!
+    private var noMoreView: UIView!
+    private var noMoreLine: CAShapeLayer!
+    
     var searchText: String?
     var currentSelectItem: Int = -1
     var musics: [VideoEditorMusic] = []
@@ -178,6 +73,7 @@ class EditorMusicListViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        initViews()
         view.backgroundColor = .clear
         title = "背景音乐".localized
         if !config.infos.isEmpty {
@@ -211,6 +107,104 @@ class EditorMusicListViewController: BaseViewController {
         view.addSubview(searchView)
         view.addSubview(collectionView)
         searchView.becomeFirstResponder()
+    }
+    
+    private func initViews() {
+        loadingView = UIActivityIndicatorView(style: .white)
+        loadingView.hidesWhenStopped = true
+        loadBgView = UIView()
+        loadBgView.addSubview(loadingView)
+        
+        finishButton = UIButton(type: .system)
+        let title = "完成".localized
+        let font = UIFont.systemFont(ofSize: 17)
+        finishButton.setTitle(title, for: .normal)
+        finishButton.setTitleColor(config.finishButtonTitleColor, for: .normal)
+        if config.finishButtonBackgroundColor != .clear {
+            let image = UIImage.image(
+                for: config.finishButtonBackgroundColor,
+                havingSize: CGSize(
+                    width: title.width(ofFont: font, maxHeight: 35),
+                    height: 30
+                ),
+                radius: 3
+            )
+            finishButton.setBackgroundImage(image, for: .normal)
+        }
+        finishButton.titleLabel?.font = font
+        finishButton.isEnabled = false
+        finishButton.addTarget(self, action: #selector(didFinishButtonClick), for: .touchUpInside)
+        
+        searchView = SearchView()
+        searchView.textColor = .white
+        searchView.tintColor = config.tintColor
+        searchView.attributedPlaceholder = NSAttributedString(
+            string: config.placeholder.isEmpty ?
+                "搜索歌名".localized :
+                config.placeholder,
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor.white.withAlphaComponent(0.4)
+            ]
+        )
+        searchView.font = .systemFont(ofSize: 17)
+        searchView.clearButtonMode = .whileEditing
+        searchView.returnKeyType = .search
+        let searchIcon = UIImageView()
+        searchIcon.image = "hx_editor_video_music_search".image?.withRenderingMode(.alwaysTemplate)
+        searchIcon.tintColor = .white.withAlphaComponent(0.4)
+        searchIcon.size = searchIcon.image?.size ?? .zero
+        searchView.leftView = searchIcon
+        searchView.leftViewMode = .always
+        searchView.layer.cornerRadius = 10
+        searchView.layer.masksToBounds = true
+        searchView.delegate = self
+        
+        let visualEffect = UIBlurEffect(style: .light)
+        searchBgView = UIVisualEffectView.init(effect: visualEffect)
+        searchBgView.layer.cornerRadius = 10
+        searchBgView.layer.masksToBounds = true
+        searchBgView.alpha = 0.5
+        
+        flowLayout = UICollectionViewFlowLayout()
+        flowLayout.scrollDirection = .vertical
+        flowLayout.minimumLineSpacing = 15
+        flowLayout.minimumInteritemSpacing = 0
+        
+        collectionView = UICollectionView(
+            frame: CGRect(
+                x: 0, y: 0,
+                width: 0, height: 90
+            ),
+            collectionViewLayout: flowLayout
+        )
+        collectionView.backgroundColor = .clear
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.showsHorizontalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        }
+        collectionView.register(EditorMusicViewCell.self, forCellWithReuseIdentifier: "EditorMusicViewCellID")
+        
+        noMoreLine = CAShapeLayer()
+        noMoreLine.contentsScale = UIScreen.main.scale
+        noMoreLine.fillColor = UIColor.white.withAlphaComponent(0.5).cgColor
+        noMoreLine.strokeColor = UIColor.white.withAlphaComponent(0.5).cgColor
+        noMoreLine.lineCap = .round
+        noMoreLine.lineJoin = .round
+        noMoreLine.lineWidth = 1
+        
+        noMoreView = UIView()
+        noMoreView.layer.addSublayer(noMoreLine)
+        
+        let darkEffect = UIBlurEffect.init(style: .dark)
+        bgView = UIVisualEffectView.init(effect: darkEffect)
+    }
+    
+    @objc
+    private func didFinishButtonClick() {
+        dismiss(animated: true)
     }
     
     func deselect() {

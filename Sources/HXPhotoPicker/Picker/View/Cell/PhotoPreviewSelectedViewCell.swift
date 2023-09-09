@@ -11,24 +11,9 @@ import Photos
 
 open class PhotoPreviewSelectedViewCell: UICollectionViewCell {
     
-    public lazy var photoView: PhotoThumbnailView = {
-        let photoView = PhotoThumbnailView()
-        photoView.imageView.size = size
-        return photoView
-    }()
-    
-    public lazy var selectedView: UIView = {
-        let selectedView = UIView.init()
-        selectedView.isHidden = true
-        selectedView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
-        selectedView.addSubview(tickView)
-        return selectedView
-    }()
-    
-    public lazy var tickView: AlbumTickView = {
-        let tickView = AlbumTickView.init(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
-        return tickView
-    }()
+    public var photoView: PhotoThumbnailView!
+    public var selectedView: UIView!
+    public var tickView: AlbumTickView!
     
     open var tickColor: UIColor? {
         didSet {
@@ -61,8 +46,18 @@ open class PhotoPreviewSelectedViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        photoView = PhotoThumbnailView()
+        photoView.imageView.size = size
         contentView.addSubview(photoView)
+        
+        selectedView = UIView()
+        selectedView.isHidden = true
+        selectedView.backgroundColor = .black.withAlphaComponent(0.6)
         contentView.addSubview(selectedView)
+        
+        tickView = AlbumTickView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        selectedView.addSubview(tickView)
     }
     
     public func cancelRequest() {

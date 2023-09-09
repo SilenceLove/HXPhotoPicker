@@ -12,17 +12,7 @@ import Kingfisher
 #endif
 
 final class ImageView: UIView {
-    lazy var imageView: UIImageView = {
-        var imageView: UIImageView
-        #if canImport(Kingfisher)
-        imageView = AnimatedImageView.init()
-        #else
-        imageView = GIFImageView.init()
-        #endif
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        return imageView
-    }()
+    var imageView: UIImageView!
     var image: UIImage? {
         get {
             my.image
@@ -44,6 +34,13 @@ final class ImageView: UIView {
     
     init() {
         super.init(frame: .zero)
+        #if canImport(Kingfisher)
+        imageView = AnimatedImageView.init()
+        #else
+        imageView = GIFImageView.init()
+        #endif
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         addSubview(imageView)
     }
     required init?(coder: NSCoder) {
@@ -58,7 +55,7 @@ final class ImageView: UIView {
         if let image = image {
             my.image = image
             if animated {
-                let transition = CATransition()
+                let transition: CATransition = .init()
                 transition.type = .fade
                 transition.duration = 0.2
                 transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
@@ -70,7 +67,7 @@ final class ImageView: UIView {
     func setImage(_ img: UIImage?) {
         #if canImport(Kingfisher)
         if let img = img {
-            let image = DefaultImageProcessor.default.process(item: .image(img), options: .init([]))
+            let image: KFCrossPlatformImage? = DefaultImageProcessor.default.process(item: .image(img), options: .init([]))
             my.image = image
         }else {
             my.image = img
@@ -86,14 +83,14 @@ final class ImageView: UIView {
             my.image = nil
             return
         }
-        let image = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))
+        let image: KFCrossPlatformImage? = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))
         my.image = image
         #else
         guard let imageData = imageData else {
             my.gifImage = nil
             return
         }
-        let image = GIFImage.init(data: imageData)
+        let image: GIFImage? = .init(data: imageData)
         my.gifImage = image
         #endif
     }

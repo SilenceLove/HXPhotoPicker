@@ -22,24 +22,30 @@ public struct NotAuthorizedConfiguration {
     
     /// 暗黑风格下的关闭按钮图片名
     public var closeButtonDarkImageName: String = "hx_picker_notAuthorized_close_dark"
+    
+    /// 关闭按钮颜色
+    public var closeButtonColor: UIColor? = .systemBlue
+    
+    /// 暗黑风格下的关闭按钮颜色
+    public var closeButtonDarkColor: UIColor? = .white
 
     /// 隐藏关闭按钮
     public var isHiddenCloseButton: Bool = false
     
     /// 标题颜色
-    public var titleColor: UIColor = .black
+    public var titleColor: UIColor = "#666666".hx.color
     
     /// 暗黑风格下的标题颜色
     public var titleDarkColor: UIColor = .white
     
     /// 子标题颜色
-    public var subTitleColor: UIColor = "#444444".hx.color
+    public var subTitleColor: UIColor = "#999999".hx.color
     
     /// 暗黑风格下的子标题颜色
-    public var darkSubTitleColor: UIColor = .white
+    public var darkSubTitleColor: UIColor = "#dadada".hx.color
     
     /// 跳转按钮背景颜色
-    public var jumpButtonBackgroundColor: UIColor = "#333333".hx.color
+    public var jumpButtonBackgroundColor: UIColor = .systemBlue
     
     /// 暗黑风格下跳转按钮背景颜色
     public var jumpButtonDarkBackgroundColor: UIColor = .white

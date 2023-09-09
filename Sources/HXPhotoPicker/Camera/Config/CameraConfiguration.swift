@@ -89,7 +89,7 @@ public struct CameraConfiguration: IndicatorTypeConfig {
     public var takePhotoMode: TakePhotoMode = .press
     
     /// 主题色
-    public var tintColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var tintColor: UIColor = .systemBlue
     
     /// 摄像头最大缩放比例
     public var videoMaxZoomScale: CGFloat = 6
@@ -102,13 +102,13 @@ public struct CameraConfiguration: IndicatorTypeConfig {
     
     /// 拍照时的滤镜数组，请与 videoFilters 效果保持一致
     /// 左滑/右滑切换滤镜
-    public lazy var photoFilters: [CameraFilter] = [
+    public var photoFilters: [CameraFilter] = [
         InstantFilter(), Apply1977Filter(), ToasterFilter(), TransferFilter()
     ]
     
     /// 录制视频的滤镜数组，请与 photoFilters 效果保持一致
     /// 左滑/右滑切换滤镜
-    public lazy var videoFilters: [CameraFilter] = [
+    public var videoFilters: [CameraFilter] = [
         InstantFilter(), Apply1977Filter(), ToasterFilter(), TransferFilter()
     ]
     
@@ -118,12 +118,7 @@ public struct CameraConfiguration: IndicatorTypeConfig {
     public var allowsEditing: Bool = true
     
     /// 编辑器配置
-    public lazy var editor: EditorConfiguration = {
-        var editor = EditorConfiguration()
-        editor.languageType = languageType
-        editor.indicatorType = indicatorType
-        return editor
-    }()
+    public var editor: EditorConfiguration = .init()
     #endif
     
     #if HXPICKER_ENABLE_CAMERA_LOCATION
@@ -132,6 +127,11 @@ public struct CameraConfiguration: IndicatorTypeConfig {
     #endif
     
     public init() {
+        #if HXPICKER_ENABLE_EDITOR
+        editor.languageType = languageType
+        editor.indicatorType = indicatorType
+        #endif
+        
         if #available(iOS 13.0, *) {
             modalPresentationStyle = .automatic
         } else {

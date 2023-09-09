@@ -118,10 +118,7 @@ extension CameraViewController: CameraBottomViewDelegate {
         previewView.effectiveScale = cameraManager.zoomFacto
     }
     func bottomView(didBackButton bottomView: CameraBottomView) {
-        delegate?.cameraViewController(didCancel: self)
-        if autoDismiss {
-            dismiss(animated: true, completion: nil)
-        }
+        backClick(true)
     }
     func bottomView(
         _ bottomView: CameraBottomView,

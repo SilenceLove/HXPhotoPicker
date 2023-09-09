@@ -17,16 +17,28 @@ class EditorFiltersView: UIView {
     
     weak var delegate: EditorFiltersViewDelegate?
     
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var collectionView: EditorCollectionView!
+    
+    private var loaddingView: UIActivityIndicatorView!
+    private var loadQueue: OperationQueue!
+    
+    var loadCompletion: ((EditorFiltersView) -> Void)?
+    var didLoad: Bool = false
+    var image: UIImage?
+    var filters: [PhotoEditorFilter] = []
+    var currentSelectedIndex: Int = 0
+    let filterConfig: EditorConfiguration.Filter
+    init(
+        filterConfig: EditorConfiguration.Filter
+    ) {
+        self.filterConfig = filterConfig
+        super.init(frame: .zero)
+        flowLayout = UICollectionViewFlowLayout()
         flowLayout.itemSize = CGSize(width: 60, height: 90)
         flowLayout.minimumLineSpacing = 5
         flowLayout.minimumInteritemSpacing = 0
-        return flowLayout
-    }()
-    
-    lazy var collectionView: EditorCollectionView = {
-        let collectionView = EditorCollectionView(
+        collectionView = EditorCollectionView(
             frame: CGRect(x: 0, y: 0, width: 0, height: 50),
             collectionViewLayout: flowLayout
         )
@@ -43,37 +55,12 @@ class EditorFiltersView: UIView {
             EditorFiltersViewCell.self,
             forCellWithReuseIdentifier: "EditorFiltersViewCellID"
         )
-        return collectionView
-    }()
-    
-    var image: UIImage?
-    
-    var filters: [PhotoEditorFilter] = []
-    var currentSelectedIndex: Int = 0
-    var filterConfig: EditorConfiguration.Filter
-    init(
-        filterConfig: EditorConfiguration.Filter
-    ) {
-        self.filterConfig = filterConfig
-        super.init(frame: .zero)
         addSubview(collectionView)
-    }
-    
-    var didLoad: Bool = false
-    
-    lazy var loaddingView: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .white)
-        view.hidesWhenStopped = true
-        return view
-    }()
-    
-    lazy var loadQueue: OperationQueue = {
-        let loadQueue = OperationQueue()
+        loaddingView = UIActivityIndicatorView(style: .white)
+        loaddingView.hidesWhenStopped = true
+        loadQueue = OperationQueue()
         loadQueue.maxConcurrentOperationCount = 1
-        return loadQueue
-    }()
-    
-    var loadCompletion: ((EditorFiltersView) -> Void)?
+    }
     
     func loadFilters(
         originalImage: UIImage,
@@ -88,7 +75,7 @@ class EditorFiltersView: UIView {
             return
         }
         loadQueue.cancelAllOperations()
-        if DispatchQueue.isMain {
+        if Thread.isMainThread {
             loaddingView.startAnimating()
             addSubview(loaddingView)
             
@@ -241,7 +228,7 @@ extension EditorFiltersView: UICollectionViewDataSource, UICollectionViewDelegat
         cell.delegate = self
         let filter = filters[indexPath.item]
         if filter.isOriginal {
-            cell.imageView.image = image
+            cell.image = image
         }
         cell.selectedColor = filterConfig.selectedColor
         cell.filter = filter
@@ -291,7 +278,7 @@ extension EditorFiltersView: EditorFiltersViewCellDelegate {
         if let handler = filterInfo.filterHandler, let image = image?.ci_Image {
             return handler(
                 image,
-                cell.imageView.image,
+                cell.image,
                 cell.filter.parameters,
                 true
             )?.image
@@ -317,52 +304,20 @@ protocol EditorFiltersViewCellDelegate: AnyObject {
 class EditorFiltersViewCell: UICollectionViewCell {
     weak var delegate: EditorFiltersViewCellDelegate?
     
-    lazy var imageView: UIImageView = {
-        let view = UIImageView.init()
-        view.clipsToBounds = true
-        view.contentMode = .scaleAspectFill
-        return view
-    }()
-    
-    lazy var filterNameLb: UILabel = {
-        let label = UILabel.init()
-        label.textColor = .white
-        label.font = .regularPingFang(ofSize: 13)
-        label.textAlignment = .center
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
-    
-    lazy var selectedView: UIView = {
-        let view = UIView.init()
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.2)
-        view.layer.borderWidth = 2
-        view.layer.borderColor = UIColor.red.cgColor
-        view.layer.cornerRadius = 4
-        return view
-    }()
-    
-    lazy var editButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage("hx_editor_tools_filter_edit".image, for: .normal)
-        button.addTarget(self, action: #selector(didEditButtonClick), for: .touchUpInside)
-        return button
-    }()
-    
-    @objc
-    func didEditButtonClick() {
-        delegate?.filterViewCell(didEdit: self)
+    var image: UIImage? {
+        get {
+            imageView.image
+        }
+        set {
+            imageView.image = newValue
+        }
     }
     
-    lazy var parameterLb: UILabel = {
-        let label = UILabel()
-        label.text = "0"
-        label.textColor = .white
-        label.font = .regularPingFang(ofSize: 11)
-        label.textAlignment = .center
-        label.isHidden = true
-        return label
-    }()
+    private var imageView: UIImageView!
+    private var filterNameLb: UILabel!
+    private var selectedView: UIView!
+    private var editButton: UIButton!
+    private var parameterLb: UILabel!
     
     var selectedColor: UIColor? {
         didSet {
@@ -376,8 +331,48 @@ class EditorFiltersViewCell: UICollectionViewCell {
         }
     }
     
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        initViews()
+    }
+    
+    private func initViews() {
+        imageView = UIImageView()
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        contentView.addSubview(imageView)
+        selectedView = UIView()
+        selectedView.backgroundColor = UIColor.black.withAlphaComponent(0.2)
+        selectedView.layer.borderWidth = 2
+        selectedView.layer.borderColor = UIColor.red.cgColor
+        selectedView.layer.cornerRadius = 4
+        contentView.addSubview(selectedView)
+        editButton = UIButton(type: .custom)
+        editButton.setImage("hx_editor_tools_filter_edit".image, for: .normal)
+        editButton.addTarget(self, action: #selector(didEditButtonClick), for: .touchUpInside)
+        contentView.addSubview(editButton)
+        filterNameLb = UILabel()
+        filterNameLb.textColor = .white
+        filterNameLb.font = .regularPingFang(ofSize: 13)
+        filterNameLb.textAlignment = .center
+        filterNameLb.adjustsFontSizeToFitWidth = true
+        contentView.addSubview(filterNameLb)
+        parameterLb = UILabel()
+        parameterLb.text = "0"
+        parameterLb.textColor = .white
+        parameterLb.font = .regularPingFang(ofSize: 11)
+        parameterLb.textAlignment = .center
+        parameterLb.isHidden = true
+        contentView.addSubview(parameterLb)
+    }
+    
+    @objc
+    private func didEditButtonClick() {
+        delegate?.filterViewCell(didEdit: self)
+    }
+    
     func updateFilter() {
-        filterNameLb.text = filter.filterName
+        filterNameLb.text = filter.filterName.localized
         if !filter.isOriginal {
             imageView.image = delegate?.filterViewCell(fetchFilter: self)
         }
@@ -401,15 +396,6 @@ class EditorFiltersViewCell: UICollectionViewCell {
         }else {
             editButton.isHidden = true
         }
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        contentView.addSubview(imageView)
-        contentView.addSubview(selectedView)
-        contentView.addSubview(editButton)
-        contentView.addSubview(filterNameLb)
-        contentView.addSubview(parameterLb)
     }
     
     override func layoutSubviews() {

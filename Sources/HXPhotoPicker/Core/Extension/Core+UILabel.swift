@@ -27,12 +27,3 @@ extension UILabel {
         return .zero
     }
 }
-
-public extension HXPickerWrapper where Base: UILabel {
-    var textWidth: CGFloat {
-        base.textWidth
-    }
-    var textHeight: CGFloat {
-        base.textHeight
-    }
-}

@@ -79,8 +79,6 @@ extension UIView: HXPickerCompatible {
         return nil
     }
     
-    /// UIView转UIImage
-    /// - Returns: UIImage
     func convertedToImage(rect: CGRect = .zero) -> UIImage? {
         var size = bounds.size
         var origin = bounds.origin
@@ -90,8 +88,6 @@ extension UIView: HXPickerCompatible {
         }
         UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
         drawHierarchy(in: CGRect(origin: origin, size: bounds.size), afterScreenUpdates: true)
-//        let context = UIGraphicsGetCurrentContext()
-//        layer.render(in: context!)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image
@@ -124,38 +120,8 @@ extension UIRectCorner {
         }
     }
 }
+
 public extension HXPickerWrapper where Base: UIView {
-    var x: CGFloat {
-        get { base.x }
-        set { base.x = newValue }
-    }
-    var y: CGFloat {
-        get { base.y }
-        set { base.y = newValue }
-    }
-    var width: CGFloat {
-        get { base.width }
-        set { base.width = newValue }
-    }
-    var height: CGFloat {
-        get { base.height }
-        set { base.height = newValue }
-    }
-    var size: CGSize {
-        get { base.size }
-        set { base.size = newValue }
-    }
-    var centerX: CGFloat {
-        get { base.centerX }
-        set { base.centerX = newValue }
-    }
-    var centerY: CGFloat {
-        get { base.centerY }
-        set { base.centerY = newValue }
-    }
-    var viewController: UIViewController? {
-        base.viewController
-    }
     
     func show(
         text: String? = nil,

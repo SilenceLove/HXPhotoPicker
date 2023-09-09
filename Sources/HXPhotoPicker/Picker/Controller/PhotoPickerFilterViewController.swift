@@ -19,35 +19,9 @@ class PhotoPickerFilterViewController: UITableViewController {
     
     var didSelectedHandler: ((PhotoPickerFilterViewController) -> Void)?
     
-    lazy var bottomView: UIView = {
-        let view = UIView()
-        view.addSubview(numberView)
-        view.addSubview(filterLb)
-        return view
-    }()
-    
-    lazy var numberView: PhotoPickerBottomNumberView = {
-        let view = PhotoPickerBottomNumberView()
-        view.photoCount = photoCount
-        view.videoCount = videoCount
-        view.config = .init()
-        return view
-    }()
-    
-    lazy var filterLb: UILabel = {
-        let label = UILabel()
-        label.text = options == .any ? "无筛选条件".localized : "筛选结果".localized
-        label.font = .systemFont(ofSize: 12)
-        if #available(iOS 13.0, *) {
-            label.textColor = UIColor(dynamicProvider: {
-                $0.userInterfaceStyle == .dark ? .white : .black
-            })
-        } else {
-            label.textColor = .black
-        }
-        label.textAlignment = .center
-        return label
-    }()
+    private var bottomView: UIView!
+    private var numberView: PhotoPickerBottomNumberView!
+    private var filterLb: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,6 +44,8 @@ class PhotoPickerFilterViewController: UITableViewController {
             target: self,
             action: #selector(didDoneClick)
         )
+        initViews()
+        
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(PhotoPickerFilterViewCell.self, forCellReuseIdentifier: "PhotoPickerFilterViewCellID")
         let bottomHeight =  UIDevice.bottomMargin + 100
@@ -113,12 +89,36 @@ class PhotoPickerFilterViewController: UITableViewController {
         }
     }
     
+    private func initViews() {
+        numberView = PhotoPickerBottomNumberView()
+        numberView.photoCount = photoCount
+        numberView.videoCount = videoCount
+        numberView.config = .init()
+        
+        filterLb = UILabel()
+        filterLb.text = options == .any ? "无筛选条件".localized : "筛选结果".localized
+        filterLb.font = .systemFont(ofSize: 12)
+        if #available(iOS 13.0, *) {
+            filterLb.textColor = UIColor(dynamicProvider: {
+                $0.userInterfaceStyle == .dark ? .white : .black
+            })
+        } else {
+            filterLb.textColor = .black
+        }
+        filterLb.textAlignment = .center
+        
+        bottomView = UIView()
+        bottomView.addSubview(numberView)
+        bottomView.addSubview(filterLb)
+    }
+    
+    
     @objc
-    func didDoneClick() {
+    private func didDoneClick() {
         dismiss(animated: true)
     }
     
-    var sections: [PhotoPickerFilterSection] = []
+    private var sections: [PhotoPickerFilterSection] = []
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         sections.count

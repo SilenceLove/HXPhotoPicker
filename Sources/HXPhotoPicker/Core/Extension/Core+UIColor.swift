@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension UIColor: HXPickerCompatible {
+extension UIColor {
     
     convenience init(hexString: String) {
         let hex = hexString.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -26,9 +26,6 @@ extension UIColor: HXPickerCompatible {
             (a, r, g, b) = (255, 0, 0, 0)
         }
         self.init(red: CGFloat(r) / 255, green: CGFloat(g) / 255, blue: CGFloat(b) / 255, alpha: CGFloat(a) / 255)
-    }
-    class var systemTintColor: UIColor {
-        UIColor(red: 0, green: 0.47843137254901963, blue: 1, alpha: 1)
     }
     
     var isWhite: Bool {
@@ -48,24 +45,6 @@ extension UIColor: HXPickerCompatible {
         radius: CGFloat = 0
     ) -> UIImage? {
         .image(
-            for: color,
-            havingSize: havingSize,
-            radius: radius
-        )
-    }
-}
-
-public extension HXPickerWrapper where Base: UIColor {
-    static var systemTintColor: UIColor {
-        Base.systemTintColor
-    }
-    
-    func image(
-        for color: UIColor?,
-        havingSize: CGSize,
-        radius: CGFloat = 0
-    ) -> UIImage? {
-        return base.image(
             for: color,
             havingSize: havingSize,
             radius: radius

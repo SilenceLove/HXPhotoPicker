@@ -52,53 +52,17 @@ open class CameraViewController: BaseViewController {
         self.autoDismiss = config.isAutoBack
     }
     private var didLayoutPreview = false
-    lazy var previewView: CameraPreviewView = {
-        let view = CameraPreviewView(
-            config: config,
-            cameraManager: cameraManager
-        )
-        view.delegate = self
-        return view
-    }()
     
-    lazy var cameraManager: CameraManager = {
-        let manager = CameraManager(config: config)
-        manager.flashModeDidChanged = { [weak self] in
-            guard let self = self else { return }
-            self.delegate?.cameraViewController(self, flashModeDidChanged: $0)
-        }
-        manager.captureDidOutput = { [weak self] pixelBuffer in
-            guard let self = self else { return } 
-            self.previewView.pixelBuffer = pixelBuffer
-        }
-        return manager
-    }()
-    
-    lazy var bottomView: CameraBottomView = {
-        let view = CameraBottomView(
-            tintColor: config.tintColor,
-            takePhotoMode: config.takePhotoMode
-        )
-        view.delegate = self
-        return view
-    }()
-    
-    lazy var topMaskLayer: CAGradientLayer = {
-        let layer = PhotoTools.getGradientShadowLayer(true)
-        return layer
-    }()
+    var previewView: CameraPreviewView!
+    var cameraManager: CameraManager!
+    var bottomView: CameraBottomView!
+    var topMaskLayer: CAGradientLayer!
     #if HXPICKER_ENABLE_CAMERA_LOCATION
-    lazy var locationManager: CLLocationManager = {
-        let manager = CLLocationManager()
-        manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyBest
-        manager.distanceFilter = kCLDistanceFilterNone
-        manager.requestWhenInUseAuthorization()
-        return manager
-    }()
+    var locationManager: CLLocationManager!
     var currentLocation: CLLocation?
     var didLocation: Bool = false
     #endif
+    
     var firstShowFilterName = true
     var currentZoomFacto: CGFloat = 1
     
@@ -112,7 +76,7 @@ open class CameraViewController: BaseViewController {
         edgesForExtendedLayout = .all
         view.backgroundColor = .black
         navigationController?.navigationBar.tintColor = .white
-        
+        initViews()
         if !UIImagePickerController.isSourceTypeAvailable(.camera) {
             bottomView.isGestureEnable = false
             view.addSubview(bottomView)
@@ -122,8 +86,7 @@ open class CameraViewController: BaseViewController {
                 message: nil,
                 actionTitle: "确定".localized
             ) { [weak self] _ in
-                guard let self = self else { return }
-                self.dismiss(animated: true)
+                self?.backClick(true)
             }
             return
         }
@@ -135,8 +98,8 @@ open class CameraViewController: BaseViewController {
                 self.view.addSubview(self.bottomView)
                 PhotoTools.showNotCameraAuthorizedAlert(
                     viewController: self
-                ) {
-                    self.dismiss(animated: true)
+                ) { [weak self] in
+                    self?.backClick(true)
                 }
             }
         }
@@ -153,6 +116,47 @@ open class CameraViewController: BaseViewController {
             name: UIApplication.didEnterBackgroundNotification,
             object: nil
         )
+    }
+    private func initViews() {
+        cameraManager = CameraManager(config: config)
+        cameraManager.flashModeDidChanged = { [weak self] in
+            guard let self = self else { return }
+            self.delegate?.cameraViewController(self, flashModeDidChanged: $0)
+        }
+        cameraManager.captureDidOutput = { [weak self] pixelBuffer in
+            guard let self = self else { return }
+            self.previewView.pixelBuffer = pixelBuffer
+        }
+        
+        previewView = CameraPreviewView(
+            config: config,
+            cameraManager: cameraManager
+        )
+        previewView.delegate = self
+        
+        bottomView = CameraBottomView(
+            tintColor: config.tintColor,
+            takePhotoMode: config.takePhotoMode
+        )
+        bottomView.delegate = self
+        
+        topMaskLayer = PhotoTools.getGradientShadowLayer(true)
+        
+        #if HXPICKER_ENABLE_CAMERA_LOCATION
+        locationManager = CLLocationManager()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.distanceFilter = kCLDistanceFilterNone
+        locationManager.requestWhenInUseAuthorization()
+        #endif
+    }
+    func backClick(_ isCancel: Bool = false) {
+        if isCancel {
+            delegate?.cameraViewController(didCancel: self)
+        }
+        if autoDismiss {
+            dismiss(animated: true, completion: nil)
+        }
     }
     open override func deviceOrientationWillChanged(notify: Notification) {
         didLayoutPreview = false
@@ -376,8 +380,8 @@ extension CameraViewController {
                         title: "相机初始化失败!".localized,
                         message: nil,
                         actionTitle: "确定".localized
-                    ) { _ in
-                        self.dismiss(animated: true)
+                    ) { [weak self] _ in
+                        self?.backClick(true)
                     }
                 }
             }

@@ -9,6 +9,10 @@ import UIKit
 
 class EditorScaleView: UIView {
     
+    struct Scale {
+        let value: CGFloat
+    }
+    
     enum State {
         case begin
         case changed
@@ -17,53 +21,12 @@ class EditorScaleView: UIView {
     
     var state: State = .end
     
-    lazy var shadeView: UIView = {
-        let view = UIView()
-        view.addSubview(collectionView)
-        view.layer.mask = shadeMaskLayer
-        return view
-    }()
-    
-    lazy var shadeMaskLayer: CAGradientLayer = {
-        let maskLayer = CAGradientLayer()
-        maskLayer.colors = [UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor]
-        maskLayer.locations = [0.0, 0.05, 0.95, 1.0]
-        return maskLayer
-    }()
-    
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
-        return flowLayout
-    }()
-    
-    lazy var collectionView: EditorScaleCollectionView = {
-        let collectionView = EditorScaleCollectionView(frame: .zero, collectionViewLayout: flowLayout)
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.backgroundColor = .clear
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.register(EditorScaleViewCell.self, forCellWithReuseIdentifier: "EditorScaleViewCellId")
-        collectionView.decelerationRate = .fast
-        if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .never
-        }
-        return collectionView
-    }()
-    
-    lazy var centerLineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        return view
-    }()
-    
-    lazy var valueLb: UILabel = {
-        let label = UILabel()
-        label.text = "0"
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 11)
-        return label
-    }()
+    private var shadeView: UIView!
+    private var shadeMaskLayer: CAGradientLayer!
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var collectionView: EditorScaleCollectionView!
+    private var centerLineView: UIView!
+    private var valueLb: UILabel!
     
     var angleChanged: ((CGFloat, State) -> Void)?
     
@@ -107,7 +70,7 @@ class EditorScaleView: UIView {
     
     var currentIndex: Int = 0
     
-    var themeColor: UIColor = .systemTintColor
+    var themeColor: UIColor = .systemBlue
     
     var padding: CGFloat {
         return 5
@@ -126,9 +89,36 @@ class EditorScaleView: UIView {
     
     var isAngleChange = false
     
-    func initView() {
+    private func initView() {
+        valueLb = UILabel()
+        valueLb.text = "0"
+        valueLb.textColor = .white
+        valueLb.font = .systemFont(ofSize: UIDevice.isPad ? 14 : 12)
         addSubview(valueLb)
+        
+        flowLayout = UICollectionViewFlowLayout()
+        collectionView = EditorScaleCollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.backgroundColor = .clear
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.register(EditorScaleViewCell.self, forCellWithReuseIdentifier: "EditorScaleViewCellId")
+        collectionView.decelerationRate = .fast
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        }
+        shadeMaskLayer = CAGradientLayer()
+        shadeMaskLayer.colors = [UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor]
+        shadeMaskLayer.locations = [0.0, 0.05, 0.95, 1.0]
+        
+        shadeView = UIView()
+        shadeView.addSubview(collectionView)
+        shadeView.layer.mask = shadeMaskLayer
         addSubview(shadeView)
+        
+        centerLineView = UIView()
+        centerLineView.backgroundColor = .white
         addSubview(centerLineView)
         DispatchQueue.main.async {
             self.currentIndex = self.centerIndex
@@ -227,8 +217,7 @@ class EditorScaleView: UIView {
             shadeMaskLayer.endPoint = CGPoint(x: 1, y: 1)
             
             flowLayout.scrollDirection = .vertical
-            shadeView.frame = .init(x: 0, y: 0, width: 30, height: height)
-            collectionView.contentInset = .zero
+            shadeView.frame = .init(x: 0, y: 0, width: width, height: height)
             collectionView.frame = shadeView.bounds
             shadeMaskLayer.frame = CGRect(x: 0, y: 0, width: shadeView.width, height: shadeView.height)
             let margin: CGFloat
@@ -238,11 +227,10 @@ class EditorScaleView: UIView {
             }else {
                 margin = (contentHeight * 0.5 + (height - contentHeight) * 0.5) - 0.5
             }
-            collectionView.contentInset = .init(top: margin, left: 0, bottom: margin, right: 0)
-            
+            collectionView.contentInset = .init(top: margin, left: 5, bottom: margin, right: 0)
             centerLineView.size = .init(width: 25, height: 1)
             centerLineView.centerY = height * 0.5
-            centerLineView.x = collectionView.x + (collectionView.width - 20) * 0.5 + 20 - centerLineView.width
+            centerLineView.x = 25 - centerLineView.width
             
             valueLb.textAlignment = .left
             valueLb.y = 0
@@ -425,37 +413,46 @@ extension EditorScaleView: UICollectionViewDataSource, UICollectionViewDelegate,
         }
     }
 }
-
-extension EditorScaleView {
-    struct Scale {
-        let value: CGFloat
-    }
-}
-
+ 
 class EditorScaleCollectionView: UICollectionView {
     var isCenter: Bool = true
 }
 
 class EditorScaleViewCell: UICollectionViewCell {
-    lazy var lineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        return view
-    }()
+    private var lineView: UIView!
+    private var pointView: UIView!
     
-    lazy var pointView: UIView = {
-        let view = UIView()
-        view.isHidden = true
-        view.alpha = 0
-        view.backgroundColor = .white
-        view.layer.cornerRadius = 3
-        view.layer.masksToBounds = true
-        return view
-    }()
     var isShowPoint: Bool = false {
         didSet {
             pointView.isHidden = !isShowPoint
         }
+    }
+    
+    var isBold: Bool = false
+    var isOriginal: Bool = false
+    
+    func update() {
+        lineView.backgroundColor = isBold ? .white : .white.withAlphaComponent(0.6)
+        updateLineView()
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: .zero)
+        initView()
+    }
+    
+    private func initView() {
+        pointView = UIView()
+        pointView.isHidden = true
+        pointView.alpha = 0
+        pointView.backgroundColor = .white
+        pointView.layer.cornerRadius = 3
+        pointView.layer.masksToBounds = true
+        contentView.addSubview(pointView)
+        
+        lineView = UIView()
+        lineView.backgroundColor = .white
+        contentView.addSubview(lineView)
     }
     
     func showPoint(_ isAnimation: Bool = true) {
@@ -478,34 +475,12 @@ class EditorScaleViewCell: UICollectionViewCell {
         }
     }
     
-    var isBold: Bool = false
-    var isOriginal: Bool = false
-    
-    func update() {
-        lineView.backgroundColor = isBold ? .white : .white.withAlphaComponent(0.6)
-        updateLineView()
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: .zero)
-        initView()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func initView() {
-        contentView.addSubview(pointView)
-        contentView.addSubview(lineView)
-    }
-    
     override func layoutSubviews() {
         super.layoutSubviews()
         updateLineView()
     }
     
-    func updateLineView() {
+    private func updateLineView() {
         if UIDevice.isPortrait {
             pointView.y = -5
             pointView.size = .init(width: 6, height: 6)
@@ -521,5 +496,9 @@ class EditorScaleViewCell: UICollectionViewCell {
             lineView.centerY = height * 0.5
             lineView.x = width - lineView.width
         }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

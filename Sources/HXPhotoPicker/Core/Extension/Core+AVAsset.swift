@@ -8,7 +8,7 @@
 import UIKit
 import AVFoundation
 
-extension AVAsset: HXPickerCompatibleValue {
+extension AVAsset {
     func getImage(at time: TimeInterval) -> UIImage? {
         let assetImageGenerator = AVAssetImageGenerator(asset: self)
         assetImageGenerator.appliesPreferredTrackTransform = true
@@ -71,24 +71,5 @@ extension AVAsset: HXPickerCompatibleValue {
                 imageGenerator?(generator)
             }
         }
-    }
-}
-
-public extension HXPickerWrapper where Base == AVAsset {
-    
-    func getImage(at time: TimeInterval) -> UIImage? {
-        base.getImage(at: time)
-    }
-    
-    func getImage(
-        at time: TimeInterval,
-        imageGenerator: ((AVAssetImageGenerator) -> Void)? = nil,
-        completion: @escaping (AVAsset, UIImage?, AVAssetImageGenerator.Result) -> Void
-    ) {
-        base.getImage(
-            at: time,
-            imageGenerator: imageGenerator,
-            completion: completion
-        )
     }
 }

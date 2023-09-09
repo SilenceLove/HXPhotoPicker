@@ -41,10 +41,8 @@ public struct PhotoListCellConfiguration {
     public var backgroundDarkColor: UIColor?
     
     /// The sharpness of the thumbnail, the bigger the clearer, the smaller the blurrier
-    /// Defaults to 250
     /// 缩略图的清晰度，越大越清楚，越小越模糊
-    /// 默认为 250
-    public var targetWidth: CGFloat = 250
+    public var targetWidth: CGFloat = 350
     
     /// Whether to display the disabled mask when the cell is not selectable
     /// Not valid if the file size of the photo/video is limited

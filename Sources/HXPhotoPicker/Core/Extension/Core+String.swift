@@ -64,67 +64,58 @@ extension String: HXPickerCompatibleValue {
     }
     
     func boundingRect(ofAttributes attributes: [NSAttributedString.Key: Any], size: CGSize) -> CGRect {
-        hx.boundingRect(ofAttributes: attributes, size: size)
+        let boundingBox = boundingRect(
+            with: size,
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: attributes,
+            context: nil
+        )
+        return boundingBox
     }
     
     func size(ofAttributes attributes: [NSAttributedString.Key: Any], maxWidth: CGFloat, maxHeight: CGFloat) -> CGSize {
-        hx.size(
-            ofAttributes: attributes,
-            maxWidth: maxWidth,
-            maxHeight: maxHeight
-        )
+        boundingRect(ofAttributes: attributes, size: .init(width: maxWidth, height: maxHeight)).size
     }
     
     func size(ofFont font: UIFont, maxWidth: CGFloat, maxHeight: CGFloat) -> CGSize {
-        hx.size(ofFont: font, maxWidth: maxWidth, maxHeight: maxHeight)
+        let constraintRect = CGSize(width: maxWidth, height: maxHeight)
+        let boundingBox = boundingRect(
+            with: constraintRect,
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: font],
+            context: nil
+        )
+        return boundingBox.size
     }
     
-    /// 字符串宽度
-    /// - Parameters:
-    ///   - size: 字体大小
-    ///   - maxHeight: 最大高度
-    /// - Returns: 字符串宽度
     func width(ofSize size: CGFloat, maxHeight: CGFloat) -> CGFloat {
-        hx.width(
-            ofSize: size,
+        width(
+            ofFont: UIFont.systemFont(ofSize: size),
             maxHeight: maxHeight
         )
     }
     
-    /// 字符串宽度
-    /// - Parameters:
-    ///   - font: 字体
-    ///   - maxHeight: 最大高度
-    /// - Returns: 字符串宽度
     func width(ofFont font: UIFont, maxHeight: CGFloat) -> CGFloat {
-        hx.width(
-            ofFont: font,
+        size(
+            ofAttributes: [NSAttributedString.Key.font: font],
+            maxWidth: CGFloat(MAXFLOAT),
             maxHeight: maxHeight
-        )
+        ).width
     }
     
-    /// 字符串高度
-    /// - Parameters:
-    ///   - size: 字体大小
-    ///   - maxWidth: 最大宽度
-    /// - Returns: 高度
     func height(ofSize size: CGFloat, maxWidth: CGFloat) -> CGFloat {
-        hx.height(
-            ofSize: size,
+        height(
+            ofFont: UIFont.systemFont(ofSize: size),
             maxWidth: maxWidth
         )
     }
     
-    /// 字符串高度
-    /// - Parameters:
-    ///   - font: 字体
-    ///   - maxWidth: 最大宽度
-    /// - Returns: 高度
     func height(ofFont font: UIFont, maxWidth: CGFloat) -> CGFloat {
-        hx.height(
-            ofFont: font,
-            maxWidth: maxWidth
-        )
+        size(
+            ofAttributes: [NSAttributedString.Key.font: font],
+            maxWidth: maxWidth,
+            maxHeight: CGFloat(MAXFLOAT)
+        ).height
     }
     
     subscript(_ indexs: ClosedRange<Int>) -> String {
@@ -173,95 +164,13 @@ extension String: HXPickerCompatibleValue {
 }
 
 public extension HXPickerWrapper where Base == String {
-    
-    static func fileName(suffix: String) -> String {
-        Base.fileName(suffix: suffix)
-    }
-    
-    var localized: String { Bundle.localizedString(for: base) }
-    
+    var localized: String { base.localized }
     var color: UIColor { base.color }
-    
-    var image: UIImage? { base.image }
-    
-    func boundingRect(ofAttributes attributes: [NSAttributedString.Key: Any], size: CGSize) -> CGRect {
-        let boundingBox = base.boundingRect(
-            with: size,
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: attributes,
-            context: nil
-        )
-        return boundingBox
-    }
-    
-    func size(ofAttributes attributes: [NSAttributedString.Key: Any], maxWidth: CGFloat, maxHeight: CGFloat) -> CGSize {
-        boundingRect(ofAttributes: attributes, size: .init(width: maxWidth, height: maxHeight)).size
-    }
-    
-    func size(ofFont font: UIFont, maxWidth: CGFloat, maxHeight: CGFloat) -> CGSize {
-        let constraintRect = CGSize(width: maxWidth, height: maxHeight)
-        let boundingBox = base.boundingRect(
-            with: constraintRect,
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: [.font: font],
-            context: nil
-        )
-        return boundingBox.size
-    }
-    
-    /// 字符串宽度
-    /// - Parameters:
-    ///   - size: 字体大小
-    ///   - maxHeight: 最大高度
-    /// - Returns: 字符串宽度
-    func width(ofSize size: CGFloat, maxHeight: CGFloat) -> CGFloat {
-        width(
-            ofFont: UIFont.systemFont(ofSize: size),
-            maxHeight: maxHeight
-        )
-    }
-    
-    /// 字符串宽度
-    /// - Parameters:
-    ///   - font: 字体
-    ///   - maxHeight: 最大高度
-    /// - Returns: 字符串宽度
-    func width(ofFont font: UIFont, maxHeight: CGFloat) -> CGFloat {
-        size(
-            ofAttributes: [NSAttributedString.Key.font: font],
-            maxWidth: CGFloat(MAXFLOAT),
-            maxHeight: maxHeight
-        ).width
-    }
-    
-    /// 字符串高度
-    /// - Parameters:
-    ///   - size: 字体大小
-    ///   - maxWidth: 最大宽度
-    /// - Returns: 高度
-    func height(ofSize size: CGFloat, maxWidth: CGFloat) -> CGFloat {
-        height(
-            ofFont: UIFont.systemFont(ofSize: size),
-            maxWidth: maxWidth
-        )
-    }
-    
-    /// 字符串高度
-    /// - Parameters:
-    ///   - font: 字体
-    ///   - maxWidth: 最大宽度
-    /// - Returns: 高度
-    func height(ofFont font: UIFont, maxWidth: CGFloat) -> CGFloat {
-        size(
-            ofAttributes: [NSAttributedString.Key.font: font],
-            maxWidth: maxWidth,
-            maxHeight: CGFloat(MAXFLOAT)
-        ).height
-    }
 }
 
+
 // array of bytes, little-endian representation
-func arrayOfBytes<T>(_ value: T, length: Int? = nil) -> [UInt8] {
+fileprivate func arrayOfBytes<T>(_ value: T, length: Int? = nil) -> [UInt8] {
     let totalBytes: Int
     if let length = length {
         totalBytes = length
@@ -286,7 +195,7 @@ func arrayOfBytes<T>(_ value: T, length: Int? = nil) -> [UInt8] {
     return bytes
 }
 
-extension Int {
+fileprivate extension Int {
     // Array of bytes with optional padding (little-endian)
     func bytes(_ totalBytes: Int = MemoryLayout<Int>.size) -> [UInt8] {
         return arrayOfBytes(self, length: totalBytes)
@@ -294,7 +203,7 @@ extension Int {
 
 }
 
-extension NSMutableData {
+fileprivate extension NSMutableData {
 
     // Convenient way to append bytes
     func appendBytes(_ arrayOfBytes: [UInt8]) {
@@ -303,13 +212,13 @@ extension NSMutableData {
 
 }
 
-protocol HashProtocol {
+fileprivate protocol HashProtocol {
     var message: [UInt8] { get }
     // Common part for hash calculation. Prepare header data.
     func prepare(_ len: Int) -> [UInt8]
 }
 
-extension HashProtocol {
+fileprivate extension HashProtocol {
 
     func prepare(_ len: Int) -> [UInt8] {
         var tmpMessage = message
@@ -331,7 +240,7 @@ extension HashProtocol {
     }
 }
 
-func toUInt32Array(_ slice: ArraySlice<UInt8>) -> [UInt32] {
+fileprivate func toUInt32Array(_ slice: ArraySlice<UInt8>) -> [UInt32] {
     var result = [UInt32]()
     result.reserveCapacity(16)
 
@@ -347,7 +256,7 @@ func toUInt32Array(_ slice: ArraySlice<UInt8>) -> [UInt32] {
     return result
 }
 
-struct BytesIterator: IteratorProtocol {
+fileprivate struct BytesIterator: IteratorProtocol {
 
     let chunkSize: Int
     let data: [UInt8]
@@ -367,7 +276,7 @@ struct BytesIterator: IteratorProtocol {
     }
 }
 
-struct BytesSequence: Sequence {
+fileprivate struct BytesSequence: Sequence {
     let chunkSize: Int
     let data: [UInt8]
 
@@ -376,11 +285,11 @@ struct BytesSequence: Sequence {
     }
 }
 
-func rotateLeft(_ value: UInt32, bits: UInt32) -> UInt32 {
+fileprivate func rotateLeft(_ value: UInt32, bits: UInt32) -> UInt32 {
     return ((value << bits) & 0xFFFFFFFF) | (value >> (32 - bits))
 }
 
-class MD5: HashProtocol {
+fileprivate class MD5: HashProtocol {
 
     static let size = 16 // 128 / 8
     let message: [UInt8]

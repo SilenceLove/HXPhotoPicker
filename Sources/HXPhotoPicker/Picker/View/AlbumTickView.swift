@@ -9,8 +9,12 @@
 import UIKit
 
 public class AlbumTickView: UIView {
-    public lazy var tickLayer: CAShapeLayer = {
-        let tickLayer = CAShapeLayer.init()
+    
+    public var tickLayer: CAShapeLayer!
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        tickLayer = CAShapeLayer.init()
         tickLayer.contentsScale = UIScreen.main.scale
         let tickPath = UIBezierPath.init()
         tickPath.move(to: CGPoint(x: scale(8), y: height * 0.5 + scale(1)))
@@ -20,10 +24,7 @@ public class AlbumTickView: UIView {
         tickLayer.lineWidth = 1.5
         tickLayer.strokeColor = UIColor.black.cgColor
         tickLayer.fillColor = UIColor.clear.cgColor
-        return tickLayer
-    }()
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+        
         layer.addSublayer(tickLayer)
     }
     

@@ -207,11 +207,6 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
                 if pickerCell.photoAsset.downloadStatus != .downloading {
                     pickerCell.syncICloud()
                 }
-//                photoAsset.syncICloud(
-//                    hudAddedTo: navigationController?.view
-//                ) { [weak self] photoAsset, _ in
-//                    self?.resetICloud(for: photoAsset)
-//                }
                 return
             }
             let item = needOffset ? indexPath.item - offsetIndex : indexPath.item
@@ -282,6 +277,7 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             )
         }
     }
+    
     @discardableResult
     func openPhotoEditor(
         photoAsset: PhotoAsset,
@@ -468,9 +464,9 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
                 let maxWidth = viewSize.width - UIDevice.leftMargin - UIDevice.rightMargin - 60
                 let maxHeight: CGFloat
                 if UIDevice.isPortrait {
-                    maxHeight = UIScreen.main.bounds.height * 0.659
+                    maxHeight = UIDevice.screenSize.height * 0.659
                 }else {
-                    maxHeight = UIScreen.main.bounds.height - UIDevice.topMargin - UIDevice.bottomMargin
+                    maxHeight = UIDevice.screenSize.height - UIDevice.topMargin - UIDevice.bottomMargin
                 }
                 var width = imageSize.width
                 var height = imageSize.height
@@ -608,10 +604,6 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
         PhotoManager.shared.thumbnailLoadModeDidChange(.simplify)
         return true
     }
-//    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-//        setCellLoadMode(.complete)
-//        print("BeginDragging complete")
-//    }
     public func scrollViewDidEndDragging(
         _ scrollView: UIScrollView,
         willDecelerate decelerate: Bool

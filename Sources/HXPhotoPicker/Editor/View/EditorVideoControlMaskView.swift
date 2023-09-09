@@ -18,6 +18,16 @@ class EditorVideoControlMaskView: UIView {
     let controlWidth: CGFloat = 18
     
     weak var delegate: EditorVideoControlMaskViewDelegate?
+    
+    private var maskLayer: CAShapeLayer!
+    private var topView: UIView!
+    private var bottomView: UIView!
+    private var leftImageView: UIImageView!
+    private var leftControl: UIView!
+    private var rightImageView: UIImageView!
+    private var rightControl: UIView!
+    private var mask_View: UIView!
+    
     var validRect: CGRect = .zero {
         didSet {
             leftControl.frame = CGRect(x: validRect.minX - controlWidth, y: 0, width: controlWidth, height: height)
@@ -41,13 +51,60 @@ class EditorVideoControlMaskView: UIView {
     }
     var isShowFrame: Bool = false
     var minWidth: CGFloat = 0
-    lazy var maskLayer: CAShapeLayer = {
-        let maskLayer = CAShapeLayer()
-        maskLayer.contentsScale = UIScreen.main.scale
-        return maskLayer
-    }()
     
-    func drawMaskLayer() {
+    var arrowNormalColor: UIColor = .white
+    var arrowHighlightedColor: UIColor = .black
+    var frameHighlightedColor: UIColor = "#FDCC00".color
+    
+    init() {
+        super.init(frame: .zero)
+        initViews()
+    }
+    
+    private func initViews() {
+        maskLayer = CAShapeLayer()
+        maskLayer.contentsScale = UIScreen.main.scale
+        mask_View = UIView()
+        mask_View.backgroundColor = .black.withAlphaComponent(0.5)
+        mask_View.layer.mask = maskLayer
+        addSubview(mask_View)
+        
+        topView = UIView()
+        topView.backgroundColor = .clear
+        addSubview(topView)
+        
+        bottomView = UIView()
+        bottomView.backgroundColor = .clear
+        addSubview(bottomView)
+        
+        leftImageView = UIImageView(image: "hx_editor_video_control_arrow_left".image?.withRenderingMode(.alwaysTemplate))
+        leftImageView.size = leftImageView.image?.size ?? .zero
+        leftImageView.tintColor = arrowNormalColor
+        leftControl = UIView()
+        leftControl.tag = 0
+        if #available(iOS 11.0, *) {
+            leftControl.cornersRound(radius: 4, corner: [.topLeft, .bottomLeft])
+        }
+        leftControl.addSubview(leftImageView)
+        let leftControlPanGR = PhotoPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerAction(panGR:)))
+        leftControl.addGestureRecognizer(leftControlPanGR)
+        addSubview(leftControl)
+        
+        rightImageView = UIImageView(image: "hx_editor_video_control_arrow_right".image?.withRenderingMode(.alwaysTemplate))
+        rightImageView.size = rightImageView.image?.size ?? .zero
+        rightImageView.tintColor = arrowNormalColor
+        rightControl = UIView()
+        rightControl.tag = 1
+        rightControl.addSubview(rightImageView)
+        if #available(iOS 11.0, *) {
+            rightControl.cornersRound(radius: 4, corner: [.topRight, .bottomRight])
+        }
+        let rightControlPanGR = PhotoPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerAction(panGR:)))
+        rightControl.addGestureRecognizer(rightControlPanGR)
+        addSubview(rightControl)
+    }
+    
+    private func drawMaskLayer() {
         let maskPath = UIBezierPath(rect: bounds)
         maskPath.append(
             UIBezierPath(
@@ -61,82 +118,6 @@ class EditorVideoControlMaskView: UIView {
         )
         maskLayer.path = maskPath.cgPath
         
-    }
-    
-    lazy var topView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
-    
-    lazy var bottomView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
-    
-    var arrowNormalColor: UIColor = .white
-    var arrowHighlightedColor: UIColor = .black
-    var frameHighlightedColor: UIColor = "#FDCC00".color
-    
-    lazy var leftImageView: UIImageView = {
-        let view = UIImageView(image: "hx_editor_video_control_arrow_left".image?.withRenderingMode(.alwaysTemplate))
-        view.size = view.image?.size ?? .zero
-        view.tintColor = arrowNormalColor
-        return view
-    }()
-    
-    lazy var leftControl: UIView = {
-        let leftControl = UIView()
-        leftControl.tag = 0
-        if #available(iOS 11.0, *) {
-            leftControl.cornersRound(radius: 4, corner: [.topLeft, .bottomLeft])
-        }
-        leftControl.addSubview(leftImageView)
-        let panGR = PhotoPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerAction(panGR:)))
-        leftControl.addGestureRecognizer(panGR)
-        return leftControl
-    }()
-    
-    lazy var rightImageView: UIImageView = {
-        let view = UIImageView(image: "hx_editor_video_control_arrow_right".image?.withRenderingMode(.alwaysTemplate))
-        view.size = view.image?.size ?? .zero
-        view.tintColor = arrowNormalColor
-        return view
-    }()
-    
-    lazy var rightControl: UIView = {
-        let rightControl = UIView()
-        rightControl.tag = 1
-        rightControl.addSubview(rightImageView)
-        if #available(iOS 11.0, *) {
-            rightControl.cornersRound(radius: 4, corner: [.topRight, .bottomRight])
-        }
-        let panGR = PhotoPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerAction(panGR:)))
-        rightControl.addGestureRecognizer(panGR)
-        return rightControl
-    }()
-    
-//    lazy var mask_View: UIVisualEffectView = {
-//        let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-//        view.layer.mask = maskLayer
-//        return view
-//    }()
-    
-    lazy var mask_View: UIView = {
-        let view = UIView()
-        view.backgroundColor = .black.withAlphaComponent(0.5)
-        view.layer.mask = maskLayer
-        return view
-    }()
-    
-    init() {
-        super.init(frame: .zero)
-        addSubview(mask_View)
-        addSubview(topView)
-        addSubview(bottomView)
-        addSubview(leftControl)
-        addSubview(rightControl)
     }
     
     override func layoutSubviews() {

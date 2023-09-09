@@ -9,50 +9,48 @@ import UIKit
 
 class EditorBrushSizeView: UIView {
     
-    lazy var sizeLayer: CAShapeLayer = {
-        let sizeLayer = CAShapeLayer()
-        sizeLayer.contentsScale = UIScreen.main.scale
-        sizeLayer.shadowColor = UIColor.black.cgColor
-        sizeLayer.shadowOpacity = 0.4
-        sizeLayer.shadowOffset = CGSize(width: 0, height: 0)
-        sizeLayer.fillColor = UIColor.white.cgColor
-        return sizeLayer
-    }()
-    
-    lazy var blockView: UIView = {
-        let view = UIView(frame: .init(x: 0, y: 0, width: 20, height: 20))
-        view.layer.cornerRadius = 10
-        view.backgroundColor = .white
-        view.layer.shadowOffset = CGSize(width: 0, height: 0)
-        view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOpacity = 0.5
-        view.addGestureRecognizer(UIPanGestureRecognizer(
-            target: self,
-            action: #selector(blockViewPanGestureRecognizerClick(_:))
-        ))
-        view.center = .init(x: 12.5, y: 5)
-        return view
-    }()
+    private var sizeLayer: CAShapeLayer!
+    private var blockView: UIView!
     
     var value: CGFloat = 0 {
         didSet {
             blockView.center = .init(x: 12.5, y: 5 + 195 * (1 - value))
         }
     }
-    
     var blockDidChanged: (((CGFloat)) -> Void)?
     var blockBeganChanged: (((CGFloat)) -> Void)?
     var blockEndedChanged: (((CGFloat)) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        initViews()
         layer.addSublayer(sizeLayer)
         addSubview(blockView)
         drawSizeLayer()
     }
     
-    func drawSizeLayer() {
+    private func initViews() {
+        sizeLayer = CAShapeLayer()
+        sizeLayer.contentsScale = UIScreen.main.scale
+        sizeLayer.shadowColor = UIColor.black.cgColor
+        sizeLayer.shadowOpacity = 0.4
+        sizeLayer.shadowOffset = CGSize(width: 0, height: 0)
+        sizeLayer.fillColor = UIColor.white.cgColor
+        
+        blockView = UIView(frame: .init(x: 0, y: 0, width: 20, height: 20))
+        blockView.layer.cornerRadius = 10
+        blockView.backgroundColor = .white
+        blockView.layer.shadowOffset = CGSize(width: 0, height: 0)
+        blockView.layer.shadowColor = UIColor.black.cgColor
+        blockView.layer.shadowOpacity = 0.5
+        blockView.addGestureRecognizer(UIPanGestureRecognizer(
+            target: self,
+            action: #selector(blockViewPanGestureRecognizerClick(_:))
+        ))
+        blockView.center = .init(x: 12.5, y: 5)
+    }
+    
+    private func drawSizeLayer() {
         let path = UIBezierPath()
         path.move(to: .init(x: 5, y: 7))
         path.addCurve(to: .init(x: 7, y: 5), controlPoint1: .init(x: 5, y: 7), controlPoint2: .init(x: 5, y: 5))

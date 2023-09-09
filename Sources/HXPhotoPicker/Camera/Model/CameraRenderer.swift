@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 class CameraRenderer {
     var isPrepared = false
@@ -223,6 +223,6 @@ class CameraRenderer {
 
 class OriginalFilter: CameraFilter {
     var filterName: String {
-        "原片".localized
+        "原片"
     }
 }

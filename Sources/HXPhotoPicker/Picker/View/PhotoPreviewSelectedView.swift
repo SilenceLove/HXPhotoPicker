@@ -17,24 +17,29 @@ class PhotoPreviewSelectedView: UIView,
                                 UICollectionViewDataSource,
                                 UICollectionViewDelegate,
                                 UICollectionViewDelegateFlowLayout {
+    
     weak var delegate: PhotoPreviewSelectedViewDelegate?
     
-    lazy var collectionViewLayout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout.init()
-        layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 5
-        layout.minimumInteritemSpacing = 5
-        layout.sectionInset = UIEdgeInsets(
+    var collectionViewLayout: UICollectionViewFlowLayout!
+    var collectionView: UICollectionView!
+    var tickColor: UIColor?
+    
+    private var photoAssetArray: [PhotoAsset] = []
+    private var currentSelectedIndexPath: IndexPath?
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        collectionViewLayout = UICollectionViewFlowLayout()
+        collectionViewLayout.scrollDirection = .horizontal
+        collectionViewLayout.minimumLineSpacing = 5
+        collectionViewLayout.minimumInteritemSpacing = 5
+        collectionViewLayout.sectionInset = .init(
             top: 10,
             left: 12 + UIDevice.leftMargin,
             bottom: 5,
             right: 12 + UIDevice.rightMargin
         )
-        return layout
-    }()
-
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: bounds, collectionViewLayout: collectionViewLayout)
+        collectionView = UICollectionView(frame: bounds, collectionViewLayout: collectionViewLayout)
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -48,15 +53,6 @@ class PhotoPreviewSelectedView: UIView,
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
-        return collectionView
-    }()
-    
-    var photoAssetArray: [PhotoAsset] = []
-    var currentSelectedIndexPath: IndexPath?
-    var tickColor: UIColor?
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
         addSubview(collectionView)
     }
     func reloadSectionInset() {

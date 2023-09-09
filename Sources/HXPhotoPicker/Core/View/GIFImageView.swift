@@ -10,7 +10,7 @@ import UIKit
 
 class GIFImage {
     /// 内部读取图片帧队列
-    fileprivate lazy var readFrameQueue: DispatchQueue = DispatchQueue(
+    fileprivate var readFrameQueue: DispatchQueue = DispatchQueue(
         label: "hxpickerimage.gif.readFrameQueue",
         qos: .background
     )
@@ -47,7 +47,7 @@ class GIFImage {
     }
 
     /// 获取图片数据源的第 index 帧图片的动画时间
-    fileprivate class func getCGImageSourceGifFrameDelay(imageSource: CGImageSource, index: Int) -> TimeInterval {
+    fileprivate static func getCGImageSourceGifFrameDelay(imageSource: CGImageSource, index: Int) -> TimeInterval {
         var delay = 0.0
         guard let imgProperties: NSDictionary = CGImageSourceCopyPropertiesAtIndex(
                 imageSource,

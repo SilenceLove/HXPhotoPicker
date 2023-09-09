@@ -11,13 +11,13 @@ import UIKit
 public struct ArrowViewConfiguration {
     
     /// 箭头背景颜色
-    public var backgroundColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var backgroundColor: UIColor = .systemBlue
     
     /// 箭头颜色
     public var arrowColor: UIColor = "#ffffff".hx.color
     
     /// 暗黑风格下箭头背景颜色
-    public var backgroudDarkColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var backgroudDarkColor: UIColor = .systemBlue
     
     /// 暗黑风格下箭头颜色
     public var arrowDarkColor: UIColor = "#ffffff".hx.color

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 import VideoToolbox
 
 class EditorVideoCompositor: NSObject, AVVideoCompositing {

@@ -18,19 +18,17 @@ public enum EditorTransitionMode {
 // swiftlint:disable type_body_length
 class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
     // swiftlint:enable type_body_length
-    let mode: EditorTransitionMode
-    var requestID: PHImageRequestID?
-    lazy var previewView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        return imageView
-    }()
-    var transitionView: UIView?
-
+    private let mode: EditorTransitionMode
+    private var requestID: PHImageRequestID?
+    private var transitionView: UIView?
+    private var previewView: UIImageView!
+    
     init(mode: EditorTransitionMode) {
         self.mode = mode
         super.init()
+        previewView = UIImageView()
+        previewView.contentMode = .scaleAspectFill
+        previewView.clipsToBounds = true
     }
 
     func transitionDuration(

@@ -25,82 +25,15 @@ class EditorMusicViewCell: UICollectionViewCell {
     
     weak var delegate: EditorMusicViewCellDelegate?
     
-    lazy var bgView: UIVisualEffectView = {
-        let visualEffect = UIBlurEffect.init(style: .light)
-        let view = UIVisualEffectView.init(effect: visualEffect)
-        view.layer.cornerRadius = 12
-        view.layer.masksToBounds = true
-        view.contentView.addSubview(musicIconView)
-        return view
-    }()
-    lazy var songNameLb: UILabel = {
-        let label = UILabel()
-        label.font = .mediumPingFang(ofSize: 16)
-        return label
-    }()
-    lazy var animationView: EditorAudioAnimationView = {
-        let view = EditorAudioAnimationView()
-        view.isHidden = true
-        return view
-    }()
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout.init()
-        flowLayout.scrollDirection = .horizontal
-        flowLayout.minimumLineSpacing = 0
-        flowLayout.minimumInteritemSpacing = 20
-        flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
-        return flowLayout
-    }()
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(
-            frame: CGRect(x: 0, y: 0, width: 0, height: 50),
-            collectionViewLayout: flowLayout
-        )
-        collectionView.backgroundColor = .clear
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.isScrollEnabled = false
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.isUserInteractionEnabled = false
-        if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .never
-        }
-        collectionView.register(
-            EditorMusicLyricViewCell.self,
-            forCellWithReuseIdentifier: "EditorMusicLyricViewCellID"
-        )
-        return collectionView
-    }()
-    
-    lazy var shadeView: UIView = {
-        let view = UIView.init()
-        view.addSubview(collectionView)
-        view.layer.mask = maskLayer
-        return view
-    }()
-    
-    lazy var maskLayer: CAGradientLayer = {
-        let maskLayer = CAGradientLayer.init()
-        maskLayer.colors = [UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor]
-        maskLayer.startPoint = CGPoint(x: 0, y: 1)
-        maskLayer.endPoint = CGPoint(x: 1, y: 1)
-        maskLayer.locations = [0.0, 0.1, 0.9, 1.0]
-        return maskLayer
-    }()
-    
-    lazy var musicIconView: UIImageView = {
-        let view = UIImageView.init(image: "hx_editor_tools_music".image?.withRenderingMode(.alwaysTemplate))
-        view.tintColor = .white
-        view.size = view.image?.size ?? .zero
-        return view
-    }()
-    
-    lazy var loadingView: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .white)
-        view.isHidden = true
-        return view
-    }()
+    private var bgView: UIVisualEffectView!
+    private var songNameLb: UILabel!
+    private var animationView: EditorAudioAnimationView!
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var collectionView: UICollectionView!
+    private var shadeView: UIView!
+    private var maskLayer: CAGradientLayer!
+    private var musicIconView: UIImageView!
+    private var loadingView: UIActivityIndicatorView!
     
     var music: VideoEditorMusic! {
         didSet {
@@ -130,8 +63,69 @@ class EditorMusicViewCell: UICollectionViewCell {
             }
         }
     }
-    var isPlaying: Bool = false
-    var playTimer: DispatchSourceTimer?
+    private var isPlaying: Bool = false
+    private var playTimer: DispatchSourceTimer?
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        maskLayer = CAGradientLayer()
+        maskLayer.colors = [UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor]
+        maskLayer.startPoint = CGPoint(x: 0, y: 1)
+        maskLayer.endPoint = CGPoint(x: 1, y: 1)
+        maskLayer.locations = [0.0, 0.1, 0.9, 1.0]
+        
+        musicIconView = UIImageView.init(image: "hx_editor_tools_music".image?.withRenderingMode(.alwaysTemplate))
+        musicIconView.tintColor = .white
+        musicIconView.size = musicIconView.image?.size ?? .zero
+        
+        bgView = UIVisualEffectView.init(effect: UIBlurEffect(style: .light))
+        bgView.layer.cornerRadius = 12
+        bgView.layer.masksToBounds = true
+        bgView.contentView.addSubview(musicIconView)
+        contentView.addSubview(bgView)
+        
+        flowLayout = UICollectionViewFlowLayout()
+        flowLayout.scrollDirection = .horizontal
+        flowLayout.minimumLineSpacing = 0
+        flowLayout.minimumInteritemSpacing = 20
+        flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+        collectionView = UICollectionView(
+            frame: CGRect(x: 0, y: 0, width: 0, height: 50),
+            collectionViewLayout: flowLayout
+        )
+        collectionView.backgroundColor = .clear
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.isScrollEnabled = false
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.isUserInteractionEnabled = false
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        }
+        collectionView.register(
+            EditorMusicLyricViewCell.self,
+            forCellWithReuseIdentifier: "EditorMusicLyricViewCellID"
+        )
+        
+        shadeView = UIView()
+        shadeView.addSubview(collectionView)
+        shadeView.layer.mask = maskLayer
+        contentView.addSubview(shadeView)
+        
+        loadingView = UIActivityIndicatorView(style: .white)
+        loadingView.isHidden = true
+        contentView.addSubview(loadingView)
+        
+        animationView = EditorAudioAnimationView()
+        animationView.isHidden = true
+        contentView.addSubview(animationView)
+        
+        songNameLb = UILabel()
+        songNameLb.font = .mediumPingFang(ofSize: 16)
+        contentView.addSubview(songNameLb)
+    }
+    
     func playMusic(completion: @escaping (VideoEditorMusicURL, VideoEditorMusic) -> Void) {
         hideLoading()
         switch music.audioURL {
@@ -326,14 +320,6 @@ class EditorMusicViewCell: UICollectionViewCell {
         collectionView.reloadData()
         playTimer?.cancel()
         collectionView.setContentOffset(.zero, animated: false)
-    }
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        contentView.addSubview(bgView)
-        contentView.addSubview(shadeView)
-        contentView.addSubview(loadingView)
-        contentView.addSubview(animationView)
-        contentView.addSubview(songNameLb)
     }
     
     required init?(coder: NSCoder) {

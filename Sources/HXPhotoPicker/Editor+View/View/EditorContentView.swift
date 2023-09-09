@@ -293,6 +293,7 @@ class EditorContentView: UIView {
     // MARK: initialize
     init() {
         super.init(frame: .zero)
+        initViews()
         addSubview(imageView)
         addSubview(mosaicView)
         addSubview(videoView)
@@ -314,41 +315,33 @@ class EditorContentView: UIView {
     }
     
     // MARK: SubViews
-    lazy var imageView: ImageView = {
-        let imageView = ImageView()
+    var imageView: ImageView!
+    var videoView: EditorVideoPlayerView!
+    var drawView: EditorDrawView!
+    var mosaicView: EditorMosaicView!
+    var stickerView: EditorStickersView!
+    
+    private func initViews() {
+        imageView = ImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.isHidden = true
-        return imageView
-    }()
-    
-    lazy var videoView: EditorVideoPlayerView = {
-        let videoView = EditorVideoPlayerView()
-        videoView.size = UIScreen.main.bounds.size
+        
+        videoView = EditorVideoPlayerView()
+        videoView.size = UIDevice.screenSize
         videoView.delegate = self
         videoView.isHidden = true
-        return videoView
-    }()
-    
-    lazy var drawView: EditorDrawView = {
-        let drawView = EditorDrawView()
+        
+        drawView = EditorDrawView()
         drawView.delegate = self
-        return drawView
-    }()
-    
-    lazy var mosaicView: EditorMosaicView = {
-        let mosaicView = EditorMosaicView()
+        
+        mosaicView = EditorMosaicView()
         mosaicView.delegate = self
         mosaicView.isHidden = true
-        return mosaicView
-    }()
-    
-    lazy var stickerView: EditorStickersView = {
-        let stickerView = EditorStickersView()
+        
+        stickerView = EditorStickersView()
         stickerView.delegate = self
-//        mosaicView.isHidden = true
-        return stickerView
-    }()
+    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

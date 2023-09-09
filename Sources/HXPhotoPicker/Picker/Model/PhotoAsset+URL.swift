@@ -186,19 +186,67 @@ public extension PhotoAsset {
         public let imageURL: URL?
         public let videoURL: URL?
         
-        public init(imageURL: URL) {
+        public init(imageURL: URL, videoURL: URL? = nil) {
             self.imageURL = imageURL
-            self.videoURL = nil
+            self.videoURL = videoURL
         }
         
-        public init(videoURL: URL) {
-            self.imageURL = nil
+        public init(imageURL: URL? = nil, videoURL: URL) {
+            self.imageURL = imageURL
             self.videoURL = videoURL
         }
         
         public init(imageURL: URL, videoURL: URL) {
             self.imageURL = imageURL
             self.videoURL = videoURL
+        }
+    }
+    
+    func getAssetResult(
+        toFile fileConfig: PhotoAsset.FileConfig?,
+        compression: PhotoAsset.Compression?,
+        completion: @escaping (Result<AssetResult, Error>) -> Void
+    ) {
+        var urlResult: AssetURLResult?
+        var image: UIImage?
+        var error: Error = PickerError.imageFetchFaild
+        
+        let group = DispatchGroup()
+        let queue = DispatchQueue(label: "HXPhotoPicker.request.urls", qos: .userInitiated)
+        queue.async(group: group) {
+            let semaphore = DispatchSemaphore(value: 0)
+            self.getURL(toFile: fileConfig, compression: compression) {
+                switch $0 {
+                case .success(let result):
+                    urlResult = result
+                case .failure(let err):
+                    error = err
+                }
+                semaphore.signal()
+            }
+            semaphore.wait()
+        }
+        queue.async(group: group) {
+            let semaphore = DispatchSemaphore(value: 0)
+            self.requestThumbnailImage(targetWidth: 350) { img, _, info in
+                if AssetManager.assetIsDegraded(for: info) {
+                    return
+                }
+                if let img = img {
+                    image = img
+                }else {
+                    error = PickerError.imageFetchFaild
+                }
+                semaphore.signal()
+            }
+            semaphore.wait()
+        }
+        group.notify(queue: .main) {
+            if let image = image, let urlResult = urlResult {
+                completion(.success(.init(image: image, urlReuslt: urlResult)))
+            }else {
+                completion(.failure(error))
+            }
         }
     }
 }

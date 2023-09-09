@@ -131,28 +131,4 @@ public extension AssetManager {
             }
         }
     }
-    
-    /// 请求获取图片地址
-    /// - Parameters:
-    ///   - asset: 对应的 PHAsset 数据
-    ///   - resultHandler: 获取结果
-    /// - Returns: 请求ID
-    @discardableResult
-    static func requestImageURL(
-        for asset: PHAsset,
-        resultHandler: @escaping (URL?, UIImage?) -> Void
-    ) -> PHContentEditingInputRequestID {
-        let options = PHContentEditingInputRequestOptions.init()
-        options.isNetworkAccessAllowed = true
-        return asset.requestContentEditingInput(
-            with: options
-        ) { (input, _) in
-            DispatchQueue.main.async {
-                resultHandler(
-                    input?.fullSizeImageURL,
-                    input?.displaySizeImage
-                )
-            }
-        }
-    }
 }

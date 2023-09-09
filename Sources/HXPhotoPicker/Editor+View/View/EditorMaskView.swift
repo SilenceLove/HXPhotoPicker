@@ -9,161 +9,27 @@ import UIKit
 
 class EditorMaskView: UIView {
     
-    lazy var customMaskView: UIView = {
-        let view = UIView()
-        view.alpha = 0
-        view.isUserInteractionEnabled = false
-        switch maskType {
-        case .customColor(let color):
-            view.backgroundColor = color
-            customMaskEffectView.alpha = 0
-        case .blurEffect:
-            customMaskEffectView.alpha = 1
-        }
-        view.addSubview(customMaskEffectView)
-        view.mask = maskImageView
-        return view
-    }()
+    private var customMaskView: UIView!
+    private var maskImageView: UIImageView!
+    private var customMaskEffectView: UIVisualEffectView!
+    private var visualEffectView: UIVisualEffectView!
+    private var blackMaskView: UIView!
+    private var maskLayer: CAShapeLayer!
+    private var frameLayer: CAShapeLayer!
+    private var dotsLayer: CAShapeLayer!
+    private var sizeLb: UILabel!
+    private var frameView: UIView!
+    private var gridlinesLayer: CAShapeLayer!
+    private var gridGraylinesLayer: CAShapeLayer!
     
-    lazy var maskImageView: UIImageView = {
-        let imageView = UIImageView(image: maskImage)
-        return imageView
-    }()
-    
-    lazy var customMaskEffectView: UIVisualEffectView = {
-        let style: UIBlurEffect.Style
-        switch maskType {
-        case .blurEffect(let _style):
-            style = _style
-        default:
-            style = .light
-        }
-        let visualEffect = UIBlurEffect(style: style)
-        let view = UIVisualEffectView(effect: visualEffect)
-        view.isUserInteractionEnabled = false
-        return view
-    }()
-    
-    lazy var visualEffectView: UIVisualEffectView = {
-        let style: UIBlurEffect.Style
-        switch maskType {
-        case .blurEffect(let _style):
-            style = _style
-        default:
-            style = .light
-        }
-        let visualEffect = UIBlurEffect(style: style)
-        let view = UIVisualEffectView(effect: visualEffect)
-        view.isUserInteractionEnabled = false
-        return view
-    }()
-    
-    lazy var blackMaskView: UIView = {
-        let view = UIView()
-        view.isHidden = true
-        view.alpha = 0
-        view.isUserInteractionEnabled = false
-        view.backgroundColor = maskColor
-        return view
-    }()
-    
-    lazy var maskLayer: CAShapeLayer = {
-        let layer = CAShapeLayer()
-        layer.contentsScale = UIScreen.main.scale
-        return layer
-    }()
-    
-    lazy var frameLayer: CAShapeLayer = {
-        let layer = CAShapeLayer()
-        layer.strokeColor = UIColor.white.cgColor
-        layer.fillColor = UIColor.clear.cgColor
-        layer.lineWidth = 1.2
-        layer.shadowOffset = CGSize(width: -1, height: 1)
-        layer.contentsScale = UIScreen.main.scale
-        layer.shouldRasterize = true
-        layer.rasterizationScale = layer.contentsScale
-        layer.shadowOpacity = 0.5
-        return layer
-    }()
-    
-    lazy var dotsLayer: CAShapeLayer = {
-        let layer = CAShapeLayer()
-        layer.strokeColor = UIColor.white.cgColor
-        layer.fillColor = UIColor.clear.cgColor
-        layer.lineWidth = 3.5
-        layer.contentsScale = UIScreen.main.scale
-        return layer
-    }()
+    var gridlinesView: UIView!
+    var gridGraylinesView: UIView!
     
     var imageSize: CGSize = .zero {
         didSet {
             sizeLb.text = "\(Int(max(1, round(imageSize.width))))x\(Int(max(1, round(imageSize.height))))"
         }
     }
-    
-    lazy var sizeLb: UILabel = {
-        let label = UILabel()
-        label.font = .semiboldPingFang(ofSize: 15)
-        label.textColor = .white
-        label.textAlignment = .center
-        label.isHighlighted = true
-        label.highlightedTextColor = .white
-        label.layer.shadowColor = UIColor.black.cgColor
-        label.layer.shadowOpacity = 1
-        label.layer.shadowRadius = 8
-        label.layer.shadowOffset = CGSize(width: 0, height: 0)
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
-    
-    lazy var frameView: UIView = {
-        let view = UIView()
-        view.isUserInteractionEnabled = false
-        view.layer.addSublayer(frameLayer)
-        view.layer.addSublayer(dotsLayer)
-        return view
-    }()
-    
-    lazy var gridlinesView: UIView = {
-        let view = UIView()
-        view.alpha = 0
-        view.isUserInteractionEnabled = false
-        view.layer.addSublayer(gridlinesLayer)
-        view.addSubview(sizeLb)
-        return view
-    }()
-    
-    lazy var gridlinesLayer: CAShapeLayer = {
-        let layer = CAShapeLayer()
-        layer.strokeColor = UIColor.white.cgColor
-        layer.fillColor = UIColor.clear.cgColor
-        layer.lineWidth = 0.5
-        layer.shadowOffset = CGSize(width: -1, height: 1)
-        layer.contentsScale = UIScreen.main.scale
-        layer.shouldRasterize = true
-        layer.rasterizationScale = layer.contentsScale
-        layer.shadowOpacity = 0.5
-        return layer
-    }()
-    
-    lazy var gridGraylinesView: UIView = {
-        let view = UIView()
-        view.alpha = 0
-        view.isUserInteractionEnabled = false
-        view.layer.addSublayer(gridGraylinesLayer)
-        return view
-    }()
-    
-    lazy var gridGraylinesLayer: CAShapeLayer = {
-        let layer = CAShapeLayer()
-        layer.strokeColor = UIColor.gray.withAlphaComponent(0.75).cgColor
-        layer.fillColor = UIColor.clear.cgColor
-        layer.lineWidth = 0.5
-        layer.contentsScale = UIScreen.main.scale
-        layer.shouldRasterize = true
-        layer.rasterizationScale = layer.contentsScale
-        return layer
-    }()
     
     /// 圆形裁剪框
     var isRoundCrop: Bool = false
@@ -271,10 +137,14 @@ class EditorMaskView: UIView {
         super.init(frame: .zero)
         switch type {
         case .frame:
+            initFrameView()
+            initLineLayers()
             addSubview(frameView)
             addSubview(gridGraylinesView)
             addSubview(gridlinesView)
         case .mask:
+            initBlackMaskView()
+            initEffectViews()
             switch maskType {
             case .customColor(let color):
                 backgroundColor = color
@@ -283,11 +153,131 @@ class EditorMaskView: UIView {
                 visualEffectView.alpha = 1
             }
             addSubview(visualEffectView)
+            maskLayer = CAShapeLayer()
+            maskLayer.contentsScale = UIScreen.main.scale
             layer.mask = maskLayer
             addSubview(blackMaskView)
         case .customMask:
+            initCustomEffectViews()
             addSubview(customMaskView)
         }
+    }
+    
+    private func initFrameView() {
+        dotsLayer = CAShapeLayer()
+        dotsLayer.strokeColor = UIColor.white.cgColor
+        dotsLayer.fillColor = UIColor.clear.cgColor
+        dotsLayer.lineWidth = 3.5
+        dotsLayer.contentsScale = UIScreen.main.scale
+        
+        frameLayer = CAShapeLayer()
+        frameLayer.strokeColor = UIColor.white.cgColor
+        frameLayer.fillColor = UIColor.clear.cgColor
+        frameLayer.lineWidth = 1.2
+        frameLayer.shadowOffset = CGSize(width: -1, height: 1)
+        frameLayer.contentsScale = UIScreen.main.scale
+        frameLayer.shouldRasterize = true
+        frameLayer.rasterizationScale = layer.contentsScale
+        frameLayer.shadowOpacity = 0.5
+        
+        frameView = UIView()
+        frameView.isUserInteractionEnabled = false
+        frameView.layer.addSublayer(frameLayer)
+        frameView.layer.addSublayer(dotsLayer)
+    }
+    
+    private func initLineLayers() {
+        
+        gridlinesLayer = CAShapeLayer()
+        gridlinesLayer.strokeColor = UIColor.white.cgColor
+        gridlinesLayer.fillColor = UIColor.clear.cgColor
+        gridlinesLayer.lineWidth = 0.5
+        gridlinesLayer.shadowOffset = CGSize(width: -1, height: 1)
+        gridlinesLayer.contentsScale = UIScreen.main.scale
+        gridlinesLayer.shouldRasterize = true
+        gridlinesLayer.rasterizationScale = layer.contentsScale
+        gridlinesLayer.shadowOpacity = 0.5
+        
+        sizeLb = UILabel()
+        sizeLb.font = .semiboldPingFang(ofSize: UIDevice.isPad ? 18 : 15)
+        sizeLb.textColor = .white
+        sizeLb.textAlignment = .center
+        sizeLb.isHighlighted = true
+        sizeLb.highlightedTextColor = .white
+        sizeLb.layer.shadowColor = UIColor.black.cgColor
+        sizeLb.layer.shadowOpacity = 1
+        sizeLb.layer.shadowRadius = 8
+        sizeLb.layer.shadowOffset = CGSize(width: 0, height: 0)
+        sizeLb.adjustsFontSizeToFitWidth = true
+        
+        gridlinesView = UIView()
+        gridlinesView.alpha = 0
+        gridlinesView.isUserInteractionEnabled = false
+        gridlinesView.layer.addSublayer(gridlinesLayer)
+        gridlinesView.addSubview(sizeLb)
+        
+        gridGraylinesLayer = CAShapeLayer()
+        gridGraylinesLayer.strokeColor = UIColor.gray.withAlphaComponent(0.75).cgColor
+        gridGraylinesLayer.fillColor = UIColor.clear.cgColor
+        gridGraylinesLayer.lineWidth = 0.5
+        gridGraylinesLayer.contentsScale = UIScreen.main.scale
+        gridGraylinesLayer.shouldRasterize = true
+        gridGraylinesLayer.rasterizationScale = layer.contentsScale
+        
+        gridGraylinesView = UIView()
+        gridGraylinesView.alpha = 0
+        gridGraylinesView.isUserInteractionEnabled = false
+        gridGraylinesView.layer.addSublayer(gridGraylinesLayer)
+    }
+    
+    private func initBlackMaskView() {
+        blackMaskView = UIView()
+        blackMaskView.isHidden = true
+        blackMaskView.alpha = 0
+        blackMaskView.isUserInteractionEnabled = false
+        blackMaskView.backgroundColor = maskColor
+    }
+    private func initEffectViews() {
+        let style: UIBlurEffect.Style
+        switch maskType {
+        case .blurEffect(let _style):
+            style = _style
+        default:
+            style = .light
+        }
+        let visualEffect = UIBlurEffect(style: style)
+        
+        visualEffectView = UIVisualEffectView(effect: visualEffect)
+        visualEffectView.isUserInteractionEnabled = false
+    }
+    
+    private func initCustomEffectViews() {
+        maskImageView = UIImageView(image: maskImage)
+        
+        let style: UIBlurEffect.Style
+        switch maskType {
+        case .blurEffect(let _style):
+            style = _style
+        default:
+            style = .light
+        }
+        let visualEffect = UIBlurEffect(style: style)
+        
+        customMaskEffectView = UIVisualEffectView(effect: visualEffect)
+        customMaskEffectView.isUserInteractionEnabled = false
+        
+        customMaskView = UIView()
+        customMaskView.alpha = 0
+        customMaskView.isUserInteractionEnabled = false
+        switch maskType {
+        case .customColor(let color):
+            customMaskView.backgroundColor = color
+            customMaskEffectView.alpha = 0
+        case .blurEffect:
+            customMaskEffectView.alpha = 1
+        }
+        customMaskView.addSubview(customMaskEffectView)
+        customMaskView.mask = maskImageView
     }
     
     required init?(coder: NSCoder) {

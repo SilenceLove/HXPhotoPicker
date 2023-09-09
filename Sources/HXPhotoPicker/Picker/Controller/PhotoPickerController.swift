@@ -33,7 +33,7 @@ open class PhotoPickerController: UINavigationController {
     public var isOriginal: Bool = false
     
     /// fetch Assets 时的选项配置
-    public lazy var options: PHFetchOptions = .init()
+    public var options: PHFetchOptions = .init()
     
     /// 完成/取消时自动 dismiss ,为false需要自己在代理回调里手动 dismiss
     public var autoDismiss: Bool = true
@@ -148,7 +148,6 @@ open class PhotoPickerController: UINavigationController {
         config: PickerConfiguration,
         delegate: PhotoPickerControllerDelegate? = nil
     ) {
-        var config = config
         PhotoManager.shared.appearanceStyle = config.appearanceStyle
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
         self.config = config
@@ -273,32 +272,14 @@ open class PhotoPickerController: UINavigationController {
     var selectOptions: PickerAssetOptions!
     var selectedPhotoAssetArray: [PhotoAsset] = []
     var selectedVideoAssetArray: [PhotoAsset] = []
-    lazy var deniedView: DeniedAuthorizationView = {
-        let deniedView = DeniedAuthorizationView.init(config: config.notAuthorized)
-        deniedView.frame = view.bounds
-        return deniedView
-    }()
     var singleVideo: Bool = false
-    lazy var assetCollectionsQueue: OperationQueue = {
-        let assetCollectionsQueue = OperationQueue.init()
-        assetCollectionsQueue.maxConcurrentOperationCount = 1
-        return assetCollectionsQueue
-    }()
-    lazy var assetsQueue: OperationQueue = {
-        let assetCollectionsQueue = OperationQueue()
-        assetCollectionsQueue.maxConcurrentOperationCount = 1
-        return assetCollectionsQueue
-    }()
-    lazy var requestAssetBytesQueue: OperationQueue = {
-        let requestAssetBytesQueue = OperationQueue.init()
-        requestAssetBytesQueue.maxConcurrentOperationCount = 1
-        return requestAssetBytesQueue
-    }()
-    lazy var previewRequestAssetBytesQueue: OperationQueue = {
-        let requestAssetBytesQueue = OperationQueue.init()
-        requestAssetBytesQueue.maxConcurrentOperationCount = 1
-        return requestAssetBytesQueue
-    }()
+    
+    var deniedView: DeniedAuthorizationView!
+    var assetCollectionsQueue: OperationQueue!
+    var assetsQueue: OperationQueue!
+    var requestAssetBytesQueue: OperationQueue!
+    var previewRequestAssetBytesQueue: OperationQueue!
+    
     public override var modalPresentationStyle: UIModalPresentationStyle {
         didSet {
             if (isPreviewAsset || isExternalPickerPreview) && modalPresentationStyle == .custom {
@@ -312,7 +293,7 @@ open class PhotoPickerController: UINavigationController {
     var dismissInteractiveTransition: PickerControllerInteractiveTransition?
     
     #if HXPICKER_ENABLE_EDITOR
-    lazy var editedPhotoAssetArray: [PhotoAsset] = []
+    var editedPhotoAssetArray: [PhotoAsset] = []
     #endif
     
     var isDismissed: Bool = false
@@ -323,9 +304,9 @@ open class PhotoPickerController: UINavigationController {
         PhotoManager.shared.indicatorType = config.indicatorType
         PhotoManager.shared.loadNetworkVideoMode = config.previewView.loadNetworkVideoMode
         PhotoManager.shared.thumbnailLoadMode = .complete
-        configColor()
-        navigationBar.isTranslucent = config.navigationBarIsTranslucent
         selectOptions = config.selectOptions
+        initViews()
+        initQueues()
         if !isPreviewAsset && !isExternalPickerPreview {
             setOptions()
             requestAuthorization()
@@ -362,6 +343,27 @@ open class PhotoPickerController: UINavigationController {
             }
         }
     }
+    
+    private func initViews() {
+        configColor()
+        navigationBar.isTranslucent = config.navigationBarIsTranslucent
+        deniedView = DeniedAuthorizationView(config: config.notAuthorized)
+        deniedView.frame = view.bounds
+    }
+    private func initQueues() {
+        assetCollectionsQueue = OperationQueue()
+        assetCollectionsQueue.maxConcurrentOperationCount = 1
+        
+        assetsQueue = OperationQueue()
+        assetsQueue.maxConcurrentOperationCount = 1
+        
+        requestAssetBytesQueue = OperationQueue()
+        requestAssetBytesQueue.maxConcurrentOperationCount = 1
+        
+        previewRequestAssetBytesQueue = OperationQueue()
+        previewRequestAssetBytesQueue.maxConcurrentOperationCount = 1
+    }
+    
     public override func present(
         _ viewControllerToPresent: UIViewController,
         animated flag: Bool,
@@ -611,6 +613,7 @@ public extension PhotoPickerController {
     /// - Returns: 获取对应的对象数组
     static func picker<T: PhotoAssetObject>(
         _ config: PickerConfiguration,
+        selectedAssets: [PhotoAsset] = [],
         delegate: PhotoPickerControllerDelegate? = nil,
         compression: PhotoAsset.Compression? = nil,
         fromVC: UIViewController? = nil,
@@ -618,21 +621,23 @@ public extension PhotoPickerController {
     ) async throws -> [T] {
         var config = config
         config.isAutoBack = false
-        let vc = show(config, delegate: delegate, fromVC: fromVC)
+        let vc = show(config, selectedAssets: selectedAssets, delegate: delegate, fromVC: fromVC)
         return try await vc.pickerObject(compression, toFile: fileConfig)
     }
     
     static func picker(
         _ config: PickerConfiguration,
+        selectedAssets: [PhotoAsset] = [],
         delegate: PhotoPickerControllerDelegate? = nil,
         fromVC: UIViewController? = nil
     ) async throws -> PickerResult {
-        let vc = show(config, delegate: delegate, fromVC: fromVC)
+        let vc = show(config, selectedAssets: selectedAssets, delegate: delegate, fromVC: fromVC)
         return try await vc.picker()
     }
     
     static func show(
         _ config: PickerConfiguration,
+        selectedAssets: [PhotoAsset] = [],
         delegate: PhotoPickerControllerDelegate? = nil,
         fromVC: UIViewController? = nil
     ) -> PhotoPickerController {
@@ -643,6 +648,7 @@ public extension PhotoPickerController {
             topVC = UIViewController.topViewController
         }
         let pickerController = PhotoPickerController(picker: config, delegate: delegate)
+        pickerController.selectedAssetArray = selectedAssets
         topVC?.present(pickerController, animated: true)
         return pickerController
     }
@@ -673,8 +679,11 @@ public extension PhotoPickerController {
        toFile fileConfig: PickerResult.FileConfigHandler? = nil
     ) async throws -> [T] {
        try await withCheckedThrowingContinuation { continuation in
+           var isDimissed: Bool = false
            finishHandler = { [weak self] result, controller in
                guard let self = self else { return }
+               if isDimissed { return }
+               isDimissed = true
                ProgressHUD.showLoading(addedTo: self.view)
                self.pickerTask = Task {
                    do {
@@ -695,6 +704,8 @@ public extension PhotoPickerController {
                }
            }
            cancelHandler = { controller in
+               if isDimissed { return }
+               isDimissed = true
                controller.dismiss(true)
                continuation.resume(with: .failure(PickerError.canceled))
            }

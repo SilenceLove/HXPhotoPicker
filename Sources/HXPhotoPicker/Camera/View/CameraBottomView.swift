@@ -21,109 +21,19 @@ protocol CameraBottomViewDelegate: AnyObject {
 
 class CameraBottomView: UIView {
     weak var delegate: CameraBottomViewDelegate?
-    lazy var backButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage("hx_camera_down_back".image, for: .normal)
-        button.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
-        button.size = button.currentImage?.size ?? .zero
-        button.tintColor = .white
-        button.imageView?.tintColor = .white
-        return button
-    }()
-    lazy var maskLayer: CAGradientLayer = {
-        let layer = PhotoTools.getGradientShadowLayer(false)
-        return layer
-    }()
-    lazy var takeMaskLayer: CAShapeLayer = {
-        let takeLayer = CAShapeLayer()
-        takeLayer.contentsScale = UIScreen.main.scale
-        takeLayer.fillColor = UIColor.clear.cgColor
-        takeLayer.lineWidth = 5
-        takeLayer.strokeColor = color.cgColor
-        takeLayer.isHidden = true
-        return takeLayer
-    }()
-    lazy var takeBgView: UIVisualEffectView = {
-        let effect = UIBlurEffect(style: .extraLight)
-        let view = UIVisualEffectView(effect: effect)
-        view.size = CGSize(width: 80, height: 80)
-        view.layer.cornerRadius = view.width * 0.5
-        view.layer.masksToBounds = true
-        view.layer.addSublayer(takeMaskLayer)
-        return view
-    }()
-    lazy var takeView: UIView = {
-        let view = UIView()
-        view.size = CGSize(width: 60, height: 60)
-        view.backgroundColor = .white
-        view.isUserInteractionEnabled = false
-        view.layer.cornerRadius = view.width * 0.5
-        view.layer.masksToBounds = true
-        return view
-    }()
-    lazy var tapGesture: UITapGestureRecognizer = {
-        let tapGesture = UITapGestureRecognizer(
-            target: self,
-            action: #selector(tapGestureRecognizerClick(tap:))
-        )
-        tapGesture.isEnabled = false
-        return tapGesture
-    }()
-    lazy var longPress: UILongPressGestureRecognizer = {
-        let longPress = UILongPressGestureRecognizer(
-            target: self,
-            action: #selector(longPressGestureRecognizerClick(longPress:))
-        )
-        longPress.isEnabled = false
-        return longPress
-    }()
-    lazy var tipLb: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.textAlignment = .center
-        label.font = UIFont.mediumPingFang(ofSize: 14)
-        label.numberOfLines = 0
-        label.adjustsFontSizeToFitWidth = true
-        label.shadowColor = UIColor.black.withAlphaComponent(0.6)
-        label.shadowOffset = CGSize(width: 0, height: 1)
-        return label
-    }()
-    lazy var typeView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
-    lazy var photoButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setTitle("照片".localized, for: .normal)
-        button.setTitleColor(.white.withAlphaComponent(0.5), for: .normal)
-        button.setTitleColor(.white, for: .selected)
-        button.titleLabel?.font = .systemFont(ofSize: 15)
-        button.addTarget(self, action: #selector(didPhotoButtonClick), for: .touchUpInside)
-        return button
-    }()
-    lazy var videoButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setTitle("视频".localized, for: .normal)
-        button.setTitleColor(.white.withAlphaComponent(0.5), for: .normal)
-        button.setTitleColor(.white, for: .selected)
-        button.titleLabel?.font = .systemFont(ofSize: 15)
-        button.addTarget(self, action: #selector(didVideoButtonClick), for: .touchUpInside)
-        return button
-    }()
-    lazy var videoTimeLb: UILabel = {
-        let label = UILabel()
-        label.alpha = 0
-        label.text = "00:00"
-        label.textColor = .white
-        label.textAlignment = .center
-        label.font = UIFont.mediumPingFang(ofSize: 16)
-        label.numberOfLines = 0
-        label.shadowColor = UIColor.black.withAlphaComponent(0.4)
-        label.shadowOffset = CGSize(width: 0, height: 1)
-        label.isUserInteractionEnabled = false
-        return label
-    }()
+    private var backButton: UIButton!
+    private var maskLayer: CAGradientLayer!
+    private var takeMaskLayer: CAShapeLayer!
+    private var takeBgView: UIVisualEffectView!
+    private var takeView: UIView!
+    private var tapGesture: UITapGestureRecognizer!
+    private var longPress: UILongPressGestureRecognizer!
+    private var tipLb: UILabel!
+    private var typeView: UIView!
+    private var photoButton: UIButton!
+    private var videoButton: UIButton!
+    private var videoTimeLb: UILabel!
+    
     var isGestureEnable: Bool = false {
         didSet {
             tapGesture.isEnabled = isGestureEnable
@@ -137,6 +47,7 @@ class CameraBottomView: UIView {
     let takePhotoMode: CameraConfiguration.TakePhotoMode
     var captureType: CameraController.CaptureType?
     var takeType: CameraBottomViewTakeType = .photo
+    
     init(
         tintColor: UIColor,
         takePhotoMode: CameraConfiguration.TakePhotoMode
@@ -144,15 +55,96 @@ class CameraBottomView: UIView {
         self.color = tintColor
         self.takePhotoMode = takePhotoMode
         super.init(frame: .zero)
+        initViews()
+        setTakeMaskLayerPath()
+    }
+    
+    private func initViews() {
+        maskLayer = PhotoTools.getGradientShadowLayer(false)
         layer.addSublayer(maskLayer)
+        
+        backButton = UIButton(type: .system)
+        backButton.setImage("hx_camera_down_back".image, for: .normal)
+        backButton.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
+        backButton.size = backButton.currentImage?.size ?? .zero
+        backButton.tintColor = .white
+        backButton.imageView?.tintColor = .white
         addSubview(backButton)
+        
+        takeMaskLayer = CAShapeLayer()
+        takeMaskLayer.contentsScale = UIScreen.main.scale
+        takeMaskLayer.fillColor = UIColor.clear.cgColor
+        takeMaskLayer.lineWidth = 5
+        takeMaskLayer.strokeColor = color.cgColor
+        takeMaskLayer.isHidden = true
+        
+        takeBgView = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+        takeBgView.size = CGSize(width: 80, height: 80)
+        takeBgView.layer.cornerRadius = takeBgView.width * 0.5
+        takeBgView.layer.masksToBounds = true
+        takeBgView.layer.addSublayer(takeMaskLayer)
         addSubview(takeBgView)
+        
+        takeView = UIView()
+        takeView.size = CGSize(width: 60, height: 60)
+        takeView.backgroundColor = .white
+        takeView.isUserInteractionEnabled = false
+        takeView.layer.cornerRadius = takeView.width * 0.5
+        takeView.layer.masksToBounds = true
         addSubview(takeView)
+        
+        tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(tapGestureRecognizerClick(tap:))
+        )
+        tapGesture.isEnabled = false
+        
+        longPress = UILongPressGestureRecognizer(
+            target: self,
+            action: #selector(longPressGestureRecognizerClick(longPress:))
+        )
+        longPress.isEnabled = false
+        
+        tipLb = UILabel()
+        tipLb.textColor = .white
+        tipLb.textAlignment = .center
+        tipLb.font = .mediumPingFang(ofSize: 14)
+        tipLb.numberOfLines = 0
+        tipLb.adjustsFontSizeToFitWidth = true
+        tipLb.shadowColor = .black.withAlphaComponent(0.6)
+        tipLb.shadowOffset = CGSize(width: 0, height: 1)
         addSubview(tipLb)
+        
         if takePhotoMode == .click {
+            typeView = UIView()
+            typeView.backgroundColor = .clear
             addSubview(typeView)
         }
-        setTakeMaskLayerPath()
+        
+        photoButton = UIButton(type: .custom)
+        photoButton.setTitle("照片".localized, for: .normal)
+        photoButton.setTitleColor(.white.withAlphaComponent(0.5), for: .normal)
+        photoButton.setTitleColor(.white, for: .selected)
+        photoButton.titleLabel?.font = .systemFont(ofSize: 15)
+        photoButton.addTarget(self, action: #selector(didPhotoButtonClick), for: .touchUpInside)
+        
+        videoButton = UIButton(type: .custom)
+        videoButton.setTitle("视频".localized, for: .normal)
+        videoButton.setTitleColor(.white.withAlphaComponent(0.5), for: .normal)
+        videoButton.setTitleColor(.white, for: .selected)
+        videoButton.titleLabel?.font = .systemFont(ofSize: 15)
+        videoButton.addTarget(self, action: #selector(didVideoButtonClick), for: .touchUpInside)
+        
+        videoTimeLb = UILabel()
+        videoTimeLb.alpha = 0
+        videoTimeLb.text = "00:00"
+        videoTimeLb.textColor = .white
+        videoTimeLb.textAlignment = .center
+        videoTimeLb.font = .mediumPingFang(ofSize: 16)
+        videoTimeLb.numberOfLines = 0
+        videoTimeLb.shadowColor = .black.withAlphaComponent(0.4)
+        videoTimeLb.shadowOffset = CGSize(width: 0, height: 1)
+        videoTimeLb.isUserInteractionEnabled = false
     }
     
     func stopRecord() {
@@ -221,7 +213,7 @@ class CameraBottomView: UIView {
         }
     }
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        if typeView.frame.contains(point) && takePhotoMode == .click {
+        if takePhotoMode == .click && typeView.frame.contains(point) {
             return true
         }
         return super.point(inside: point, with: event)

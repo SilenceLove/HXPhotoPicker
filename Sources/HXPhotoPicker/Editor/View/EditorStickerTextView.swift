@@ -9,34 +9,14 @@ import UIKit
 
 class EditorStickerTextView: UIView {
     let config: EditorConfiguration.Text
-    lazy var textView: UITextView = {
-        let textView = UITextView()
-        textView.backgroundColor = .clear
-        textView.delegate = self
-        textView.layoutManager.delegate = self
-        textView.textContainerInset = UIEdgeInsets(
-            top: 15,
-            left: 15 + UIDevice.leftMargin,
-            bottom: 15,
-            right: 15 + UIDevice.rightMargin
-        )
-        textView.contentInset = .zero
-        
-        textView.becomeFirstResponder()
-        return textView
-    }()
+    var textView: UITextView!
+    private var textButton: UIButton!
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var collectionView: UICollectionView!
     
     var text: String {
         textView.text
     }
-    
-    lazy var textButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage("hx_editor_photo_text_normal".image, for: .normal)
-        button.setImage("hx_editor_photo_text_selected".image, for: .selected)
-        button.addTarget(self, action: #selector(didTextButtonClick(button:)), for: .touchUpInside)
-        return button
-    }()
     var currentSelectedIndex: Int = 0 {
         didSet {
             collectionView.scrollToItem(
@@ -46,47 +26,8 @@ class EditorStickerTextView: UIView {
             )
         }
     }
+    
     var currentSelectedColor: UIColor = .clear
-    @objc func didTextButtonClick(button: UIButton) {
-        button.isSelected = !button.isSelected
-        showBackgroudColor = button.isSelected
-        useBgColor = currentSelectedColor
-        if button.isSelected {
-            if currentSelectedColor.isWhite {
-                changeTextColor(color: .black)
-            }else {
-                changeTextColor(color: .white)
-            }
-        }else {
-            changeTextColor(color: currentSelectedColor)
-        }
-    }
-    
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.scrollDirection = .horizontal
-        flowLayout.minimumInteritemSpacing = 5
-        flowLayout.itemSize = CGSize(width: 37, height: 37)
-        return flowLayout
-    }()
-    
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-        collectionView.backgroundColor = .clear
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .never
-        }
-        collectionView.register(
-            EditorStickerTextViewCell.self,
-            forCellWithReuseIdentifier: "EditorStickerTextViewCellID"
-        )
-        return collectionView
-    }()
-    
     var typingAttributes: [NSAttributedString.Key: Any] = [:]
     var stickerText: EditorStickerText?
     
@@ -107,16 +48,56 @@ class EditorStickerTextView: UIView {
         self.config = config
         self.stickerText = stickerText
         super.init(frame: .zero)
-        addSubview(textView)
-        addSubview(textButton)
-        addSubview(collectionView)
+        initViews()
         setupTextConfig()
         setupStickerText()
         setupTextColors()
         addKeyboardNotificaition()
+        
+        textView.becomeFirstResponder()
     }
     
-    func setupStickerText() {
+    private func initViews() {
+        textView = UITextView()
+        textView.backgroundColor = .clear
+        textView.delegate = self
+        textView.layoutManager.delegate = self
+        textView.textContainerInset = UIEdgeInsets(
+            top: 15,
+            left: 15 + UIDevice.leftMargin,
+            bottom: 15,
+            right: 15 + UIDevice.rightMargin
+        )
+        textView.contentInset = .zero
+        addSubview(textView)
+        
+        textButton = UIButton(type: .custom)
+        textButton.setImage("hx_editor_photo_text_normal".image, for: .normal)
+        textButton.setImage("hx_editor_photo_text_selected".image, for: .selected)
+        textButton.addTarget(self, action: #selector(didTextButtonClick(button:)), for: .touchUpInside)
+        addSubview(textButton)
+        
+        flowLayout = UICollectionViewFlowLayout()
+        flowLayout.scrollDirection = .horizontal
+        flowLayout.minimumInteritemSpacing = 5
+        flowLayout.itemSize = CGSize(width: 37, height: 37)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView.backgroundColor = .clear
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        }
+        collectionView.register(
+            EditorStickerTextViewCell.self,
+            forCellWithReuseIdentifier: "EditorStickerTextViewCellID"
+        )
+        addSubview(collectionView)
+    }
+    
+    private func setupStickerText() {
         if let text = stickerText {
             showBackgroudColor = text.showBackgroud
             textView.text = text.text
@@ -125,12 +106,12 @@ class EditorStickerTextView: UIView {
         setupTextAttributes()
     }
     
-    func setupTextConfig() {
+    private func setupTextConfig() {
         textView.tintColor = config.tintColor
         textView.font = config.font
     }
     
-    func setupTextAttributes() {
+    private func setupTextAttributes() {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = 8
         let attributes = [NSAttributedString.Key.font: config.font,
@@ -139,7 +120,7 @@ class EditorStickerTextView: UIView {
         textView.attributedText = NSAttributedString(string: stickerText?.text ?? "", attributes: attributes)
     }
     
-    func setupTextColors() {
+    private func setupTextColors() {
         for (index, colorHex) in config.colors.enumerated() {
             let color = colorHex.color
             if let text = stickerText {
@@ -180,7 +161,23 @@ class EditorStickerTextView: UIView {
         }
     }
     
-    func addKeyboardNotificaition() {
+    @objc
+    private func didTextButtonClick(button: UIButton) {
+        button.isSelected = !button.isSelected
+        showBackgroudColor = button.isSelected
+        useBgColor = currentSelectedColor
+        if button.isSelected {
+            if currentSelectedColor.isWhite {
+                changeTextColor(color: .black)
+            }else {
+                changeTextColor(color: .white)
+            }
+        }else {
+            changeTextColor(color: currentSelectedColor)
+        }
+    }
+    
+    private func addKeyboardNotificaition() {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(keyboardWillAppearance),
@@ -195,7 +192,8 @@ class EditorStickerTextView: UIView {
         )
     }
     
-    @objc func keyboardWillAppearance(notifi: Notification) {
+    @objc
+    private func keyboardWillAppearance(notifi: Notification) {
         guard let info = notifi.userInfo,
               let duration = info[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
               let keyboardFrame = info[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
@@ -207,7 +205,8 @@ class EditorStickerTextView: UIView {
         }
     }
     
-    @objc func keyboardWillDismiss(notifi: Notification) {
+    @objc
+    private func keyboardWillDismiss(notifi: Notification) {
         guard let info = notifi.userInfo,
               let duration = info[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else {
             return
@@ -287,52 +286,9 @@ class EditorStickerTextView: UIView {
 }
 
 class EditorStickerTextViewCell: UICollectionViewCell {
-    lazy var colorBgView: UIView = {
-        let view = UIView.init()
-        view.size = CGSize(width: 22, height: 22)
-        view.layer.cornerRadius = 11
-        view.layer.masksToBounds = true
-        view.addSubview(imageView)
-        return view
-    }()
-    
-    lazy var imageView: UIImageView = {
-        let view = UIImageView(image: "hx_editor_brush_color_custom".image)
-        view.isHidden = true
-        
-        let bgLayer = CAShapeLayer()
-        bgLayer.contentsScale = UIScreen.main.scale
-        bgLayer.frame = CGRect(x: 0, y: 0, width: 22, height: 22)
-        bgLayer.fillColor = UIColor.white.cgColor
-        let bgPath = UIBezierPath(
-            roundedRect: CGRect(x: 1.5, y: 1.5, width: 19, height: 19),
-            cornerRadius: 19 * 0.5
-        )
-        bgLayer.path = bgPath.cgPath
-        view.layer.addSublayer(bgLayer)
-
-        let maskLayer = CAShapeLayer()
-        maskLayer.contentsScale = UIScreen.main.scale
-        maskLayer.frame = CGRect(x: 0, y: 0, width: 22, height: 22)
-        let maskPath = UIBezierPath(rect: bgLayer.bounds)
-        maskPath.append(
-            UIBezierPath(
-                roundedRect: CGRect(x: 3, y: 3, width: 16, height: 16),
-                cornerRadius: 8
-            ).reversing()
-        )
-        maskLayer.path = maskPath.cgPath
-        view.layer.mask = maskLayer
-        return view
-    }()
-    
-    lazy var colorView: UIView = {
-        let view = UIView.init()
-        view.size = CGSize(width: 16, height: 16)
-        view.layer.cornerRadius = 8
-        view.layer.masksToBounds = true
-        return view
-    }()
+    private var colorBgView: UIView!
+    private var imageView: UIImageView!
+    private var colorView: UIView!
     
     var colorHex: String! {
         didSet {
@@ -369,7 +325,44 @@ class EditorStickerTextViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        imageView = UIImageView(image: "hx_editor_brush_color_custom".image)
+        imageView.isHidden = true
+        
+        let bgLayer = CAShapeLayer()
+        bgLayer.contentsScale = UIScreen.main.scale
+        bgLayer.frame = CGRect(x: 0, y: 0, width: 22, height: 22)
+        bgLayer.fillColor = UIColor.white.cgColor
+        let bgPath = UIBezierPath(
+            roundedRect: CGRect(x: 1.5, y: 1.5, width: 19, height: 19),
+            cornerRadius: 19 * 0.5
+        )
+        bgLayer.path = bgPath.cgPath
+        imageView.layer.addSublayer(bgLayer)
+
+        let maskLayer = CAShapeLayer()
+        maskLayer.contentsScale = UIScreen.main.scale
+        maskLayer.frame = CGRect(x: 0, y: 0, width: 22, height: 22)
+        let maskPath = UIBezierPath(rect: bgLayer.bounds)
+        maskPath.append(
+            UIBezierPath(
+                roundedRect: CGRect(x: 3, y: 3, width: 16, height: 16),
+                cornerRadius: 8
+            ).reversing()
+        )
+        maskLayer.path = maskPath.cgPath
+        imageView.layer.mask = maskLayer
+        
+        colorBgView = UIView()
+        colorBgView.size = CGSize(width: 22, height: 22)
+        colorBgView.layer.cornerRadius = 11
+        colorBgView.layer.masksToBounds = true
+        colorBgView.addSubview(imageView)
         contentView.addSubview(colorBgView)
+        
+        colorView = UIView()
+        colorView.size = CGSize(width: 16, height: 16)
+        colorView.layer.cornerRadius = 8
+        colorView.layer.masksToBounds = true
         contentView.addSubview(colorView)
     }
     

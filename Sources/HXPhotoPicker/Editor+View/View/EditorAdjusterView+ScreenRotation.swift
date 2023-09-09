@@ -104,7 +104,7 @@ extension EditorAdjusterView {
             oldAdjustedFactor?.zoomScale = zoomScale
         }
         
-        let controlView = frameView.controlView
+        let controlView = frameView.controlView!
         setScrollViewContentInset(controlView.frame)
         if state == .edit {
             let minimumZoomScale = getScrollViewMinimumZoomScale(controlView.frame)

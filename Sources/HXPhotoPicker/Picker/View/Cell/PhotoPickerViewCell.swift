@@ -12,65 +12,26 @@ import Photos
 open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
     
     /// iCloud标示
-    public lazy var iCloudMarkView: UIImageView = {
-        let view = UIImageView(image: "hx_picker_photo_icloud_mark".image)
-        view.size = view.image?.size ?? .zero
-        view.isHidden = true
-        return view
-    }()
+    public var iCloudMarkView: UIImageView!
+    /// 资源类型标签背景
+    public var assetTypeMaskView: UIView!
+    /// 资源类型标签背景
+    public var assetTypeMaskLayer: CAGradientLayer!
+    /// 资源类型标签
+    public var assetTypeLb: UILabel!
+    /// 资源类型图标
+    public var assetTypeIcon: UIImageView!
+    /// 资源编辑标示
+    public var assetEditMarkIcon: UIImageView!
+    /// 禁用遮罩
+    public var disableMaskLayer: CALayer!
+    /// 选中遮罩
+    public var selectMaskLayer: CALayer!
+    
+    public var syncICloudRequestID: PHImageRequestID?
     
     /// iCloud下载进度视图
-    lazy var loaddingView: PhotoLoaddingView = {
-        let view = PhotoLoaddingView(frame: .init(origin: .zero, size: size))
-        view.isHidden = true
-        return view
-    }()
-    
-    /// 资源类型标签背景
-    public lazy var assetTypeMaskView: UIView = {
-        let assetTypeMaskView = UIView()
-        assetTypeMaskView.isHidden = true
-        assetTypeMaskView.layer.addSublayer(assetTypeMaskLayer)
-        return assetTypeMaskView
-    }()
-    
-    /// 资源类型标签背景
-    public lazy var assetTypeMaskLayer: CAGradientLayer = {
-        let layer = PhotoTools.getGradientShadowLayer(false)
-        return layer
-    }()
-    
-    /// 资源类型标签
-    public lazy var assetTypeLb: UILabel = {
-        let assetTypeLb = UILabel.init()
-        assetTypeLb.font = UIFont.mediumPingFang(ofSize: 14)
-        assetTypeLb.textColor = .white
-        assetTypeLb.textAlignment = .right
-        return assetTypeLb
-    }()
-    
-    /// 资源类型图标
-    public lazy var assetTypeIcon: UIImageView = {
-        let assetTypeIcon = UIImageView.init(image: UIImage.image(for: "hx_picker_cell_video_icon"))
-        assetTypeIcon.isHidden = true
-        return assetTypeIcon
-    }()
-    
-    /// 资源编辑标示
-    public lazy var assetEditMarkIcon: UIImageView = {
-        let assetEditMarkIcon = UIImageView.init(image: UIImage.image(for: "hx_picker_cell_photo_edit_icon"))
-        assetEditMarkIcon.isHidden = true
-        return assetEditMarkIcon
-    }()
-    
-    /// 禁用遮罩
-    public lazy var disableMaskLayer: CALayer = {
-        let disableMaskLayer = CALayer()
-        disableMaskLayer.backgroundColor = UIColor.white.withAlphaComponent(0.6).cgColor
-        disableMaskLayer.isHidden = true
-        return disableMaskLayer
-    }()
-    
+    var loaddingView: PhotoLoadingView!
     /// 获取视频时长时的 AVAsset 对象
     var videoDurationAsset: AVAsset?
     
@@ -80,6 +41,58 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
             cancelGetVideoDuration()
             setupState()
         }
+    }
+    
+    /// 是否可以选择
+    open override var canSelect: Bool {
+        didSet {
+            // 禁用遮罩
+            setupDisableMask()
+        }
+    }
+    
+    /// 添加视图
+    open override func initView() {
+        super.initView()
+        assetTypeMaskLayer = PhotoTools.getGradientShadowLayer(false)
+        assetTypeMaskView = UIView()
+        assetTypeMaskView.isHidden = true
+        assetTypeMaskView.layer.addSublayer(assetTypeMaskLayer)
+        photoView.addSubview(assetTypeMaskView)
+        
+        selectMaskLayer = CALayer()
+        selectMaskLayer.backgroundColor = UIColor.black.withAlphaComponent(0.6).cgColor
+        selectMaskLayer.frame = bounds
+        selectMaskLayer.isHidden = true
+        photoView.layer.addSublayer(selectMaskLayer)
+        
+        assetTypeLb = UILabel()
+        assetTypeLb.font = .mediumPingFang(ofSize: 14)
+        assetTypeLb.textColor = .white
+        assetTypeLb.textAlignment = .right
+        contentView.addSubview(assetTypeLb)
+        
+        assetTypeIcon = UIImageView(image: UIImage.image(for: "hx_picker_cell_video_icon"))
+        assetTypeIcon.isHidden = true
+        contentView.addSubview(assetTypeIcon)
+        
+        assetEditMarkIcon = UIImageView(image: UIImage.image(for: "hx_picker_cell_photo_edit_icon"))
+        assetEditMarkIcon.isHidden = true
+        contentView.addSubview(assetEditMarkIcon)
+        
+        disableMaskLayer = CALayer()
+        disableMaskLayer.backgroundColor = UIColor.white.withAlphaComponent(0.6).cgColor
+        disableMaskLayer.isHidden = true
+        contentView.layer.addSublayer(disableMaskLayer)
+        
+        iCloudMarkView = UIImageView(image: "hx_picker_photo_icloud_mark".image)
+        iCloudMarkView.size = iCloudMarkView.image?.size ?? .zero
+        iCloudMarkView.isHidden = true
+        contentView.addSubview(iCloudMarkView)
+        
+        loaddingView = PhotoLoadingView(frame: .init(origin: .zero, size: size))
+        loaddingView.isHidden = true
+        contentView.addSubview(loaddingView)
     }
     
     open override func requestICloudStateCompletion(_ inICloud: Bool) {
@@ -96,36 +109,6 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         }
     }
     
-    /// 选中遮罩
-    public lazy var selectMaskLayer: CALayer = {
-        let selectMaskLayer = CALayer.init()
-        selectMaskLayer.backgroundColor = UIColor.black.withAlphaComponent(0.6).cgColor
-        selectMaskLayer.frame = bounds
-        selectMaskLayer.isHidden = true
-        return selectMaskLayer
-    }()
-    
-    /// 是否可以选择
-    open override var canSelect: Bool {
-        didSet {
-            // 禁用遮罩
-            setupDisableMask()
-        }
-    }
-    
-    /// 添加视图
-    open override func initView() {
-        super.initView()
-        photoView.addSubview(assetTypeMaskView)
-        photoView.layer.addSublayer(selectMaskLayer)
-        contentView.addSubview(assetTypeLb)
-        contentView.addSubview(assetTypeIcon)
-        contentView.addSubview(assetEditMarkIcon)
-        contentView.layer.addSublayer(disableMaskLayer)
-        contentView.addSubview(iCloudMarkView)
-        contentView.addSubview(loaddingView)
-    }
-    
     /// 触发选中回调
     open func selectedAction(_ isSelected: Bool) {
         delegate?.cell(self, didSelectControl: isSelected)
@@ -139,8 +122,6 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         }
         disableMaskLayer.isHidden = canSelect
     }
-    
-    public var syncICloudRequestID: PHImageRequestID?
     
     open func cancelSyncICloud() {
         guard let id = syncICloudRequestID else {

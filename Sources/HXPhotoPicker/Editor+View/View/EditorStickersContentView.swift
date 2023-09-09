@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 class EditorStickersContentView: UIView {
     var scale: CGFloat = 1
@@ -57,18 +57,16 @@ extension EditorStickersContentView: UIGestureRecognizerDelegate {
 }
 
 class EditorStickersContentImageView: EditorStickersContentView {
-    lazy var imageView: ImageView = {
-        let view = ImageView()
-        if let imageData = item.imageData {
-            view.setImageData(imageData)
-        }else {
-            view.image = item.image
-        }
-        return view
-    }()
+    var imageView: ImageView!
     
     override init(item: EditorStickerItem) {
         super.init(item: item)
+        imageView = ImageView()
+        if let imageData = item.imageData {
+            imageView.setImageData(imageData)
+        }else {
+            imageView.image = item.image
+        }
         if item.isText {
             imageView.layer.shadowColor = UIColor.black.withAlphaComponent(0.8).cgColor
         }
@@ -94,15 +92,16 @@ class EditorStickersContentImageView: EditorStickersContentView {
 }
 
 class EditorStickersContentAudioView: EditorStickersContentView {
-    lazy var animationView: EditorAudioAnimationView = {
-        let view = EditorAudioAnimationView(hexColor: "#ffffff")
-        view.frame = CGRect(x: 2, y: 0, width: 20, height: 15)
-        view.startAnimation()
-        return view
-    }()
+    var animationView: EditorAudioAnimationView!
+    var textLayer: CATextLayer!
     
-    lazy var textLayer: CATextLayer = {
-        let textLayer = CATextLayer()
+    override init(item: EditorStickerItem) {
+        super.init(item: item)
+        animationView = EditorAudioAnimationView(hexColor: "#ffffff")
+        animationView.frame = CGRect(x: 2, y: 0, width: 20, height: 15)
+        animationView.startAnimation()
+        addSubview(animationView)
+        textLayer = CATextLayer()
         let fontSize: CGFloat = 25
         let font = UIFont.boldSystemFont(ofSize: fontSize)
         textLayer.font = font
@@ -112,12 +111,7 @@ class EditorStickersContentAudioView: EditorStickersContentView {
         textLayer.contentsScale = UIScreen.main.scale
         textLayer.alignmentMode = .left
         textLayer.isWrapped = true
-        return textLayer
-    }()
-    
-    override init(item: EditorStickerItem) {
-        super.init(item: item)
-        addSubview(animationView)
+        
         layer.addSublayer(textLayer)
         switch item.type {
         case .audio(let audio):

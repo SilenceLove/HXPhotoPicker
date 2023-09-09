@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension UIViewController: HXPickerCompatible {
+extension UIViewController {
     
     class var topViewController: UIViewController? {
         let window = UIApplication._keyWindow
@@ -28,11 +28,5 @@ extension UIViewController: HXPickerCompatible {
             return topViewController
         }
         return nil
-    }
-}
-
-public extension HXPickerWrapper where Base: UIViewController {
-    static var topViewController: UIViewController? {
-        Base.topViewController
     }
 }

@@ -32,8 +32,21 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
     weak var delegate: PhotoPreviewViewCellDelegate?
     
     var scrollContentView: PhotoPreviewContentView!
-    lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView.init()
+    var scrollView: UIScrollView!
+    
+    var statusBarShouldBeHidden = false
+    var allowInteration: Bool = true
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func initView() {
+        scrollView = UIScrollView()
         scrollView.delegate = self
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
@@ -58,20 +71,9 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
         scrollView.addSubview(scrollContentView)
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressClick(longPress:)))
         scrollView.addGestureRecognizer(longPress)
-        return scrollView
-    }()
-    
-    var statusBarShouldBeHidden = false
-    var allowInteration: Bool = true
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-    }
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    func initView() {
         contentView.addSubview(scrollView)
     }
+    
     func checkContentSize() {
         if !UIDevice.isPortrait {
             return

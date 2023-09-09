@@ -19,31 +19,10 @@ class EditorChartletViewListCell: UICollectionViewCell,
                                   UICollectionViewDelegate,
                                   UICollectionViewDelegateFlowLayout {
     weak var delegate: EditorChartletViewListCellDelegate?
-    lazy var loadingView: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .white)
-        view.hidesWhenStopped = true
-        return view
-    }()
+    private var loadingView: UIActivityIndicatorView!
+    private var flowLayout: UICollectionViewFlowLayout!
+    var collectionView: UICollectionView!
     
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.scrollDirection = .vertical
-        flowLayout.minimumLineSpacing = 5
-        flowLayout.minimumInteritemSpacing = 5
-        return flowLayout
-    }()
-    lazy var collectionView: UICollectionView = {
-        let view = UICollectionView.init(frame: .zero, collectionViewLayout: flowLayout)
-        view.backgroundColor = .clear
-        view.dataSource = self
-        view.delegate = self
-        view.showsHorizontalScrollIndicator = false
-        if #available(iOS 11.0, *) {
-            view.contentInsetAdjustmentBehavior = .never
-        }
-        view.register(EditorChartletViewCell.self, forCellWithReuseIdentifier: "EditorChartletViewListCellID")
-        return view
-    }()
     var rowCount: Int = 4
     var chartletList: [EditorChartlet] = [] {
         didSet {
@@ -69,12 +48,27 @@ class EditorChartletViewListCell: UICollectionViewCell,
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        flowLayout = UICollectionViewFlowLayout()
+        flowLayout.scrollDirection = .vertical
+        flowLayout.minimumLineSpacing = 5
+        flowLayout.minimumInteritemSpacing = 5
+        collectionView = UICollectionView.init(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView.backgroundColor = .clear
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.showsHorizontalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        }
+        collectionView.register(EditorChartletViewCell.self, forCellWithReuseIdentifier: "EditorChartletViewListCellID")
         contentView.addSubview(collectionView)
+        loadingView = UIActivityIndicatorView(style: .white)
+        loadingView.hidesWhenStopped = true
         contentView.addSubview(loadingView)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return chartletList.count
+        chartletList.count
     }
     
     func collectionView(

@@ -34,13 +34,7 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
         }
     }
     /// 展示图片
-    public lazy var photoView: PhotoThumbnailView = {
-        let photoView = PhotoThumbnailView()
-        photoView.size = size
-        photoView.imageView.size = size
-        photoView.fadeImage = PhotoManager.shared.firstLoadAssets
-        return photoView
-    }()
+    public var photoView: PhotoThumbnailView!
     
     /// 是否可以选择
     open var canSelect = true
@@ -73,6 +67,10 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     
     /// 初始化
     open func initView() {
+        photoView = PhotoThumbnailView()
+        photoView.size = size
+        photoView.imageView.size = size
+        photoView.fadeImage = PhotoManager.shared.firstLoadAssets
         contentView.addSubview(photoView)
     }
     /// 配置背景颜色
@@ -173,15 +171,17 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
         }
     }
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         initView()
 //        addLoadModeObserver()
     }
+    
     open override func layoutSubviews() {
         super.layoutSubviews()
         layoutView()
     }
+    
     open override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
@@ -190,12 +190,15 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
             }
         }
     }
+    
     var isRequestDirectly = true
     var iCloundLoading = false
     var requestICloudCompletion = false
+    
     deinit {
         cancelRequest()
     }
+    
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

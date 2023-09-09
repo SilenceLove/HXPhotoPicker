@@ -53,15 +53,15 @@ public extension AssetManager {
                     )
                     return
                 }
-                let options = PHAssetResourceRequestOptions.init()
+                let options: PHAssetResourceRequestOptions = .init()
                 options.isNetworkAccessAllowed = true
                 var imageCompletion = false
                 var imageError: Error?
                 var videoCompletion = false
                 var videoError: Error?
                 var imageData: Data?
-                let videoURL = PhotoTools.getVideoTmpURL()
-                let callback = {(imageError: Error?, videoError: Error?) in
+                let videoURL: URL = PhotoTools.getVideoTmpURL()
+                let callback = { (imageError: Error?, videoError: Error?) in
                     if imageError != nil && videoError != nil {
                         completionHandler(.allError(imageError, videoError))
                     }else if imageError != nil {
@@ -72,7 +72,7 @@ public extension AssetManager {
                         completionHandler(nil)
                     }
                 }
-                var hasAdjustmentData = false
+                var hasAdjustmentData: Bool = false
                 for assetResource in assetResources where
                     assetResource.type == .adjustmentData {
                     hasAdjustmentData = true
@@ -121,7 +121,6 @@ public extension AssetManager {
                 }
             }
         } else {
-            // Fallback on earlier versions
             completionHandler(
                 .allError(
                     PhotoError.error(
@@ -200,10 +199,10 @@ public extension AssetManager {
                     )
                     return
                 }
-                let videoURL = fileURL
-                let options = PHAssetResourceRequestOptions.init()
+                let videoURL: URL = fileURL
+                let options: PHAssetResourceRequestOptions = .init()
                 options.isNetworkAccessAllowed = true
-                var hasAdjustmentData = false
+                var hasAdjustmentData: Bool = false
                 for assetResource in assetResources where
                     assetResource.type == .adjustmentData {
                     hasAdjustmentData = true
@@ -232,7 +231,6 @@ public extension AssetManager {
                 }
             }
         } else {
-            // Fallback on earlier versions
             completionHandler(
                 nil,
                 .allError(
@@ -248,6 +246,7 @@ public extension AssetManager {
             )
         }
     }
+    
     // MARK: 获取LivePhoto里的图片地址和视频地址
     static func requestLivePhoto(
         contentURL asset: PHAsset,
@@ -258,7 +257,6 @@ public extension AssetManager {
         completionHandler: @escaping (LivePhotoError?) -> Void
     ) {
         guard #available(iOS 9.1, *) else {
-            // Fallback on earlier versions
             completionHandler(
                 .allError(
                     PhotoError.error(
@@ -307,14 +305,24 @@ public extension AssetManager {
                 )
                 return
             }
-            let options = PHAssetResourceRequestOptions.init()
+            let options: PHAssetResourceRequestOptions = .init()
             options.isNetworkAccessAllowed = true
             var imageCompletion = false
             var imageError: Error?
             var videoCompletion = false
             var videoError: Error?
-            let imageURL = imageFileURL ?? PhotoTools.getImageTmpURL(.png)
-            let videoURL = videoFileURL ?? PhotoTools.getVideoTmpURL()
+            let imageURL: URL
+            if let imageFileURL = imageFileURL {
+                imageURL = imageFileURL
+            }else {
+                imageURL = PhotoTools.getImageTmpURL(.png)
+            }
+            let videoURL: URL
+            if let videoFileURL = videoFileURL {
+                videoURL = videoFileURL
+            }else {
+                videoURL = PhotoTools.getVideoTmpURL()
+            }
             let callback = {(imageError: Error?, videoError: Error?) in
                 if imageError != nil && videoError != nil {
                     completionHandler(.allError(imageError, videoError))
@@ -326,7 +334,7 @@ public extension AssetManager {
                     completionHandler(nil)
                 }
             }
-            var hasAdjustmentData = false
+            var hasAdjustmentData: Bool = false
             for assetResource in assetResources where
                 assetResource.type == .adjustmentData {
                 hasAdjustmentData = true
@@ -341,10 +349,10 @@ public extension AssetManager {
                 }
                 if assetResource.type == photoType {
                     let _imageURL: URL
-                    let isHEIC = assetResource.uniformTypeIdentifier.uppercased().hasSuffix("HEIC")
-                    let sourceIsHEIC = imageURL.pathExtension.uppercased() == "HEIC"
+                    let isHEIC: Bool = assetResource.uniformTypeIdentifier.uppercased().hasSuffix("HEIC")
+                    let sourceIsHEIC: Bool = imageURL.pathExtension.uppercased() == "HEIC"
                     if isHEIC, !sourceIsHEIC {
-                        let path = imageURL.path.replacingOccurrences(of: imageURL.pathExtension, with: "HEIC")
+                        let path: String = imageURL.path.replacingOccurrences(of: imageURL.pathExtension, with: "HEIC")
                         _imageURL = .init(fileURLWithPath: path)
                     }else {
                         _imageURL = imageURL
@@ -355,9 +363,9 @@ public extension AssetManager {
                         options: options
                     ) { (error) in
                         if isHEIC && !sourceIsHEIC {
-                            let image = UIImage(contentsOfFile: _imageURL.path)?.normalizedImage()
+                            let image: UIImage? = UIImage(contentsOfFile: _imageURL.path)?.normalizedImage()
                             try? FileManager.default.removeItem(at: _imageURL)
-                            guard let data = PhotoTools.getImageData(for: image) else {
+                            guard let data: Data = PhotoTools.getImageData(for: image) else {
                                 imageError = AssetError.assetResourceWriteDataFailed(AssetError.invalidData)
                                 imageCompletion = true
                                 DispatchQueue.main.async {

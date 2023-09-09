@@ -9,60 +9,27 @@
 import UIKit
 import Photos
 
-public class AlbumViewController: BaseViewController {
+public class AlbumViewController: BaseViewController, UITableViewDataSource, UITableViewDelegate {
     
-    public lazy var tableView: UITableView = {
-        let tableView = UITableView(
-            frame: .zero,
-            style: .plain
-        )
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.separatorStyle = .none
-        tableView.register(
-            AlbumViewCell.self,
-            forCellReuseIdentifier: "cellId"
-        )
-        if #available(iOS 11.0, *) {
-            tableView.contentInsetAdjustmentBehavior = .never
-        } else {
-            // Fallback on earlier versions
-            self.automaticallyAdjustsScrollViewInsets = false
-        }
-        return tableView
-    }()
-    lazy var promptLb: UILabel = {
-        let promptLb = UILabel(
-            frame: CGRect(x: 0, y: 0, width: 0, height: 40)
-        )
-        promptLb.text = "只能查看允许访问的照片和相关相册".localized
-        promptLb.textAlignment = .center
-        promptLb.font = UIFont.systemFont(ofSize: 14)
-        promptLb.adjustsFontSizeToFitWidth = true
-        promptLb.numberOfLines = 0
-        return promptLb
-    }()
-    lazy var titleLabel: UILabel = {
-        let titleLabel = UILabel()
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        titleLabel.textAlignment = .center
-        return titleLabel
-    }()
-    let config: AlbumListConfiguration
-    var assetCollectionsArray: [PhotoAssetCollection] = []
-    var orientationDidChange: Bool = false
-    var beforeOrientationIndexPath: IndexPath?
-    var canFetchAssetCollections: Bool = false
+    var tableView: UITableView!
+    private var promptLb: UILabel!
+    private var titleLabel: UILabel!
+    
+    private let config: AlbumListConfiguration
+    private var assetCollectionsArray: [PhotoAssetCollection] = []
+    private var orientationDidChange: Bool = false
+    private var beforeOrientationIndexPath: IndexPath?
+    private var canFetchAssetCollections: Bool = false
+    
     init(config: AlbumListConfiguration) {
         self.config = config
         super.init(nibName: nil, bundle: nil)
     }
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         guard let picker = pickerController else { return }
+        initViews()
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
         title = "返回".localized
@@ -82,7 +49,40 @@ public class AlbumViewController: BaseViewController {
         configColor()
         fetchCameraAssetCollection()
     }
-    func configColor() {
+    
+    private func initViews() {
+        tableView = UITableView(
+            frame: .zero,
+            style: .plain
+        )
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.separatorStyle = .none
+        tableView.register(
+            AlbumViewCell.self,
+            forCellReuseIdentifier: "cellId"
+        )
+        if #available(iOS 11.0, *) {
+            tableView.contentInsetAdjustmentBehavior = .never
+        } else {
+            self.automaticallyAdjustsScrollViewInsets = false
+        }
+        
+        promptLb = UILabel(
+            frame: CGRect(x: 0, y: 0, width: 0, height: 40)
+        )
+        promptLb.text = "只能查看允许访问的照片和相关相册".localized
+        promptLb.textAlignment = .center
+        promptLb.font = UIFont.systemFont(ofSize: 14)
+        promptLb.adjustsFontSizeToFitWidth = true
+        promptLb.numberOfLines = 0
+        
+        titleLabel = UILabel()
+        titleLabel.font = .boldSystemFont(ofSize: 18)
+        titleLabel.textAlignment = .center
+    }
+    
+    private func configColor() {
         let isDark = PhotoManager.isDark
         tableView.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
         view.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
@@ -91,14 +91,10 @@ public class AlbumViewController: BaseViewController {
             pickerController?.config.navigationTitleDarkColor :
             pickerController?.config.navigationTitleColor
     }
-    public override func deviceOrientationWillChanged(notify: Notification) {
-        beforeOrientationIndexPath = tableView.indexPathsForVisibleRows?.first
-        orientationDidChange = true
-    }
     private func fetchCameraAssetCollection() {
-        if pickerController?.cameraAssetCollection != nil {
+        if let cameraAssetCollection = pickerController?.cameraAssetCollection {
             pushPhotoPickerController(
-                assetCollection: pickerController?.cameraAssetCollection,
+                assetCollection: cameraAssetCollection,
                 animated: false
             )
             canFetchAssetCollections = true
@@ -142,12 +138,12 @@ public class AlbumViewController: BaseViewController {
         self.assetCollectionsArray = assetCollectionsArray
         if self.assetCollectionsArray.isEmpty {
             let assetCollection = PhotoAssetCollection(
-                albumName: self.config.emptyAlbumName.localized,
-                coverImage: self.config.emptyCoverImageName.image
+                albumName: config.emptyAlbumName.localized,
+                coverImage: config.emptyCoverImageName.image
             )
             self.assetCollectionsArray.append(assetCollection)
         }
-        self.tableView.reloadData()
+        tableView.reloadData()
     }
     func updatePrompt() {
         guard let picker = pickerController else { return }
@@ -167,7 +163,8 @@ public class AlbumViewController: BaseViewController {
         navigationController?.pushViewController(photoVC, animated: animated)
     }
     
-    @objc func didCancelItemClick() {
+    @objc
+    private func didCancelItemClick() {
         pickerController?.cancelCallback()
     }
     
@@ -218,6 +215,45 @@ public class AlbumViewController: BaseViewController {
             orientationDidChange = false
         }
     }
+    
+    public func tableView(
+        _ tableView: UITableView,
+        numberOfRowsInSection section: Int
+    ) -> Int {
+        assetCollectionsArray.count
+    }
+    public func tableView(
+        _ tableView: UITableView,
+        cellForRowAt indexPath: IndexPath
+    ) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: "cellId"
+        ) as! AlbumViewCell
+        let assetCollection = assetCollectionsArray[indexPath.row]
+        cell.assetCollection = assetCollection
+        cell.config = config
+        return cell
+    }
+    
+    public func tableView(
+        _ tableView: UITableView,
+        heightForRowAt indexPath: IndexPath
+    ) -> CGFloat {
+        config.cellHeight
+    }
+    public func tableView(
+        _ tableView: UITableView,
+        didSelectRowAt indexPath: IndexPath
+    ) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let assetCollection = assetCollectionsArray[indexPath.row]
+        pushPhotoPickerController(assetCollection: assetCollection, animated: true)
+    }
+    
+    public override func deviceOrientationWillChanged(notify: Notification) {
+        beforeOrientationIndexPath = tableView.indexPathsForVisibleRows?.first
+        orientationDidChange = true
+    }
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         changeSubviewFrame()
@@ -255,43 +291,7 @@ public class AlbumViewController: BaseViewController {
             }
         }
     }
-}
-
-extension AlbumViewController: UITableViewDataSource {
-    public func tableView(
-        _ tableView: UITableView,
-        numberOfRowsInSection section: Int
-    ) -> Int {
-        assetCollectionsArray.count
-    }
-    public func tableView(
-        _ tableView: UITableView,
-        cellForRowAt indexPath: IndexPath
-    ) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(
-            withIdentifier: "cellId"
-        ) as! AlbumViewCell
-        let assetCollection = assetCollectionsArray[indexPath.row]
-        cell.assetCollection = assetCollection
-        cell.config = config
-        return cell
-    }
-}
-
-extension AlbumViewController: UITableViewDelegate {
-    
-    public func tableView(
-        _ tableView: UITableView,
-        heightForRowAt indexPath: IndexPath
-    ) -> CGFloat {
-        config.cellHeight
-    }
-    public func tableView(
-        _ tableView: UITableView,
-        didSelectRowAt indexPath: IndexPath
-    ) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let assetCollection = assetCollectionsArray[indexPath.row]
-        pushPhotoPickerController(assetCollection: assetCollection, animated: true)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

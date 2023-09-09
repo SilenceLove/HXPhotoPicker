@@ -75,6 +75,7 @@ class EditorAdjusterView: UIView {
     init(maskColor: UIColor?) {
         self.maskColor = maskColor
         super.init(frame: .zero)
+        initViews()
         addSubview(containerView)
         resetState()
     }
@@ -115,28 +116,24 @@ class EditorAdjusterView: UIView {
     }
     
     // MARK: views
-    lazy var containerView: ContainerView = {
-        let containerView = ContainerView()
-        containerView.addSubview(mirrorView)
-        containerView.addSubview(frameView)
-        return containerView
-    }()
+    var containerView: ContainerView!
+    var mirrorView: UIView!
+    var rotateView: UIView!
+    var scrollView: ScrollView!
+    var contentView: EditorContentView!
+    var frameView: EditorFrameView!
     
-    lazy var mirrorView: UIView = {
-        let view = UIView()
-        view.addSubview(rotateView)
-        view.addSubview(scrollView)
-        return view
-    }()
-    
-    lazy var rotateView: UIView = {
-        let view = UIView()
-        view.isUserInteractionEnabled = false
-        return view
-    }()
-    
-    lazy var scrollView: ScrollView = {
-        let scrollView = ScrollView()
+    private func initViews() {
+        rotateView = UIView()
+        rotateView.isUserInteractionEnabled = false
+        
+        contentView = EditorContentView()
+        contentView.delegate = self
+        
+        frameView = EditorFrameView(maskColor: maskColor)
+        frameView.delegate = self
+        
+        scrollView = ScrollView()
         scrollView.delegate = self
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = maximumZoomScale
@@ -148,20 +145,15 @@ class EditorAdjusterView: UIView {
             scrollView.contentInsetAdjustmentBehavior = .never
         }
         scrollView.addSubview(contentView)
-        return scrollView
-    }()
-    
-    lazy var contentView: EditorContentView = {
-        let contentView = EditorContentView()
-        contentView.delegate = self
-        return contentView
-    }()
-    
-    lazy var frameView: EditorFrameView = {
-        let frameView = EditorFrameView(maskColor: maskColor)
-        frameView.delegate = self
-        return frameView
-    }()
+        
+        mirrorView = UIView()
+        mirrorView.addSubview(rotateView)
+        mirrorView.addSubview(scrollView)
+        
+        containerView = ContainerView()
+        containerView.addSubview(mirrorView)
+        containerView.addSubview(frameView)
+    }
     
     // MARK: Screen Rotation
     var beforeContentOffset: CGPoint = .zero
@@ -179,6 +171,7 @@ class EditorAdjusterView: UIView {
         videoTool?.cancelExport()
     }
 }
+
 extension EditorAdjusterView {
     var contentType: EditorContentViewType {
         contentView.type
@@ -243,8 +236,6 @@ extension EditorAdjusterView {
         adjustedFactor.maskImage = image
         frameView.setMaskImage(image, animated: animated)
     }
-}
-extension EditorAdjusterView {
     
     var image: UIImage? {
         get {
@@ -578,12 +569,10 @@ extension EditorAdjusterView {
         }
     }
     
-}
-
-extension EditorAdjusterView {
     var contentScale: CGFloat {
         contentView.contentScale
     }
+    
     var contentViewFrame: CGRect {
         let maxWidth = containerView.width
         let maxHeight = containerView.height
@@ -622,9 +611,6 @@ extension EditorAdjusterView {
         let minimumZoomScale = imageWidth / baseContentSize.width
         return minimumZoomScale
     }
-}
-
-extension EditorAdjusterView {
      
     func getContentBaseFrame() -> CGRect {
         let maxWidth = containerView.width
@@ -844,9 +830,7 @@ extension EditorAdjusterView {
             height: CGFloat(Float(String(format: "%.2f", size.height))!)
         )
     }
-}
-
-extension EditorAdjusterView {
+    
     func resetAll() {
         reset(false)
         oldAdjustedFactor = nil
@@ -859,9 +843,6 @@ extension EditorAdjusterView {
     func resetScrollContent() {
         scrollView.contentOffset.y = -scrollView.contentInset.top
     }
-}
-
-extension EditorAdjusterView {
     
     func getData() -> EditAdjustmentData {
         let adjustedData = getCurrentAdjusted()
@@ -928,7 +909,7 @@ extension EditorAdjusterView {
         let beforeZoomScale = contentData.scrollViewZoomScale
         resetOldMaskRectData(controlScale)
         
-        let controlView = frameView.controlView
+        let controlView = frameView.controlView!
         setScrollViewContentInset(controlView.frame)
         if state == .edit {
             let minimumZoomScale = getScrollViewMinimumZoomScale(controlView.frame)
@@ -1145,10 +1126,7 @@ extension EditorAdjusterView {
         let right = containerView.width - rotateRect.maxX
         return .init(top: top, left: left, bottom: bottom, right: right)
     }
-    
-}
-
-extension EditorAdjusterView {
+     
     class ContainerView: UIView {
         override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
             true

@@ -9,12 +9,7 @@ import UIKit
 
 class EditorVideoControlViewCell: UICollectionViewCell {
     
-    lazy var imageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.clipsToBounds = true
-        imageView.contentMode = .scaleAspectFill
-        return imageView
-    }()
+    private var imageView: UIImageView!
     
     var image: UIImage? {
         didSet {
@@ -26,6 +21,9 @@ class EditorVideoControlViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        imageView = UIImageView()
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
         addSubview(imageView)
     }
     

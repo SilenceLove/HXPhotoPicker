@@ -142,7 +142,7 @@ public extension AssetManager {
         options: PHVideoRequestOptions,
         resultHandler: @escaping AVAssetResultHandler
     ) -> PHImageRequestID {
-        return PHImageManager.default().requestAVAsset(
+        PHImageManager.default().requestAVAsset(
             forVideo: asset,
             options: options
         ) { avAsset, avAudioMix, info in

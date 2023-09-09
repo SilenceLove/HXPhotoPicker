@@ -29,44 +29,10 @@ class EditorFilterParameterView: UIView {
     
     weak var delegate: EditorFilterParameterViewDelegate?
     
-    lazy var bgView: UIVisualEffectView = {
-        let visualEffect = UIBlurEffect.init(style: .dark)
-        let view = UIVisualEffectView.init(effect: visualEffect)
-        view.contentView.addSubview(titleLb)
-        view.contentView.addSubview(collectionView)
-        return view
-    }()
-    
-    lazy var titleLb: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 15)
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
-    
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.minimumLineSpacing = 0
-        flowLayout.minimumInteritemSpacing = 0
-        return flowLayout
-    }()
-    
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-        collectionView.isScrollEnabled = false
-        collectionView.backgroundColor = .clear
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.register(
-            EditorFilterParameterViewCell.self,
-            forCellWithReuseIdentifier: "EditorFilterParameterViewCell"
-        )
-        return collectionView
-    }()
+    private var bgView: UIVisualEffectView!
+    private var titleLb: UILabel!
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var collectionView: UICollectionView!
     
     var type: `Type` = .filter
     
@@ -88,16 +54,47 @@ class EditorFilterParameterView: UIView {
     init(sliderColor: UIColor) {
         self.sliderColor = sliderColor
         super.init(frame: .zero)
+        initViews()
         addSubview(bgView)
+    }
+    
+    private func initViews() {
+        titleLb = UILabel()
+        titleLb.textColor = .white
+        titleLb.textAlignment = .center
+        titleLb.font = .systemFont(ofSize: 15)
+        titleLb.adjustsFontSizeToFitWidth = true
+        
+        flowLayout = UICollectionViewFlowLayout()
+        flowLayout.minimumLineSpacing = 0
+        flowLayout.minimumInteritemSpacing = 0
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView.isScrollEnabled = false
+        collectionView.backgroundColor = .clear
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.dataSource = self
+        collectionView.register(
+            EditorFilterParameterViewCell.self,
+            forCellWithReuseIdentifier: "EditorFilterParameterViewCell"
+        )
+        
+        let visualEffect: UIBlurEffect = .init(style: .dark)
+        bgView = .init(effect: visualEffect)
+        bgView.contentView.addSubview(titleLb)
+        bgView.contentView.addSubview(collectionView)
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        if bgView.frame.equalTo(bounds) {
+            return
+        }
         bgView.frame = bounds
         updateContentFrame()
     }
     
-    func updateContentFrame() {
+    private func updateContentFrame() {
         if UIDevice.isPortrait {
             flowLayout.scrollDirection = .horizontal
             titleLb.frame = .init(x: 0, y: 10, width: width, height: 20)
@@ -170,61 +167,13 @@ extension EditorFilterParameterView: UICollectionViewDataSource {
     }
 }
 
-extension EditorFilterParameterView: UICollectionViewDelegate {
-    
-}
-
 class EditorFilterParameterViewCell: UICollectionViewCell, ParameterSliderViewDelegate {
-    lazy var titleLb: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 15)
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
+    private var titleLb: UILabel!
+    private var slider: ParameterSliderView!
+    private var numberLb: UILabel!
     
-    lazy var slider: ParameterSliderView = {
-        let slider = ParameterSliderView()
-        slider.value = 1
-        slider.delegate = self
-        return slider
-    }()
-    
-    lazy var numberLb: UILabel = {
-        let label = UILabel()
-        label.text = "100"
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 15)
-        label.textAlignment = .center
-        return label
-    }()
-    
-    func sliderView(
-        _ sliderView: ParameterSliderView,
-        didChangedValue value: CGFloat,
-        state: ParameterSliderView.Event
-    ) {
-        if state == .touchDown {
-            sliderDidStart?()
-        }
-        numberLb.text = String(Int(sliderView.value * 100))
-        model?.value = Float(sliderView.value)
-        if sliderView.value == 0 {
-            model?.isNormal = true
-        }else {
-            model?.isNormal = false
-        }
-        if let model = model {
-            sliderDidChanged?(model)
-        }
-        if state == .touchUpInSide {
-            sliderDidEnded?()
-        }
-    }
     var sliderDidStart: (() -> Void)?
     var sliderDidEnded: (() -> Void)?
-    
     var sliderDidChanged: ((PhotoEditorFilterParameterInfo) -> Void)?
     
     var model: PhotoEditorFilterParameterInfo? {
@@ -251,9 +200,50 @@ class EditorFilterParameterViewCell: UICollectionViewCell, ParameterSliderViewDe
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .clear
+        initViews()
         contentView.addSubview(titleLb)
         contentView.addSubview(slider)
         contentView.addSubview(numberLb)
+    }
+    private func initViews() {
+        titleLb = UILabel()
+        titleLb.textColor = .white
+        titleLb.textAlignment = .center
+        titleLb.font = .systemFont(ofSize: 15)
+        titleLb.adjustsFontSizeToFitWidth = true
+        
+        slider = ParameterSliderView()
+        slider.value = 1
+        slider.delegate = self
+        
+        numberLb = UILabel()
+        numberLb.text = "100"
+        numberLb.textColor = .white
+        numberLb.font = .systemFont(ofSize: 15)
+        numberLb.textAlignment = .center
+    }
+    
+    func sliderView(
+        _ sliderView: ParameterSliderView,
+        didChangedValue value: CGFloat,
+        state: ParameterSliderView.Event
+    ) {
+        if state == .touchDown {
+            sliderDidStart?()
+        }
+        numberLb.text = String(Int(sliderView.value * 100))
+        model?.value = Float(sliderView.value)
+        if sliderView.value == 0 {
+            model?.isNormal = true
+        }else {
+            model?.isNormal = false
+        }
+        if let model = model {
+            sliderDidChanged?(model)
+        }
+        if state == .touchUpInSide {
+            sliderDidEnded?()
+        }
     }
     
     override func layoutSubviews() {
@@ -268,7 +258,7 @@ class EditorFilterParameterViewCell: UICollectionViewCell, ParameterSliderViewDe
                 numberLb.frame = .init(x: width - 10 - 40 - UIDevice.rightMargin, y: 0, width: 40, height: 20)
                 numberLb.centerY = titleLb.centerY
                 let sliderWidth: CGFloat = 200.0 / 375.0
-                slider.size = .init(width: UIScreen.main.bounds.width * sliderWidth, height: 20)
+                slider.size = .init(width: UIDevice.screenSize.width * sliderWidth, height: 20)
                 slider.x = numberLb.x - 15 - slider.width
                 slider.centerY = titleLb.centerY
                 titleLb.width = slider.x - titleLb.x - 5
@@ -317,7 +307,8 @@ protocol ParameterSliderViewDelegate: AnyObject {
     )
 }
 
-extension ParameterSliderView {
+class ParameterSliderView: UIView {
+    
     enum `Type`: Codable {
         case normal
         case center
@@ -328,64 +319,28 @@ extension ParameterSliderView {
         case touchUpInSide
         case changed
     }
-}
-
-class ParameterSliderView: UIView {
     
     weak var delegate: ParameterSliderViewDelegate?
-    lazy var panGR: PhotoPanGestureRecognizer = {
-        let pan = PhotoPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerClick(pan:)))
-        return pan
-    }()
-    lazy var thumbView: UIImageView = {
-        let imageSize = CGSize(width: 18, height: 18)
-        let view = UIImageView(image: .image(for: .white, havingSize: imageSize, radius: 9))
-        view.size = imageSize
-        return view
-    }()
+    private var panGR: PhotoPanGestureRecognizer!
+    private var thumbView: UIImageView!
+    private var trackView: UIView!
+    private var progressView: UIView!
+    private var pointView: UIView!
+    
     var value: CGFloat = 0
     var thumbViewFrame: CGRect = .zero
-    
     var didImpactFeedback = false
-
     var trackColor: UIColor? {
         didSet {
             trackView.backgroundColor = trackColor
             pointView.backgroundColor = trackColor
         }
     }
-    
-    lazy var trackView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.layer.masksToBounds = true
-        view.layer.cornerRadius = 1
-        return view
-    }()
-    
     var progressColor: UIColor? {
         didSet {
             progressView.backgroundColor = progressColor
         }
     }
-    
-    lazy var progressView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white.withAlphaComponent(0.2)
-        view.layer.masksToBounds = true
-        view.layer.cornerRadius = 1
-        return view
-    }()
-    
-    lazy var pointView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.layer.masksToBounds = true
-        view.layer.cornerRadius = 3
-        view.isHidden = type == .normal
-        return view
-    }()
-    
     var type: `Type` {
         didSet {
             pointView.isHidden = type == .normal
@@ -396,10 +351,31 @@ class ParameterSliderView: UIView {
     init(type: `Type` = .normal) {
         self.type = type
         super.init(frame: .zero)
+        initViews()
+    }
+    
+    private func initViews() {
+        progressView = UIView()
+        progressView.backgroundColor = .white.withAlphaComponent(0.2)
+        progressView.layer.masksToBounds = true
+        progressView.layer.cornerRadius = 1
         addSubview(progressView)
+        trackView = UIView()
+        trackView.backgroundColor = .white
+        trackView.layer.masksToBounds = true
+        trackView.layer.cornerRadius = 1
         addSubview(trackView)
+        pointView = UIView()
+        pointView.backgroundColor = .white
+        pointView.layer.masksToBounds = true
+        pointView.layer.cornerRadius = 3
+        pointView.isHidden = type == .normal
         addSubview(pointView)
+        let imageSize = CGSize(width: 18, height: 18)
+        thumbView = UIImageView(image: .image(for: .white, havingSize: imageSize, radius: 9))
+        thumbView.size = imageSize
         addSubview(thumbView)
+        panGR = PhotoPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerClick(pan:)))
         addGestureRecognizer(panGR)
     }
     
@@ -454,12 +430,6 @@ class ParameterSliderView: UIView {
         }
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-extension ParameterSliderView {
     func setValue(
         _ value: CGFloat,
         isAnimation: Bool
@@ -695,5 +665,9 @@ extension ParameterSliderView {
         default:
             break
         }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

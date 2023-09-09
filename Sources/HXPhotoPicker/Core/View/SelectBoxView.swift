@@ -32,37 +32,41 @@ public final class SelectBoxView: UIControl {
             updateLayers()
         }
     }
+    
+    
     var textSize: CGSize = CGSize.zero
-    public lazy var config: SelectBoxConfiguration = .init()
     
-    lazy var backgroundLayer: CAShapeLayer = {
-        let backgroundLayer = CAShapeLayer.init()
-        backgroundLayer.contentsScale = UIScreen.main.scale
-        return backgroundLayer
-    }()
-    lazy var textLayer: CATextLayer = {
-        let textLayer = CATextLayer.init()
-        textLayer.contentsScale = UIScreen.main.scale
-        textLayer.alignmentMode = .center
-        textLayer.isWrapped = true
-        return textLayer
-    }()
-    lazy var tickLayer: CAShapeLayer = {
-        let tickLayer = CAShapeLayer.init()
-        tickLayer.lineJoin = .round
-        tickLayer.contentsScale = UIScreen.main.scale
-        return tickLayer
-    }()
+    private var backgroundLayer: CAShapeLayer!
+    private var textLayer: CATextLayer!
+    private var tickLayer: CAShapeLayer!
     
-    public override init(frame: CGRect) {
+    public var config: SelectBoxConfiguration
+    public init(_ config: SelectBoxConfiguration, frame: CGRect = .zero) {
+        self.config = config
         super.init(frame: frame)
+        initViews()
         layer.addSublayer(backgroundLayer)
         layer.addSublayer(textLayer)
         layer.addSublayer(tickLayer)
     }
     
+    private func initViews() {
+        backgroundLayer = CAShapeLayer()
+        backgroundLayer.contentsScale = UIScreen.main.scale
+        
+        textLayer = CATextLayer()
+        textLayer.contentsScale = UIScreen.main.scale
+        textLayer.alignmentMode = .center
+        textLayer.isWrapped = true
+        
+        tickLayer = CAShapeLayer()
+        tickLayer.lineJoin = .round
+        tickLayer.contentsScale = UIScreen.main.scale
+    }
+    
+    
     private func backgroundPath() -> CGPath {
-        let strokePath = UIBezierPath(
+        let strokePath: UIBezierPath = .init(
             roundedRect: CGRect(
                 x: 0,
                 y: 0,
@@ -99,7 +103,7 @@ public final class SelectBoxView: UIControl {
             textLayer.string = nil
         }
         
-        let font = UIFont.mediumPingFang(ofSize: config.titleFontSize)
+        let font: UIFont = .mediumPingFang(ofSize: config.titleFontSize)
         var textHeight: CGFloat
         var textWidth: CGFloat
         if textSize.equalTo(CGSize.zero) {
@@ -125,7 +129,7 @@ public final class SelectBoxView: UIControl {
     }
     
     private func tickPath() -> CGPath {
-        let tickPath = UIBezierPath.init()
+        let tickPath: UIBezierPath = .init()
         tickPath.move(to: CGPoint(x: scale(8), y: height * 0.5 + scale(1)))
         tickPath.addLine(to: CGPoint(x: width * 0.5 - scale(2), y: height - scale(8)))
         tickPath.addLine(to: CGPoint(x: width - scale(7), y: scale(9)))

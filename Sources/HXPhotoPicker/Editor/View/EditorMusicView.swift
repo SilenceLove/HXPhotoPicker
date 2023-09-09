@@ -29,71 +29,44 @@ protocol EditorMusicViewDelegate: AnyObject {
 
 class EditorMusicView: UIView {
     weak var delegate: EditorMusicViewDelegate?
-    lazy var bgMaskLayer: CAGradientLayer = {
-        let layer = PhotoTools.getGradientShadowLayer(false)
-        return layer
-    }()
-    lazy var searchBgView: UIVisualEffectView = {
-        let visualEffect = UIBlurEffect.init(style: .light)
-        let view = UIVisualEffectView.init(effect: visualEffect)
-        view.layer.cornerRadius = 15
-        view.layer.masksToBounds = true
-        view.contentView.addSubview(searchButton)
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.2)
-        return view
-    }()
-    lazy var searchButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage("hx_editor_video_music_search".image?.withRenderingMode(.alwaysTemplate), for: .normal)
-        button.setTitle("搜索".localized, for: .normal)
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -3, bottom: 0, right: 0)
-        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 3, bottom: 0, right: 0)
-        button.titleLabel?.font = .mediumPingFang(ofSize: 14)
-        button.tintColor = .white
-        button.imageView?.tintColor = .white
-        button.addTarget(self, action: #selector(didSearchButtonClick), for: .touchUpInside)
-        return button
-    }()
-    @objc func didSearchButtonClick() {
-        if isloading {
-            return
-        }
-        delegate?.musicView(didSearchButton: self)
+    private var bgMaskLayer: CAGradientLayer!
+    private var searchBgView: UIVisualEffectView!
+    private var searchButton: UIButton!
+    private var volumeBgView: UIVisualEffectView!
+    private var volumeButton: UIButton!
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var collectionView: UICollectionView!
+    
+    var backgroundButton: UIButton!
+    var originalSoundButton: UIButton!
+    var showLyricButton: UIButton!
+    
+    var isloading: Bool = false
+    var pageWidth: CGFloat = 0
+    var selectedIndex: Int = -1
+    var currentPlayIndex: Int = -2
+    var beforeIsSelect = false
+    var musics: [VideoEditorMusic] = []
+    let config: EditorConfiguration.Music
+    var didEnterPlayGround = false
+    
+    var centerIndex: Int = 0
+    init(config: EditorConfiguration.Music) {
+        self.config = config
+        super.init(frame: .zero)
+        setMusics(infos: config.infos)
+        initViews()
     }
-    lazy var volumeBgView: UIVisualEffectView = {
-        let visualEffect = UIBlurEffect.init(style: .light)
-        let view = UIVisualEffectView.init(effect: visualEffect)
-        view.layer.cornerRadius = 15
-        view.layer.masksToBounds = true
-        view.contentView.addSubview(volumeButton)
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.2)
-        return view
-    }()
-    lazy var volumeButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage("hx_editor_video_music_volume".image?.withRenderingMode(.alwaysTemplate), for: .normal)
-        button.setTitle("音量".localized, for: .normal)
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -3, bottom: 0, right: 0)
-        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 3, bottom: 0, right: 0)
-        button.titleLabel?.font = .mediumPingFang(ofSize: 14)
-        button.tintColor = .white
-        button.imageView?.tintColor = .white
-        button.addTarget(self, action: #selector(didVolumeButtonClick), for: .touchUpInside)
-        return button
-    }()
-    @objc func didVolumeButtonClick() {
-        delegate?.musicView(didVolumeButton: self)
-    }
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
+    
+    private func initViews() {
+        bgMaskLayer = PhotoTools.getGradientShadowLayer(false)
+        layer.addSublayer(bgMaskLayer)
+        
+        flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal
         flowLayout.minimumLineSpacing = 15
         flowLayout.minimumInteritemSpacing = 0
-        return flowLayout
-    }()
-    
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(
+        collectionView = UICollectionView(
             frame: CGRect(x: 0, y: 0, width: 0, height: 50),
             collectionViewLayout: flowLayout
         )
@@ -107,57 +80,101 @@ class EditorMusicView: UIView {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
         collectionView.register(EditorMusicViewCell.self, forCellWithReuseIdentifier: "EditorMusicViewCellID")
-        return collectionView
-    }()
+        addSubview(collectionView)
+        if config.showSearch {
+            searchButton = UIButton(type: .system)
+            searchButton.setImage("hx_editor_video_music_search".image?.withRenderingMode(.alwaysTemplate), for: .normal)
+            searchButton.setTitle("搜索".localized, for: .normal)
+            searchButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -3, bottom: 0, right: 0)
+            searchButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 3, bottom: 0, right: 0)
+            searchButton.titleLabel?.font = .mediumPingFang(ofSize: 14)
+            searchButton.tintColor = .white
+            searchButton.imageView?.tintColor = .white
+            searchButton.addTarget(self, action: #selector(didSearchButtonClick), for: .touchUpInside)
+            let visualEffect = UIBlurEffect.init(style: .light)
+            searchBgView = UIVisualEffectView.init(effect: visualEffect)
+            searchBgView.layer.cornerRadius = 15
+            searchBgView.layer.masksToBounds = true
+            searchBgView.contentView.addSubview(searchButton)
+            searchBgView.backgroundColor = UIColor.black.withAlphaComponent(0.2)
+            addSubview(searchBgView)
+        }
+        
+        volumeButton = UIButton(type: .system)
+        volumeButton.setImage("hx_editor_video_music_volume".image?.withRenderingMode(.alwaysTemplate), for: .normal)
+        volumeButton.setTitle("音量".localized, for: .normal)
+        volumeButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -3, bottom: 0, right: 0)
+        volumeButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 3, bottom: 0, right: 0)
+        volumeButton.titleLabel?.font = .mediumPingFang(ofSize: 14)
+        volumeButton.tintColor = .white
+        volumeButton.imageView?.tintColor = .white
+        volumeButton.addTarget(self, action: #selector(didVolumeButtonClick), for: .touchUpInside)
+        
+        let volumeEffect = UIBlurEffect.init(style: .light)
+        volumeBgView = UIVisualEffectView.init(effect: volumeEffect)
+        volumeBgView.layer.cornerRadius = 15
+        volumeBgView.layer.masksToBounds = true
+        volumeBgView.contentView.addSubview(volumeButton)
+        volumeBgView.backgroundColor = UIColor.black.withAlphaComponent(0.2)
+        addSubview(volumeBgView)
+        
+        backgroundButton = UIButton(type: .custom)
+        backgroundButton.setTitle("配乐".localized, for: .normal)
+        backgroundButton.setTitleColor(.white, for: .normal)
+        backgroundButton.titleLabel?.adjustsFontSizeToFitWidth = true
+        backgroundButton.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
+        backgroundButton.setImage("hx_photo_box_normal".image, for: .normal)
+        backgroundButton.setImage("hx_photo_box_selected".image, for: .selected)
+        backgroundButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
+        backgroundButton.tintColor = .white
+        backgroundButton.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)
+        backgroundButton.isHidden = musics.isEmpty
+        backgroundButton.alpha = musics.isEmpty ? 0 : 1
+        addSubview(backgroundButton)
+        
+        originalSoundButton = UIButton(type: .custom)
+        originalSoundButton.setTitle("视频原声".localized, for: .normal)
+        originalSoundButton.setTitleColor(.white, for: .normal)
+        originalSoundButton.titleLabel?.adjustsFontSizeToFitWidth = true
+        originalSoundButton.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
+        originalSoundButton.setImage("hx_photo_box_normal".image, for: .normal)
+        originalSoundButton.setImage("hx_photo_box_selected".image, for: .selected)
+        originalSoundButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
+        originalSoundButton.tintColor = .white
+        originalSoundButton.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)
+        originalSoundButton.isSelected = true
+        addSubview(originalSoundButton)
+        
+        showLyricButton = UIButton(type: .custom)
+        showLyricButton.setTitle("歌词".localized, for: .normal)
+        showLyricButton.setTitleColor(.white, for: .normal)
+        showLyricButton.titleLabel?.adjustsFontSizeToFitWidth = true
+        showLyricButton.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
+        showLyricButton.setImage("hx_photo_box_normal".image, for: .normal)
+        showLyricButton.setImage("hx_photo_box_selected".image, for: .selected)
+        showLyricButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
+        showLyricButton.tintColor = .white
+        showLyricButton.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)
+        showLyricButton.isHidden = musics.isEmpty
+        showLyricButton.alpha = musics.isEmpty ? 0 : 1
+        addSubview(showLyricButton)
+    }
     
-    lazy var backgroundButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setTitle("配乐".localized, for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.adjustsFontSizeToFitWidth = true
-        button.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
-        button.setImage("hx_photo_box_normal".image, for: .normal)
-        button.setImage("hx_photo_box_selected".image, for: .selected)
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
-        button.tintColor = .white
-        button.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)
-        button.isHidden = musics.isEmpty
-        button.alpha = musics.isEmpty ? 0 : 1
-        return button
-    }()
+    @objc
+    private func didSearchButtonClick() {
+        if isloading {
+            return
+        }
+        delegate?.musicView(didSearchButton: self)
+    }
     
-    lazy var originalSoundButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setTitle("视频原声".localized, for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.adjustsFontSizeToFitWidth = true
-        button.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
-        button.setImage("hx_photo_box_normal".image, for: .normal)
-        button.setImage("hx_photo_box_selected".image, for: .selected)
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
-        button.tintColor = .white
-        button.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)
-        button.isSelected = true
-        return button
-    }()
+    @objc
+    private func didVolumeButtonClick() {
+        delegate?.musicView(didVolumeButton: self)
+    }
     
-    lazy var showLyricButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setTitle("歌词".localized, for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.adjustsFontSizeToFitWidth = true
-        button.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
-        button.setImage("hx_photo_box_normal".image, for: .normal)
-        button.setImage("hx_photo_box_selected".image, for: .selected)
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
-        button.tintColor = .white
-        button.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)
-        button.isHidden = musics.isEmpty
-        button.alpha = musics.isEmpty ? 0 : 1
-        return button
-    }()
-    
-    @objc func didButtonClick(button: UIButton) {
+    @objc
+    private func didButtonClick(button: UIButton) {
         if isloading {
             return
         }
@@ -182,30 +199,7 @@ class EditorMusicView: UIView {
             }
         }
     }
-    var isloading: Bool = false
-    var pageWidth: CGFloat = 0
-    var selectedIndex: Int = -1
-    var currentPlayIndex: Int = -2
-    var beforeIsSelect = false
-    var musics: [VideoEditorMusic] = []
-    let config: EditorConfiguration.Music
-    var didEnterPlayGround = false
     
-    var centerIndex: Int = 0
-    init(config: EditorConfiguration.Music) {
-        self.config = config
-        super.init(frame: .zero)
-        setMusics(infos: config.infos)
-        layer.addSublayer(bgMaskLayer)
-        addSubview(collectionView)
-        if config.showSearch {
-            addSubview(searchBgView)
-        }
-        addSubview(volumeBgView)
-        addSubview(backgroundButton)
-        addSubview(originalSoundButton)
-        addSubview(showLyricButton)
-    }
     func selectedMusic(_ music: VideoEditorMusic?) {
         if let music = music {
             for (index, tmpMusic) in musics.enumerated() where tmpMusic == music {

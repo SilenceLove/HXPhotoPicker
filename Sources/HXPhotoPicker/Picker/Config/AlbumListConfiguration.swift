@@ -33,7 +33,7 @@ public struct AlbumListConfiguration {
     
     /// Table background color under dark style
     /// 暗黑风格下列表背景颜色
-    public var backgroundDarkColor: UIColor = "#2E2F30".color
+    public var backgroundDarkColor: UIColor = "#2E2F30".hx.color
     
     /// Customize cell, inherit AlbumViewCell and modify it
     /// 自定义cell，继承 AlbumViewCell 加以修改
@@ -70,7 +70,7 @@ public struct AlbumListConfiguration {
     public var albumNameDarkColor: UIColor = .white
     
     /// 相册名称字体
-    public var albumNameFont: UIFont = HXPickerWrapper<UIFont>.mediumPingFang(ofSize: 15)
+    public var albumNameFont: UIFont
     
     /// 照片数量颜色
     public var photoCountColor: UIColor = "#999999".hx.color
@@ -85,7 +85,7 @@ public struct AlbumListConfiguration {
     
     /// photo quantity font
     /// 照片数量字体
-    public var photoCountFont: UIFont = HXPickerWrapper<UIFont>.mediumPingFang(ofSize: 12)
+    public var photoCountFont: UIFont
     
     /// Divider color
     /// 分隔线颜色
@@ -97,11 +97,14 @@ public struct AlbumListConfiguration {
     
     /// Check the color of the tick
     /// 选中勾勾的颜色
-    public var tickColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var tickColor: UIColor = .systemBlue
     
     /// Dark style checked tick color
     /// 暗黑风格选中勾勾的颜色
     public var tickDarkColor: UIColor = "#ffffff".hx.color
     
-    public init() { }
+    public init() {
+        albumNameFont = .mediumPingFang(ofSize: 15)
+        photoCountFont = .mediumPingFang(ofSize: 12)
+    }
 }

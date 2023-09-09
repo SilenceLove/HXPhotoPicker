@@ -26,16 +26,13 @@ extension PhotoPickerBottomViewDelegate {
     func bottomView(_ bottomView: PhotoPickerBottomView, moveItemAt fromIndex: Int, toIndex: Int) {}
 }
 
-extension PhotoPickerBottomView {
-    
+class PhotoPickerBottomView: UIToolbar {
     enum SourceType {
         case picker
         case preview
         case browser
     }
-}
-
-class PhotoPickerBottomView: UIToolbar {
+    
     weak var hx_delegate: PhotoPickerBottomViewDelegate?
     let config: PickerBottomViewConfiguration
     let sourceType: SourceType
@@ -45,41 +42,23 @@ class PhotoPickerBottomView: UIToolbar {
         config: PickerBottomViewConfiguration,
         allowLoadPhotoLibrary: Bool,
         isMultipleSelect: Bool,
-        sourceType: SourceType) {
+        sourceType: SourceType
+    ) {
         self.sourceType = sourceType
         self.allowLoadPhotoLibrary = allowLoadPhotoLibrary
         self.config = config
         self.isMultipleSelect = isMultipleSelect
-        super.init(frame: CGRect.zero)
+        super.init(frame: .zero)
+        initViews()
         layoutSubviews()
-        if config.isShowPrompt &&
-            AssetManager.authorizationStatusIsLimited() &&
-            allowLoadPhotoLibrary &&
-            sourceType == .picker {
-            addSubview(promptView)
-        }
-        if sourceType == .browser {
-            if config.isShowSelectedView {
-                addSubview(selectedView)
-            }
-            #if HXPICKER_ENABLE_EDITOR
-            if !config.isHiddenEditButton {
-                addSubview(editBtn)
-            }
-            #endif
-        }else {
-            addSubview(contentView)
-            if config.isShowSelectedView && isMultipleSelect {
-                addSubview(selectedView)
-            }
-        }
         configColor()
         isTranslucent = config.isTranslucent
     }
     
     convenience init(
         config: PickerBottomViewConfiguration,
-        allowLoadPhotoLibrary: Bool) {
+        allowLoadPhotoLibrary: Bool
+    ) {
         self.init(
             config: config,
             allowLoadPhotoLibrary: allowLoadPhotoLibrary,
@@ -88,8 +67,51 @@ class PhotoPickerBottomView: UIToolbar {
         )
     }
     
-    lazy var selectedView: PhotoPreviewSelectedView = {
-        let selectedView = PhotoPreviewSelectedView.init(frame: CGRect(x: 0, y: 0, width: width, height: 70))
+    var selectedView: PhotoPreviewSelectedView!
+    var boxControl: SelectBoxView!
+    private var promptView: UIView!
+    private var promptLb: UILabel!
+    private var promptIcon: UIImageView!
+    private var promptArrow: UIImageView!
+    private var contentView: UIView!
+    private var previewBtn: UIButton!
+    private var originalBtn: UIView!
+    private var originalTitleLb: UILabel!
+    private var originalLoadingView: UIActivityIndicatorView!
+    private var finishBtn: UIButton!
+    
+    private var showOriginalLoadingView: Bool = false
+    private var originalLoadingDelayTimer: Timer?
+    
+    private func initPromptView() {
+        promptLb = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 60))
+        promptLb.text = "无法访问相册中所有照片，\n请允许访问「照片」中的「所有照片」".localized
+        promptLb.font = .systemFont(ofSize: 15)
+        promptLb.numberOfLines = 0
+        promptLb.adjustsFontSizeToFitWidth = true
+        
+        let promptIconImage = UIImage.image(for: "hx_picker_photolist_bottom_prompt")?.withRenderingMode(.alwaysTemplate)
+        promptIcon = UIImageView(image: promptIconImage)
+        promptIcon.size = promptIcon.image?.size ?? CGSize.zero
+        
+        let promptArrowImage = UIImage.image(for: "hx_picker_photolist_bottom_prompt_arrow")?.withRenderingMode(.alwaysTemplate)
+        promptArrow = UIImageView(image: promptArrowImage)
+        promptArrow.size = promptArrow.image?.size ?? CGSize.zero
+        
+        promptView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: 70))
+        promptView.addSubview(promptIcon)
+        promptView.addSubview(promptLb)
+        promptView.addSubview(promptArrow)
+        promptView.addGestureRecognizer(
+            UITapGestureRecognizer(
+                target: self,
+                action: #selector(didPromptViewClick))
+        )
+        addSubview(promptView)
+    }
+    
+    private func initSelectedView() {
+        selectedView = PhotoPreviewSelectedView(frame: CGRect(x: 0, y: 0, width: width, height: 70))
         if let customSelectedViewCellClass = config.customSelectedViewCellClass {
             selectedView.collectionView.register(
                 customSelectedViewCellClass,
@@ -105,57 +127,34 @@ class PhotoPickerBottomView: UIToolbar {
         }
         selectedView.delegate = self
         selectedView.tickColor = config.selectedViewTickColor
-        return selectedView
-    }()
+        addSubview(selectedView)
+    }
     
-    lazy var promptView: UIView = {
-        let promptView = UIView.init(frame: CGRect(x: 0, y: 0, width: width, height: 70))
-        promptView.addSubview(promptIcon)
-        promptView.addSubview(promptLb)
-        promptView.addSubview(promptArrow)
-        promptView.addGestureRecognizer(
-            UITapGestureRecognizer(
-                target: self,
-                action: #selector(didPromptViewClick))
+    #if HXPICKER_ENABLE_EDITOR
+    var editBtn: UIButton!
+    private func initEditButton() {
+        editBtn = UIButton(type: .custom)
+        editBtn.setTitle("编辑".localized, for: .normal)
+        editBtn.titleLabel?.font = .systemFont(ofSize: 17)
+        editBtn.addTarget(self, action: #selector(didEditBtnButtonClick(button:)), for: .touchUpInside)
+        editBtn.isHidden = config.isHiddenEditButton
+        editBtn.height = 50
+        let editWidth: CGFloat = editBtn.currentTitle!.localized.width(
+            ofFont: editBtn.titleLabel!.font,
+            maxHeight: 50
         )
-        return promptView
-    }()
-    lazy var promptLb: UILabel = {
-        let promptLb = UILabel.init(frame: CGRect(x: 0, y: 0, width: 0, height: 60))
-        promptLb.text = "无法访问相册中所有照片，\n请允许访问「照片」中的「所有照片」".localized
-        promptLb.font = UIFont.systemFont(ofSize: 15)
-        promptLb.numberOfLines = 0
-        promptLb.adjustsFontSizeToFitWidth = true
-        return promptLb
-    }()
-    lazy var promptIcon: UIImageView = {
-        let image = UIImage.image(for: "hx_picker_photolist_bottom_prompt")?.withRenderingMode(.alwaysTemplate)
-        let promptIcon = UIImageView.init(image: image)
-        promptIcon.size = promptIcon.image?.size ?? CGSize.zero
-        return promptIcon
-    }()
-    lazy var promptArrow: UIImageView = {
-        let image = UIImage.image(for: "hx_picker_photolist_bottom_prompt_arrow")?.withRenderingMode(.alwaysTemplate)
-        let promptArrow = UIImageView.init(image: image)
-        promptArrow.size = promptArrow.image?.size ?? CGSize.zero
-        return promptArrow
-    }()
+        editBtn.width = editWidth
+    }
+    @objc
+    private func didEditBtnButtonClick(button: UIButton) {
+        hx_delegate?.bottomView(didEditButtonClick: self)
+    }
+    #endif
     
-    lazy var contentView: UIView = {
-        let contentView = UIView.init(frame: CGRect(x: 0, y: 0, width: width, height: 50 + UIDevice.bottomMargin))
-        contentView.addSubview(previewBtn)
-        #if HXPICKER_ENABLE_EDITOR
-        contentView.addSubview(editBtn)
-        #endif
-        contentView.addSubview(originalBtn)
-        contentView.addSubview(finishBtn)
-        return contentView
-    }()
-    
-    lazy var previewBtn: UIButton = {
-        let previewBtn = UIButton.init(type: .custom)
+    private func initContentView() {
+        previewBtn = UIButton(type: .custom)
         previewBtn.setTitle("预览".localized, for: .normal)
-        previewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        previewBtn.titleLabel?.font = .systemFont(ofSize: 17)
         previewBtn.isEnabled = false
         previewBtn.addTarget(self, action: #selector(didPreviewButtonClick(button:)), for: .touchUpInside)
         previewBtn.isHidden = config.isHiddenPreviewButton
@@ -165,72 +164,70 @@ class PhotoPickerBottomView: UIToolbar {
             maxHeight: 50
         )
         previewBtn.width = previewWidth
-        return previewBtn
-    }()
-    
-    #if HXPICKER_ENABLE_EDITOR
-    lazy var editBtn: UIButton = {
-        let editBtn = UIButton.init(type: .custom)
-        editBtn.setTitle("编辑".localized, for: .normal)
-        editBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
-        editBtn.addTarget(self, action: #selector(didEditBtnButtonClick(button:)), for: .touchUpInside)
-        editBtn.isHidden = config.isHiddenEditButton
-        editBtn.height = 50
-        let editWidth: CGFloat = editBtn.currentTitle!.localized.width(
-            ofFont: editBtn.titleLabel!.font,
-            maxHeight: 50
-        )
-        editBtn.width = editWidth
-        return editBtn
-    }()
-    
-    @objc func didEditBtnButtonClick(button: UIButton) {
-        hx_delegate?.bottomView(didEditButtonClick: self)
-    }
-    #endif
-    
-    lazy var originalBtn: UIView = {
-        let originalBtn = UIView.init()
+        
+        originalTitleLb = UILabel()
+        originalTitleLb.text = "原图".localized
+        originalTitleLb.font = .systemFont(ofSize: 17)
+        originalTitleLb.lineBreakMode = .byTruncatingHead
+        
+        boxControl = SelectBoxView(config.originalSelectBox, frame: CGRect(x: 0, y: 0, width: 17, height: 17))
+        boxControl.backgroundColor = .clear
+        
+        originalLoadingView = UIActivityIndicatorView(style: .white)
+        originalLoadingView.hidesWhenStopped = true
+        
+        originalBtn = UIView()
         originalBtn.addSubview(originalTitleLb)
         originalBtn.addSubview(boxControl)
         originalBtn.addSubview(originalLoadingView)
         let tap = UITapGestureRecognizer.init(target: self, action: #selector(didOriginalButtonClick))
         originalBtn.addGestureRecognizer(tap)
         originalBtn.isHidden = config.isHiddenOriginalButton
-        return originalBtn
-    }()
-    lazy var originalTitleLb: UILabel = {
-        let originalTitleLb = UILabel.init()
-        originalTitleLb.text = "原图".localized
-        originalTitleLb.font = UIFont.systemFont(ofSize: 17)
-        originalTitleLb.lineBreakMode = .byTruncatingHead
-        return originalTitleLb
-    }()
-    
-    lazy var boxControl: SelectBoxView = {
-        let boxControl = SelectBoxView.init(frame: CGRect(x: 0, y: 0, width: 17, height: 17))
-        boxControl.config = config.originalSelectBox
-        boxControl.backgroundColor = .clear
-        return boxControl
-    }()
-    var showOriginalLoadingView: Bool = false
-    var originalLoadingDelayTimer: Timer?
-    lazy var originalLoadingView: UIActivityIndicatorView = {
-        let originalLoadingView = UIActivityIndicatorView.init(style: .white)
-        originalLoadingView.hidesWhenStopped = true
-        return originalLoadingView
-    }()
-    
-    lazy var finishBtn: UIButton = {
-        let finishBtn = UIButton.init(type: .custom)
+        
+        finishBtn = UIButton(type: .custom)
         finishBtn.setTitle("完成".localized, for: .normal)
-        finishBtn.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
+        finishBtn.titleLabel?.font = .mediumPingFang(ofSize: 16)
         finishBtn.layer.cornerRadius = 3
         finishBtn.layer.masksToBounds = true
         finishBtn.isEnabled = false
         finishBtn.addTarget(self, action: #selector(didFinishButtonClick(button:)), for: .touchUpInside)
-        return finishBtn
-    }()
+        
+        contentView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: 50 + UIDevice.bottomMargin))
+        contentView.addSubview(previewBtn)
+        #if HXPICKER_ENABLE_EDITOR
+        initEditButton()
+        contentView.addSubview(editBtn)
+        #endif
+        contentView.addSubview(originalBtn)
+        contentView.addSubview(finishBtn)
+        
+        addSubview(contentView)
+    }
+    
+    private func initViews() {
+        if config.isShowPrompt &&
+            AssetManager.authorizationStatusIsLimited() &&
+            allowLoadPhotoLibrary &&
+            sourceType == .picker {
+            initPromptView()
+        }
+        if sourceType == .browser {
+            if config.isShowSelectedView {
+                initSelectedView()
+            }
+            #if HXPICKER_ENABLE_EDITOR
+            if !config.isHiddenEditButton {
+                initEditButton()
+                addSubview(editBtn)
+            }
+            #endif
+        }else {
+            initContentView()
+            if config.isShowSelectedView && isMultipleSelect {
+                initSelectedView()
+            }
+        }
+    }
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -303,15 +300,18 @@ class PhotoPickerBottomView: UIToolbar {
 
 extension PhotoPickerBottomView {
     
-    @objc func didPromptViewClick() {
+    @objc
+    func didPromptViewClick() {
         PhotoTools.openSettingsURL()
     }
     
-    @objc func didPreviewButtonClick(button: UIButton) {
+    @objc
+    func didPreviewButtonClick(button: UIButton) {
         hx_delegate?.bottomView(didPreviewButtonClick: self)
     }
     
-    @objc func didOriginalButtonClick() {
+    @objc
+    func didOriginalButtonClick() {
         boxControl.isSelected = !boxControl.isSelected
         if !boxControl.isSelected {
             // 取消
@@ -328,6 +328,7 @@ extension PhotoPickerBottomView {
         keyAnimation.values = [1.2, 0.8, 1.1, 0.9, 1.0]
         boxControl.layer.add(keyAnimation, forKey: "SelectControlAnimation")
     }
+    
     func requestAssetBytes() {
         if sourceType == .browser {
            return
@@ -370,7 +371,8 @@ extension PhotoPickerBottomView {
             }
         }
     }
-    @objc func showOriginalLoading(timer: Timer) {
+    @objc
+    func showOriginalLoading(timer: Timer) {
         originalTitleLb.text = "原图".localized
         showOriginalLoadingView = true
         originalLoadingView.startAnimating()

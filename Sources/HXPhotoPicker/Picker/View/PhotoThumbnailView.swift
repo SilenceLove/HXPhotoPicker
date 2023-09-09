@@ -16,12 +16,7 @@ import Kingfisher
 open class PhotoThumbnailView: UIView {
     
     /// 展示图片
-    public lazy var imageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        return imageView
-    }()
+    public var imageView: UIImageView!
     
     /// 占位图
     public var placeholder: UIImage? {
@@ -72,8 +67,12 @@ open class PhotoThumbnailView: UIView {
     var fadeImage: Bool = false
     var loadCompletion: Bool = false
     
-    public override init(frame: CGRect) {
+    public init(_ photoAsset: PhotoAsset? = nil) {
+        self.photoAsset = photoAsset
         super.init(frame: .zero)
+        imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         addSubview(imageView)
     }
     

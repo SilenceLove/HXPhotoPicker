@@ -23,129 +23,16 @@ public class PhotoPickerViewController: BaseViewController {
     var swipeSelectBeganIndexPath: IndexPath?
     var swipeSelectedIndexArray: [Int]?
     var swipeSelectState: SwipeSelectState?
-    lazy var collectionViewLayout: UICollectionViewFlowLayout = {
-        let collectionViewLayout = UICollectionViewFlowLayout.init()
-        let space = config.spacing
-        collectionViewLayout.minimumLineSpacing = space
-        collectionViewLayout.minimumInteritemSpacing = space
-        return collectionViewLayout
-    }()
-    public lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView.init(frame: view.bounds, collectionViewLayout: collectionViewLayout)
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        if let customSingleCellClass = config.cell.customSingleCellClass {
-            collectionView.register(
-                customSingleCellClass,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(
-                        PhotoPickerViewCell.classForCoder()
-                    )
-            )
-        }else {
-            collectionView.register(
-                PhotoPickerViewCell.self,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(
-                        PhotoPickerViewCell.classForCoder()
-                    )
-            )
-        }
-        if let customSelectableCellClass = config.cell.customSelectableCellClass {
-            collectionView.register(
-                customSelectableCellClass,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(
-                        PhotoPickerSelectableViewCell.classForCoder()
-                    )
-            )
-        }else {
-            collectionView.register(
-                PhotoPickerSelectableViewCell.self,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(
-                        PhotoPickerSelectableViewCell.classForCoder()
-                    )
-            )
-        }
-        if config.allowAddCamera {
-            #if !targetEnvironment(macCatalyst)
-            collectionView.register(
-                PickerCameraViewCell.self,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(PickerCameraViewCell.classForCoder())
-            )
-            #endif
-        }
-        if #available(iOS 14.0, *), config.allowAddLimit {
-            collectionView.register(
-                PhotoPickerLimitCell.self,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(PhotoPickerLimitCell.classForCoder())
-            )
-        }
-        if config.isShowAssetNumber {
-            collectionView.register(
-                PhotoPickerBottomNumberView.self,
-                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                withReuseIdentifier: NSStringFromClass(PhotoPickerBottomNumberView.classForCoder())
-            )
-        }
-        if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .never
-        } else {
-            // Fallback on earlier versions
-            automaticallyAdjustsScrollViewInsets = false
-        }
-        return collectionView
-    }()
     
-    private lazy var emptyView: EmptyView = {
-        let emptyView = EmptyView.init(frame: CGRect(x: 0, y: 0, width: view.width, height: 0))
-        emptyView.config = config.emptyView
-        emptyView.layoutSubviews()
-        return emptyView
-    }()
-    lazy var titleLabel: UILabel = {
-        let titleLabel = UILabel.init()
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        titleLabel.textAlignment = .center
-        return titleLabel
-    }()
-    lazy var titleView: AlbumTitleView = {
-        let titleView = AlbumTitleView.init(config: config.titleView)
-        titleView.addTarget(self, action: #selector(didTitleViewClick(control:)), for: .touchUpInside)
-        return titleView
-    }()
-    
-    lazy var albumBackgroudView: UIView = {
-        let albumBackgroudView = UIView.init()
-        albumBackgroudView.isHidden = true
-        albumBackgroudView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
-        albumBackgroudView.addGestureRecognizer(
-            UITapGestureRecognizer(
-                target: self,
-                action: #selector(didAlbumBackgroudViewClick)
-            )
-        )
-        return albumBackgroudView
-    }()
-    
-    lazy var albumView: AlbumView = {
-        let albumView = AlbumView(config: pickerController!.config.albumList)
-        albumView.delegate = self
-        return albumView
-    }()
-    
-    lazy var bottomView: PhotoPickerBottomView = {
-        let bottomView = PhotoPickerBottomView(
-            config: config.bottomView,
-            allowLoadPhotoLibrary: allowLoadPhotoLibrary
-        )
-        bottomView.hx_delegate = self
-        bottomView.boxControl.isSelected = pickerController!.isOriginal
-        return bottomView
-    }()
+    var collectionViewLayout: UICollectionViewFlowLayout!
+    public var collectionView: UICollectionView!
+    private var emptyView: EmptyView!
+    var titleLabel: UILabel!
+    var titleView: AlbumTitleView!
+    var albumBackgroudView: UIView!
+    var albumView: AlbumView!
+    var bottomView: PhotoPickerBottomView!
+    var bottomPromptView: PhotoPickerBottomPromptView!
     
     var showLoading: Bool = false
     /// 允许加载系统相册库
@@ -265,11 +152,6 @@ public class PhotoPickerViewController: BaseViewController {
             AssetManager.authorizationStatusIsLimited() &&
             allowLoadPhotoLibrary
     }
-    
-    lazy var bottomPromptView: PhotoPickerBottomPromptView = {
-        let view = PhotoPickerBottomPromptView(config: config.bottomView)
-        return view
-    }()
     
     // MARK: UIScrollView滚动相关
     var scrollToTop = false
@@ -458,6 +340,108 @@ extension PhotoPickerViewController {
         guard let picker = pickerController else { return }
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
+        collectionViewLayout = UICollectionViewFlowLayout()
+        collectionViewLayout.minimumLineSpacing = config.spacing
+        collectionViewLayout.minimumInteritemSpacing = config.spacing
+        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: collectionViewLayout)
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        if let customSingleCellClass = config.cell.customSingleCellClass {
+            collectionView.register(
+                customSingleCellClass,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(
+                        PhotoPickerViewCell.classForCoder()
+                    )
+            )
+        }else {
+            collectionView.register(
+                PhotoPickerViewCell.self,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(
+                        PhotoPickerViewCell.classForCoder()
+                    )
+            )
+        }
+        if let customSelectableCellClass = config.cell.customSelectableCellClass {
+            collectionView.register(
+                customSelectableCellClass,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(
+                        PhotoPickerSelectableViewCell.classForCoder()
+                    )
+            )
+        }else {
+            collectionView.register(
+                PhotoPickerSelectableViewCell.self,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(
+                        PhotoPickerSelectableViewCell.classForCoder()
+                    )
+            )
+        }
+        if config.allowAddCamera {
+            #if !targetEnvironment(macCatalyst)
+            collectionView.register(
+                PickerCameraViewCell.self,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(PickerCameraViewCell.classForCoder())
+            )
+            #endif
+        }
+        if #available(iOS 14.0, *), config.allowAddLimit {
+            collectionView.register(
+                PhotoPickerLimitCell.self,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(PhotoPickerLimitCell.classForCoder())
+            )
+        }
+        if config.isShowAssetNumber {
+            collectionView.register(
+                PhotoPickerBottomNumberView.self,
+                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                withReuseIdentifier: NSStringFromClass(PhotoPickerBottomNumberView.classForCoder())
+            )
+        }
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        } else {
+            automaticallyAdjustsScrollViewInsets = false
+        }
+        
+        emptyView = EmptyView(frame: CGRect(x: 0, y: 0, width: view.width, height: 0))
+        emptyView.config = config.emptyView
+        emptyView.layoutSubviews()
+        
+        titleLabel = UILabel()
+        titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
+        titleLabel.textAlignment = .center
+        
+        titleView = AlbumTitleView.init(config: config.titleView)
+        titleView.addTarget(self, action: #selector(didTitleViewClick(control:)), for: .touchUpInside)
+        
+        albumBackgroudView = UIView()
+        albumBackgroudView.isHidden = true
+        albumBackgroudView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        albumBackgroudView.addGestureRecognizer(
+            UITapGestureRecognizer(
+                target: self,
+                action: #selector(didAlbumBackgroudViewClick)
+            )
+        )
+        
+        albumView = AlbumView(config: pickerController!.config.albumList)
+        albumView.delegate = self
+        
+        bottomView = PhotoPickerBottomView(
+            config: config.bottomView,
+            allowLoadPhotoLibrary: allowLoadPhotoLibrary
+        )
+        bottomView.hx_delegate = self
+        bottomView.boxControl.isSelected = pickerController!.isOriginal
+        
+        bottomPromptView = PhotoPickerBottomPromptView(config: config.bottomView)
+        
         view.addSubview(collectionView)
         if isMultipleSelect {
             view.addSubview(bottomView)
@@ -471,6 +455,8 @@ extension PhotoPickerViewController {
             view.addSubview(albumBackgroudView)
             view.addSubview(albumView)
         }
+        
+        updateTitle()
     }
     func initNavItems(_ addFilter: Bool = true) {
         guard let picker = pickerController else { return }
@@ -540,7 +526,6 @@ extension PhotoPickerViewController {
         guard let picker = pickerController else { return }
         isMultipleSelect = picker.config.selectMode == .multiple
         videoLoadSingleCell = picker.singleVideo
-        updateTitle()
     }
     private func configColor() {
         guard let picker = pickerController else { return }

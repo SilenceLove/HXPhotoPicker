@@ -10,23 +10,7 @@ import AVFoundation
 
 open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDelete {
     
-    lazy var playButton: UIButton = {
-        let playButton = UIButton.init(type: UIButton.ButtonType.custom)
-        playButton.setImage("hx_picker_cell_video_play".image, for: UIControl.State.normal)
-        playButton.setImage(UIImage.init(), for: UIControl.State.selected)
-        playButton.addTarget(self, action: #selector(didPlayButtonClick(button:)), for: UIControl.Event.touchUpInside)
-        playButton.size = playButton.currentImage!.size
-        playButton.alpha = 0
-        return playButton
-    }()
-    
-    @objc func didPlayButtonClick(button: UIButton) {
-        if !button.isSelected {
-            scrollContentView.videoView.startPlay()
-        }else {
-            scrollContentView.videoView.stopPlay()
-        }
-    }
+    var playButton: UIButton!
     
     var videoPlayType: PhotoPreviewViewController.PlayType = .normal {
         didSet {
@@ -43,7 +27,22 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
         scrollContentView.delegate = self
         scrollContentView.videoView.delegate = self
         initView()
+        playButton = UIButton.init(type: UIButton.ButtonType.custom)
+        playButton.setImage("hx_picker_cell_video_play".image, for: UIControl.State.normal)
+        playButton.setImage(UIImage.init(), for: UIControl.State.selected)
+        playButton.addTarget(self, action: #selector(didPlayButtonClick(button:)), for: UIControl.Event.touchUpInside)
+        playButton.size = playButton.currentImage!.size
+        playButton.alpha = 0
         addSubview(playButton)
+    }
+
+    @objc
+    private func didPlayButtonClick(button: UIButton) {
+        if !button.isSelected {
+            scrollContentView.videoView.startPlay()
+        }else {
+            scrollContentView.videoView.stopPlay()
+        }
     }
     
     override func setupScrollViewContentSize() {

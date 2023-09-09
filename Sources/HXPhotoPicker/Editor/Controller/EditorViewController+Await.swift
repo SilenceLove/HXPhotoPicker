@@ -11,7 +11,6 @@ import UIKit
 @available(iOS 13.0.0, *)
 public extension EditorViewController {
     
-    @discardableResult
     static func edit(
         _ asset: EditorAsset,
         config: EditorConfiguration = .init(),
@@ -22,7 +21,6 @@ public extension EditorViewController {
         return try await vc.edit()
     }
     
-    @discardableResult
     static func show(
         _ asset: EditorAsset,
         config: EditorConfiguration = .init(),
@@ -35,7 +33,6 @@ public extension EditorViewController {
         return vc
     }
     
-    @discardableResult
     func edit() async throws -> EditorAsset {
         try await withCheckedThrowingContinuation { continuation in
             var isDimissed: Bool = false
@@ -52,14 +49,18 @@ public extension EditorViewController {
         }
     }
     
-    enum EditorError: Error, LocalizedError {
+    enum EditorError: Error, LocalizedError, CustomStringConvertible {
         case canceled
         
         public var errorDescription: String? {
             switch self {
             case .canceled:
-                return "取消编辑"
+                return "canceled：取消编辑"
             }
+        }
+        
+        public var description: String {
+            errorDescription ?? "nil"
         }
     }
 }

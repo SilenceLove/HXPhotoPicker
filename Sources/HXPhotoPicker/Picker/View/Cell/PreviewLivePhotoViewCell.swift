@@ -9,52 +9,20 @@ import UIKit
 
 class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDelete {
     
+    private var liveMarkView: UIVisualEffectView!
+    
     var livePhotoPlayType: PhotoPreviewViewController.PlayType = .once {
         didSet {
             scrollContentView.livePhotoPlayType = livePhotoPlayType
         }
     }
-    
-    lazy var liveMarkView: UIVisualEffectView = {
-        let effect = UIBlurEffect(style: .light)
-        let view = UIVisualEffectView(effect: effect)
-        if let nav = UIViewController.topViewController?.navigationController, !nav.navigationBar.isHidden {
-            view.y = nav.navigationBar.frame.maxY + 5
-        }else {
-            if UIApplication.shared.isStatusBarHidden {
-                view.y = UIDevice.navigationBarHeight + UIDevice.generalStatusBarHeight + 5
-            }else {
-                view.y = UIDevice.navigationBarHeight + 5
-            }
-        }
-        view.x = 5 + UIDevice.leftMargin
-        view.height = 24
-        view.layer.cornerRadius = 3
-        view.layer.masksToBounds = true
-        let imageView = UIImageView(image: "hx_picker_livePhoto".image?.withRenderingMode(.alwaysTemplate))
-        imageView.tintColor = "#666666".color
-        imageView.size = imageView.image?.size ?? .zero
-        imageView.centerY = view.height * 0.5
-        imageView.x = 5
-        view.contentView.addSubview(imageView)
-        let label = UILabel()
-        label.text = "Live"
-        label.textColor = "#666666".color
-        label.textAlignment = .center
-        label.font = .regularPingFang(ofSize: 15)
-        label.x = imageView.frame.maxX + 5
-        label.height = view.height
-        label.width = label.textWidth
-        view.width = label.frame.maxX + 5
-        view.contentView.addSubview(label)
-        return view
-    }()
-    
+
     var liveMarkConfig: PreviewViewConfiguration.LivePhotoMark? {
         didSet {
             configLiveMark()
         }
     }
+    
     override var photoAsset: PhotoAsset! {
         didSet {
             #if HXPICKER_ENABLE_EDITOR
@@ -96,6 +64,38 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         scrollContentView = PhotoPreviewContentView(type: .livePhoto)
         scrollContentView.delegate = self
         initView()
+        
+        let effect = UIBlurEffect(style: .light)
+        liveMarkView = UIVisualEffectView(effect: effect)
+        if let nav = UIViewController.topViewController?.navigationController, !nav.navigationBar.isHidden {
+            liveMarkView.y = nav.navigationBar.frame.maxY + 5
+        }else {
+            if UIApplication.shared.isStatusBarHidden {
+                liveMarkView.y = UIDevice.navigationBarHeight + UIDevice.generalStatusBarHeight + 5
+            }else {
+                liveMarkView.y = UIDevice.navigationBarHeight + 5
+            }
+        }
+        liveMarkView.x = 5 + UIDevice.leftMargin
+        liveMarkView.height = 24
+        liveMarkView.layer.cornerRadius = 3
+        liveMarkView.layer.masksToBounds = true
+        let imageView = UIImageView(image: "hx_picker_livePhoto".image?.withRenderingMode(.alwaysTemplate))
+        imageView.tintColor = "#666666".color
+        imageView.size = imageView.image?.size ?? .zero
+        imageView.centerY = liveMarkView.height * 0.5
+        imageView.x = 5
+        liveMarkView.contentView.addSubview(imageView)
+        let label = UILabel()
+        label.text = "Live"
+        label.textColor = "#666666".color
+        label.textAlignment = .center
+        label.font = .regularPingFang(ofSize: 15)
+        label.x = imageView.frame.maxX + 5
+        label.height = liveMarkView.height
+        label.width = label.textWidth
+        liveMarkView.width = label.frame.maxX + 5
+        liveMarkView.contentView.addSubview(label)
         addSubview(liveMarkView)
     }
     

@@ -31,18 +31,3 @@ extension UIFont {
         return .systemFont(ofSize: size, weight: .semibold)
     }
 }
-
-public extension HXPickerWrapper where Base == UIFont {
-    
-    static func regularPingFang(ofSize size: CGFloat) -> UIFont {
-        Base.regularPingFang(ofSize: size)
-    }
-    
-    static func mediumPingFang(ofSize size: CGFloat) -> UIFont {
-        Base.mediumPingFang(ofSize: size)
-    }
-    
-    static func semiboldPingFang(ofSize size: CGFloat) -> UIFont {
-        Base.semiboldPingFang(ofSize: size)
-    }
-}

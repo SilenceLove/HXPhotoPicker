@@ -27,18 +27,8 @@ class EditorMosaicView: UIView {
             mosaicContentLayer.contents = originalCGImage
         }
     }
-    var mosaicContentLayer: CALayer = {
-        let mosaicContentLayer = CALayer()
-        return mosaicContentLayer
-    }()
-    var mosaicPathLayer: CAShapeLayer = {
-        let mosaicPathLayer = CAShapeLayer()
-        mosaicPathLayer.strokeColor = UIColor.white.cgColor
-        mosaicPathLayer.fillColor = nil
-        mosaicPathLayer.lineCap = .round
-        mosaicPathLayer.lineJoin = .round
-        return mosaicPathLayer
-    }()
+    private var mosaicContentLayer: CALayer!
+    private var mosaicPathLayer: CAShapeLayer!
     
     var isEnabled: Bool = false {
         didSet { isUserInteractionEnabled = isEnabled }
@@ -55,6 +45,7 @@ class EditorMosaicView: UIView {
     
     init() {
         super.init(frame: .zero)
+        initViews()
         layer.addSublayer(mosaicContentLayer)
         layer.addSublayer(mosaicPathLayer)
         mosaicPathLayer.lineWidth = mosaicLineWidth / scale
@@ -67,6 +58,15 @@ class EditorMosaicView: UIView {
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinchGesureRecognizerClick(pinchGR:)))
         pinch.delegate = self
         addGestureRecognizer(pinch)
+    }
+    
+    func initViews() {
+        mosaicContentLayer = CALayer()
+        mosaicPathLayer = CAShapeLayer()
+        mosaicPathLayer.strokeColor = UIColor.white.cgColor
+        mosaicPathLayer.fillColor = nil
+        mosaicPathLayer.lineCap = .round
+        mosaicPathLayer.lineJoin = .round
     }
     
     var mosaicPaths: [MosaicPath] = []

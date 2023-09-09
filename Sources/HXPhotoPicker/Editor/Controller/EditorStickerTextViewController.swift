@@ -35,58 +35,76 @@ final class EditorStickerTextViewController: BaseViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    lazy var bgView: UIVisualEffectView = {
-        let effext = UIBlurEffect(style: .dark)
-        let view = UIVisualEffectView.init(effect: effext)
-        return view
-    }()
+    private var bgView: UIVisualEffectView!
+    private var cancelButton: UIButton!
+    private var finishButton: UIButton!
+    private var textView: EditorStickerTextView!
     
-    lazy var cancelButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("取消".localized, for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 17)
-        button.size = CGSize(width: 60, height: 30)
-        button.addTarget(self, action: #selector(didCancelButtonClick), for: .touchUpInside)
-        return button
-    }()
-    
-    @objc func didCancelButtonClick() {
-        dismiss(animated: true, completion: nil)
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        if let nav = navigationController,
+           nav.modalPresentationStyle == .fullScreen {
+            view.backgroundColor = "#666666".color
+        }else {
+            view.backgroundColor = .clear
+        }
+        initViews()
+        navigationController?.view.backgroundColor = .clear
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: cancelButton)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: finishButton)
+        view.addSubview(bgView)
+        view.addSubview(textView)
     }
     
-    lazy var finishButton: UIButton = {
-        let button = UIButton(type: .system)
+    private func initViews() {
+        let effext = UIBlurEffect(style: .dark)
+        bgView = UIVisualEffectView.init(effect: effext)
+        
+        cancelButton = UIButton(type: .system)
+        cancelButton.setTitle("取消".localized, for: .normal)
+        cancelButton.setTitleColor(.white, for: .normal)
+        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        cancelButton.size = CGSize(width: 60, height: 30)
+        cancelButton.addTarget(self, action: #selector(didCancelButtonClick), for: .touchUpInside)
+        
+        finishButton = UIButton(type: .system)
         let text = "完成".localized
-        button.setTitle(text, for: .normal)
-        button.setTitleColor(config.doneTitleColor, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        finishButton.setTitle(text, for: .normal)
+        finishButton.setTitleColor(config.doneTitleColor, for: .normal)
+        finishButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         var textWidth = text.width(ofFont: .systemFont(ofSize: 17), maxHeight: 30)
         if textWidth < 60 {
             textWidth = 60
         }else {
             textWidth += 10
         }
-        button.size = CGSize(width: textWidth, height: 30)
+        finishButton.size = CGSize(width: textWidth, height: 30)
         if config.doneBackgroundColor != UIColor.clear {
-            button.setBackgroundImage(
+            finishButton.setBackgroundImage(
                 UIImage.image(
                     for: config.doneBackgroundColor,
-                    havingSize: button.size,
+                    havingSize: finishButton.size,
                     radius: 3
                 ),
                 for: .normal
             )
         }
-        button.addTarget(
+        finishButton.addTarget(
             self,
             action: #selector(didFinishButtonClick),
             for: .touchUpInside
         )
-        return button
-    }()
+        
+        textView = EditorStickerTextView(config: config, stickerText: stickerText)
+    }
     
-    @objc func didFinishButtonClick() {
+    @objc
+    private func didCancelButtonClick() {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc
+    private func didFinishButtonClick() {
         if let image = textView.textImage(), !textView.text.isEmpty {
             let stickerText = EditorStickerText(
                 image: image,
@@ -102,26 +120,6 @@ final class EditorStickerTextViewController: BaseViewController {
         }
         textView.textView.resignFirstResponder()
         dismiss(animated: true, completion: nil)
-    }
-    
-    lazy var textView: EditorStickerTextView = {
-        let view = EditorStickerTextView(config: config, stickerText: stickerText)
-        return view
-    }()
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        if let nav = navigationController,
-           nav.modalPresentationStyle == .fullScreen {
-            view.backgroundColor = "#666666".color
-        }else {
-            view.backgroundColor = .clear
-        }
-        navigationController?.view.backgroundColor = .clear
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: cancelButton)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: finishButton)
-        view.addSubview(bgView)
-        view.addSubview(textView)
     }
     
     override func viewWillAppear(_ animated: Bool) {

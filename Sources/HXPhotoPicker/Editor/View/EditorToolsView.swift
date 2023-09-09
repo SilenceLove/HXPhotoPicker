@@ -18,45 +18,10 @@ class EditorToolsView: UIView {
     
     let contentType: EditorContentViewType
     
-    lazy var shadeView: UIView = {
-        let view = UIView()
-        view.addSubview(collectionView)
-        view.layer.mask = shadeMaskLayer
-        return view
-    }()
-    
-    lazy var shadeMaskLayer: CAGradientLayer = {
-        let maskLayer = CAGradientLayer.init()
-        maskLayer.colors = [UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor]
-        maskLayer.startPoint = CGPoint(x: 0, y: 1)
-        maskLayer.endPoint = CGPoint(x: 1, y: 1)
-        maskLayer.locations = [0.0, 0.05, 0.95, 1.0]
-        return maskLayer
-    }()
-    
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.minimumInteritemSpacing = 0
-        return flowLayout
-    }()
-    
-    lazy var collectionView: EditorCollectionView = {
-        let collectionView = EditorCollectionView(
-            frame: CGRect(x: 0, y: 0, width: 0, height: 50),
-            collectionViewLayout: flowLayout
-        )
-        collectionView.delaysContentTouches = false
-        collectionView.backgroundColor = .clear
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .never
-        }
-        collectionView.register(EditorToolViewCell.self, forCellWithReuseIdentifier: "EditorToolViewCellID")
-        return collectionView
-    }()
+    private var shadeView: UIView!
+    private var shadeMaskLayer: CAGradientLayer!
+    private var flowLayout: UICollectionViewFlowLayout!
+    private var collectionView: EditorCollectionView!
     
     var musicCellShowBox: Bool = false {
         didSet {
@@ -73,7 +38,7 @@ class EditorToolsView: UIView {
         initViews()
     }
     
-    func initViews() {
+    private func initViews() {
         for option in config.toolOptions {
             if contentType == .image {
                 switch option.type {
@@ -91,6 +56,31 @@ class EditorToolsView: UIView {
                 }
             }
         }
+        shadeView = UIView()
+        flowLayout = UICollectionViewFlowLayout()
+        flowLayout.minimumInteritemSpacing = 0
+        collectionView = EditorCollectionView(
+            frame: CGRect(x: 0, y: 0, width: 0, height: 50),
+            collectionViewLayout: flowLayout
+        )
+        collectionView.delaysContentTouches = false
+        collectionView.backgroundColor = .clear
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        }
+        collectionView.register(EditorToolViewCell.self, forCellWithReuseIdentifier: "EditorToolViewCellID")
+        shadeView.addSubview(collectionView)
+        
+        shadeMaskLayer = CAGradientLayer()
+        shadeMaskLayer.colors = [UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor]
+        shadeMaskLayer.startPoint = CGPoint(x: 0, y: 1)
+        shadeMaskLayer.endPoint = CGPoint(x: 1, y: 1)
+        shadeMaskLayer.locations = [0.0, 0.05, 0.95, 1.0]
+        shadeView.layer.mask = shadeMaskLayer
         addSubview(shadeView)
     }
     
@@ -273,38 +263,9 @@ protocol EditorToolViewCellDelegate: AnyObject {
 class EditorToolViewCell: UICollectionViewCell {
     weak var delegate: EditorToolViewCellDelegate?
     
-    lazy var pointView: UIView = {
-        let view = UIView()
-        view.size = .init(width: 4, height: 4)
-        if #available(iOS 11.0, *) {
-            view.cornersRound(radius: 2, corner: .allCorners)
-        }
-        return view
-    }()
-    
-    lazy var boxView: SelectBoxView = {
-        let view = SelectBoxView.init(frame: CGRect(x: 0, y: 0, width: 12, height: 12))
-        view.isHidden = true
-        view.config.style = .tick
-        view.config.tickWidth = 1
-        view.config.tickColor = musicTickColor
-        view.config.tickDarkColor = musicTickColor
-        view.config.selectedBackgroundColor = musicTickBackgroundColor
-        view.config.selectedBackgroudDarkColor = musicTickBackgroundColor
-        view.isUserInteractionEnabled = false
-        return view
-    }()
-    
-    lazy var button: UIButton = {
-        let button = UIButton(type: .system)
-        button.addTarget(self, action: #selector(didButtonClick), for: .touchUpInside)
-        button.tintColor = .white
-        return button
-    }()
-    
-    @objc func didButtonClick() {
-        delegate?.toolViewCell(didClick: self)
-    }
+    private var pointView: UIView!
+    private var boxView: SelectBoxView!
+    private var button: UIButton!
     
     var showBox: Bool = false {
         didSet {
@@ -357,9 +318,34 @@ class EditorToolViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        button = UIButton(type: .system)
+        button.addTarget(self, action: #selector(didButtonClick), for: .touchUpInside)
+        button.tintColor = .white
         contentView.addSubview(button)
+        
+        var config = SelectBoxConfiguration()
+        config.style = .tick
+        config.tickWidth = 1
+        config.tickColor = musicTickColor
+        config.tickDarkColor = musicTickColor
+        config.selectedBackgroundColor = musicTickBackgroundColor
+        config.selectedBackgroudDarkColor = musicTickBackgroundColor
+        boxView = SelectBoxView(config, frame: CGRect(x: 0, y: 0, width: 12, height: 12))
+        boxView.isHidden = true
+        boxView.isUserInteractionEnabled = false
         contentView.addSubview(boxView)
+        
+        pointView = UIView()
+        pointView.size = .init(width: 4, height: 4)
+        if #available(iOS 11.0, *) {
+            pointView.cornersRound(radius: 2, corner: .allCorners)
+        }
         contentView.addSubview(pointView)
+    }
+    
+    @objc
+    private func didButtonClick() {
+        delegate?.toolViewCell(didClick: self)
     }
     
     required init?(coder: NSCoder) {

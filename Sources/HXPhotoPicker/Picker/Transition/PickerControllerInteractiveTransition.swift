@@ -12,21 +12,16 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
         case pop
         case dismiss
     }
-    lazy var panGestureRecognizer: UIPanGestureRecognizer = {
-        let panGestureRecognizer = UIPanGestureRecognizer(
-            target: self,
-            action: #selector(panGestureRecognizerAction(panGR:))
-        )
-        return panGestureRecognizer
-    }()
-    weak var bgView: UIView?
-    var pickerControllerBackgroundColor: UIColor?
-    var beganPoint: CGPoint = .zero
+    private var panGestureRecognizer: UIPanGestureRecognizer!
+    private weak var bgView: UIView?
+    private var pickerControllerBackgroundColor: UIColor?
+    private var beganPoint: CGPoint = .zero
+    private let triggerRange: CGFloat
+    private weak var transitionContext: UIViewControllerContextTransitioning?
+    private weak var pickerController: PhotoPickerController?
+    private let type: TransitionType
+    
     var canInteration: Bool = false
-    let triggerRange: CGFloat
-    weak var transitionContext: UIViewControllerContextTransitioning?
-    weak var pickerController: PhotoPickerController?
-    let type: TransitionType
     init(
         panGestureRecognizerFor pickerController: PhotoPickerController,
         type: TransitionType,
@@ -36,6 +31,10 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
         self.type = type
         self.triggerRange = triggerRange
         super.init()
+        panGestureRecognizer = UIPanGestureRecognizer(
+            target: self,
+            action: #selector(panGestureRecognizerAction(panGR:))
+        )
         panGestureRecognizer.delegate = self
         pickerController.view.addGestureRecognizer(panGestureRecognizer)
     }

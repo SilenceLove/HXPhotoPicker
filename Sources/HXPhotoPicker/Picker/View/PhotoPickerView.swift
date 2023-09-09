@@ -77,6 +77,9 @@ open class PhotoPickerView: UIView {
         }
     }
     
+    /// 内容视图
+    public var collectionView: UICollectionView!
+    
     /// 初始化选择视图
     /// - Parameters:
     ///   - manager: 管理数据
@@ -102,85 +105,20 @@ open class PhotoPickerView: UIView {
         }
         super.init(frame: .zero)
         self.delegate = delegate
-        setup()
+        initViews()
     }
     
-    /// 内容视图
-    public lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(
-            frame: bounds,
-            collectionViewLayout: scrollDirection == .vertical ? verticalLayout : horizontalLayout
-        )
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        if let customSingleCellClass = config.cell.customSingleCellClass {
-            collectionView.register(
-                customSingleCellClass,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(
-                        PhotoPickerViewCell.classForCoder()
-                    )
-            )
-        }else {
-            collectionView.register(
-                PhotoPickerViewCell.self,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(
-                        PhotoPickerViewCell.classForCoder()
-                    )
-            )
-        }
-        if let customSelectableCellClass = config.cell.customSelectableCellClass {
-            collectionView.register(
-                customSelectableCellClass,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(
-                        PhotoPickerSelectableViewCell.classForCoder()
-                    )
-            )
-        }else {
-            collectionView.register(
-                PhotoPickerSelectableViewCell.self,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(
-                        PhotoPickerSelectableViewCell.classForCoder()
-                    )
-            )
-        }
-        if config.allowAddCamera {
-            #if !targetEnvironment(macCatalyst)
-            collectionView.register(
-                PickerCameraViewCell.self,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(PickerCameraViewCell.classForCoder())
-            )
-            #endif
-        }
-        if config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
-            collectionView.register(
-                PhotoPickerLimitCell.self,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(PhotoPickerLimitCell.classForCoder())
-            )
-        }
-        if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .never
-        }
-        return collectionView
-    }()
-    lazy var verticalLayout: PhotoPickerSwitchLayout = {
-        let layout = PhotoPickerSwitchLayout()
-        layout.scrollDirection = .vertical
-        return layout
-    }()
-    lazy var horizontalLayout: PhotoPickerSwitchLayout = {
-        let layout = PhotoPickerSwitchLayout()
-        layout.scrollDirection = .horizontal
-        return layout
-    }()
+    var verticalLayout: PhotoPickerSwitchLayout!
+    var horizontalLayout: PhotoPickerSwitchLayout!
+    var emptyView: EmptyView!
+    var deniedView: DeniedAuthorizationView!
+    var panGR: UIPanGestureRecognizer!
+    var dragView: UIImageView!
+    
     var config: PhotoListConfiguration {
         manager.config.photoList
     }
+    
     let isMultipleSelect: Bool
     let videoLoadSingleCell: Bool
     var assets: [PhotoAsset] = []
@@ -225,32 +163,7 @@ open class PhotoPickerView: UIView {
         cell.config = config.limitCell
         return cell
     }
-    lazy var emptyView: EmptyView = {
-        let emptyView = EmptyView(frame: .zero)
-        emptyView.config = config.emptyView
-        return emptyView
-    }()
-    lazy var deniedView: DeniedAuthorizationView = {
-        var config = manager.config.notAuthorized
-        config.isHiddenCloseButton = true
-        let deniedView = DeniedAuthorizationView(config: config)
-        return deniedView
-    }()
-    lazy var panGR: UIPanGestureRecognizer = {
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerClick(pan:)))
-        if scrollDirection == .horizontal {
-            pan.isEnabled = dragEnable
-        }else {
-            pan.isEnabled = false
-        }
-        return pan
-    }()
-    lazy var dragView: UIImageView = {
-        let view = UIImageView()
-        view.clipsToBounds = true
-        view.contentMode = .scaleAspectFill
-        return view
-    }()
+    
     var dragTempCell: PhotoPickerBaseViewCell?
     var initialDragRect: CGRect = .zero
     var didFetchAsset: Bool = false
@@ -320,6 +233,7 @@ open class PhotoPickerView: UIView {
         loadingView?.center = CGPoint(x: width * 0.5, y: height * 0.5)
         setupOther()
     }
+    
     func setupOther() {
         emptyView.width = collectionView.width
         emptyView.centerY = collectionView.height * 0.5

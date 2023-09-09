@@ -12,14 +12,10 @@ import CoreGraphics
 import MobileCoreServices
 
 extension UIImage {
-    var width: CGFloat {
-        size.width
-    }
-    var height: CGFloat {
-        size.height
-    }
+    var width: CGFloat { size.width }
+    var height: CGFloat { size.height }
     
-    class func image(for named: String?) -> UIImage? {
+    static func image(for named: String?) -> UIImage? {
         if named == nil {
             return nil
         }
@@ -89,7 +85,7 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return image
     }
-    class func image(
+    static func image(
         for color: UIColor?,
         havingSize: CGSize,
         radius: CGFloat = 0,
@@ -283,7 +279,7 @@ extension UIImage {
         return mergeImage
     }
     
-    class func merge(images: [UIImage], scale: CGFloat = UIScreen.main.scale) -> UIImage? {
+    static func merge(images: [UIImage], scale: CGFloat = UIScreen.main.scale) -> UIImage? {
         if images.isEmpty {
             return nil
         }
@@ -298,7 +294,7 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return mergeImage
     }
-    class func gradualShadowImage(_ havingSize: CGSize) -> UIImage? {
+    static func gradualShadowImage(_ havingSize: CGSize) -> UIImage? {
         let layer = PhotoTools.getGradientShadowLayer(true)
         layer.frame = CGRect(origin: .zero, size: havingSize)
         UIGraphicsBeginImageContextWithOptions(havingSize, false, UIScreen.main.scale)

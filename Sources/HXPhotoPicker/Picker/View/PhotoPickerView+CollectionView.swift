@@ -394,7 +394,7 @@ extension PhotoPickerView: UICollectionViewDelegate {
                 let imageSize = photoAsset.imageSize
                 let aspectRatio = imageSize.width / imageSize.height
                 let maxWidth = viewSize.width - UIDevice.leftMargin - UIDevice.rightMargin - 60
-                let maxHeight = UIScreen.main.bounds.height * 0.659
+                let maxHeight = UIDevice.screenSize.height * 0.659
                 var width = imageSize.width
                 var height = imageSize.height
                 if width > maxWidth {

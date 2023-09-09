@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                   = "HXPhotoPicker-Lite"
-    spec.version                = "4.0.5"
+    spec.version                = "4.0.6"
     spec.summary                = "Photo selector - Support LivePhoto, GIF selection"
     spec.homepage               = "https://github.com/SilenceLove/HXPhotoPicker"
     spec.license                = { :type => "MIT", :file => "LICENSE" }
@@ -27,6 +27,7 @@ Pod::Spec.new do |spec|
         picker.subspec 'KF' do |kf|
             kf.dependency 'HXPhotoPicker-Lite/Picker/Lite'
             kf.dependency 'Kingfisher'
+            kf.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'HXPICKER_ENABLE_PICKER_LITE' }
         end
     end
   

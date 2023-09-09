@@ -144,7 +144,7 @@ extension EditorViewController: EditorFiltersViewDelegate {
     
     func filterView(_ filterView: EditorFiltersView, didSelectedParameter filter: PhotoEditorFilter, at index: Int) {
         filterParameterView.type = .filter
-        filterParameterView.title = filter.filterName
+        filterParameterView.title = filter.filterName.localized
         filterParameterView.models = filter.parameters
         showFilterParameterView()
     }

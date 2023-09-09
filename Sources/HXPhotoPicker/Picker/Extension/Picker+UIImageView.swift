@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 #if canImport(Kingfisher)
 import Kingfisher
 #endif
@@ -170,7 +170,12 @@ extension UIImageView {
                 .set(to: self)
             return task
         }
-        let imageResource = KF.ImageResource(downloadURL: url, cacheKey: cacheKey)
+        let imageResource: Resource
+        #if HXPICKER_ENABLE_PICKER_LITE
+        imageResource = ImageResource(downloadURL: url, cacheKey: cacheKey)
+        #else
+        imageResource = KF.ImageResource(downloadURL: url, cacheKey: cacheKey)
+        #endif
         return kf.setImage(
             with: imageResource,
             placeholder: placeholderImage,

@@ -9,7 +9,91 @@ import UIKit
 
 extension PhotoPickerView {
     
-    func setup() {
+    func initViews() {
+        verticalLayout = PhotoPickerSwitchLayout()
+        verticalLayout.scrollDirection = .vertical
+        
+        horizontalLayout = PhotoPickerSwitchLayout()
+        horizontalLayout.scrollDirection = .horizontal
+        
+        collectionView = UICollectionView(
+            frame: bounds,
+            collectionViewLayout: scrollDirection == .vertical ? verticalLayout : horizontalLayout
+        )
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        if let customSingleCellClass = config.cell.customSingleCellClass {
+            collectionView.register(
+                customSingleCellClass,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(
+                        PhotoPickerViewCell.classForCoder()
+                    )
+            )
+        }else {
+            collectionView.register(
+                PhotoPickerViewCell.self,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(
+                        PhotoPickerViewCell.classForCoder()
+                    )
+            )
+        }
+        if let customSelectableCellClass = config.cell.customSelectableCellClass {
+            collectionView.register(
+                customSelectableCellClass,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(
+                        PhotoPickerSelectableViewCell.classForCoder()
+                    )
+            )
+        }else {
+            collectionView.register(
+                PhotoPickerSelectableViewCell.self,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(
+                        PhotoPickerSelectableViewCell.classForCoder()
+                    )
+            )
+        }
+        if config.allowAddCamera {
+            #if !targetEnvironment(macCatalyst)
+            collectionView.register(
+                PickerCameraViewCell.self,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(PickerCameraViewCell.classForCoder())
+            )
+            #endif
+        }
+        if config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
+            collectionView.register(
+                PhotoPickerLimitCell.self,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(PhotoPickerLimitCell.classForCoder())
+            )
+        }
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        }
+        
+        emptyView = EmptyView(frame: .zero)
+        emptyView.config = config.emptyView
+        
+        var deniedConfig = manager.config.notAuthorized
+        deniedConfig.isHiddenCloseButton = true
+        deniedView = DeniedAuthorizationView(config: deniedConfig)
+        
+        panGR = UIPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerClick(pan:)))
+        if scrollDirection == .horizontal {
+            panGR.isEnabled = dragEnable
+        }else {
+            panGR.isEnabled = false
+        }
+        
+        dragView = UIImageView()
+        dragView.clipsToBounds = true
+        dragView.contentMode = .scaleAspectFill
+        
         addSubview(collectionView)
         let isDark = PhotoManager.isDark
         backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
@@ -17,6 +101,7 @@ extension PhotoPickerView {
         callBack()
         addGestureRecognizer(panGR)
     }
+    
     
     func callBack() {
         manager.willSelectAsset = { [weak self] in

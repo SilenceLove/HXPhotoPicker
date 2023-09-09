@@ -63,7 +63,7 @@ extension EditorAdjusterView: EditorFrameViewDelegate {
         var rectX = contentInsets.left
         /// 裁剪框的宽度
         var rectW = containerView.width - contentInsets.left - contentInsets.right
-        let controlView = frameView.controlView
+        let controlView = frameView.controlView!
         /// 裁剪框高度
         var rectH = rectW / controlView.width * controlView.height
         if rectH > maxHeight {

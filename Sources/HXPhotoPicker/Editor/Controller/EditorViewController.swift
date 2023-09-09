@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 import Photos
 
 extension EditorViewController {
@@ -24,6 +24,15 @@ open class EditorViewController: BaseViewController {
     public var finishHandler: FinishHandler?
     public var cancelHandler: CancelHandler?
     
+    public private(set) var selectedIndex: Int = 0
+    
+    public var topMaskView: UIView!
+    public var bottomMaskView: UIView!
+    public var topMaskLayer: CAGradientLayer!
+    public var bottomMaskLayer: CAGradientLayer!
+    
+    public var selectedTool: EditorConfiguration.ToolsView.Options?
+    
     public init(
         _ asset: EditorAsset,
         config: EditorConfiguration = .init(),
@@ -31,6 +40,7 @@ open class EditorViewController: BaseViewController {
         finish: FinishHandler? = nil,
         cancel: CancelHandler? = nil
     ) {
+        PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
         self.assets = [asset]
         self.selectedAsset = asset
         self.config = config
@@ -38,43 +48,80 @@ open class EditorViewController: BaseViewController {
         finishHandler = finish
         cancelHandler = cancel
         editedResult = asset.result
+        finishRatioIndex = config.cropSize.defaultSeletedIndex
         super.init(nibName: nil, bundle: nil)
     }
     
-    public private(set) var selectedIndex: Int = 0
+    var videoControlView: EditorVideoControlView!
+    var brushColorView: EditorBrushColorView!
+    var brushSizeView: EditorBrushSizeView!
+    var brushBlockView: EditorBrushBlockView!
+    var filterEditView: EditorFilterEditView!
+    var filtersView: EditorFiltersView!
+    var filterParameterView: EditorFilterParameterView!
+    var rotateScaleView: EditorScaleView!
+    var ratioToolView: EditorRatioToolView!
+    var mosaicToolView: EditorMosaicToolView!
+    var musicView: EditorMusicView!
+    var volumeView: EditorVolumeView!
+    var toolsView: EditorToolsView!
+    var cancelButton: UIButton!
+    var finishButton: UIButton!
+    var resetButton: UIButton!
+    var leftRotateButton: UIButton!
+    var rightRotateButton: UIButton!
+    var mirrorHorizontallyButton: UIButton!
+    var mirrorVerticallyButton: UIButton!
+    var changeButton: UIButton!
+    var maskListButton: UIButton!
+    var scaleSwitchView: UIView!
+    var scaleSwitchLeftBtn: UIButton!
+    var scaleSwitchRightBtn: UIButton!
+    var editorView: EditorView!
     
-    lazy var videoControlView: EditorVideoControlView = {
+    var finishScaleAngle: CGFloat = 0
+    var lastScaleAngle: CGFloat = 0
+    var finishRatioIndex: Int
+    
+    var scaleSwitchSelectType: Int?
+    var finishScaleSwitchSelectType: Int?
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        imageFilterQueue = OperationQueue()
+        imageFilterQueue.maxConcurrentOperationCount = 1
+        
+        initViews()
+        addViews()
+        initAsset()
+    }
+    
+    private func initViews() {
         var cropTime = config.video.cropTime
         if config.isFixedCropSizeState && config.isIgnoreCropTimeWhenFixedCropSizeState {
             cropTime.maximumTime = 0
         }
-        let view = EditorVideoControlView(config: cropTime)
-        view.delegate = self
-        view.alpha = 0
-        view.isHidden = true
-        return view
-    }()
-    
-    lazy var brushColorView: EditorBrushColorView = {
-        let view = EditorBrushColorView(config: config.brush)
-        view.delegate = self
-        view.alpha = 0
-        view.isHidden = true
-        return view
-    }()
-    
-    lazy var brushSizeView: EditorBrushSizeView = {
-        let view = EditorBrushSizeView()
-        view.alpha = 0
-        view.isHidden = true
-        view.value = config.brush.lineWidth / (config.brush.maximumLinewidth - config.brush.minimumLinewidth)
-        view.blockBeganChanged = { [weak self] _ in
+        videoControlView = EditorVideoControlView(config: cropTime)
+        videoControlView.delegate = self
+        videoControlView.alpha = 0
+        videoControlView.isHidden = true
+        
+        brushColorView = EditorBrushColorView(config: config.brush)
+        brushColorView.delegate = self
+        brushColorView.alpha = 0
+        brushColorView.isHidden = true
+        
+        brushSizeView = EditorBrushSizeView()
+        brushSizeView.alpha = 0
+        brushSizeView.isHidden = true
+        brushSizeView.value = config.brush.lineWidth / (config.brush.maximumLinewidth - config.brush.minimumLinewidth)
+        brushSizeView.blockBeganChanged = { [weak self] _ in
             guard let self = self else { return }
             let lineWidth = self.editorView.drawLineWidth + 4
             self.brushBlockView.size = CGSize(width: lineWidth, height: lineWidth)
             self.showBrushBlockView()
         }
-        view.blockDidChanged = { [weak self] in
+        brushSizeView.blockDidChanged = { [weak self] in
             guard let self = self else { return }
             let config = self.config.brush
             let lineWidth = (
@@ -84,57 +131,40 @@ open class EditorViewController: BaseViewController {
             self.brushBlockView.size = CGSize(width: lineWidth + 4, height: lineWidth + 4)
             self.brushBlockView.center = CGPoint(x: self.view.width * 0.5, y: self.view.height * 0.5)
         }
-        view.blockEndedChanged = { [weak self] _ in
+        brushSizeView.blockEndedChanged = { [weak self] _ in
             guard let self = self else { return }
             self.hideBrushBlockView()
         }
-        return view
-    }()
-    
-    lazy var brushBlockView: EditorBrushBlockView = {
+        
         let lineWidth = config.brush.lineWidth + 4
-        let view = EditorBrushBlockView()
-        view.color = config.brush.colors[config.brush.defaultColorIndex].color
-        view.size = .init(width: lineWidth, height: lineWidth)
-        return view
-    }()
-    
-    lazy var filterEditView: EditorFilterEditView = {
-        let view = EditorFilterEditView()
-        view.delegate = self
-        view.alpha = 0
-        view.isHidden = true
-        return view
-    }()
-    
-    lazy var filtersView: EditorFiltersView = {
-        let view = EditorFiltersView(
+        brushBlockView = EditorBrushBlockView()
+        brushBlockView.color = config.brush.colors[config.brush.defaultColorIndex].color
+        brushBlockView.size = .init(width: lineWidth, height: lineWidth)
+        
+        filterEditView = EditorFilterEditView()
+        filterEditView.delegate = self
+        filterEditView.alpha = 0
+        filterEditView.isHidden = true
+        
+        filtersView = EditorFiltersView(
             filterConfig: selectedAsset.contentType == .image ? config.photo.filter : config.video.filter
         )
-        view.delegate = self
-        view.alpha = 0
-        view.isHidden = true
-        return view
-    }()
-    
-    lazy var filterParameterView: EditorFilterParameterView = {
+        filtersView.delegate = self
+        filtersView.alpha = 0
+        filtersView.isHidden = true
+        
         let sliderColor: UIColor
         if selectedAsset.contentType == .image {
             sliderColor = config.photo.filter.selectedColor
         }else {
             sliderColor = config.video.filter.selectedColor
         }
-        let view = EditorFilterParameterView(sliderColor: sliderColor)
-        view.delegate = self
-        return view
-    }()
-    
-    var finishScaleAngle: CGFloat = 0
-    var lastScaleAngle: CGFloat = 0
-    lazy var rotateScaleView: EditorScaleView = {
-        let view = EditorScaleView()
-        view.themeColor = config.cropSize.angleScaleColor
-        view.angleChanged = { [weak self] in
+        filterParameterView = EditorFilterParameterView(sliderColor: sliderColor)
+        filterParameterView.delegate = self
+        
+        rotateScaleView = EditorScaleView()
+        rotateScaleView.themeColor = config.cropSize.angleScaleColor
+        rotateScaleView.angleChanged = { [weak self] in
             guard let self = self else { return }
             if self.editorView.state == .normal {
                 return
@@ -149,62 +179,41 @@ open class EditorViewController: BaseViewController {
                 self.resetButton.isEnabled = self.isReset
             }
         }
-        view.alpha = 0
-        view.isHidden = true
-        return view
-    }()
-    
-    lazy var finishRatioIndex: Int = config.cropSize.defaultSeletedIndex
-    lazy var ratioToolView: EditorRatioToolView = {
-        let view = EditorRatioToolView(
+        rotateScaleView.alpha = 0
+        rotateScaleView.isHidden = true
+        
+        ratioToolView = EditorRatioToolView(
             ratios: config.cropSize.aspectRatios,
             selectedIndex: config.cropSize.defaultSeletedIndex
         )
-        view.delegate = self
-        view.alpha = 0
-        view.isHidden = true
-        return view
-    }()
-    
-    lazy var mosaicToolView: EditorMosaicToolView = {
-        let view = EditorMosaicToolView(selectedColor: config.toolsView.toolSelectedColor)
-        view.delegate = self
-        view.alpha = 0
-        view.isHidden = true
-        return view
-    }()
-    
-    lazy var musicView: EditorMusicView = {
-        let view = EditorMusicView(config: config.video.music)
-        view.delegate = self
-        return view
-    }()
-    lazy var volumeView: EditorVolumeView = {
-        let view = EditorVolumeView(config.video.music.tintColor)
-        view.hasMusic = false
-        view.delegate = self
-        return view
-    }()
-    
-    lazy var toolsView: EditorToolsView = {
-        let view = EditorToolsView(config: config.toolsView, contentType: selectedAsset.type.contentType)
-        view.delegate = self
-        return view
-    }()
-    
-    lazy var cancelButton: UIButton = {
-        let cancelButton = UIButton(type: .custom)
+        ratioToolView.delegate = self
+        ratioToolView.alpha = 0
+        ratioToolView.isHidden = true
+        
+        mosaicToolView = EditorMosaicToolView(selectedColor: config.toolsView.toolSelectedColor)
+        mosaicToolView.delegate = self
+        mosaicToolView.alpha = 0
+        mosaicToolView.isHidden = true
+        
+        musicView = EditorMusicView(config: config.video.music)
+        musicView.delegate = self
+        
+        volumeView = EditorVolumeView(config.video.music.tintColor)
+        volumeView.hasMusic = false
+        volumeView.delegate = self
+        
+        toolsView = EditorToolsView(config: config.toolsView, contentType: selectedAsset.type.contentType)
+        toolsView.delegate = self
+        
+        cancelButton = UIButton(type: .custom)
         cancelButton.setTitle("取消".localized, for: .normal)
         cancelButton.setTitleColor(config.cancelButtonTitleColor, for: .normal)
         cancelButton.setTitleColor(config.cancelButtonTitleColor.withAlphaComponent(0.5), for: .highlighted)
         cancelButton.titleLabel?.font = UIFont.regularPingFang(ofSize: 17)
         cancelButton.contentHorizontalAlignment = .left
         cancelButton.addTarget(self, action: #selector(didCancelButtonClick(button:)), for: .touchUpInside)
-        return cancelButton
-    }()
-    
-    lazy var finishButton: UIButton = {
-        let finishButton = UIButton(type: .custom)
+        
+        finishButton = UIButton(type: .custom)
         finishButton.setTitle("完成".localized, for: .normal)
         finishButton.setTitleColor(config.finishButtonTitleNormalColor, for: .normal)
         finishButton.setTitleColor(config.finishButtonTitleNormalColor.withAlphaComponent(0.5), for: .highlighted)
@@ -213,11 +222,8 @@ open class EditorViewController: BaseViewController {
         finishButton.contentHorizontalAlignment = .right
         finishButton.addTarget(self, action: #selector(didFinishButtonClick(button:)), for: .touchUpInside)
         finishButton.isEnabled = !config.isWhetherFinishButtonDisabledInUneditedState
-        return finishButton
-    }()
-    
-    lazy var resetButton: UIButton = {
-        let resetButton = UIButton(type: .custom)
+        
+        resetButton = UIButton(type: .custom)
         resetButton.setTitle("还原".localized, for: .normal)
         resetButton.setTitleColor(.white, for: .normal)
         resetButton.setTitleColor(.white.withAlphaComponent(0.5), for: .highlighted)
@@ -226,80 +232,77 @@ open class EditorViewController: BaseViewController {
         resetButton.addTarget(self, action: #selector(didResetButtonClick(button:)), for: .touchUpInside)
         resetButton.alpha = 0
         resetButton.isHidden = true
-        return resetButton
-    }()
-    
-    lazy var leftRotateButton: UIButton = {
-        let button = UIButton.init(type: .system)
-        button.setImage("hx_editor_photo_rotate_left".image, for: .normal)
-        button.size = button.currentImage?.size ?? .zero
-        button.tintColor = .white
-        button.addTarget(self, action: #selector(didLeftRotateButtonClick(button:)), for: .touchUpInside)
-        button.alpha = 0
-        button.isHidden = true
-        return button
-    }()
-    
-    lazy var rightRotateButton: UIButton = {
-        let button = UIButton.init(type: .system)
-        button.setImage("hx_editor_photo_rotate_right".image, for: .normal)
-        button.size = button.currentImage?.size ?? .zero
-        button.tintColor = .white
-        button.addTarget(self, action: #selector(didRightRotateButtonClick(button:)), for: .touchUpInside)
-        button.alpha = 0
-        button.isHidden = true
-        return button
-    }()
-    
-    lazy var mirrorHorizontallyButton: UIButton = {
-        let button = UIButton.init(type: .system)
-        button.setImage("hx_editor_photo_mirror_horizontally".image, for: .normal)
-        button.size = button.currentImage?.size ?? .zero
-        button.tintColor = .white
-        button.addTarget(self, action: #selector(didMirrorHorizontallyButtonClick(button:)), for: .touchUpInside)
-        button.alpha = 0
-        button.isHidden = true
-        return button
-    }()
-    
-    lazy var mirrorVerticallyButton: UIButton = {
-        let button = UIButton.init(type: .system)
-        button.setImage("hx_editor_photo_mirror_vertically".image, for: .normal)
-        button.size = button.currentImage?.size ?? .zero
-        button.tintColor = .white
-        button.addTarget(self, action: #selector(didMirrorVerticallyButtonClick(button:)), for: .touchUpInside)
-        button.alpha = 0
-        button.isHidden = true
-        return button
-    }()
-    
-    lazy var changeButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage("hx_editor_change_asset".image, for: .normal)
-        button.size = button.currentImage?.size ?? .zero
-        button.addTarget(self, action: #selector(didChangeButtonClick(button:)), for: .touchUpInside)
-        button.layer.shadowColor = UIColor.black.withAlphaComponent(0.5).cgColor
-        button.layer.shadowOpacity = 1
-        button.layer.shadowRadius = 10
-        button.alpha = 0
-        button.isHidden = true
-        return button
-    }()
-    
-    lazy var maskListButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage("hx_editor_crop_mask_list".image, for: .normal)
-        button.size = button.currentImage?.size ?? .zero
-        button.tintColor = .white
-        button.addTarget(self, action: #selector(didMaskListButtonClick(button:)), for: .touchUpInside)
-        button.alpha = 0
-        button.isHidden = true
-        return button
-    }()
-    
-    lazy var editorView: EditorView = {
-        let view = EditorView()
-        view.editContentInset = { [weak self] _ in
+        
+        leftRotateButton = UIButton.init(type: .system)
+        leftRotateButton.setImage("hx_editor_photo_rotate_left".image, for: .normal)
+        leftRotateButton.size = leftRotateButton.currentImage?.size ?? .zero
+        leftRotateButton.tintColor = .white
+        leftRotateButton.addTarget(self, action: #selector(didLeftRotateButtonClick(button:)), for: .touchUpInside)
+        leftRotateButton.alpha = 0
+        leftRotateButton.isHidden = true
+        
+        rightRotateButton = UIButton.init(type: .system)
+        rightRotateButton.setImage("hx_editor_photo_rotate_right".image, for: .normal)
+        rightRotateButton.size = rightRotateButton.currentImage?.size ?? .zero
+        rightRotateButton.tintColor = .white
+        rightRotateButton.addTarget(self, action: #selector(didRightRotateButtonClick(button:)), for: .touchUpInside)
+        rightRotateButton.alpha = 0
+        rightRotateButton.isHidden = true
+        
+        mirrorHorizontallyButton = UIButton.init(type: .system)
+        mirrorHorizontallyButton.setImage("hx_editor_photo_mirror_horizontally".image, for: .normal)
+        mirrorHorizontallyButton.size = mirrorHorizontallyButton.currentImage?.size ?? .zero
+        mirrorHorizontallyButton.tintColor = .white
+        mirrorHorizontallyButton.addTarget(self, action: #selector(didMirrorHorizontallyButtonClick(button:)), for: .touchUpInside)
+        mirrorHorizontallyButton.alpha = 0
+        mirrorHorizontallyButton.isHidden = true
+        
+        mirrorVerticallyButton = UIButton.init(type: .system)
+        mirrorVerticallyButton.setImage("hx_editor_photo_mirror_vertically".image, for: .normal)
+        mirrorVerticallyButton.size = mirrorVerticallyButton.currentImage?.size ?? .zero
+        mirrorVerticallyButton.tintColor = .white
+        mirrorVerticallyButton.addTarget(self, action: #selector(didMirrorVerticallyButtonClick(button:)), for: .touchUpInside)
+        mirrorVerticallyButton.alpha = 0
+        mirrorVerticallyButton.isHidden = true
+        
+        changeButton = UIButton(type: .custom)
+        changeButton.setImage("hx_editor_change_asset".image, for: .normal)
+        changeButton.size = changeButton.currentImage?.size ?? .zero
+        changeButton.addTarget(self, action: #selector(didChangeButtonClick(button:)), for: .touchUpInside)
+        changeButton.layer.shadowColor = UIColor.black.withAlphaComponent(0.5).cgColor
+        changeButton.layer.shadowOpacity = 1
+        changeButton.layer.shadowRadius = 10
+        changeButton.alpha = 0
+        changeButton.isHidden = true
+        
+        maskListButton = UIButton(type: .custom)
+        maskListButton.setImage("hx_editor_crop_mask_list".image, for: .normal)
+        maskListButton.size = maskListButton.currentImage?.size ?? .zero
+        maskListButton.tintColor = .white
+        maskListButton.addTarget(self, action: #selector(didMaskListButtonClick(button:)), for: .touchUpInside)
+        maskListButton.alpha = 0
+        maskListButton.isHidden = true
+        
+        scaleSwitchLeftBtn = UIButton(type: .custom)
+        scaleSwitchLeftBtn.setImage("hx_editor_crop_scale_switch_left".image, for: .normal)
+        scaleSwitchLeftBtn.setImage("hx_editor_crop_scale_switch_left_selected".image, for: .selected)
+        scaleSwitchLeftBtn.size = scaleSwitchLeftBtn.currentImage?.size ?? .zero
+        scaleSwitchLeftBtn.addTarget(self, action: #selector(didScaleSwitchLeftBtn(button:)), for: .touchUpInside)
+        
+        scaleSwitchRightBtn = UIButton(type: .custom)
+        scaleSwitchRightBtn.setImage("hx_editor_crop_scale_switch_right".image, for: .normal)
+        scaleSwitchRightBtn.setImage("hx_editor_crop_scale_switch_right_selected".image, for: .selected)
+        scaleSwitchRightBtn.size = scaleSwitchRightBtn.currentImage?.size ?? .zero
+        scaleSwitchRightBtn.addTarget(self, action: #selector(didScaleSwitchRightBtn(button:)), for: .touchUpInside)
+        
+        scaleSwitchView = UIView()
+        scaleSwitchView.alpha = 0
+        scaleSwitchView.isHidden = true
+        scaleSwitchView.addSubview(scaleSwitchLeftBtn)
+        scaleSwitchView.addSubview(scaleSwitchRightBtn)
+        
+        editorView = EditorView()
+        editorView.editContentInset = { [weak self] _ in
             guard let self = self else {
                 return .zero
             }
@@ -312,13 +315,13 @@ open class EditorViewController: BaseViewController {
                 }
                 let top: CGFloat
                 let bottom: CGFloat
-                if self.config.buttonPostion == .bottom {
+                if self.config.buttonType == .bottom {
                     if isFullScreen {
-                        top = UIDevice.isPad ? 30 : UIDevice.topMargin + 10
+                        top = UIDevice.isPad ? 50 : UIDevice.topMargin + 10
                     }else {
                         top = 30
                     }
-                    bottom = UIDevice.bottomMargin + 50 + 140
+                    bottom = UIDevice.bottomMargin + 55 + 140
                 }else {
                     let navHeight: CGFloat
                     if let barHeight = self.navigationController?.navigationBar.height {
@@ -341,78 +344,60 @@ open class EditorViewController: BaseViewController {
                     }else {
                         top = navHeight + 10
                     }
-                    bottom = UIDevice.bottomMargin + 140
+                    if UIDevice.isPad {
+                        bottom = UIDevice.bottomMargin + 150
+                    }else {
+                        bottom = UIDevice.bottomMargin + 140
+                    }
                 }
                 let left = UIDevice.isPad ? 30 : UIDevice.leftMargin + 15
                 let right = UIDevice.isPad ? 30 : UIDevice.rightMargin + 15
                 return .init(top: top, left: left, bottom: bottom, right: right)
             }else {
+                let margin = self.view.width - self.rotateScaleView.x + 15
                 return .init(
                     top: UIDevice.topMargin + 55,
-                    left: UIDevice.leftMargin + 165,
+                    left: margin,
                     bottom: UIDevice.bottomMargin + 15,
-                    right: UIDevice.rightMargin + 165
+                    right: margin
                 )
             }
         }
-        view.urlConfig = config.urlConfig
-        view.exportScale = config.photo.scale
-        view.initialRoundMask = config.cropSize.isRoundCrop
-        view.initialFixedRatio = config.cropSize.isFixedRatio
-        view.initialAspectRatio = config.cropSize.aspectRatio
-        view.maskType = config.cropSize.maskType
-        view.isShowScaleSize = config.cropSize.isShowScaleSize
+        editorView.urlConfig = config.urlConfig
+        editorView.exportScale = config.photo.scale
+        editorView.initialRoundMask = config.cropSize.isRoundCrop
+        editorView.initialFixedRatio = config.cropSize.isFixedRatio
+        editorView.initialAspectRatio = config.cropSize.aspectRatio
+        editorView.maskType = config.cropSize.maskType
+        editorView.isShowScaleSize = config.cropSize.isShowScaleSize
         if config.cropSize.isFixedRatio {
-            view.isResetIgnoreFixedRatio = config.cropSize.isResetToOriginal
+            editorView.isResetIgnoreFixedRatio = config.cropSize.isResetToOriginal
         }else {
-            view.isResetIgnoreFixedRatio = true
+            editorView.isResetIgnoreFixedRatio = true
         }
         if !config.brush.colors.isEmpty {
-            view.drawLineColor = config.brush.colors[
+            editorView.drawLineColor = config.brush.colors[
                 min(max(config.brush.defaultColorIndex, 0), config.brush.colors.count - 1)
             ].color
         }
-        view.drawLineWidth = config.brush.lineWidth
-        view.mosaicWidth = config.mosaic.mosaiclineWidth
-        view.smearWidth = config.mosaic.smearWidth
-        view.editDelegate = self
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapClick)))
-        return view
-    }()
-    
-    public lazy var topMaskView: UIView = {
-        let view = UIView()
-        view.isUserInteractionEnabled = false
-        view.layer.addSublayer(topMaskLayer)
-        return view
-    }()
-    
-    public lazy var bottomMaskView: UIView = {
-        let view = UIView()
-        view.isUserInteractionEnabled = false
-        view.layer.addSublayer(bottomMaskLayer)
-        return view
-    }()
-    
-    public lazy var topMaskLayer: CAGradientLayer = {
-        let layer = PhotoTools.getGradientShadowLayer(true)
-        return layer
-    }()
-    
-    public lazy var bottomMaskLayer: CAGradientLayer = {
-        let layer = PhotoTools.getGradientShadowLayer(false)
-        return layer
-    }()
-    
-    public var selectedTool: EditorConfiguration.ToolsView.Options?
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        initView()
-        initAsset()
+        editorView.drawLineWidth = config.brush.lineWidth
+        editorView.mosaicWidth = config.mosaic.mosaiclineWidth
+        editorView.smearWidth = config.mosaic.smearWidth
+        editorView.editDelegate = self
+        editorView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapClick)))
+        
+        topMaskLayer = PhotoTools.getGradientShadowLayer(true)
+        topMaskView = UIView()
+        topMaskView.isUserInteractionEnabled = false
+        topMaskView.layer.addSublayer(topMaskLayer)
+        
+        bottomMaskLayer = PhotoTools.getGradientShadowLayer(false)
+        bottomMaskView = UIView()
+        bottomMaskView.isUserInteractionEnabled = false
+        bottomMaskView.layer.addSublayer(bottomMaskLayer)
     }
     
-    func initView() {
+    private func addViews() {
         view.clipsToBounds = true
         view.backgroundColor = .black
         view.addSubview(editorView)
@@ -426,6 +411,10 @@ open class EditorViewController: BaseViewController {
         view.addSubview(rotateScaleView)
         if !config.cropSize.aspectRatios.isEmpty {
             view.addSubview(ratioToolView)
+            for aspectRatio in config.cropSize.aspectRatios
+                where aspectRatio.ratio.width < 0 || aspectRatio.ratio.height < 0 {
+                view.addSubview(scaleSwitchView)
+            }
         }
         view.addSubview(mosaicToolView)
         if !config.isFixedCropSizeState {
@@ -440,6 +429,7 @@ open class EditorViewController: BaseViewController {
         view.addSubview(rightRotateButton)
         view.addSubview(mirrorHorizontallyButton)
         view.addSubview(mirrorVerticallyButton)
+        
         if !config.cropSize.maskList.isEmpty {
             view.addSubview(maskListButton)
         }
@@ -538,13 +528,9 @@ open class EditorViewController: BaseViewController {
     var imageFilter: PhotoEditorFilter?
     var videoFilterInfo: PhotoEditorFilterInfo?
     var videoFilter: VideoEditorFilter?
-    lazy var filterEditFator: EditorFilterEditFator = .init()
-    lazy var imageFilterContext: CIContext = CIContext(options: nil)
-    lazy var imageFilterQueue: OperationQueue = {
-        let imageFilterQueue = OperationQueue()
-        imageFilterQueue.maxConcurrentOperationCount = 1
-        return imageFilterQueue
-    }()
+    var filterEditFator: EditorFilterEditFator = .init()
+    var imageFilterContext: CIContext = CIContext(options: nil)
+    var imageFilterQueue: OperationQueue!
     
     var isStartFilterParameterTime: CMTime?
     var lastMusicDownloadTask: URLSessionDownloadTask?
@@ -553,6 +539,10 @@ open class EditorViewController: BaseViewController {
     public override func deviceOrientationWillChanged(notify: Notification) {
         orientationDidChange = true
         if editorView.type == .video {
+            if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac, editorView.isVideoPlaying {
+                stopPlayVideo()
+                editorView.pauseVideo()
+            }
             videoControlView.stopScroll()
             videoControlView.stopLineAnimation()
             videoControlInfo = videoControlView.controlInfo
@@ -566,7 +556,7 @@ open class EditorViewController: BaseViewController {
         super.viewDidLayoutSubviews()
         editorView.frame = view.bounds
         let buttonHeight: CGFloat
-        if UIDevice.isPortrait && config.buttonPostion == .bottom {
+        if UIDevice.isPortrait && config.buttonType == .bottom {
             buttonHeight = 50
         }else {
             buttonHeight = 44
@@ -597,8 +587,15 @@ open class EditorViewController: BaseViewController {
         finishButton.height = buttonHeight
         cancelButton.width = cancelWidth + 10
         finishButton.width = finishWidth + 10
-        cancelButton.x = UIDevice.leftMargin + 12
-        finishButton.x = view.width - finishButton.width - 12 - UIDevice.rightMargin
+        
+        let buttonMargin: CGFloat
+        if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+            buttonMargin = 12
+        }else {
+            buttonMargin = UIDevice.isPad ? 20 : 12
+        }
+        cancelButton.x = UIDevice.leftMargin + buttonMargin
+        finishButton.x = view.width - finishButton.width - buttonMargin - UIDevice.rightMargin
         
         resetButton.size = .init(width: resetWidth, height: buttonHeight)
         resetButton.centerX = view.width * 0.5
@@ -648,7 +645,7 @@ open class EditorViewController: BaseViewController {
         bottomMaskLayer = PhotoTools.getGradientShadowLayer(false)
         bottomMaskView.layer.addSublayer(bottomMaskLayer)
         if isToolsDisplay {
-            if config.buttonPostion == .bottom {
+            if config.buttonType == .bottom {
                 topMaskView.alpha = 0
                 topMaskView.isHidden = true
             }else {
@@ -662,7 +659,8 @@ open class EditorViewController: BaseViewController {
             }
             bottomMaskView.isHidden = false
         }
-        if config.buttonPostion == .bottom {
+        
+        if config.buttonType == .bottom {
             cancelButton.y = view.height - UIDevice.bottomMargin - buttonHeight
             finishButton.centerY = cancelButton.centerY
             resetButton.centerY = cancelButton.centerY
@@ -735,10 +733,16 @@ open class EditorViewController: BaseViewController {
                 width: view.width,
                 height: toolsHeight + UIDevice.bottomMargin
             )
+            let rotateBottom: CGFloat
+            if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+                rotateBottom = UIDevice.bottomMargin + 5
+            }else {
+                rotateBottom = UIDevice.bottomMargin
+            }
             if !config.cropSize.aspectRatios.isEmpty {
                 ratioToolView.frame = .init(
                     x: 0,
-                    y: view.height - UIDevice.bottomMargin - ratioToolHeight,
+                    y: view.height - rotateBottom - ratioToolHeight,
                     width: view.width,
                     height: ratioToolHeight
                 )
@@ -746,7 +750,7 @@ open class EditorViewController: BaseViewController {
             }else {
                 rotateScaleView.frame = .init(
                     x: 0,
-                    y: view.height - UIDevice.bottomMargin - 45,
+                    y: view.height - rotateBottom - 45,
                     width: view.width,
                     height: 45
                 )
@@ -772,7 +776,7 @@ open class EditorViewController: BaseViewController {
         brushSizeView.x = view.width - 45 - UIDevice.rightMargin
         mosaicToolView.frame =  .init(x: 0, y: toolsView.y - 65, width: view.width, height: 65)
         
-        if !UIDevice.isPad || config.buttonPostion == .bottom {
+        if !UIDevice.isPad || config.buttonType == .bottom {
             leftRotateButton.y = rotateScaleView.y - leftRotateButton.height - 10
             leftRotateButton.x = UIDevice.leftMargin + 20
             rightRotateButton.centerY = leftRotateButton.centerY
@@ -785,6 +789,30 @@ open class EditorViewController: BaseViewController {
             
             maskListButton.centerY = mirrorVerticallyButton.centerY
             maskListButton.centerX = view.width / 2
+        }
+        
+        scaleSwitchLeftBtn.x = 0
+        scaleSwitchRightBtn.x = scaleSwitchLeftBtn.frame.maxX + 15
+        scaleSwitchView.height = scaleSwitchLeftBtn.height
+        scaleSwitchView.width = scaleSwitchRightBtn.frame.maxX
+        scaleSwitchRightBtn.centerY = scaleSwitchView.height / 2
+        scaleSwitchView.x = view.width / 2 - (scaleSwitchLeftBtn.width + 7.5)
+        if UIDevice.isPad {
+            scaleSwitchView.y = rotateScaleView.y - scaleSwitchView.height - 10
+        }else {
+            scaleSwitchView.centerY = leftRotateButton.centerY
+        }
+        if let type = selectedTool?.type {
+            switch type {
+            case .cropSize:
+                if let ratio = ratioToolView.selectedRatio?.ratio, (ratio.width < 0 || ratio.height < 0) {
+                    showScaleSwitchView(true)
+                }else {
+                    showScaleSwitchView(false)
+                }
+            default:
+                break
+            }
         }
         
         if orientationDidChange || firstAppear {
@@ -876,16 +904,45 @@ open class EditorViewController: BaseViewController {
                 width: view.width, height: 40
             )
         }
+        scaleSwitchRightBtn.x = 0
+        scaleSwitchRightBtn.y = scaleSwitchLeftBtn.frame.maxY + 15
+        scaleSwitchView.height = scaleSwitchRightBtn.frame.maxY
+        scaleSwitchView.width = scaleSwitchRightBtn.width
+        scaleSwitchLeftBtn.centerX = scaleSwitchView.width / 2
+        
+        scaleSwitchView.x = UIDevice.leftMargin + 15
+        scaleSwitchView.centerY = view.height / 2
+        
+        if let type = selectedTool?.type {
+            switch type {
+            case .cropSize:
+                if let ratio = ratioToolView.selectedRatio?.ratio, (ratio.width < 0 || ratio.height < 0) {
+                    showScaleSwitchView()
+                    maskListButton.isHidden = false
+                    maskListButton.alpha = 1
+                }else {
+                    hideScaleSwitchView(true)
+                }
+            default:
+                break
+            }
+        }
     }
     
     func updateVideoControlInfo() {
         if let videoControlInfo = videoControlInfo {
             videoControlView.reloadVideo()
             videoControlView.layoutIfNeeded()
-            DispatchQueue.main.async {
-                self.videoControlView.setControlInfo(videoControlInfo)
-                self.videoControlView.resetLineViewFrsme(at: self.editorView.videoPlayTime)
-                self.updateVideoTimeRange()
+            if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+                videoControlView.setControlInfo(videoControlInfo)
+                videoControlView.resetLineViewFrsme(at: editorView.videoPlayTime)
+                updateVideoTimeRange()
+            }else {
+                DispatchQueue.main.async {
+                    self.videoControlView.setControlInfo(videoControlInfo)
+                    self.videoControlView.resetLineViewFrsme(at: self.editorView.videoPlayTime)
+                    self.updateVideoTimeRange()
+                }
             }
             self.videoControlInfo = nil
         }
@@ -930,13 +987,19 @@ open class EditorViewController: BaseViewController {
         let marginHeight: CGFloat = 190
         let musicY: CGFloat
         let musicHeight: CGFloat
+        let bottomMargin: CGFloat
+        if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+            bottomMargin = UIDevice.bottomMargin + 5
+        }else {
+            bottomMargin = UIDevice.bottomMargin
+        }
         if let type = selectedTool?.type,
            type == .music {
-            musicY = view.height - marginHeight - UIDevice.bottomMargin
-            musicHeight = marginHeight + UIDevice.bottomMargin
+            musicY = view.height - marginHeight - bottomMargin
+            musicHeight = marginHeight + bottomMargin
         }else {
             musicY = view.height
-            musicHeight = marginHeight + UIDevice.bottomMargin
+            musicHeight = marginHeight + bottomMargin
         }
         musicView.frame = CGRect(
             x: 0,

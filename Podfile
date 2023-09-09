@@ -14,3 +14,7 @@ target "HXPhotoPickerExample" do
 #  pod 'GDPerformanceView-Swift'
 #  pod 'GPUImage'
 end
+
+target "SwiftUIExample" do
+  pod 'HXPhotoPicker', :path => './'
+end

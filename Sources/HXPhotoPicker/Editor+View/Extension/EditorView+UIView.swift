@@ -37,7 +37,7 @@ extension UIView {
                        alpha: CGFloat(pixel[3]) / 255.0)
     }
     
-    class func animate(
+    static func animate(
         animations: @escaping () -> Void,
         completion: ((Bool) -> Void)? = nil
     ) {

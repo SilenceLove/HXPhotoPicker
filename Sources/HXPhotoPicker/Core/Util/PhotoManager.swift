@@ -79,10 +79,7 @@ public final class PhotoManager: NSObject {
     #endif
     
     #if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_EDITOR
-    lazy var downloadSession: URLSession = {
-        let session = URLSession.init(configuration: .default, delegate: self, delegateQueue: nil)
-        return session
-    }()
+    var downloadSession: URLSession!
     var downloadTasks: [String: URLSessionDownloadTask] = [:]
     var downloadCompletions: [String: (URL?, Error?, Any?) -> Void] = [:]
     var downloadProgresss: [String: (Double, URLSessionDownloadTask) -> Void] = [:]
@@ -106,6 +103,10 @@ public final class PhotoManager: NSObject {
     
     private override init() {
         super.init()
+        
+        #if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_EDITOR
+        downloadSession = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        #endif
         createBundle()
     }
     
@@ -114,7 +115,7 @@ public final class PhotoManager: NSObject {
         if self.bundle == nil {
             #if HXPICKER_ENABLE_SPM
             if let path = Bundle.module.path(forResource: "HXPhotoPicker", ofType: "bundle") {
-                self.bundle = Bundle.init(path: path)
+                self.bundle = Bundle(path: path)
             }else {
                 self.bundle = Bundle.main
             }
@@ -157,14 +158,6 @@ extension PhotoManager {
             return
         }
         thumbnailLoadMode = mode
-//        if !needReload && !forceReload {
-//            return
-//        }
-//        NotificationCenter.default.post(
-//            name: .ThumbnailLoadModeDidChange,
-//            object: nil,
-//            userInfo: ["needReload": forceReload ? true : needReload]
-//        )
     }
 }
 #endif

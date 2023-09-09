@@ -42,7 +42,7 @@ public extension CameraFilter {
 
 public class ToasterFilter: CameraFilter {
     public var filterName: String {
-        "怀旧".localized
+        "怀旧"
     }
     var filter: CIFilter?
     public func prepare(_ size: CGSize) {
@@ -100,7 +100,7 @@ public class ToasterFilter: CameraFilter {
 
 public class InstantFilter: CameraFilter {
     public var filterName: String {
-        "梦幻".localized
+        "梦幻"
     }
     var filter: CIFilter?
     public func prepare(_ size: CGSize) {
@@ -123,7 +123,7 @@ public class InstantFilter: CameraFilter {
 
 public class Apply1977Filter: CameraFilter {
     public var filterName: String {
-        "1977".localized
+        "1977"
     }
     
     public func render(_ pixelBuffer: CVPixelBuffer) -> CIImage? {
@@ -159,7 +159,7 @@ public class Apply1977Filter: CameraFilter {
 
 public class TransferFilter: CameraFilter {
     public var filterName: String {
-        "岁月".localized
+        "岁月"
     }
     var filter: CIFilter?
     public func prepare(_ size: CGSize) {

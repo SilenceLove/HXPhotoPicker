@@ -28,7 +28,7 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
         }
         #if HXPICKER_ENABLE_EDITOR && HXPICKER_ENABLE_PICKER
         beforeNavDelegate = navigationController?.delegate
-        var pickerConfig = picker.config
+        let pickerConfig = picker.config
         if photoAsset.mediaType == .video && pickerConfig.editorOptions.isVideo {
             let cell = getCell(
                 for: currentPreviewIndex

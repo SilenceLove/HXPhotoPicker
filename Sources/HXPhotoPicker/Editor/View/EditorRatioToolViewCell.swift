@@ -9,37 +9,19 @@ import UIKit
 
 class EditorRatioToolViewCell: UICollectionViewCell {
     
-    lazy var bgEffectView: UIVisualEffectView = {
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        view.layer.cornerRadius = 22 / 2
-        view.layer.masksToBounds = true
-        view.isHidden = true
-        return view
-    }()
+    private var bgEffectView: UIVisualEffectView!
+    private var bgView: UIView!
+    private var titleLb: UILabel!
     
-    lazy var bgView: UIView = {
-        let view = UIView()
-        if #available(iOS 11.0, *) {
-            view.cornersRound(radius: 22 / 2, corner: .allCorners)
-        }
-        view.addSubview(titleLb)
-        return view
-    }()
+    private let bgHeight: CGFloat = UIDevice.isPad ? 25 : 22
     
-    lazy var titleLb: UILabel = {
-        let label = UILabel()
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 14)
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
     
     var config: EditorRatioToolConfig? {
         didSet {
             guard let config = config else {
                 return
             }
-            titleLb.text = config.title
+            titleLb.text = config.title.localized
             titleLb.textColor = config.titleNormalColor.color
             bgView.backgroundColor = config.backgroundNormalColor.color
         }
@@ -49,6 +31,30 @@ class EditorRatioToolViewCell: UICollectionViewCell {
         didSet {
             updateSelectState(isSelected)
         }
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        initView()
+    }
+    
+    func initView() {
+        bgEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        bgEffectView.layer.cornerRadius = bgHeight / 2
+        bgEffectView.layer.masksToBounds = true
+        bgEffectView.isHidden = true
+        contentView.addSubview(bgEffectView)
+        
+        bgView = UIView()
+        if #available(iOS 11.0, *) {
+            bgView.cornersRound(radius: bgHeight / 2, corner: .allCorners)
+        }
+        titleLb = UILabel()
+        titleLb.textAlignment = .center
+        titleLb.font = .systemFont(ofSize: UIDevice.isPad ? 16 : 14)
+        titleLb.adjustsFontSizeToFitWidth = true
+        bgView.addSubview(titleLb)
+        contentView.addSubview(bgView)
     }
     
     func updateSelectState(_ isSelected: Bool) {
@@ -64,26 +70,16 @@ class EditorRatioToolViewCell: UICollectionViewCell {
         titleLb.textColor = isSelected ? config.titleSelectedColor.color : config.titleNormalColor.color
     }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        initView()
-    }
-    
-    func initView() {
-        contentView.addSubview(bgEffectView)
-        contentView.addSubview(bgView)
-    }
-    
     override func layoutSubviews() {
         super.layoutSubviews()
         if UIDevice.isPortrait {
             bgView.x = 0
-            bgView.size = .init(width: width, height: 22)
+            bgView.size = .init(width: width, height: bgHeight)
             bgView.centerY = height * 0.5
         }else {
-            if let config = config {
+            if let config = config, let font = titleLb.font {
                 bgView.y = 0
-                let titleWidth = config.title.width(ofFont: .systemFont(ofSize: 14), maxHeight: .max) + 12
+                let titleWidth = config.title.width(ofFont: font, maxHeight: .max) + 12
                 bgView.size = .init(width: min(titleWidth, 120), height: height)
                 bgView.centerX = width * 0.5
             }
@@ -91,7 +87,7 @@ class EditorRatioToolViewCell: UICollectionViewCell {
         titleLb.frame = bgView.bounds
         bgEffectView.frame = bgView.frame
         guard #available(iOS 11.0, *) else {
-            bgView.cornersRound(radius: 22 / 2, corner: .allCorners)
+            bgView.cornersRound(radius: bgHeight / 2, corner: .allCorners)
             return
         }
     }

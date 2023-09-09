@@ -9,12 +9,7 @@ import UIKit
 
 class EditorMusicLyricViewCell: UICollectionViewCell {
     
-    lazy var lyricLb: UILabel = {
-        let label = UILabel.init()
-        label.font = .mediumPingFang(ofSize: 16)
-        label.textColor = .white
-        return label
-    }()
+    var lyricLb: UILabel!
     
     var lyric: VideoEditorLyric! {
         didSet {
@@ -23,6 +18,9 @@ class EditorMusicLyricViewCell: UICollectionViewCell {
     }
     override init(frame: CGRect) {
         super.init(frame: frame)
+        lyricLb = UILabel()
+        lyricLb.font = .mediumPingFang(ofSize: 16)
+        lyricLb.textColor = .white
         contentView.addSubview(lyricLb)
     }
     override func layoutSubviews() {

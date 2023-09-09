@@ -33,7 +33,7 @@ public struct PickerBottomViewConfiguration {
     
     /// Preview button title color
     /// 预览按钮标题颜色
-    public var previewButtonTitleColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var previewButtonTitleColor: UIColor = .systemBlue
     
     /// Preview button title color in dark style
     /// 暗黑风格下预览按钮标题颜色
@@ -53,7 +53,7 @@ public struct PickerBottomViewConfiguration {
     
     /// Original image button title color
     /// 原图按钮标题颜色
-    public var originalButtonTitleColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var originalButtonTitleColor: UIColor = .systemBlue
     
     /// Preview button title color in dark style
     /// 暗黑风格下原图按钮标题颜色
@@ -93,19 +93,19 @@ public struct PickerBottomViewConfiguration {
     
     /// background color when done button is selected
     /// 完成按钮选中时的背景颜色
-    public var finishButtonBackgroundColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var finishButtonBackgroundColor: UIColor = .systemBlue
     
     /// The background color when the Done button is selected in the dark style
     /// 暗黑风格下完成按钮选中时的背景颜色
-    public var finishButtonDarkBackgroundColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var finishButtonDarkBackgroundColor: UIColor = .systemBlue
     
     /// background color when done button is disabled
     /// 完成按钮禁用时的背景颜色
-    public var finishButtonDisableBackgroundColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor.withAlphaComponent(0.4)
+    public var finishButtonDisableBackgroundColor: UIColor = .systemBlue.withAlphaComponent(0.4)
     
     /// Background color when done button is disabled in dark style
     /// 暗黑风格下完成按钮禁用时的背景颜色
-    public var finishButtonDisableDarkBackgroundColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor.withAlphaComponent(0.4)
+    public var finishButtonDisableDarkBackgroundColor: UIColor = .systemBlue.withAlphaComponent(0.4)
     
     /// Whether to disable the finish button when no resource is selected
     /// 未选择资源时是否禁用完成按钮
@@ -121,7 +121,7 @@ public struct PickerBottomViewConfiguration {
     
     /// Edit button title color
     /// 编辑按钮标题颜色
-    public var editButtonTitleColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var editButtonTitleColor: UIColor = .systemBlue
     
     /// Edit button title color in dark style
     /// 暗黑风格下编辑按钮标题颜色
@@ -139,7 +139,7 @@ public struct PickerBottomViewConfiguration {
     
     /// Hint icon color
     /// 提示图标颜色
-    public var promptIconColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var promptIconColor: UIColor = .systemBlue
     
     /// The color of the prompt icon in the dark style
     /// 暗黑风格下提示图标颜色
@@ -147,7 +147,7 @@ public struct PickerBottomViewConfiguration {
     
     /// prompt color
     /// 提示语颜色
-    public var promptTitleColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var promptTitleColor: UIColor = .systemBlue
     
     /// Prompt color in dark style
     /// 暗黑风格下提示语颜色
@@ -155,7 +155,7 @@ public struct PickerBottomViewConfiguration {
     
     /// prompt arrow color
     /// 提示语箭头颜色
-    public var promptArrowColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+    public var promptArrowColor: UIColor = .systemBlue
     
     /// The color of the prompt arrow in the dark style
     /// 暗黑风格下提示语箭头颜色
@@ -174,14 +174,14 @@ public struct PickerBottomViewConfiguration {
     public var selectedViewTickColor: UIColor = .white
     
     public init() {
-        var boxConfig = SelectBoxConfiguration.init()
+        var boxConfig = SelectBoxConfiguration()
         boxConfig.style = .tick
         // The width of the border when the original image button is not selected
         // 原图按钮未选中时的边框宽度
         boxConfig.borderWidth = 1
         // The border color of the original image button when it is not selected
         // 原图按钮未选中时的边框颜色
-        boxConfig.borderColor = .systemTintColor
+        boxConfig.borderColor = .systemBlue
         // The border color of the original image button when the dark style is not selected
         // 暗黑风格下原图按钮未选中时的边框颜色
         boxConfig.borderDarkColor = .white

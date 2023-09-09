@@ -8,20 +8,8 @@
 import UIKit
 
 class EditorMaskListViewCell: UICollectionViewCell {
-    lazy var titleLb: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.textAlignment = .center
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
-    
-    lazy var imageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.tintColor = .white
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
+    private var titleLb: UILabel!
+    private var imageView: UIImageView!
     
     var config: EditorConfiguration.CropSize.MaskType? {
         didSet {
@@ -45,13 +33,21 @@ class EditorMaskListViewCell: UICollectionViewCell {
             }
         }
     }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         initViews()
     }
     
-    func initViews() {
+    private func initViews() {
+        titleLb = UILabel()
+        titleLb.textColor = .white
+        titleLb.textAlignment = .center
+        titleLb.adjustsFontSizeToFitWidth = true
         contentView.addSubview(titleLb)
+        imageView = UIImageView()
+        imageView.tintColor = .white
+        imageView.contentMode = .scaleAspectFit
         contentView.addSubview(imageView)
     }
     

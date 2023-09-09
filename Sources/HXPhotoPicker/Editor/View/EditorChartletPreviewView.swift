@@ -11,18 +11,8 @@ import Kingfisher
 #endif
 
 class EditorChartletPreviewView: UIView {
-    lazy var imageView: ImageView = {
-        let view = ImageView()
-        return view
-    }()
-    lazy var bgLayer: CAShapeLayer = {
-        let bgLayer = CAShapeLayer()
-        bgLayer.fillColor = UIColor.white.cgColor
-        bgLayer.strokeColor = UIColor.white.cgColor
-        bgLayer.contentsScale = UIScreen.main.scale
-        bgLayer.path = bgLayerPath()
-        return bgLayer
-    }()
+    private var imageView: ImageView!
+    private var bgLayer: CAShapeLayer!
     let touchCenter: CGPoint
     let touchViewSize: CGSize
     var image: UIImage?
@@ -40,9 +30,7 @@ class EditorChartletPreviewView: UIView {
         touchViewSize = viewSize
         super.init(frame: .zero)
         setupFrame(imageSize: image.size)
-        layer.addSublayer(bgLayer)
-        imageView.image = image
-        addSubview(imageView)
+        initViews()
     }
     #if canImport(Kingfisher)
     init(
@@ -56,8 +44,7 @@ class EditorChartletPreviewView: UIView {
         touchViewSize = viewSize
         super.init(frame: .zero)
         setupFrame(imageSize: CGSize(width: 200, height: 200))
-        layer.addSublayer(bgLayer)
-        addSubview(imageView)
+        initViews()
         imageView.my.kf.indicatorType = .activity
         let options: KingfisherOptionsInfo
         if imageURL.isGif && editorType == .video {
@@ -91,12 +78,25 @@ class EditorChartletPreviewView: UIView {
         }
     }
     #endif
+    
+    private func initViews() {
+        imageView = ImageView()
+        bgLayer = CAShapeLayer()
+        bgLayer.fillColor = UIColor.white.cgColor
+        bgLayer.strokeColor = UIColor.white.cgColor
+        bgLayer.contentsScale = UIScreen.main.scale
+        bgLayer.path = bgLayerPath()
+        
+        layer.addSublayer(bgLayer)
+        imageView.image = image
+        addSubview(imageView)
+    }
     func setupFrame(imageSize: CGSize) {
         let viewSize = touchViewSize
         let center = touchCenter
         let imageScale = imageSize.height / imageSize.width
-        let screenWidth = UIScreen.main.bounds.width
-        let screenHeight = UIScreen.main.bounds.height
+        let screenWidth = UIDevice.screenSize.width
+        let screenHeight = UIDevice.screenSize.height
         let maxWidth = (!UIDevice.isPad && UIDevice.isPortrait) ?
             screenWidth * 0.5 :
             screenWidth * 0.25

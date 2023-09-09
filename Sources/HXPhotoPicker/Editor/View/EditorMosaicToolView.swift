@@ -19,54 +19,10 @@ protocol EditorMosaicToolViewDelegate: AnyObject {
 
 class EditorMosaicToolView: UIView {
     weak var delegate: EditorMosaicToolViewDelegate?
-    lazy var mosaicButton: UIButton = {
-        let button = UIButton(type: .custom)
-        let image = "hx_editor_tool_mosaic_normal".image?.withRenderingMode(.alwaysTemplate)
-        button.setImage(image, for: .normal)
-        button.setImage(image, for: .selected)
-        button.addTarget(self, action: #selector(didMosaicClick(button:)), for: .touchUpInside)
-        button.tintColor = .white
-        button.isSelected = true
-        button.imageView?.tintColor = selectedColor
-        return button
-    }()
+    private var mosaicButton: UIButton!
+    private var smearButton: UIButton!
+    private var undoButton: UIButton!
     
-    @objc func didMosaicClick(button: UIButton) {
-        button.isSelected = true
-        button.imageView?.tintColor = selectedColor
-        smearButton.isSelected = false
-        smearButton.imageView?.tintColor = nil
-        delegate?.mosaicToolView(self, didChangedMosaicType: .mosaic)
-    }
-    lazy var smearButton: UIButton = {
-        let button = UIButton(type: .custom)
-        let image = "hx_editor_tool_mosaic_color".image?.withRenderingMode(.alwaysTemplate)
-        button.setImage(image, for: .normal)
-        button.setImage(image, for: .selected)
-        button.addTarget(self, action: #selector(didSmearClick(button:)), for: .touchUpInside)
-        button.tintColor = .white
-        return button
-    }()
-    
-    @objc func didSmearClick(button: UIButton) {
-        button.isSelected = true
-        button.imageView?.tintColor = selectedColor
-        mosaicButton.isSelected = false
-        mosaicButton.imageView?.tintColor = nil
-        delegate?.mosaicToolView(self, didChangedMosaicType: .smear)
-    }
-    lazy var undoButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage("hx_editor_brush_repeal".image, for: .normal)
-        button.addTarget(self, action: #selector(didUndoClick(button:)), for: .touchUpInside)
-        button.tintColor = .white
-        button.isEnabled = false
-        return button
-    }()
-    
-    @objc func didUndoClick(button: UIButton) {
-        delegate?.mosaicToolView(didUndoClick: self)
-    }
     var canUndo: Bool = false {
         didSet {
             undoButton.isEnabled = canUndo
@@ -91,9 +47,57 @@ class EditorMosaicToolView: UIView {
     init(selectedColor: UIColor) {
         self.selectedColor = selectedColor
         super.init(frame: .zero)
+        initViews()
+    }
+    
+    private func initViews() {
+        mosaicButton = UIButton(type: .custom)
+        let mosaicImage = "hx_editor_tool_mosaic_normal".image?.withRenderingMode(.alwaysTemplate)
+        mosaicButton.setImage(mosaicImage, for: .normal)
+        mosaicButton.setImage(mosaicImage, for: .selected)
+        mosaicButton.addTarget(self, action: #selector(didMosaicClick(button:)), for: .touchUpInside)
+        mosaicButton.tintColor = .white
+        mosaicButton.isSelected = true
+        mosaicButton.imageView?.tintColor = selectedColor
         addSubview(mosaicButton)
+        
+        smearButton = UIButton(type: .custom)
+        let smearImage = "hx_editor_tool_mosaic_color".image?.withRenderingMode(.alwaysTemplate)
+        smearButton.setImage(smearImage, for: .normal)
+        smearButton.setImage(smearImage, for: .selected)
+        smearButton.addTarget(self, action: #selector(didSmearClick(button:)), for: .touchUpInside)
+        smearButton.tintColor = .white
         addSubview(smearButton)
+        
+        undoButton = UIButton(type: .custom)
+        undoButton.setImage("hx_editor_brush_repeal".image, for: .normal)
+        undoButton.addTarget(self, action: #selector(didUndoClick(button:)), for: .touchUpInside)
+        undoButton.tintColor = .white
+        undoButton.isEnabled = false
         addSubview(undoButton)
+    }
+    
+    @objc
+    private func didMosaicClick(button: UIButton) {
+        button.isSelected = true
+        button.imageView?.tintColor = selectedColor
+        smearButton.isSelected = false
+        smearButton.imageView?.tintColor = nil
+        delegate?.mosaicToolView(self, didChangedMosaicType: .mosaic)
+    }
+    
+    @objc
+    private func didSmearClick(button: UIButton) {
+        button.isSelected = true
+        button.imageView?.tintColor = selectedColor
+        mosaicButton.isSelected = false
+        mosaicButton.imageView?.tintColor = nil
+        delegate?.mosaicToolView(self, didChangedMosaicType: .smear)
+    }
+    
+    @objc
+    private func didUndoClick(button: UIButton) {
+        delegate?.mosaicToolView(didUndoClick: self)
     }
     
     required init?(coder: NSCoder) {

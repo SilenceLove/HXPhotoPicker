@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 public class EditorVideoTool {
     
@@ -38,6 +38,9 @@ public class EditorVideoTool {
         self.cropFactor = cropFactor
         self.maskType = maskType
         self.filter = filter
+        audioMix = AVMutableAudioMix()
+        mixComposition = AVMutableComposition()
+        videoComposition = AVMutableVideoComposition(propertiesOf: mixComposition)
     }
     
     public init(
@@ -56,6 +59,9 @@ public class EditorVideoTool {
         self.cropFactor = .empty
         self.maskType = maskType
         self.filter = filter
+        audioMix = AVMutableAudioMix()
+        mixComposition = AVMutableComposition()
+        videoComposition = AVMutableVideoComposition(propertiesOf: mixComposition)
     }
     
     public func export(
@@ -68,28 +74,16 @@ public class EditorVideoTool {
             Task {
                 do {
                     _ = try await avAsset.load(.duration)
-                    let status = avAsset.status(of: .duration)
                     await MainActor.run {
-                        switch status {
-                        case .loaded:
-                            exprotHandler()
-                        case .failed(let error):
-                            self.completionHandler?(
-                                .failure(EditorError.error(
-                                    type: .exportFailed,
-                                    message: "导出失败：" + error.localizedDescription
-                                ))
-                            )
-                        default:
-                            self.completionHandler?(
-                                .failure(EditorError.error(type: .exportFailed, message: "导出失败：时长获取失败"))
-                            )
-                        }
+                        exprotHandler()
                     }
                 } catch {
                     await MainActor.run {
                         self.completionHandler?(
-                            .failure(EditorError.error(type: .exportFailed, message: "导出失败：时长获取失败"))
+                            .failure(EditorError.error(
+                                type: .exportFailed,
+                                message: "导出失败：" + error.localizedDescription
+                            ))
                         )
                     }
                 }
@@ -208,31 +202,33 @@ public class EditorVideoTool {
                     maxSize: maxSize
                 )
             }
-            exportSession.exportAsynchronously(completionHandler: {
-                DispatchQueue.main.async {
-                    switch exportSession.status {
-                    case .completed:
-                        self.progressHandler?(1)
-                        self.progressTimer?.invalidate()
-                        self.progressTimer = nil
-                        self.completionHandler?(.success(self.outputURL))
-                    case .failed, .cancelled:
-                        self.progressTimer?.invalidate()
-                        self.progressTimer = nil
-                        let errorString: String
-                        if let error = exportSession.error {
-                            errorString = "导出失败：" + error.localizedDescription
-                        }else {
-                            errorString = "导出失败，未知原因"
+            DispatchQueue.global().async {
+                exportSession.exportAsynchronously(completionHandler: {
+                    DispatchQueue.main.async {
+                        switch exportSession.status {
+                        case .completed:
+                            self.progressHandler?(1)
+                            self.progressTimer?.invalidate()
+                            self.progressTimer = nil
+                            self.completionHandler?(.success(self.outputURL))
+                        case .failed, .cancelled:
+                            self.progressTimer?.invalidate()
+                            self.progressTimer = nil
+                            let errorString: String
+                            if let error = exportSession.error {
+                                errorString = "导出失败：" + error.localizedDescription
+                            }else {
+                                errorString = "导出失败，未知原因"
+                            }
+                            self.completionHandler?(.failure(EditorError.error(
+                                type: exportSession.status == .cancelled ? .cancelled : .exportFailed,
+                                message: errorString
+                            )))
+                        default: break
                         }
-                        self.completionHandler?(.failure(EditorError.error(
-                            type: exportSession.status == .cancelled ? .cancelled : .exportFailed,
-                            message: errorString
-                        )))
-                    default: break
                     }
-                }
-            })
+                })
+            }
             
             progressTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { [weak self] _ in
                 self?.progressHandler?(CGFloat(exportSession.progress))
@@ -248,11 +244,6 @@ public class EditorVideoTool {
         }
     }
     
-    lazy var mixComposition: AVMutableComposition = {
-        let mixComposition = AVMutableComposition()
-        return mixComposition
-    }()
-    
     func cropSize() {
         if !cropFactor.isClip {
             return
@@ -262,15 +253,10 @@ public class EditorVideoTool {
         videoComposition.renderSize = .init(width: width, height: height)
     }
     
-    lazy var videoComposition: AVMutableVideoComposition = {
-        let videoComposition = AVMutableVideoComposition(propertiesOf: mixComposition)
-        return videoComposition
-    }()
     
-    lazy var audioMix: AVMutableAudioMix = {
-        let audioMix = AVMutableAudioMix()
-        return audioMix
-    }()
+    var mixComposition: AVMutableComposition!
+    var videoComposition: AVMutableVideoComposition!
+    var audioMix: AVMutableAudioMix!
 }
 
 fileprivate extension EditorVideoTool {

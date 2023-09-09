@@ -19,8 +19,11 @@ class EditorBrushBlockView: UIView {
         }
     }
     
-    lazy var borderLayer: CAShapeLayer = {
-        let borderLayer = CAShapeLayer()
+    private var borderLayer: CAShapeLayer!
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        borderLayer = CAShapeLayer()
         borderLayer.strokeColor = UIColor.white.cgColor
         borderLayer.fillColor = UIColor.clear.cgColor
         borderLayer.lineWidth = 2
@@ -28,11 +31,6 @@ class EditorBrushBlockView: UIView {
         borderLayer.shadowRadius = 2
         borderLayer.shadowOpacity = 0.4
         borderLayer.shadowOffset = CGSize(width: 0, height: 0)
-        return borderLayer
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
         layer.addSublayer(borderLayer)
     }
     

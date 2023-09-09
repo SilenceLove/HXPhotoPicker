@@ -62,7 +62,7 @@ extension EditorAdjusterView {
     }
     
     func cropImage(completion: @escaping (Result<ImageEditedResult, EditorError>) -> Void) {
-        if !DispatchQueue.isMain {
+        if !Thread.isMainThread {
             DispatchQueue.main.async {
                 self.cropImage(completion: completion)
             }

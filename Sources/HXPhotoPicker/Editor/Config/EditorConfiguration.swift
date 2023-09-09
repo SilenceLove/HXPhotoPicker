@@ -53,7 +53,7 @@ public struct EditorConfiguration: IndicatorTypeConfig {
     /// The position of the Cancel/Done button when the screen is vertical
     /// iPad：.top
     /// 竖屏时，取消/完成按钮的位置
-    public var buttonPostion: ButtonPostion
+    public var buttonType: ButtonType
     
     /// The address configuration after editing, the default is under tmp
     /// Please set a different address each time you edit to prevent the existing data from being overwritten
@@ -65,31 +65,31 @@ public struct EditorConfiguration: IndicatorTypeConfig {
     
     /// picture configuration
     /// 图片配置
-    public lazy var photo: Photo = .init()
+    public var photo: Photo = .init()
     
     /// video configuration
     /// 视频配置
-    public lazy var video: Video = .init()
+    public var video: Video = .init()
      
     /// brush configuration
     /// 画笔
-    public lazy var brush: Brush = .init()
+    public var brush: Brush = .init()
     
     /// chartlet configuration
     /// 贴图配置
-    public lazy var chartlet: Chartlet = .init()
+    public var chartlet: Chartlet = .init()
     
     /// text configuration
     /// 文本
-    public lazy var text: Text = .init()
+    public var text: Text = .init()
     
     /// Crop Screen Configuration
     /// 裁剪画面配置
-    public lazy var cropSize: CropSize = .init()
+    public var cropSize: CropSize = .init()
     
     /// Mosaic configuration
     /// 马赛克配置
-    public lazy var mosaic: Mosaic = .init()
+    public var mosaic: Mosaic = .init()
     
     /// Fixed cropping state
     /// 固定裁剪状态
@@ -101,7 +101,7 @@ public struct EditorConfiguration: IndicatorTypeConfig {
     
     /// Tool View Configuration
     /// 工具视图配置
-    public lazy var toolsView: ToolsView = .default
+    public var toolsView: ToolsView = .default
     
     public init() {
         if #available(iOS 13.0, *) {
@@ -110,9 +110,9 @@ public struct EditorConfiguration: IndicatorTypeConfig {
             modalPresentationStyle = .fullScreen
         }
         if UIDevice.isPad {
-            buttonPostion = .top
+            buttonType = .top
         }else {
-            buttonPostion = .bottom
+            buttonType = .bottom
         }
     }
 }
@@ -135,7 +135,7 @@ public extension EditorConfiguration {
         
         /// filter configuration
         /// 滤镜配置
-        public lazy var filter: Filter = .photoDefault
+        public var filter: Filter = .photoDefault
         
         public init() { }
     }
@@ -168,7 +168,7 @@ public extension EditorConfiguration {
         
         /// filter configuration
         /// 滤镜配置
-        public lazy var filter: Filter = .videoDefault
+        public var filter: Filter = .videoDefault
         
         public init() { }
         
@@ -301,10 +301,10 @@ public extension EditorConfiguration {
         
         /// aspect ratio configuration
         /// 宽高比配置
-        public lazy var aspectRatios: [EditorRatioToolConfig] = [
-            .init(title: "原始比例".localized, ratio: .init(width: -1, height: -1)),
-            .init(title: "自由格式".localized, ratio: .zero),
-            .init(title: "正方形".localized, ratio: .init(width: 1, height: 1)),
+        public var aspectRatios: [EditorRatioToolConfig] = [
+            .init(title: "原始比例", ratio: .init(width: -1, height: -1)),
+            .init(title: "自由格式", ratio: .zero),
+            .init(title: "正方形", ratio: .init(width: 1, height: 1)),
             .init(title: "16:9", ratio: .init(width: 16, height: 9)),
             .init(title: "5:4", ratio: .init(width: 5, height: 4)),
             .init(title: "7:5", ratio: .init(width: 7, height: 5)),
@@ -610,7 +610,7 @@ public extension EditorConfiguration {
         }
     }
     
-    enum ButtonPostion {
+    enum ButtonType {
         case top
         case bottom
     }

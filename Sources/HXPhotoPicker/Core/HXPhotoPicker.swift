@@ -18,6 +18,7 @@ public enum Photo {
     @available(iOS 13.0, *)
     public static func picker<T: PhotoAssetObject>(
         _ config: PickerConfiguration,
+        selectedAssets: [PhotoAsset] = [],
         delegate: PhotoPickerControllerDelegate? = nil,
         compression: PhotoAsset.Compression? = nil,
         fromVC: UIViewController? = nil,
@@ -25,6 +26,7 @@ public enum Photo {
     ) async throws -> [T] {
         try await PhotoPickerController.picker(
             config,
+            selectedAssets: selectedAssets,
             delegate: delegate,
             compression: compression,
             fromVC: fromVC,
@@ -35,10 +37,16 @@ public enum Photo {
     @available(iOS 13.0, *)
     public static func picker(
         _ config: PickerConfiguration,
+        selectedAssets: [PhotoAsset] = [],
         delegate: PhotoPickerControllerDelegate? = nil,
         fromVC: UIViewController? = nil
     ) async throws -> PickerResult {
-        try await PhotoPickerController.picker(config, delegate: delegate, fromVC: fromVC)
+        try await PhotoPickerController.picker(
+            config,
+            selectedAssets: selectedAssets,
+            delegate: delegate,
+            fromVC: fromVC
+        )
     }
     
     @discardableResult
@@ -113,6 +121,17 @@ public enum Photo {
     #endif
     
     #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
+    
+    @available(iOS 13.0, *)
+    public static func capture(
+        _ config: CameraConfiguration = .init(),
+        type: CameraController.CaptureType = .all,
+        delegate: CameraControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) async throws -> CameraController.CaptureResult {
+        try await CameraController.capture(config, type: type, delegate: delegate, fromVC: fromVC)
+    }
+    
     @discardableResult
     public static func capture(
         _ config: CameraConfiguration,

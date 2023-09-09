@@ -14,33 +14,25 @@ public enum PickerInteractiveTransitionType {
 }
 
 class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestureRecognizerDelegate {
-    var type: PickerInteractiveTransitionType
-    weak var previewViewController: PhotoPreviewViewController?
-    weak var pickerController: PhotoPickerController?
-    lazy var panGestureRecognizer: UIPanGestureRecognizer = {
-        let panGestureRecognizer = UIPanGestureRecognizer(
-            target: self,
-            action: #selector(panGestureRecognizerAction(panGR:))
-        )
-        return panGestureRecognizer
-    }()
-    lazy var backgroundView: UIView = {
-        let backgroundView = UIView()
-        return backgroundView
-    }()
-    var previewView: PhotoPreviewViewCell?
-    var toView: UIView?
-    var beforePreviewFrame: CGRect = .zero
-    var previewCenter: CGPoint = .zero
-    var beganPoint: CGPoint = .zero
+    private let type: PickerInteractiveTransitionType
+    private weak var previewViewController: PhotoPreviewViewController?
+    private weak var pickerController: PhotoPickerController?
+    private var panGestureRecognizer: UIPanGestureRecognizer!
+    private var backgroundView: UIView!
+    private var previewView: PhotoPreviewViewCell?
+    private var toView: UIView?
+    private var beforePreviewFrame: CGRect = .zero
+    private var previewCenter: CGPoint = .zero
+    private var beganPoint: CGPoint = .zero
+    private var beganInterPercent: Bool = false
+    private var previewBackgroundColor: UIColor?
+    private var pickerControllerBackgroundColor: UIColor?
+    private weak var transitionContext: UIViewControllerContextTransitioning?
+    private var slidingGap: CGPoint = .zero
+    private var navigationBarAlpha: CGFloat = 1
+    private var canTransition: Bool = false
+    
     var canInteration: Bool = false
-    var beganInterPercent: Bool = false
-    var previewBackgroundColor: UIColor?
-    var pickerControllerBackgroundColor: UIColor?
-    weak var transitionContext: UIViewControllerContextTransitioning?
-    var slidingGap: CGPoint = .zero
-    var navigationBarAlpha: CGFloat = 1
-    var canTransition: Bool = false
     
     init(
         panGestureRecognizerFor previewViewController: PhotoPreviewViewController,
@@ -49,18 +41,29 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         self.type = type
         super.init()
         self.previewViewController = previewViewController
+        panGestureRecognizer = UIPanGestureRecognizer(
+            target: self,
+            action: #selector(panGestureRecognizerAction(panGR:))
+        )
         panGestureRecognizer.delegate = self
         previewViewController.view.addGestureRecognizer(panGestureRecognizer)
+        backgroundView = UIView()
     }
     
     init(
         panGestureRecognizerFor pickerController: PhotoPickerController,
-        type: PickerInteractiveTransitionType) {
+        type: PickerInteractiveTransitionType
+    ) {
         self.type = type
         super.init()
         self.pickerController = pickerController
+        panGestureRecognizer = UIPanGestureRecognizer(
+            target: self,
+            action: #selector(panGestureRecognizerAction(panGR:))
+        )
         panGestureRecognizer.delegate = self
         pickerController.view.addGestureRecognizer(panGestureRecognizer)
+        backgroundView = UIView()
     }
     public func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,

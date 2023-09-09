@@ -18,6 +18,12 @@ protocol EditorFrameViewDelegate: AnyObject {
 class EditorFrameView: UIView {
     weak var delegate: EditorFrameViewDelegate?
     
+    var maskBgView: EditorMaskView!
+    var customMaskView: EditorMaskView!
+    var maskLinesView: EditorMaskView!
+    var controlView: EditorControlView!
+    var videoSliderView: VideoPlaySliderView!
+    
     var state: EditorView.State = .normal
     var maskBgShowTimer: Timer?
     var controlTimer: Timer?
@@ -51,43 +57,6 @@ class EditorFrameView: UIView {
         setRoundCrop(isRound: false, animated: animated)
     }
     
-    lazy var maskBgView: EditorMaskView = {
-        let view = EditorMaskView(type: .mask, maskColor: maskColor)
-        view.alpha = 0
-        view.isHidden = true
-        view.isUserInteractionEnabled = false
-        return view
-    }()
-    
-    lazy var customMaskView: EditorMaskView = {
-        let view = EditorMaskView(type: .customMask, maskColor: maskColor)
-        view.isUserInteractionEnabled = false
-        return view
-    }()
-    
-    lazy var maskLinesView: EditorMaskView = {
-        let view = EditorMaskView(type: .frame)
-        view.isUserInteractionEnabled = false
-        view.alpha = 0
-        view.isHidden = true
-        return view
-    }()
-    
-    lazy var controlView: EditorControlView = {
-        let view = EditorControlView()
-        view.delegate = self
-        view.isUserInteractionEnabled = false
-        return view
-    }()
-    
-    lazy var videoSliderView: VideoPlaySliderView = {
-        let view = VideoPlaySliderView(style: .editor)
-        view.isHidden = true
-        view.alpha = 0
-        view.delegate = self
-        return view
-    }()
-    
     var maskColor: UIColor? {
         didSet {
             maskBgView.maskColor = maskColor
@@ -100,12 +69,38 @@ class EditorFrameView: UIView {
     init(maskColor: UIColor?) {
         self.maskColor = maskColor
         super.init(frame: .zero)
+        initViews()
         addSubview(maskBgView)
         addSubview(customMaskView)
         addSubview(maskLinesView)
         addSubview(controlView)
         addSubview(videoSliderView)
     }
+    
+    private func initViews() {
+        maskBgView = EditorMaskView(type: .mask, maskColor: maskColor)
+        maskBgView.alpha = 0
+        maskBgView.isHidden = true
+        maskBgView.isUserInteractionEnabled = false
+        
+        customMaskView = EditorMaskView(type: .customMask, maskColor: maskColor)
+        customMaskView.isUserInteractionEnabled = false
+        
+        maskLinesView = EditorMaskView(type: .frame)
+        maskLinesView.isUserInteractionEnabled = false
+        maskLinesView.alpha = 0
+        maskLinesView.isHidden = true
+        
+        controlView = EditorControlView()
+        controlView.delegate = self
+        controlView.isUserInteractionEnabled = false
+        
+        videoSliderView = VideoPlaySliderView(style: .editor)
+        videoSliderView.isHidden = true
+        videoSliderView.alpha = 0
+        videoSliderView.delegate = self
+    }
+    
     
     func setMaskBgFrame(_ rect: CGRect, insets: UIEdgeInsets) {
         maskBgView.maskInsets = insets
