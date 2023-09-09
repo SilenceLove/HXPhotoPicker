@@ -78,6 +78,13 @@ extension UIDevice {
         }
         return .zero
     }
+    
+    class var screenSize: CGSize {
+        if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+            return UIApplication._keyWindow?.frame.size ?? UIScreen.main.bounds.size
+        }
+        return UIScreen.main.bounds.size
+    }
 }
 
 extension UIApplication {

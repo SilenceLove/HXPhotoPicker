@@ -57,7 +57,7 @@ class PickerResultViewController: UIViewController,
     var isPublish: Bool = false
     
     var localCachePath: String {
-        var cachePath = HXPickerWrapper<FileManager>.cachesPath
+        var cachePath = FileManager.cachesPath
         cachePath.append(contentsOf: "/com.silence.WeChat_Moment")
         return cachePath
     }
@@ -74,6 +74,7 @@ class PickerResultViewController: UIViewController,
         )
     }
     
+    #if OCEXAMPLE
     @objc
     init(assets: [SwiftPhotoAsset]) {
         var selectedAssets: [PhotoAsset] = []
@@ -86,6 +87,7 @@ class PickerResultViewController: UIViewController,
             bundle: nil
         )
     }
+    #endif
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -94,7 +96,7 @@ class PickerResultViewController: UIViewController,
     override func viewDidLoad() {
         super.viewDidLoad()
         loadFonts()
-        config.editor.buttonPostion = .top
+        config.editor.buttonType = .top
         collectionViewTopConstraint.constant = 20
         collectionView.register(ResultViewCell.self, forCellWithReuseIdentifier: "ResultViewCellID")
         collectionView.register(ResultAddViewCell.self, forCellWithReuseIdentifier: "ResultAddViewCellID")
@@ -298,7 +300,7 @@ class PickerResultViewController: UIViewController,
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let flowLayout: UICollectionViewFlowLayout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
-        let itemWidth = Int((view.hx.width - 24 - CGFloat(row_Count - 1))) / row_Count
+        let itemWidth = Int((view.width - 24 - CGFloat(row_Count - 1))) / row_Count
         flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth)
         flowLayout.minimumInteritemSpacing = 1
         flowLayout.minimumLineSpacing = 1
@@ -316,10 +318,10 @@ class PickerResultViewController: UIViewController,
     func configCollectionViewHeight() {
         let rowCount = getCollectionViewrowCount()
         beforeRowCount = rowCount
-        let itemWidth = Int((view.hx.width - 24 - CGFloat(row_Count - 1))) / row_Count
+        let itemWidth = Int((view.width - 24 - CGFloat(row_Count - 1))) / row_Count
         var heightConstraint = CGFloat(rowCount * itemWidth + rowCount)
-        if heightConstraint > view.hx.height - UIDevice.navigationBarHeight - 20 - 150 {
-            heightConstraint = view.hx.height - UIDevice.navigationBarHeight - 20 - 150
+        if heightConstraint > view.height - UIDevice.navigationBarHeight - 20 - 150 {
+            heightConstraint = view.height - UIDevice.navigationBarHeight - 20 - 150
         }
         collectionViewHeightConstraint.constant = heightConstraint
     }
@@ -678,8 +680,8 @@ class PickerResultViewController: UIViewController,
             pop?.permittedArrowDirections = .any
             pop?.sourceView = photoBrowser.view
             pop?.sourceRect = CGRect(
-                x: photoBrowser.view.hx.width * 0.5,
-                y: photoBrowser.view.hx.height,
+                x: photoBrowser.view.width * 0.5,
+                y: photoBrowser.view.height,
                 width: 0,
                 height: 0
             )
@@ -789,7 +791,7 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
             var config = editorConfig
             createEditorDocumentPath()
             var fileName = "hxphotopicker_editor/"
-            fileName += HXPickerWrapper<String>.fileName(suffix: photoAsset.isGifAsset ? "gif" : "png")
+            fileName += String.fileName(suffix: photoAsset.isGifAsset ? "gif" : "png")
             config.urlConfig = .init(fileName: fileName, type: .document)
             return config
         }
@@ -805,7 +807,7 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
         if isPublish {
             var config = editorConfig
             createEditorDocumentPath()
-            let fileName = "hxphotopicker_editor/" + HXPickerWrapper<String>.fileName(suffix: "mp4")
+            let fileName = "hxphotopicker_editor/" + String.fileName(suffix: "mp4")
             config.urlConfig = .init(fileName: fileName, type: .document)
             return config
         }
@@ -855,11 +857,11 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
         _ pickerController: PhotoPickerController,
         viewControllersWillAppear viewController: UIViewController) {
         if pickerController.isPreviewAsset {
-            let navHeight = viewController.navigationController?.navigationBar.hx.height ?? 0
+            let navHeight = viewController.navigationController?.navigationBar.height ?? 0
             viewController.navigationController?.navigationBar.setBackgroundImage(
                 UIImage.gradualShadowImage(
                     CGSize(
-                        width: view.hx.width,
+                        width: view.width,
                         height: UIDevice.isAllIPhoneX ? navHeight + 54 : navHeight + 30
                     )
                 ),
@@ -1037,7 +1039,7 @@ class ResultViewCell: PhotoPickerViewCell {
     lazy var deleteButton: UIButton = {
         let deleteButton = UIButton.init(type: .custom)
         deleteButton.setImage(UIImage.init(named: "hx_compose_delete"), for: .normal)
-        deleteButton.hx.size = deleteButton.currentImage?.size ?? .zero
+        deleteButton.size = deleteButton.currentImage?.size ?? .zero
         deleteButton.addTarget(self, action: #selector(didDeleteButtonClick), for: .touchUpInside)
         return deleteButton
     }()
@@ -1054,7 +1056,7 @@ class ResultViewCell: PhotoPickerViewCell {
     }
     override func requestThumbnailImage() {
         // 因为这里的cell不会很多，重新设置 targetWidth，使图片更加清晰
-        super.requestThumbnailImage(targetWidth: hx.width * UIScreen.main.scale)
+        super.requestThumbnailImage(targetWidth: width * UIScreen.main.scale)
     }
     @objc func didDeleteButtonClick() {
         resultDelegate?.cell?(didDeleteButton: self)
@@ -1066,6 +1068,6 @@ class ResultViewCell: PhotoPickerViewCell {
     
     override func layoutView() {
         super.layoutView()
-        deleteButton.hx.x = hx.width - deleteButton.hx.width
+        deleteButton.x = width - deleteButton.width
     }
 }

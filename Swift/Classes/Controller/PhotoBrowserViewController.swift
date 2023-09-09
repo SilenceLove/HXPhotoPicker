@@ -103,7 +103,7 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        let itemWidth = Int((view.hx.width - 24 - CGFloat(row_Count - 1))) / row_Count
+        let itemWidth = Int((view.width - 24 - CGFloat(row_Count - 1))) / row_Count
         flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth)
         flowLayout.minimumInteritemSpacing = 1
         flowLayout.minimumLineSpacing = 1
@@ -112,8 +112,8 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
         collectionView.frame = CGRect(
             x: 0,
             y: collectionViewY,
-            width: view.hx.width,
-            height: view.hx.height - collectionViewY
+            width: view.width,
+            height: view.height - collectionViewY
         )
     }
     
@@ -159,18 +159,27 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
                 )
             )
         }
-        browser.addRightItem(title: "更多") { [weak self] browser in
-            self?.shwoMoreAction(browser)
-        }
+        let button = UIButton(type: .custom)
+        button.setTitle("更多", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = .regularPingFang(ofSize: 16)
+        button.addTarget(self, action: #selector(shwoMoreClick(button:)), for: .touchUpInside)
+        browser.addRightItem(customView: button)
+        currentBrowser = browser
+//        browser.addRightItem(title: "更多") { [weak self] browser in
+//            self?.shwoMoreAction(browser)
+//        }
     }
-    
-    func shwoMoreAction(_ photoBrowser: PhotoBrowser) {
-        guard let photoAsset = photoBrowser.currentAsset else {
+    weak var currentBrowser: PhotoBrowser?
+    @objc
+    func shwoMoreClick(button: UIButton) {
+        guard let photoBrowser = currentBrowser,
+              let photoAsset = photoBrowser.currentAsset else {
             return
         }
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         if let originalURL = photoAsset.networkImageAsset?.originalURL,
-           !originalURL.hx.isCache {
+           !originalURL.isCache {
             alert.addAction(.init(title: "查看原图", style: .default, handler: { [weak self] _ in
                 photoAsset.loadNetworkOriginalImage { [weak self] in
                     guard let self = self else { return }
@@ -203,10 +212,10 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
         if UIDevice.isPad {
             let pop = alert.popoverPresentationController
             pop?.permittedArrowDirections = .any
-            pop?.sourceView = photoBrowser.view
+            pop?.sourceView = button
             pop?.sourceRect = CGRect(
-                x: photoBrowser.view.hx.width * 0.5,
-                y: photoBrowser.view.hx.height,
+                x: button.width * 0.5,
+                y: button.height,
                 width: 0,
                 height: 0
             )
@@ -223,14 +232,14 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
         guard let cell = collectionView.cellForItem(at: indexPath) as? ResultViewCell else {
             return nil
         }
-        let viewSize = view.hx.size
+        let viewSize = view.size
         return .init(
             identifier: indexPath as NSCopying
         ) {
             let imageSize = cell.photoAsset.imageSize
             let aspectRatio = imageSize.width / imageSize.height
             let maxWidth = viewSize.width - UIDevice.leftMargin - UIDevice.rightMargin - 60
-            let maxHeight = UIScreen.main.bounds.height * 0.659
+            let maxHeight = UIDevice.screenSize.height * 0.659
             var width = imageSize.width
             var height = imageSize.height
             if width > maxWidth {
@@ -278,9 +287,16 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
                     )
                 )
             }
-            browser.addRightItem(title: "更多") { [weak self] browser in
-                self?.shwoMoreAction(browser)
-            }
+            let button = UIButton(type: .custom)
+            button.setTitle("更多", for: .normal)
+            button.setTitleColor(.white, for: .normal)
+            button.titleLabel?.font = .regularPingFang(ofSize: 16)
+            button.addTarget(self, action: #selector(self.shwoMoreClick(button:)), for: .touchUpInside)
+            browser.addRightItem(customView: button)
+            self.currentBrowser = browser
+//            browser.addRightItem(title: "更多") { [weak self] browser in
+//                self?.shwoMoreAction(browser)
+//            }
         }
     }
 }

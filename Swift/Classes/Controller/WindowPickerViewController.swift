@@ -42,20 +42,20 @@ class WindowPickerViewController: UIViewController {
     }()
     var showPicker = true
     lazy var toolbar: UIView = {
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: view.hx.width, height: 50))
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: view.width, height: 50))
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "select_photo"), for: .normal)
         button.addTarget(self, action: #selector(didSelectPhotoClick), for: .touchUpInside)
-        button.hx.size = CGSize(width: 40, height: 40)
-        button.hx.centerY = 25
-        button.hx.x = 12
+        button.size = CGSize(width: 40, height: 40)
+        button.centerY = 25
+        button.x = 12
         view.backgroundColor = UIColor(hexString: "#eeeeee")
         view.addSubview(button)
         return view
     }()
     
     lazy var bottomView: UIView = {
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: view.hx.width, height: 50 + UIDevice.bottomMargin))
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: view.width, height: 50 + UIDevice.bottomMargin))
         view.addSubview(originalBtn)
         view.addSubview(finishButton)
         view.backgroundColor = UIColor(hexString: "#eeeeee")
@@ -91,8 +91,8 @@ class WindowPickerViewController: UIViewController {
         button.layer.masksToBounds = true
         button.isEnabled = false
         button.addTarget(self, action: #selector(didFinishButtonClick(button:)), for: .touchUpInside)
-        button.frame = CGRect(x: view.hx.width - 12 - 60, y: 0, width: 60, height: 33)
-        button.hx.centerY = 25
+        button.frame = CGRect(x: view.width - 12 - 60, y: 0, width: 60, height: 33)
+        button.centerY = 25
         return button
     }()
     @objc func didFinishButtonClick(button: UIButton) {
@@ -114,10 +114,10 @@ class WindowPickerViewController: UIViewController {
         originalBtn.addSubview(boxControl)
         let tap = UITapGestureRecognizer.init(target: self, action: #selector(didOriginalButtonClick))
         originalBtn.addGestureRecognizer(tap)
-        originalBtn.center = CGPoint(x: view.hx.width * 0.5, y: 25)
+        originalBtn.center = CGPoint(x: view.width * 0.5, y: 25)
         
-        boxControl.hx.centerY = 25
-        originalTitleLb.hx.centerY = 25
+        boxControl.centerY = 25
+        originalTitleLb.centerY = 25
         return originalBtn
     }()
     lazy var originalTitleLb: UILabel = {
@@ -128,16 +128,16 @@ class WindowPickerViewController: UIViewController {
         return originalTitleLb
     }()
     lazy var boxControl: SelectBoxView = {
-        let boxControl = SelectBoxView(
-            frame: CGRect(x: 0, y: 0, width: 17, height: 17)
-        )
         var config = SelectBoxConfiguration()
         config.style = .tick
         config.backgroundColor = .clear
         config.borderColor = UIColor(hexString: "#07C160")
         config.tickColor = .white
         config.selectedBackgroundColor = UIColor(hexString: "#07C160")
-        boxControl.config = config
+        let boxControl = SelectBoxView(
+            config,
+            frame: CGRect(x: 0, y: 0, width: 17, height: 17)
+        )
         boxControl.isSelected = false
         boxControl.backgroundColor = UIColor.clear
         return boxControl
@@ -179,10 +179,10 @@ class WindowPickerViewController: UIViewController {
         }
     }
     func updateOriginal() {
-        let titleWidth = originalTitleLb.text!.hx.width(ofFont: originalTitleLb.font, maxHeight: 30)
-        boxControl.hx.x = (originalBtn.hx.width - (boxControl.hx.width + 4 + titleWidth)) * 0.5
-        originalTitleLb.hx.x = boxControl.frame.maxX + 4
-        originalTitleLb.hx.width = titleWidth
+        let titleWidth = originalTitleLb.text!.width(ofFont: originalTitleLb.font, maxHeight: 30)
+        boxControl.x = (originalBtn.width - (boxControl.width + 4 + titleWidth)) * 0.5
+        originalTitleLb.x = boxControl.frame.maxX + 4
+        originalTitleLb.width = titleWidth
     }
     
     lazy var sendBgView: UIView = {
@@ -212,9 +212,9 @@ class WindowPickerViewController: UIViewController {
     
     @objc
     func didSelectPhotoClick() {
-        let toolbarY = view.hx.height - toolbar.hx.height - UIDevice.bottomMargin
-        let pickerViewY = view.hx.height - pickerView.hx.height - bottomView.hx.height
-        showPicker = toolbar.hx.y == toolbarY
+        let toolbarY = view.height - toolbar.height - UIDevice.bottomMargin
+        let pickerViewY = view.height - pickerView.height - bottomView.height
+        showPicker = toolbar.y == toolbarY
         if showPicker {
             // 每次显示都重新加载所有照片
             pickerView.fetchAsset()
@@ -222,13 +222,13 @@ class WindowPickerViewController: UIViewController {
         resetOriginal()
         UIView.animate(withDuration: 0.25) {
             if self.showPicker {
-                self.pickerView.hx.y = pickerViewY
-                self.toolbar.hx.y = self.pickerView.hx.y - 50
+                self.pickerView.y = pickerViewY
+                self.toolbar.y = self.pickerView.y - 50
             }else {
-                self.toolbar.hx.y = toolbarY
-                self.pickerView.hx.y = self.view.hx.height
+                self.toolbar.y = toolbarY
+                self.pickerView.y = self.view.height
             }
-            self.bottomView.hx.y = self.pickerView.frame.maxY
+            self.bottomView.y = self.pickerView.frame.maxY
         } completion: { _ in
             if !self.showPicker {
                 self.pickerView.clear()
@@ -264,8 +264,8 @@ class WindowPickerViewController: UIViewController {
         changeButton.setTitle("改变布局", for: .normal)
         changeButton.addTarget(self, action: #selector(didChangePickerView), for: .touchUpInside)
         changeButton.frame = CGRect(origin: .zero, size: CGSize(width: 100, height: 30))
-        changeButton.hx.y = 120
-        changeButton.hx.centerX = view.hx.width * 0.5
+        changeButton.y = 120
+        changeButton.centerX = view.width * 0.5
         view.addSubview(changeButton)
         pickerView.fetchAsset()
         
@@ -286,10 +286,10 @@ class WindowPickerViewController: UIViewController {
             pickerView.manager.config.photoList.cell.targetWidth = 300
         }
         UIView.animate(withDuration: 0.25) {
-            self.pickerView.hx.height = self.pickerViewHeight
-            self.pickerView.hx.y = self.view.hx.height - self.pickerViewHeight - self.bottomView.hx.height
-            self.toolbar.hx.y = self.pickerView.hx.y - 50
-            self.bottomView.hx.y = self.pickerView.frame.maxY
+            self.pickerView.height = self.pickerViewHeight
+            self.pickerView.y = self.view.height - self.pickerViewHeight - self.bottomView.height
+            self.toolbar.y = self.pickerView.y - 50
+            self.bottomView.y = self.pickerView.frame.maxY
         } completion: { _ in
             if self.scrollDirection == .horizontal {
                 self.pickerView.scrollDirection = self.scrollDirection
@@ -329,21 +329,21 @@ class WindowPickerViewController: UIViewController {
         if showPicker {
             pickerView.frame = CGRect(
                 x: 0,
-                y: view.hx.height - pickerViewHeight - bottomView.hx.height,
-                width: view.hx.width,
+                y: view.height - pickerViewHeight - bottomView.height,
+                width: view.width,
                 height: pickerViewHeight
             )
-            toolbar.frame = CGRect(x: 0, y: pickerView.hx.y - 50, width: view.hx.width, height: 50)
+            toolbar.frame = CGRect(x: 0, y: pickerView.y - 50, width: view.width, height: 50)
         }else {
-            pickerView.frame = CGRect(x: 0, y: view.hx.height, width: view.hx.width, height: pickerViewHeight)
+            pickerView.frame = CGRect(x: 0, y: view.height, width: view.width, height: pickerViewHeight)
             toolbar.frame = CGRect(
                 x: 0,
-                y: view.hx.height - 50 - UIDevice.bottomMargin,
-                width: view.hx.width,
+                y: view.height - 50 - UIDevice.bottomMargin,
+                width: view.width,
                 height: 50
             )
         }
-        bottomView.hx.y = pickerView.frame.maxY
+        bottomView.y = pickerView.frame.maxY
     }
     deinit {
         print("deinit\(self)")
@@ -399,13 +399,13 @@ extension WindowPickerViewController: PhotoPickerViewDelegate {
     ) {
         let keyWindow = UIApplication.shared.keyWindow
         beginDragPoint = gestureRecognizer.location(in: keyWindow)
-        sendBgView.frame = CGRect(x: 0, y: 0, width: view.hx.width, height: pickerView.hx.y - 50)
+        sendBgView.frame = CGRect(x: 0, y: 0, width: view.width, height: pickerView.y - 50)
         sendBlurView.frame = sendBgView.bounds
         UIView.animate(withDuration: 0.25) {
             self.sendBlurView.effect = UIBlurEffect(style: .light)
             self.sendBlurView.viewWithTag(1)?.alpha = 1
         }
-        sendTitleLb.center = CGPoint(x: sendBgView.hx.width * 0.5, y: sendBgView.hx.height * 0.5)
+        sendTitleLb.center = CGPoint(x: sendBgView.width * 0.5, y: sendBgView.height * 0.5)
         keyWindow?.insertSubview(sendBgView, belowSubview: dragView)
         sendBgView.backgroundColor = UIColor(hexString: "#87CEFA").withAlphaComponent(0)
         sendTitleLb.alpha = 0

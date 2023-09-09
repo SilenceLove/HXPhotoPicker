@@ -407,12 +407,3 @@ extension AvatarPickerConfigurationViewController {
         }
     }
 }
-
-extension CGSize {
-    var title: String {
-        if width == 0 || height == 0 {
-            return "free"
-        }
-        return String(format: "%.0f:%.0f", width, height)
-    }
-}

@@ -30,6 +30,7 @@ class PickerConfigurationViewController: UITableViewController {
     
     @objc func openPickerController() {
         if showOpenPickerButton {
+            #if OCEXAMPLE
             if #available(iOS 13.0.0, *) {
                 Task {
                     do {
@@ -72,6 +73,7 @@ class PickerConfigurationViewController: UITableViewController {
                 vc.autoDismiss = false
                 present(vc, animated: true, completion: nil)
             }
+#endif
         }else {
             didDoneHandler?(config)
             dismiss(animated: true, completion: nil)
@@ -195,6 +197,7 @@ class PickerConfigurationViewController: UITableViewController {
 }
 extension PickerConfigurationViewController: PhotoPickerControllerDelegate {
     func pickerController(_ pickerController: PhotoPickerController, didFinishSelection result: PickerResult) {
+        #if OCEXAMPLE
         pickerController.dismiss(true) {
             let pickerResultVC = PickerResultViewController.init()
             pickerResultVC.config = pickerController.config
@@ -202,6 +205,7 @@ extension PickerConfigurationViewController: PhotoPickerControllerDelegate {
             pickerResultVC.isOriginal = result.isOriginal
             self.navigationController?.pushViewController(pickerResultVC, animated: true)
         }
+        #endif
     }
     func pickerController(didCancel pickerController: PhotoPickerController) {
         pickerController.dismiss(animated: true, completion: nil)

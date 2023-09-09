@@ -106,8 +106,8 @@ class TestEditorViewController: BaseViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        contentView.frame = .init(x: 0, y: navigationController?.navigationBar.frame.maxY ?? 88, width: view.hx.width, height: 0)
-        contentView.hx.height = view.hx.height - contentView.hx.y
+        contentView.frame = .init(x: 0, y: navigationController?.navigationBar.frame.maxY ?? 88, width: view.width, height: 0)
+        contentView.height = view.height - contentView.y
         if editorView.frame.isEmpty {
             editorView.frame = contentView.bounds
         }else {
@@ -711,8 +711,7 @@ class TestEditorViewController: BaseViewController {
                     }else {
                         self.videoURL = urlResult.url
                         let avAsset = AVAsset(url: urlResult.url)
-                        let coverImage = avAsset.hx.getImage(at: 0.1)
-                        self.editorView.setAVAsset(avAsset, coverImage: coverImage)
+                        self.editorView.setAVAsset(avAsset)
                         self.editorView.loadVideo(isPlay: true)
                     }
                     self.isShowVideoControl = false
@@ -726,12 +725,12 @@ class TestEditorViewController: BaseViewController {
     lazy var context: CIContext = .init()
     
     func setmosaicImage() {
+        let screenScale = 20 / max(UIDevice.screenSize.width, UIDevice.screenSize.height)
         DispatchQueue.global(qos: .userInteractive).async {
             guard let cgImage = self.image?.cgImage else {
                 return
             }
             let ciImage = CIImage(cgImage: cgImage)
-            let screenScale = 20 / max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
             let scale = ciImage.extent.width * screenScale
             let image = ciImage.applyingFilter("CIPixellate", parameters: [kCIInputScaleKey: scale])
             guard let mosaicImage = self.context.createCGImage(image, from: image.extent) else {
@@ -808,23 +807,6 @@ extension TestEditorViewController: EditorViewDelegate {
 extension TestEditorViewController: UIColorPickerViewControllerDelegate {
     func colorPickerViewController(_ viewController: UIColorPickerViewController, didSelect color: UIColor, continuously: Bool) {
         editorView.drawLineColor = color
-    }
-}
-
-extension UIViewController {
-    func presendAlert(_ alert: UIAlertController) {
-        if UIDevice.isPad {
-            let pop = alert.popoverPresentationController
-            pop?.permittedArrowDirections = .any
-            pop?.sourceView = view
-            pop?.sourceRect = CGRect(
-                x: view.hx.width * 0.5,
-                y: view.hx.height,
-                width: 0,
-                height: 0
-            )
-        }
-        present(alert, animated: true)
     }
 }
 

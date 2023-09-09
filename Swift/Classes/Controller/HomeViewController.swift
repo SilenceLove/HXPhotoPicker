@@ -52,6 +52,17 @@ class HomeViewController: UITableViewController {
         let rowType = Section.allCases[indexPath.section].allRowCase[indexPath.row]
         if let rowType = rowType as? HomeRowType {
             if rowType == .camera {
+//                if #available(iOS 13.0, *) {
+//                    Task {
+//                        do {
+//                            let result = try await CameraController.capture()
+//                            print(result)
+//                        } catch {
+//                            print(error)
+//                        }
+//                    }
+//                    return
+//                }
                 if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
                     PhotoTools.showAlert(viewController: self, title: "Mac 不支持", message: nil, leftActionTitle: "确定")
                     return
@@ -248,12 +259,6 @@ extension HomeViewController: PhotoPickerControllerDelegate {
     }
     func pickerController(didCancel pickerController: PhotoPickerController) {
         pickerController.dismiss(animated: true, completion: nil)
-    }
-}
-extension UITableViewCell {
-    
-    static var reuseIdentifier: String {
-        return String(describing: Self.self)
     }
 }
 #if !targetEnvironment(macCatalyst)

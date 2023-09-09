@@ -48,7 +48,7 @@ class WeChatMometViewController: UIViewController {
         presentPicker(config)
     }
     var localCachePath: String {
-        var cachePath = HXPickerWrapper<FileManager>.cachesPath
+        var cachePath = FileManager.cachesPath
         cachePath.append(contentsOf: "/com.silence.WeChat_Moment")
         return cachePath
     }
@@ -118,8 +118,8 @@ class WeChatMometViewController: UIViewController {
         imageView.frame = CGRect(
             x: 0,
             y: navigationController?.navigationBar.frame.maxY ?? 0,
-            width: view.hx.width,
-            height: view.hx.width
+            width: view.width,
+            height: view.width
         )
     }
 }

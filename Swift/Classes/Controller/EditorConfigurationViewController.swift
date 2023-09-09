@@ -156,6 +156,7 @@ extension EditorConfigurationViewController: EditorViewControllerDelegate {
         _ editorViewController: EditorViewController,
         didFinish asset: EditorAsset
     ) {
+        #if OCEXAMPLE
         if asset.contentType == .image {
             let pickerResultVC = PickerResultViewController.init()
             var pickerConfig = PickerConfiguration.init()
@@ -201,6 +202,7 @@ extension EditorConfigurationViewController: EditorViewControllerDelegate {
             }
             self.navigationController?.pushViewController(pickerResultVC, animated: true)
         }
+        #endif
     }
     
     
