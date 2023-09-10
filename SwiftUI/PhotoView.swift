@@ -9,6 +9,7 @@
 import SwiftUI
 import HXPhotoPicker
 
+@available(iOS 14.0, *)
 struct PhotoView: View {
     
     var asset: Asset

@@ -10,6 +10,7 @@ import SwiftUI
 import UIKit
 import HXPhotoPicker
 
+@available(iOS 13.0, *)
 struct PhotoBrowser: UIViewControllerRepresentable {
     
     var pageIndex: Int

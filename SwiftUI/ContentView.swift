@@ -7,10 +7,20 @@
 //
 
 import SwiftUI
+import UIKit
 import HXPhotoPicker
 
+@available(iOS 14.0, *)
 struct ContentView: View {
-    @State var config: PickerConfiguration = {
+    @State var photoAssets: [PhotoAsset]
+    @State var assets: [Asset]
+    
+    init(photoAssets: [PhotoAsset], assets: [Asset]) {
+        self.photoAssets = photoAssets
+        self.assets = assets
+    }
+    
+    @State private var config: PickerConfiguration = {
         var config = PickerConfiguration.default
         config.photoList.bottomView.disableFinishButtonWhenNotSelected = false
         return config
@@ -20,22 +30,25 @@ struct ContentView: View {
     @State private var isShowingBrowser = false
     @State private var isShowingDelete = false
     @State private var pageIndex: Int = 0
-    @State var photoAssets: [PhotoAsset]
-    @State var assets: [Asset]
     @State private var draggedItem: Int = 0
     
-    var gridItemLayout = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
-    ]
+    private var itemCount: CGFloat = UIDevice.isPad ? 5 : 3
+    private var itemSpacing: CGFloat = 12
+    private var gridItemLayout = {
+        var items: [GridItem] = []
+        let count = UIDevice.isPad ? 5 : 3
+        for _ in 0..<count {
+            items.append(.init(.flexible(), spacing: 12))
+        }
+        return items
+    }()
     
     var body: some View {
         GeometryReader { geometry in
             NavigationView {
                 ScrollView {
-                    LazyVGrid(columns: gridItemLayout, spacing: 12) {
-                        let itemWidth = (geometry.size.width - 48) / 3
+                    LazyVGrid(columns: gridItemLayout, spacing: itemSpacing) {
+                        let itemWidth = (geometry.size.width - (itemSpacing * 2 + itemSpacing * (itemCount - 1))) / itemCount
                         ForEach(0..<assets.count, id:\.self) { index in
                             let asset = assets[index]
                             Button {
@@ -78,10 +91,18 @@ struct ContentView: View {
                                     draggedItem = index
                                     return NSItemProvider(object: "\(index)" as NSString)
                                 }
-                                .onDrop(of: ["\(index)"], delegate: DragDropDelegate(fromIndex: $draggedItem, toIndex: index, itemSize: .init(width: itemWidth, height: itemWidth), photoAssets: $photoAssets, assets: $assets))
+                                .onDrop(
+                                    of: ["\(index)"],
+                                    delegate: DragDropDelegate(
+                                        fromIndex: $draggedItem,
+                                        toIndex: index,
+                                        photoAssets: $photoAssets,
+                                        assets: $assets
+                                    )
+                                )
                             }
                         }
-                        .padding([.leading, .trailing], 12)
+                        .padding([.leading, .trailing], itemSpacing)
                         
                         if config.maximumSelectedCount == 0 ||
                             assets.count < config.maximumSelectedCount {
@@ -96,7 +117,7 @@ struct ContentView: View {
                                         .foregroundColor(Color(hex: 0x999999))
                                         .scaleEffect(2)
                                 }
-                                .padding([.leading, .trailing], 12)
+                                .padding([.leading, .trailing], itemSpacing)
                             }
                         }
                     }
@@ -106,7 +127,7 @@ struct ContentView: View {
                     }, label: {
                         Text("设置")
                     }))
-                    .padding([.leading, .trailing], 12)
+                    .padding([.leading, .trailing], itemSpacing)
                 }
                 .sheet(isPresented: $isShowingBrowser, content: {
                     PhotoBrowser(pageIndex: pageIndex, photoAssets: $photoAssets, assets: $assets)
@@ -121,20 +142,15 @@ struct ContentView: View {
                         .ignoresSafeArea()
                 })
             }
+            .navigationViewStyle(StackNavigationViewStyle())
         }
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView(photoAssets: [], assets: [])
-    }
-}
-
+@available(iOS 14.0, *)
 struct DragDropDelegate: DropDelegate {
     @Binding var fromIndex: Int
     let toIndex: Int
-    let itemSize: CGSize
     @Binding var photoAssets: [PhotoAsset]
     @Binding var assets: [Asset]
     
@@ -157,6 +173,7 @@ struct DragDropDelegate: DropDelegate {
     }
 }
 
+@available(iOS 14.0, *)
 extension Color {
     init(hex: UInt, alpha: Double = 1.0) {
         self.init(
