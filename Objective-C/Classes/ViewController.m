@@ -178,6 +178,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
                 viewController = [[HomeViewController alloc] initWithStyle:UITableViewStyleGrouped];
             }
             [self.navigationController pushViewController:viewController animated:YES];
+            return;
         }
 #ifdef __IPHONE_14_0
         else if (indexPath.row == 1) {
