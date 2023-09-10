@@ -8,6 +8,7 @@
 
 import UIKit
 import HXPhotoPicker
+import SwiftUI
 
 extension PhotoPickerController {
     
@@ -50,6 +51,14 @@ class SwiftPhotoPicker: NSObject {
         }
         fromVC.present(controller, animated: true)
         return controller
+    }
+    
+    @available(iOS 14.0, *)
+    @objc
+    class func swiftUI() -> UIViewController {
+        let sView = ContentView(photoAssets: [], assets: [])
+        let hostingController = UIHostingController(rootView: sView)
+        return hostingController
     }
 }
 

@@ -546,11 +546,11 @@ class PickerResultViewController: UIViewController,
                 style = .automatic
             }
         }
-        var config = PhotoBrowser.Configuration()
+        var config = HXPhotoPicker.PhotoBrowser.Configuration()
         config.showDelete = true
         config.modalPresentationStyle = style
         let cell = collectionView.cellForItem(at: indexPath) as? ResultViewCell
-        PhotoBrowser.show(
+        HXPhotoPicker.PhotoBrowser.show(
             // 预览的资源数组
             selectedAssets,
             // 当前预览的位置
@@ -592,7 +592,7 @@ class PickerResultViewController: UIViewController,
         }
     }
     
-    func previewLongPressClick(photoAsset: PhotoAsset, photoBrowser: PhotoBrowser) {
+    func previewLongPressClick(photoAsset: PhotoAsset, photoBrowser: HXPhotoPicker.PhotoBrowser) {
         let alert = UIAlertController(title: "长按事件", message: nil, preferredStyle: .actionSheet)
         alert.addAction(
             .init(

@@ -203,7 +203,7 @@ extension PhotoListConfiguration {
         
         /// Allow camera preview
         /// 允许相机预览
-        public var allowPreview: Bool = true
+        public var allowPreview: Bool = false
         
         /// 背景颜色
         public var backgroundColor: UIColor? = "#f1f1f1".hx.color

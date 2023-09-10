@@ -123,7 +123,11 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (section == 0) {
-        return 2;
+        if (@available(iOS 14.0, *)) {
+            return 3;
+        }else {
+            return 2;
+        }
     }
     return self.list.count;
 }
@@ -144,7 +148,14 @@ static NSString *const kCellIdentifier = @"cell_identifier";
         if (indexPath.row == 0) {
             cell.textLabel.text = @"Swift示例";
             cell.detailTextLabel.text = @"查看Swift版本的示例 v4.0";
-        }else if (indexPath.row == 1) {
+        }
+#ifdef __IPHONE_14_0
+        else if (indexPath.row == 1) {
+            cell.textLabel.text = @"SwiftUI示例";
+            cell.detailTextLabel.text = @"查看示例";
+        }
+#endif
+        else  {
             cell.textLabel.text = @"OC调用Swift";
             cell.detailTextLabel.text = @"查看示例";
         }
@@ -158,6 +169,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     if (indexPath.section == 0) {
+        self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:nil action:nil];
         if (indexPath.row == 0) {
             UIViewController *viewController;
             if (@available(iOS 13.0, *)) {
@@ -165,13 +177,19 @@ static NSString *const kCellIdentifier = @"cell_identifier";
             } else {
                 viewController = [[HomeViewController alloc] initWithStyle:UITableViewStyleGrouped];
             }
-            self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:nil action:nil];
             [self.navigationController pushViewController:viewController animated:YES];
-        }else {
-            OCPickerExampleViewController *vc = [[OCPickerExampleViewController alloc] init];
-            self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:nil action:nil];
-            [self.navigationController pushViewController:vc animated:YES];
         }
+#ifdef __IPHONE_14_0
+        else if (indexPath.row == 1) {
+            if (@available(iOS 14.0, *)) {
+                UIViewController * vc = [SwiftPhotoPicker swiftUI];
+                [self.navigationController pushViewController:vc animated:YES];
+                return;
+            }
+        }
+#endif
+        OCPickerExampleViewController *vc = [[OCPickerExampleViewController alloc] init];
+        [self.navigationController pushViewController:vc animated:YES];
         return;
     }
     ListItem *item = self.list[indexPath.row];

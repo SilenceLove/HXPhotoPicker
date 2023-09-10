@@ -73,7 +73,7 @@ extension WeChatViewController: UITableViewDataSource, UITableViewDelegate {
                   let myIndexPath = self.tableView.indexPath(for: myCell)
             else { return }
             
-            PhotoBrowser.show(
+            HXPhotoPicker.PhotoBrowser.show(
                 pageIndex: myIndexPath.item,
                 transitionalImage: myCell.pictureView.image
             ) {

@@ -201,7 +201,7 @@ class TestEditorViewController: BaseViewController {
                                 self.navigationController?.pushViewController(vc, animated: true)
                                 return
                             }
-                            PhotoBrowser.show(
+                            HXPhotoPicker.PhotoBrowser.show(
                                 [.init(.init(videoURL: result.url))],
                                 transitionalImage: PhotoTools.getVideoThumbnailImage(videoURL: result.url, atTime: 0.1)
                             ) { _ in
@@ -240,7 +240,7 @@ class TestEditorViewController: BaseViewController {
                             self.navigationController?.pushViewController(vc, animated: true)
                             return
                         }
-                        PhotoBrowser.show(
+                        HXPhotoPicker.PhotoBrowser.show(
                             [.init(.init(result.url))],
                             transitionalImage: result.image
                         ) { _ in

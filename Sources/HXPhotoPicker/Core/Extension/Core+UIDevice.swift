@@ -73,7 +73,8 @@ extension UIDevice {
     class var bottomMargin: CGFloat {
         if UIDevice.isPad {
             #if HXPICKER_ENABLE_PICKER
-            if let controller = UIViewController.topViewController?.navigationController as? PhotoPickerController, controller.modalPresentationStyle == .pageSheet {
+            if let controller = UIViewController.topViewController?.navigationController as? PhotoPickerController,
+               controller.modalPresentationStyle == .pageSheet {
                 return 0
             }
             #endif

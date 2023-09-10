@@ -147,7 +147,7 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
             at: indexPath
         ) as? ResultViewCell
         
-        let browser = PhotoBrowser.show(
+        let browser = HXPhotoPicker.PhotoBrowser.show(
             previewAssets,
             pageIndex: indexPath.item,
             transitionalImage: cell?.photoView.image
@@ -170,7 +170,7 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
 //            self?.shwoMoreAction(browser)
 //        }
     }
-    weak var currentBrowser: PhotoBrowser?
+    weak var currentBrowser: HXPhotoPicker.PhotoBrowser?
     @objc
     func shwoMoreClick(button: UIButton) {
         guard let photoBrowser = currentBrowser,
@@ -275,7 +275,7 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
         ) as? ResultViewCell
         animator.addCompletion { [weak self] in
             guard let self = self else { return }
-            let browser = PhotoBrowser.show(
+            let browser = HXPhotoPicker.PhotoBrowser.show(
                 self.previewAssets,
                 pageIndex: indexPath.item,
                 transitionalImage: cell?.photoView.image

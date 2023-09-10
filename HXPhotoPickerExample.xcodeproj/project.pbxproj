@@ -418,6 +418,11 @@
 		D3CBE6492AAAD5340031802A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CBE6452AAAD5340031802A /* ContentView.swift */; };
 		D3CBE64B2AAAD5E80031802A /* PhotoPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CBE64A2AAAD5E80031802A /* PhotoPickerView.swift */; };
 		D3CBE6512AAB13450031802A /* PhotoBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CBE6502AAB13450031802A /* PhotoBrowser.swift */; };
+		D3EF65BD2AAD653100084E87 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CBE6452AAAD5340031802A /* ContentView.swift */; };
+		D3EF65BE2AAD653100084E87 /* PhotoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D35D3CAB2AAC0B8B004CBC30 /* PhotoView.swift */; };
+		D3EF65BF2AAD653100084E87 /* PhotoPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CBE64A2AAAD5E80031802A /* PhotoPickerView.swift */; };
+		D3EF65C02AAD653100084E87 /* PhotoBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CBE6502AAB13450031802A /* PhotoBrowser.swift */; };
+		D3EF65C12AAD653100084E87 /* ConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D35D3CB32AAC5B5B004CBC30 /* ConfigView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -2026,6 +2031,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D3EF65BD2AAD653100084E87 /* ContentView.swift in Sources */,
+				D3EF65BE2AAD653100084E87 /* PhotoView.swift in Sources */,
+				D3EF65BF2AAD653100084E87 /* PhotoPickerView.swift in Sources */,
+				D3EF65C02AAD653100084E87 /* PhotoBrowser.swift in Sources */,
+				D3EF65C12AAD653100084E87 /* ConfigView.swift in Sources */,
 				D36874982A39744300E70910 /* AvatarPickerConfigurationViewController.swift in Sources */,
 				D36874802A39744300E70910 /* UIDevice+Extension.swift in Sources */,
 				D36874AA2A39744300E70910 /* ImageFilter.swift in Sources */,

@@ -93,6 +93,7 @@ class HomeViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return Section.allCases[section].title
     }
+    
 }
 
 extension HomeViewController {

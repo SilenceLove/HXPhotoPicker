@@ -31,8 +31,8 @@ class WindowPickerViewController: UIViewController {
 //        manager.fetchLimit = 200
         return manager
     }()
-    lazy var pickerView: PhotoPickerView = {
-        let view = PhotoPickerView(
+    lazy var pickerView: HXPhotoPicker.PhotoPickerView = {
+        let view = HXPhotoPicker.PhotoPickerView(
             manager: manager,
             scrollDirection: .horizontal,
             delegate: self
@@ -353,7 +353,7 @@ class WindowPickerViewController: UIViewController {
 extension WindowPickerViewController: PhotoPickerViewDelegate {
     
     func photoPickerView(
-        _ photoPickerView: PhotoPickerView,
+        _ photoPickerView: HXPhotoPicker.PhotoPickerView,
         didFinishSelection result: PickerResult
     ) {
         if showPicker {
@@ -366,7 +366,7 @@ extension WindowPickerViewController: PhotoPickerViewDelegate {
     
     /// 在dismiss完成之后再跳转界面
     func photoPickerView(
-        _ photoPickerView: PhotoPickerView,
+        _ photoPickerView: HXPhotoPicker.PhotoPickerView,
         dismissCompletion result: PickerResult
     ) {
         let pickerResultVC = PickerResultViewController()
@@ -375,24 +375,24 @@ extension WindowPickerViewController: PhotoPickerViewDelegate {
         navigationController?.pushViewController(pickerResultVC, animated: true)
     }
     
-    func photoPickerView(_ photoPickerView: PhotoPickerView, didSelectAsset photoAsset: PhotoAsset, at index: Int) {
+    func photoPickerView(_ photoPickerView: HXPhotoPicker.PhotoPickerView, didSelectAsset photoAsset: PhotoAsset, at index: Int) {
         requestFileSize()
         finishButton.isEnabled = !pickerView.selectedAssets.isEmpty
     }
     
-    func photoPickerView(_ photoPickerView: PhotoPickerView, didDeselectAsset photoAsset: PhotoAsset, at index: Int) {
+    func photoPickerView(_ photoPickerView: HXPhotoPicker.PhotoPickerView, didDeselectAsset photoAsset: PhotoAsset, at index: Int) {
         requestFileSize()
         finishButton.isEnabled = !pickerView.selectedAssets.isEmpty
     }
     
-    func photoPickerView(_ photoPickerView: PhotoPickerView, previewDidOriginalButton isSelected: Bool) {
+    func photoPickerView(_ photoPickerView: HXPhotoPicker.PhotoPickerView, previewDidOriginalButton isSelected: Bool) {
         if isSelected != boxControl.isSelected {
             didOriginalButtonClick()
         }
     }
     
     func photoPickerView(
-        _ photoPickerView: PhotoPickerView,
+        _ photoPickerView: HXPhotoPicker.PhotoPickerView,
         gestureRecognizer: UIPanGestureRecognizer,
         beginDrag photoAsset: PhotoAsset,
         dragView: UIView
@@ -412,7 +412,7 @@ extension WindowPickerViewController: PhotoPickerViewDelegate {
     }
     
     func photoPickerView(
-        _ photoPickerView: PhotoPickerView,
+        _ photoPickerView: HXPhotoPicker.PhotoPickerView,
         gestureRecognizer: UIPanGestureRecognizer,
         changeDrag photoAsset: PhotoAsset
     ) {
@@ -435,7 +435,7 @@ extension WindowPickerViewController: PhotoPickerViewDelegate {
     }
     
     func photoPickerView(
-        _ photoPickerView: PhotoPickerView,
+        _ photoPickerView: HXPhotoPicker.PhotoPickerView,
         gestureRecognizer: UIPanGestureRecognizer,
         endDrag photoAsset: PhotoAsset
     ) -> Bool {
