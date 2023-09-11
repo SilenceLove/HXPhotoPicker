@@ -233,7 +233,7 @@ open class EditorViewController: BaseViewController {
         resetButton.alpha = 0
         resetButton.isHidden = true
         
-        leftRotateButton = UIButton.init(type: .system)
+        leftRotateButton = UIButton(type: .system)
         leftRotateButton.setImage("hx_editor_photo_rotate_left".image, for: .normal)
         leftRotateButton.size = leftRotateButton.currentImage?.size ?? .zero
         leftRotateButton.tintColor = .white
@@ -241,7 +241,7 @@ open class EditorViewController: BaseViewController {
         leftRotateButton.alpha = 0
         leftRotateButton.isHidden = true
         
-        rightRotateButton = UIButton.init(type: .system)
+        rightRotateButton = UIButton(type: .system)
         rightRotateButton.setImage("hx_editor_photo_rotate_right".image, for: .normal)
         rightRotateButton.size = rightRotateButton.currentImage?.size ?? .zero
         rightRotateButton.tintColor = .white
@@ -249,7 +249,7 @@ open class EditorViewController: BaseViewController {
         rightRotateButton.alpha = 0
         rightRotateButton.isHidden = true
         
-        mirrorHorizontallyButton = UIButton.init(type: .system)
+        mirrorHorizontallyButton = UIButton(type: .system)
         mirrorHorizontallyButton.setImage("hx_editor_photo_mirror_horizontally".image, for: .normal)
         mirrorHorizontallyButton.size = mirrorHorizontallyButton.currentImage?.size ?? .zero
         mirrorHorizontallyButton.tintColor = .white
@@ -257,7 +257,7 @@ open class EditorViewController: BaseViewController {
         mirrorHorizontallyButton.alpha = 0
         mirrorHorizontallyButton.isHidden = true
         
-        mirrorVerticallyButton = UIButton.init(type: .system)
+        mirrorVerticallyButton = UIButton(type: .system)
         mirrorVerticallyButton.setImage("hx_editor_photo_mirror_vertically".image, for: .normal)
         mirrorVerticallyButton.size = mirrorVerticallyButton.currentImage?.size ?? .zero
         mirrorVerticallyButton.tintColor = .white

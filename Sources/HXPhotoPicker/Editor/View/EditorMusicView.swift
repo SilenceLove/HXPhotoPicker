@@ -296,18 +296,8 @@ class EditorMusicView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         bgMaskLayer.frame = .init(x: 0, y: -25, width: width, height: height + 25)
-        let margin: CGFloat = 30
-        let searchTextWidth = searchButton.currentTitle?.width(
-            ofFont: UIFont.mediumPingFang(ofSize: 14),
-            maxHeight: 30
-        ) ?? 0
-        var searchButtonWidth = searchTextWidth + (searchButton.currentImage?.width ?? 0) + 20
-        if searchButtonWidth < 65 {
-            searchButtonWidth = 65
-        }
-        searchBgView.frame = CGRect(x: UIDevice.leftMargin + margin, y: 0, width: searchButtonWidth, height: 30)
-        searchButton.frame = searchBgView.bounds
         
+        let margin: CGFloat = 30
         let volumeTextWidth = volumeButton.currentTitle?.width(
             ofFont: UIFont.mediumPingFang(ofSize: 14),
             maxHeight: 30
@@ -316,16 +306,26 @@ class EditorMusicView: UIView {
         if volumeButtonWidth < 65 {
             volumeButtonWidth = 65
         }
-        volumeBgView.frame = CGRect(
-            x: width - UIDevice.rightMargin - margin - volumeButtonWidth,
-            y: 0,
-            width: volumeButtonWidth,
-            height: 30
-        )
+        volumeBgView.frame = .init(x: 0, y: 0, width: volumeButtonWidth, height: 30)
+        if config.showSearch {
+            let searchTextWidth = searchButton.currentTitle?.width(
+                ofFont: UIFont.mediumPingFang(ofSize: 14),
+                maxHeight: 30
+            ) ?? 0
+            var searchButtonWidth = searchTextWidth + (searchButton.currentImage?.width ?? 0) + 20
+            if searchButtonWidth < 65 {
+                searchButtonWidth = 65
+            }
+            searchBgView.frame = CGRect(x: UIDevice.leftMargin + margin, y: 0, width: searchButtonWidth, height: 30)
+            searchButton.frame = searchBgView.bounds
+            volumeBgView.x = width - UIDevice.rightMargin - margin - volumeButtonWidth
+        }else {
+            volumeBgView.x = UIDevice.leftMargin + margin
+        }
         volumeButton.frame = volumeBgView.bounds
         
         pageWidth = width - margin * 2 - UIDevice.leftMargin - UIDevice.rightMargin + flowLayout.minimumLineSpacing
-        collectionView.frame = CGRect(x: 0, y: searchBgView.frame.maxY + 15, width: width, height: 90)
+        collectionView.frame = CGRect(x: 0, y: volumeBgView.frame.maxY + 15, width: width, height: 90)
         flowLayout.sectionInset = UIEdgeInsets(
             top: 0,
             left: margin + UIDevice.leftMargin,

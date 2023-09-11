@@ -40,7 +40,6 @@ public class EditorVideoTool {
         self.filter = filter
         audioMix = AVMutableAudioMix()
         mixComposition = AVMutableComposition()
-        videoComposition = AVMutableVideoComposition(propertiesOf: mixComposition)
     }
     
     public init(
@@ -61,7 +60,6 @@ public class EditorVideoTool {
         self.filter = filter
         audioMix = AVMutableAudioMix()
         mixComposition = AVMutableComposition()
-        videoComposition = AVMutableVideoComposition(propertiesOf: mixComposition)
     }
     
     public func export(
@@ -280,6 +278,7 @@ fileprivate extension EditorVideoTool {
             of: videoTrack,
             at: .zero
         )
+        videoComposition = AVMutableVideoComposition(propertiesOf: mixComposition)
         adjustVideoOrientation()
         let renderSize = videoComposition.renderSize
         cropSize()
