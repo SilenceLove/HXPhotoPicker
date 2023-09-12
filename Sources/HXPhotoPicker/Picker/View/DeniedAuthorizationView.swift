@@ -78,15 +78,17 @@ class DeniedAuthorizationView: UIView {
     }
     
     private func configColor() {
-        let closeButtonImageName = config.closeButtonImageName
-        let closeButtonDarkImageName = config.closeButtonDarkImageName
         let isDark = PhotoManager.isDark
-        let closeBtnColor = isDark ? config.closeButtonDarkColor : config.closeButtonColor
-        if let closeBtnColor = closeBtnColor {
-            closeBtn.setImage(UIImage.image(for: isDark ? closeButtonDarkImageName : closeButtonImageName)?.withRenderingMode(.alwaysTemplate), for: .normal)
-            closeBtn.tintColor = closeBtnColor
-        }else {
-            closeBtn.setImage(UIImage.image(for: isDark ? closeButtonDarkImageName : closeButtonImageName), for: .normal)
+        if !config.isHiddenCloseButton {
+            let closeButtonImageName = config.closeButtonImageName
+            let closeButtonDarkImageName = config.closeButtonDarkImageName
+            let closeBtnColor = isDark ? config.closeButtonDarkColor : config.closeButtonColor
+            if let closeBtnColor = closeBtnColor {
+                closeBtn.setImage(UIImage.image(for: isDark ? closeButtonDarkImageName : closeButtonImageName)?.withRenderingMode(.alwaysTemplate), for: .normal)
+                closeBtn.tintColor = closeBtnColor
+            }else {
+                closeBtn.setImage(UIImage.image(for: isDark ? closeButtonDarkImageName : closeButtonImageName), for: .normal)
+            }
         }
         backgroundColor = isDark ? config.darkBackgroundColor : config.backgroundColor
         titleLb.textColor = isDark ? config.titleDarkColor : config.titleColor
@@ -120,7 +122,9 @@ class DeniedAuthorizationView: UIView {
                 barY = UIDevice.statusBarHeight
             }
         }
-        navigationBar.frame = CGRect(x: 0, y: barY, width: width, height: barHeight)
+        if !config.isHiddenCloseButton {
+            navigationBar.frame = CGRect(x: 0, y: barY, width: width, height: barHeight)
+        }
         
         var titleHeight: CGFloat = 0
         if let labelWidth = titleLb.text?.height(ofFont: titleLb.font, maxWidth: width - 20) {
