@@ -27,7 +27,6 @@ struct ContentView: View {
     }()
     @State private var isShowingSetting = false
     @State private var isShowingPicker = false
-    @State private var isShowingBrowser = false
     @State private var isShowingDelete = false
     @State private var pageIndex: Int = 0
     @State private var draggedItem: Int = 0
@@ -44,63 +43,69 @@ struct ContentView: View {
     }()
     
     var body: some View {
-        GeometryReader { geometry in
-            NavigationView {
+        NavigationView {
+            GeometryReader { geometry in
                 ScrollView {
                     LazyVGrid(columns: gridItemLayout, spacing: itemSpacing) {
                         let itemWidth = (geometry.size.width - (itemSpacing * 2 + itemSpacing * (itemCount - 1))) / itemCount
+                        let itemSize = CGSize(width: itemWidth, height: itemWidth)
                         ForEach(0..<assets.count, id:\.self) { index in
                             let asset = assets[index]
-                            Button {
-                                pageIndex = index
-                                isShowingBrowser.toggle()
-                            } label: {
-                                ZStack {
-                                    PhotoView(asset: asset)
-                                        .frame(width: itemWidth, height: itemWidth)
-                                    VStack {
-                                        HStack {
-                                            Spacer()
-                                            Button {
-                                                pageIndex = index
-                                                isShowingDelete.toggle()
-                                            } label: {
-                                                Image(systemName: "delete.backward.fill")
-                                                    .foregroundColor(.white)
-                                                    .shadow(radius: 1)
-                                                    .scaleEffect(1.2, anchor: .topTrailing)
-                                                    .padding([.top, .trailing], 1)
-                                            }
-                                            .alert(isPresented: $isShowingDelete) {
-                                                Alert(
-                                                    title: Text("是否删除"),
-                                                    primaryButton: .cancel(),
-                                                    secondaryButton: .default(Text("确定"), action: {
-                                                        withAnimation {
-                                                            photoAssets.remove(at: pageIndex)
-                                                            assets.remove(at: pageIndex)
-                                                        }
-                                                }))
-                                            }
-                                        }
-                                        Spacer()
+                            ZStack {
+                                PhotoView(asset: asset, imageSize: itemSize)
+                                    .onTapGesture {
+                                        PhotoBrowser(
+                                            pageIndex: index,
+                                            photoAssets: $photoAssets,
+                                            assets: $assets
+                                        ).show(
+                                            asset.result.image,
+                                            topMargin: geometry.frame(in: .global).minY,
+                                            itemSize: itemSize
+                                        )
                                     }
+                                VStack {
+                                    HStack {
+                                        Spacer()
+                                        Button {
+                                            pageIndex = index
+                                            isShowingDelete.toggle()
+                                        } label: {
+                                            Image(systemName: "delete.backward.fill")
+                                                .foregroundColor(.white)
+                                                .shadow(radius: 1)
+                                                .scaleEffect(1.2, anchor: .topTrailing)
+                                                .padding([.top, .trailing], 1)
+                                        }
+                                        .alert(isPresented: $isShowingDelete) {
+                                            Alert(
+                                                title: Text("是否删除"),
+                                                primaryButton: .cancel(),
+                                                secondaryButton: .default(Text("确定"), action: {
+                                                    withAnimation {
+                                                        photoAssets.remove(at: pageIndex)
+                                                        assets.remove(at: pageIndex)
+                                                    }
+                                            }))
+                                        }
+                                    }
+                                    Spacer()
                                 }
-                                .cornerRadius(5)
-                                .onDrag {
-                                    draggedItem = index
-                                    return NSItemProvider(object: "\(index)" as NSString)
-                                }
-                                .onDrop(
-                                    of: ["\(index)"],
-                                    delegate: DragDropDelegate(
-                                        fromIndex: $draggedItem,
-                                        toIndex: index,
-                                        photoAssets: $photoAssets,
-                                        assets: $assets
-                                    )
-                                )
                             }
+                            .cornerRadius(5)
+                            .onDrag {
+                                draggedItem = index
+                                return NSItemProvider(object: "\(index)" as NSString)
+                            }
+                            .onDrop(
+                                of: ["\(index)"],
+                                delegate: DragDropDelegate(
+                                    fromIndex: $draggedItem,
+                                    toIndex: index,
+                                    photoAssets: $photoAssets,
+                                    assets: $assets
+                                )
+                            )
                         }
                         .padding([.leading, .trailing], itemSpacing)
                         
@@ -129,10 +134,6 @@ struct ContentView: View {
                     }))
                     .padding([.leading, .trailing], itemSpacing)
                 }
-                .sheet(isPresented: $isShowingBrowser, content: {
-                    PhotoBrowser(pageIndex: pageIndex, photoAssets: $photoAssets, assets: $assets)
-                        .ignoresSafeArea()
-                })
                 .sheet(isPresented: $isShowingPicker, content: {
                     PhotoPickerView(config: config, photoAssets: $photoAssets, assets: $assets)
                         .ignoresSafeArea()
@@ -142,8 +143,8 @@ struct ContentView: View {
                         .ignoresSafeArea()
                 })
             }
-            .navigationViewStyle(StackNavigationViewStyle())
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 

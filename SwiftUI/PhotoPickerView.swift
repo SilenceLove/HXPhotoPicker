@@ -46,10 +46,12 @@ struct PhotoPickerView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ photoPickerController: PhotoPickerController, context: Context) {
         
+        
     }
  
 }
 
+@available(iOS 13.0, *)
 struct Asset {
     let result: AssetResult
     let videoDuration: String

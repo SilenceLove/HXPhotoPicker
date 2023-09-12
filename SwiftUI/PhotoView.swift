@@ -12,37 +12,36 @@ import HXPhotoPicker
 @available(iOS 14.0, *)
 struct PhotoView: View {
     
-    var asset: Asset
+    let asset: Asset
+    let imageSize: CGSize
     
     var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                Image(uiImage: asset.result.image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: proxy.size.width, height: proxy.size.height)
-                    .clipped()
+        ZStack {
+            Image(uiImage: asset.result.image)
+                .resizable()
+                .scaledToFill()
+                .frame(width: imageSize.width, height: imageSize.height)
+                .clipped()
+            
+            if asset.result.urlReuslt.mediaType == .video {
+                Image(systemName: "play.fill")
+                    .foregroundColor(.white)
+                    .shadow(radius: 1)
+                    .scaleEffect(2)
                 
-                if asset.result.urlReuslt.mediaType == .video {
-                    Image(systemName: "play.fill")
-                        .foregroundColor(.white)
-                        .shadow(radius: 1)
-                        .scaleEffect(2)
-                    
-                    VStack {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Image(systemName: "video")
+                            .foregroundColor(.white)
+                            .shadow(radius: 1)
+                            .padding([.leading, .bottom], 5)
                         Spacer()
-                        HStack {
-                            Image(systemName: "video")
-                                .foregroundColor(.white)
-                                .shadow(radius: 1)
-                                .padding([.leading, .bottom], 5)
-                            Spacer()
-                            Text(asset.videoDuration)
-                                .font(.callout)
-                                .foregroundColor(.white)
-                                .shadow(radius: 1)
-                                .padding([.trailing, .bottom], 5)
-                        }
+                        Text(asset.videoDuration)
+                            .font(.callout)
+                            .foregroundColor(.white)
+                            .shadow(radius: 1)
+                            .padding([.trailing, .bottom], 5)
                     }
                 }
             }
