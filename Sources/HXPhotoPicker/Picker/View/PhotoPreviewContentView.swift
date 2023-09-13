@@ -552,7 +552,8 @@ extension PhotoPreviewContentView {
                         if dataCount > 3000000 {
                             if let imageData = PhotoTools.imageCompress(
                                 dataResult.imageData,
-                                compressionQuality: dataCount.compressionQuality
+                                compressionQuality: dataCount.compressionQuality,
+                                isHEIC: asset.photoFormat == "heic"
                             ) {
                                 image = .init(data: imageData)
                             }

@@ -60,7 +60,8 @@ extension PhotoAsset {
                     }
                     if let data = PhotoTools.imageCompress(
                         imageData,
-                        compressionQuality: compressionQuality
+                        compressionQuality: compressionQuality,
+                        isHEIC: localImageURL.pathExtension.uppercased() == "HEIC"
                     ),
                        let url = PhotoTools.write(
                         toFile: fileURL,

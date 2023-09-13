@@ -11,6 +11,7 @@ import Photos
 #if canImport(Kingfisher)
 import Kingfisher
 #endif
+import ImageIO
 
 public struct PhotoTools {
     
@@ -375,9 +376,10 @@ public struct PhotoTools {
     
     static func imageCompress(
         _ data: Data,
-        compressionQuality: CGFloat
+        compressionQuality: CGFloat,
+        isHEIC: Bool = false
     ) -> Data? {
-        guard var resultImage = UIImage(data: data) else {
+        guard var resultImage = UIImage(data: data)?.normalizedImage() else {
             return nil
         }
         let compression = max(0, min(1, compressionQuality))
@@ -388,6 +390,16 @@ public struct PhotoTools {
         while data.count > maxLength && data.count != lastDataLength {
             let dataCount = data.count
             lastDataLength = dataCount
+            if isHEIC {
+                if #available(iOS 11.0, *) {
+                    let ratio = max(CGFloat(maxLength) / CGFloat(dataCount), compression)
+                    if let heicData = resultImage.heicData(compressionQuality: ratio) {
+                        data = heicData
+                        continue
+                    }
+                }
+                return data
+            }
             let maxRatio = min(5000 / resultImage.width, 5000 / resultImage.height)
             let ratio = min(max(CGFloat(maxLength) / CGFloat(dataCount), compression), maxRatio)
             let size = CGSize(

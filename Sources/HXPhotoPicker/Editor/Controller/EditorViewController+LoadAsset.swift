@@ -724,6 +724,7 @@ extension EditorViewController {
         guard let photoAsset = selectedAsset.type.photoAsset else {
             return
         }
+        let isHEIC = photoAsset.photoFormat == "heic"
         photoAsset.requestImageData(
             filterEditor: true
         ) { [weak self] _, result in
@@ -736,7 +737,8 @@ extension EditorViewController {
                     if dataCount > 3000000 {
                         if let imageData = PhotoTools.imageCompress(
                             dataResult.imageData,
-                            compressionQuality: dataCount.compressionQuality
+                            compressionQuality: dataCount.compressionQuality,
+                            isHEIC: isHEIC
                         ) {
                             image = .init(data: imageData)
                         }

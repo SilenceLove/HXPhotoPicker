@@ -129,7 +129,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 }
                 #endif
                 if let phAsset = photoAsset.phAsset, reqeustAsset {
-                    requestAssetImage(for: phAsset, isGIF: photoAsset.isGifAsset)
+                    requestAssetImage(for: phAsset, isGIF: photoAsset.isGifAsset, isHEIC: photoAsset.photoFormat == "heic")
                 }else if pushImageView.image == nil || photoAsset.isLocalAsset {
                     pushImageView.image = photoAsset.originalImage
                 }
@@ -466,7 +466,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 }
                 #endif
                 if let phAsset = photoAsset.phAsset, reqeustAsset {
-                    requestAssetImage(for: phAsset, isGIF: photoAsset.isGifAsset)
+                    requestAssetImage(for: phAsset, isGIF: photoAsset.isGifAsset, isHEIC: photoAsset.photoFormat == "heic")
                 }else if pushImageView.image == nil || photoAsset.isLocalAsset {
                     if let image = photoAsset.originalImage {
                         pushImageView.image = image
@@ -668,7 +668,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         }
     }
     
-    func requestAssetImage(for asset: PHAsset, isGIF: Bool = false) {
+    func requestAssetImage(for asset: PHAsset, isGIF: Bool = false, isHEIC: Bool = false) {
         let options = PHImageRequestOptions()
         options.resizeMode = .fast
         options.deliveryMode = .fastFormat
@@ -687,7 +687,8 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                         dataCount > 1000000 && !isGIF {
                         if let imageData = PhotoTools.imageCompress(
                             dataResult.imageData,
-                            compressionQuality: dataCount.transitionCompressionQuality
+                            compressionQuality: dataCount.transitionCompressionQuality,
+                            isHEIC: isHEIC
                         ) {
                             image = UIImage(data: imageData)?.normalizedImage()
                         }
