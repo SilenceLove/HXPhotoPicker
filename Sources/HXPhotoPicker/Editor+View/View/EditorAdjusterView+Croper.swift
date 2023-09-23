@@ -30,8 +30,13 @@ extension EditorAdjusterView {
     
     var isCropedImage: Bool {
         let cropRatio = getCropOption()
+        var canvasImage: UIImage?
+        if #available(iOS 13.0, *) {
+            canvasImage = contentView.isCanvasEmpty ? nil : contentView.canvasImage
+        }
         let cropFactor = CropFactor(
             drawLayer: contentView.drawView.count > 0 ? contentView.drawView.layer : nil,
+            canvasImage: canvasImage,
             mosaicLayer: contentView.mosaicView.count > 0 ? contentView.mosaicView.layer : nil,
             stickersLayer: contentView.stickerView.count > 0 ? contentView.stickerView.layer : nil,
             isCropImage: isCropImage,
@@ -72,8 +77,13 @@ extension EditorAdjusterView {
         let image = self.image
         let cropRect = getCropRect()
         let cropRatio = getCropOption()
+        var canvasImage: UIImage?
+        if #available(iOS 13.0, *) {
+            canvasImage = contentView.isCanvasEmpty ? nil : contentView.canvasImage
+        }
         let cropFactor = CropFactor(
             drawLayer: contentView.drawView.count > 0 ? contentView.drawView.layer : nil,
+            canvasImage: canvasImage,
             mosaicLayer: contentView.mosaicView.count > 0 ? contentView.mosaicView.layer : nil,
             stickersLayer: contentView.stickerView.count > 0 ? contentView.stickerView.layer : nil,
             isCropImage: isCropImage,
@@ -162,6 +172,11 @@ extension EditorAdjusterView {
         }
         var cropRect = rect
         let overlayImage = getOverlayImage(inputImage.size, cropFactor: cropFactor)
+        var exportScale = exportScale
+        let maxSize = max(inputImage.size.width, inputImage.size.height)
+        if maxSize * exportScale > 5000 {
+            exportScale = 5000 / maxSize
+        }
         if exportScale != inputImage.scale && overlayImage != nil {
             let scale = exportScale / inputImage.scale
             cropRect.origin.x *= scale
@@ -384,6 +399,7 @@ extension EditorAdjusterView {
     fileprivate func getImageData(_ image: UIImage, completion: @escaping (Data?) -> Void) {
         PhotoTools.getImageData(
             image,
+            isHEIC: isHEICImage,
             queueLabel: "HXPhotoPicker.editor.cropImageQueue"
         ) {
             guard let imageData = $0 else {
@@ -403,6 +419,9 @@ extension EditorAdjusterView {
             images.append(drawImage)
             layer.contents = nil
         }
+        if let image = cropFactor.canvasImage {
+            images.append(image)
+        }
         if let layer = cropFactor.mosaicLayer,
            let mosaicImage = layer.convertedToImage() {
             images.append(mosaicImage)
@@ -421,6 +440,7 @@ extension EditorAdjusterView {
     
     struct CropFactor {
         let drawLayer: CALayer?
+        let canvasImage: UIImage?
         let mosaicLayer: CALayer?
         let stickersLayer: CALayer?
         let isCropImage: Bool
@@ -439,6 +459,7 @@ extension EditorAdjusterView {
         
         init(
             drawLayer: CALayer?,
+            canvasImage: UIImage?,
             mosaicLayer: CALayer?,
             stickersLayer: CALayer?,
             isCropImage: Bool,
@@ -452,6 +473,7 @@ extension EditorAdjusterView {
             waterCenterRatio: CGPoint
         ) {
             self.drawLayer = drawLayer
+            self.canvasImage = canvasImage
             self.mosaicLayer = mosaicLayer
             self.stickersLayer = stickersLayer
             self.isCropImage = isCropImage
@@ -465,6 +487,7 @@ extension EditorAdjusterView {
             self.waterCenterRatio = waterCenterRatio
             
             isEmpty = drawLayer == nil
+            && canvasImage == nil
             && mosaicLayer == nil
             && stickersLayer == nil
             && !isCropImage
@@ -485,6 +508,7 @@ extension EditorAdjusterView {
                                 maskImage == nil &&
                                 mirrorScale.x * mirrorScale.y > 0 &&
                                 drawLayer == nil &&
+                                canvasImage == nil &&
                                 mosaicLayer == nil &&
                                 stickersLayer == nil)
             }
@@ -519,6 +543,7 @@ extension EditorAdjusterView {
         static var empty: CropFactor {
             .init(
                 drawLayer: nil,
+                canvasImage: nil,
                 mosaicLayer: nil,
                 stickersLayer: nil,
                 isCropImage: false,

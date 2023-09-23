@@ -20,7 +20,7 @@ class PhotoPickerFilterViewController: UITableViewController {
     var didSelectedHandler: ((PhotoPickerFilterViewController) -> Void)?
     
     private var bottomView: UIView!
-    private var numberView: PhotoPickerBottomNumberView!
+    private var numberView: BottomNumberView!
     private var filterLb: UILabel!
     
     override func viewDidLoad() {
@@ -90,7 +90,7 @@ class PhotoPickerFilterViewController: UITableViewController {
     }
     
     private func initViews() {
-        numberView = PhotoPickerBottomNumberView()
+        numberView = BottomNumberView()
         numberView.photoCount = photoCount
         numberView.videoCount = videoCount
         numberView.config = .init()

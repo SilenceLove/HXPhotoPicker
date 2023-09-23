@@ -95,7 +95,7 @@ final class ProgressHUD: UIView {
             let indicatorView: ProgressIndefiniteView = .init(
                 frame: CGRect(
                     origin: .zero,
-                    size: CGSize(width: 40, height: 40)
+                    size: CGSize(width: 32, height: 32)
                 )
             )
             indicatorView.startAnimating()

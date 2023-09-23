@@ -10,6 +10,35 @@ import UIKit
 // MARK: AlbumViewDelegate
 extension PhotoPickerViewController: AlbumViewDelegate {
     
+    func initAlbumView() {
+        guard let picker = pickerController else {
+            return
+        }
+        titleLabel = UILabel()
+        titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
+        titleLabel.textAlignment = .center
+        
+        titleView = AlbumTitleView.init(config: config.titleView)
+        titleView.addTarget(self, action: #selector(didTitleViewClick(control:)), for: .touchUpInside)
+        
+        albumBackgroudView = UIView()
+        albumBackgroudView.isHidden = true
+        albumBackgroudView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        albumBackgroudView.addGestureRecognizer(
+            UITapGestureRecognizer(
+                target: self,
+                action: #selector(didAlbumBackgroudViewClick)
+            )
+        )
+        
+        albumView = AlbumView(config: pickerController!.config.albumList)
+        albumView.delegate = self
+        if picker.config.albumShowMode == .popup {
+            view.addSubview(albumBackgroudView)
+            view.addSubview(albumView)
+        }
+    }
+    
     @objc func didTitleViewClick(control: AlbumTitleView) {
         control.isSelected = !control.isSelected
         if control.isSelected {

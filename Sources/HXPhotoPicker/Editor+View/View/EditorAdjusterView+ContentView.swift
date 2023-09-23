@@ -7,8 +7,15 @@
 
 import UIKit
 import AVFoundation
+import PencilKit
 
 extension EditorAdjusterView {
+    
+    var drawType: EditorDarwType {
+        get { contentView.drawType }
+        set { contentView.drawType = newValue }
+    }
+    
     var isDrawEnabled: Bool {
         get { contentView.isDrawEnabled }
         set {
@@ -131,6 +138,7 @@ extension EditorAdjusterView {
 }
 
 extension EditorAdjusterView: EditorContentViewDelegate {
+    
     func contentView(rotateVideo contentView: EditorContentView) {
         resetVideoRotate(true)
     }
@@ -208,8 +216,8 @@ extension EditorAdjusterView: EditorContentViewDelegate {
         delegate?.editorAdjusterView(self, videoDidChangedTimeAt: time)
     }
     
-    func contentView(drawViewBeganDraw contentView: EditorContentView) {
-        delegate?.editorAdjusterView(contentViewBeganDraw: self)
+    func contentView(drawViewBeginDraw contentView: EditorContentView) {
+        delegate?.editorAdjusterView(contentViewBeginDraw: self)
     }
     func contentView(drawViewEndDraw contentView: EditorContentView) {
         delegate?.editorAdjusterView(contentViewEndDraw: self)
@@ -286,4 +294,66 @@ extension EditorAdjusterView: EditorContentViewDelegate {
         }
         return sourceImage
     }
+    
+    @available(iOS 13.0, *)
+    func contentView(_ contentView: EditorContentView, toolPickerFramesObscuredDidChange toolPicker: PKToolPicker) {
+        delegate?.editorAdjusterView(self, toolPickerFramesObscuredDidChange: toolPicker)
+    }
 }
+
+@available(iOS 13.0, *)
+extension EditorAdjusterView {
+    
+    var canvasImage: UIImage {
+        contentView.canvasImage
+    }
+    
+    var isCanvasEmpty: Bool {
+        contentView.isCanvasEmpty
+    }
+    
+    var isCanvasCanUndo: Bool {
+        contentView.isCanvasCanUndo
+    }
+    
+    var isCanvasCanRedo: Bool {
+        contentView.isCanvasCanRedo
+    }
+    
+    func canvasRedo() {
+        contentView.canvasRedo()
+    }
+    
+    func canvasUndo() {
+        contentView.canvasUndo()
+    }
+    
+    func canvasUndoCurrentAll() {
+        contentView.canvasUndoCurrentAll()
+    }
+    
+    func canvasUndoAll() {
+        contentView.canvasUndoAll()
+    }
+    
+    func startCanvasDrawing() -> PKToolPicker? {
+        contentView.startCanvasDrawing()
+    }
+    
+    func finishCanvasDrawing() {
+        contentView.finishCanvasDrawing()
+    }
+     
+    func cancelCanvasDrawing() {
+        contentView.cancelCanvasDrawing()
+    }
+    
+    func enterCanvasDrawing() -> PKToolPicker? {
+        contentView.enterCanvasDrawing()
+    }
+    
+    func quitCanvasDrawing() {
+        contentView.quitCanvasDrawing()
+    }
+}
+

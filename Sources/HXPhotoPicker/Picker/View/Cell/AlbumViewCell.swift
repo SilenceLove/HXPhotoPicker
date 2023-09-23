@@ -11,17 +11,10 @@ import Photos
 
 open class AlbumViewCell: UITableViewCell {
     
-    /// 封面图片
     public var albumCoverView: UIImageView!
-    /// 相册名称
     public var albumNameLb: UILabel!
-    /// 相册里的照片数量
     public var photoCountLb: UILabel!
-    /// 底部线
     public var bottomLineView: UIView!
-    /// 选中时勾勾的颜色
-    public var tickView: AlbumTickView!
-    /// 选中时的背景视图
     public var selectedBgView: UIView!
     
     /// 配置
@@ -53,6 +46,8 @@ open class AlbumViewCell: UITableViewCell {
     /// 请求id
     public var requestID: PHImageRequestID?
     
+    var tickView: TickView!
+    
     open func initView() {
         selectedBgView = UIView()
         
@@ -71,7 +66,7 @@ open class AlbumViewCell: UITableViewCell {
         bottomLineView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.15)
         contentView.addSubview(bottomLineView)
         
-        tickView = AlbumTickView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        tickView = TickView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
         contentView.addSubview(tickView)
     }
     

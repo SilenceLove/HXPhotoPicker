@@ -78,16 +78,10 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             containerView.addSubview(fromVC.view)
             #if HXPICKER_ENABLE_PICKER
             if let pickerVC = toVC as? PhotoPickerViewController {
-                if pickerVC.isMultipleSelect {
-                    pickerVC.bottomView.alpha = 0
-                }else {
-                    if pickerVC.allowShowPrompt {
-                        pickerVC.bottomPromptView.alpha = 0
-                    }
-                }
+                pickerVC.photoToolbar.alpha = 0
                 toVC.view.insertSubview(contentView, at: 1)
             }else if let previewVC = toVC as? PhotoPreviewViewController {
-                previewVC.bottomView.alpha = 0
+                previewVC.photoToolbar.alpha = 0
                 toVC.view.insertSubview(contentView, at: 1)
             }else {
                 toVC.view.addSubview(contentView)
@@ -227,29 +221,17 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             if self.mode == .push {
                 #if HXPICKER_ENABLE_PICKER
                 if let pickerVC = fromVC as? PhotoPickerViewController {
-                    if pickerVC.isMultipleSelect {
-                        pickerVC.bottomView.alpha = 0
-                    }else {
-                        if pickerVC.allowShowPrompt {
-                            pickerVC.bottomPromptView.alpha = 0
-                        }
-                    }
+                    pickerVC.photoToolbar.alpha = 0
                 }else if let previewVC = fromVC as? PhotoPreviewViewController {
-                    previewVC.bottomView.alpha = 0
+                    previewVC.photoToolbar.alpha = 0
                 }
                 #endif
             }else if self.mode == .pop {
                 #if HXPICKER_ENABLE_PICKER
                 if let pickerVC = toVC as? PhotoPickerViewController {
-                    if pickerVC.isMultipleSelect {
-                        pickerVC.bottomView.alpha = 1
-                    }else {
-                        if pickerVC.allowShowPrompt {
-                            pickerVC.bottomPromptView.alpha = 1
-                        }
-                    }
+                    pickerVC.photoToolbar.alpha = 1
                 }else if let previewVC = toVC as? PhotoPreviewViewController {
-                    previewVC.bottomView.alpha = 1
+                    previewVC.photoToolbar.alpha = 1
                 }
                 #endif
             }
@@ -300,15 +282,9 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 }
                 #if HXPICKER_ENABLE_PICKER
                 if let pickerVC = fromVC as? PhotoPickerViewController {
-                    if pickerVC.isMultipleSelect {
-                        pickerVC.bottomView.alpha = 1
-                    }else {
-                        if pickerVC.allowShowPrompt {
-                            pickerVC.bottomPromptView.alpha = 1
-                        }
-                    }
+                    pickerVC.photoToolbar.alpha = 1
                 }else if let previewVC = fromVC as? PhotoPreviewViewController {
-                    previewVC.bottomView.alpha = 1
+                    previewVC.photoToolbar.alpha = 1
                 }
                 #endif
                 if let editorVC = editorVC as? EditorViewController {

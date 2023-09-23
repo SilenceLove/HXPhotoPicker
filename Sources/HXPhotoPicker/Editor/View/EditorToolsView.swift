@@ -227,6 +227,9 @@ extension EditorToolsView: EditorToolViewCellDelegate {
         case .cropSize, .text, .music, .chartlet:
             break
         default:
+            if #available(iOS 13.0, *), option.type == .graffiti {
+                break
+            }
             if let selectedIndexPath = selectedIndexPath,
                selectedIndexPath.item == indexPath.item {
                 deselected()

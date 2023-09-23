@@ -21,7 +21,26 @@ public class PhotoPreviewViewController: BaseViewController {
     public var isExternalPreview: Bool = false
     public var collectionView: UICollectionView!
     
+    private var collectionViewLayout: UICollectionViewFlowLayout!
+    var numberOfPages: PhotoBrowser.NumberOfPagesHandler?
+    var cellForIndex: PhotoBrowser.CellReloadContext?
+    var assetForIndex: PhotoBrowser.RequiredAsset?
+    
+    var photoToolbar: PhotoToolBarProtocol!
+    var selectBoxControl: SelectBoxView!
+    var interactiveTransition: PickerInteractiveTransition?
+    weak var beforeNavDelegate: UINavigationControllerDelegate?
+    
     var isPreviewSelect: Bool = false
+    var isExternalPickerPreview: Bool = false
+    var orientationDidChange: Bool = false
+    var statusBarShouldBeHidden: Bool = false
+    var videoLoadSingleCell = false
+    var viewDidAppear: Bool = false
+    var firstLayoutSubviews: Bool = true
+    var isMultipleSelect: Bool = false
+    var allowLoadPhotoLibrary: Bool = true
+    var requestPreviewTimer: Timer?
     
     var assetCount: Int {
         if previewAssets.isEmpty {
@@ -32,30 +51,13 @@ public class PhotoPreviewViewController: BaseViewController {
         }
         return previewAssets.count
     }
+    
     func photoAsset(for index: Int) -> PhotoAsset? {
         if !previewAssets.isEmpty && index > 0 || index < previewAssets.count {
             return previewAssets[index]
         }
         return assetForIndex?(index)
     }
-    var numberOfPages: PhotoBrowser.NumberOfPagesHandler?
-    var cellForIndex: PhotoBrowser.CellReloadContext?
-    var assetForIndex: PhotoBrowser.RequiredAsset?
-    
-    var isExternalPickerPreview: Bool = false
-    var orientationDidChange: Bool = false
-    var statusBarShouldBeHidden: Bool = false
-    var videoLoadSingleCell = false
-    var viewDidAppear: Bool = false
-    var firstLayoutSubviews: Bool = true
-    var interactiveTransition: PickerInteractiveTransition?
-    weak var beforeNavDelegate: UINavigationControllerDelegate?
-    var selectBoxControl: SelectBoxView!
-    private var collectionViewLayout: UICollectionViewFlowLayout!
-    var isMultipleSelect: Bool = false
-    var allowLoadPhotoLibrary: Bool = true
-    var bottomView: PhotoPickerBottomView!
-    var requestPreviewTimer: Timer?
     
     init(config: PreviewViewConfiguration) {
         self.config = config
@@ -86,14 +88,8 @@ public class PhotoPreviewViewController: BaseViewController {
             guard let photoAsset = photoAsset(for: currentPreviewIndex) else {
                 return
             }
-            if config.bottomView.isShowSelectedView &&
-                (isMultipleSelect || isExternalPreview) && config.isShowBottomView {
-                DispatchQueue.main.async {
-                    self.bottomView.selectedView.scrollTo(
-                        photoAsset: photoAsset,
-                        isAnimated: false
-                    )
-                }
+            DispatchQueue.main.async {
+                self.photoToolbar.selectedViewScrollTo(photoAsset, animated: false)
             }
             firstLayoutSubviews = false
         }
@@ -125,11 +121,7 @@ public class PhotoPreviewViewController: BaseViewController {
         }
     }
     public override func deviceOrientationDidChanged(notify: Notification) {
-        if config.bottomView.isShowSelectedView &&
-            (isMultipleSelect || isExternalPreview) &&
-            config.isShowBottomView {
-            bottomView.selectedView.reloadSectionInset()
-        }
+        photoToolbar.deviceOrientationDidChanged()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -203,6 +195,9 @@ public class PhotoPreviewViewController: BaseViewController {
 extension PhotoPreviewViewController {
      
     private func initView() {
+        guard let pickerController = pickerController else {
+            return
+        }
         collectionViewLayout = UICollectionViewFlowLayout()
         collectionViewLayout.scrollDirection = .horizontal
         collectionViewLayout.minimumLineSpacing = 0
@@ -242,25 +237,76 @@ extension PhotoPreviewViewController {
         }
         view.addSubview(collectionView)
         
-        bottomView = PhotoPickerBottomView(
-            config: config.bottomView,
-            allowLoadPhotoLibrary: allowLoadPhotoLibrary,
-            isMultipleSelect: isMultipleSelect,
-            sourceType: isExternalPreview ? .browser : .preview
-        )
-        bottomView.hx_delegate = self
-        if config.bottomView.isShowSelectedView && (isMultipleSelect || isExternalPreview) {
-            bottomView.selectedView.reloadData(
-                photoAssets: pickerController!.selectedAssetArray
+        photoToolbar = config.photoToolbar.init()
+        photoToolbar.initViews(pickerController.config, type: isExternalPreview ? .browser : .preview)
+        photoToolbar.selectedAssetHandler = { [weak self] in
+            guard let self = self else { return }
+            if self.previewAssets.contains($0) {
+                self.scrollToPhotoAsset($0)
+            }else {
+                self.photoToolbar.selectedViewScrollTo(nil, animated: true)
+            }
+        }
+        photoToolbar.moveAssetHandler = { [weak self] in
+            guard let self = self else { return }
+            self.delegate?.previewViewController(self, moveItem: $0, toIndex: $1)
+            guard let pickerController = self.pickerController else { return }
+            pickerController.movePhotoAsset(fromIndex: $0, toIndex: $1)
+            if self.isPreviewSelect {
+                let fromAsset = previewAssets[$0]
+                self.previewAssets.remove(at: $0)
+                self.previewAssets.insert(fromAsset, at: $1)
+                self.getCell(for: self.currentPreviewIndex)?.cancelRequest()
+                self.collectionView.reloadData()
+                self.setupRequestPreviewTimer()
+            }
+            self.photoToolbar.updateSelectedAssets(pickerController.selectedAssetArray)
+            if let asset = self.photoAsset(for: self.currentPreviewIndex) {
+                self.updateSelectBox(asset.isSelected, photoAsset: asset)
+                DispatchQueue.main.async {
+                    self.photoToolbar.selectedViewScrollTo(asset, animated: true)
+                }
+            }
+            self.delegate?.previewViewController(movePhotoAsset: self)
+        }
+        #if HXPICKER_ENABLE_EDITOR
+        photoToolbar.editHandler = { [weak self] in
+            guard let self = self, let photoAsset = self.photoAsset(for: self.currentPreviewIndex) else {
+                return
+            }
+            self.openEditor(photoAsset)
+        }
+        #endif
+        photoToolbar.originalHandler = { [weak self] in
+            guard let self = self else { return }
+            self.pickerController?.isOriginal = $0
+            self.pickerController?.originalButtonCallback()
+            if $0 {
+                self.requestSelectedAssetFileSize()
+            }else {
+                self.pickerController?.cancelRequestAssetFileSize(isPreview: true)
+            }
+            self.delegate?.previewViewController(
+                self,
+                didOriginalButton: $0
             )
+            self.pickerController?.originalButtonCallback()
         }
-        if !isExternalPreview {
-            bottomView.boxControl.isSelected = pickerController!.isOriginal
-            bottomView.requestAssetBytes()
+        photoToolbar.finishHandler = { [weak self] in
+            self?.didFinishClick()
         }
+        
         if config.isShowBottomView {
-            view.addSubview(bottomView)
-            bottomView.updateFinishButtonTitle()
+            view.addSubview(photoToolbar)
+            if !isExternalPreview {
+                photoToolbar.updateOriginalState(pickerController.isOriginal)
+                photoToolbar.requestOriginalAssetBtyes()
+                let selectedAssetArray = pickerController.selectedAssetArray
+                photoToolbar.updateSelectedAssets(selectedAssetArray)
+                photoToolbar.selectedAssetDidChanged(selectedAssetArray)
+            }else {
+                photoToolbar.updateSelectedAssets(previewAssets)
+            }
         }
         selectBoxControl = SelectBoxView(
             config.selectBox,
@@ -272,14 +318,11 @@ extension PhotoPreviewViewController {
         selectBoxControl.backgroundColor = .clear
         selectBoxControl.addTarget(self, action: #selector(didSelectBoxControlClick), for: UIControl.Event.touchUpInside)
         
-        if let pickerController = pickerController, (isExternalPreview || isExternalPickerPreview) {
-//            statusBarShouldBeHidden = pickerController.config.prefersStatusBarHidden
-            if pickerController.modalPresentationStyle != .custom {
-                configColor()
-            }
+        if (isExternalPreview || isExternalPickerPreview) && pickerController.modalPresentationStyle != .custom {
+            configColor()
         }
         if isMultipleSelect || isExternalPreview {
-            videoLoadSingleCell = pickerController!.singleVideo
+            videoLoadSingleCell = pickerController.singleVideo
             if !isExternalPreview {
                 if isExternalPickerPreview {
                     let cancelItem = UIBarButtonItem(
@@ -319,8 +362,16 @@ extension PhotoPreviewViewController {
             }
             if assetCount > 0 && currentPreviewIndex == 0 {
                 if let photoAsset = photoAsset(for: 0) {
-                    if config.bottomView.isShowSelectedView && config.isShowBottomView {
-                        bottomView.selectedView.scrollTo(photoAsset: photoAsset)
+                    if config.isShowBottomView {
+                        photoToolbar.selectedViewScrollTo(photoAsset, animated: true)
+                        
+                        #if HXPICKER_ENABLE_EDITOR
+                        if photoAsset.mediaType == .photo {
+                            photoToolbar.updateEditState(pickerController.config.editorOptions.isPhoto)
+                        }else if photoAsset.mediaType == .video {
+                            photoToolbar.updateEditState(pickerController.config.editorOptions.contains(.video))
+                        }
+                        #endif
                     }
                     if !isExternalPreview {
                         if photoAsset.mediaType == .video && videoLoadSingleCell {
@@ -330,17 +381,7 @@ extension PhotoPreviewViewController {
                             selectBoxControl.isSelected = photoAsset.isSelected
                         }
                     }
-                    #if HXPICKER_ENABLE_EDITOR
-                    if let pickerController = pickerController, !config.bottomView.isHiddenEditButton,
-                       config.isShowBottomView {
-                        if photoAsset.mediaType == .photo {
-                            bottomView.editBtn.isEnabled = pickerController.config.editorOptions.isPhoto
-                        }else if photoAsset.mediaType == .video {
-                            bottomView.editBtn.isEnabled = pickerController.config.editorOptions.contains(.video)
-                        }
-                    }
-                    #endif
-                    pickerController?.previewUpdateCurrentlyDisplayedAsset(
+                    pickerController.previewUpdateCurrentlyDisplayedAsset(
                         photoAsset: photoAsset,
                         index: currentPreviewIndex
                     )
@@ -359,16 +400,15 @@ extension PhotoPreviewViewController {
             if assetCount > 0 && currentPreviewIndex == 0 {
                 if let photoAsset = photoAsset(for: 0) {
                     #if HXPICKER_ENABLE_EDITOR
-                    if let pickerController = pickerController, !config.bottomView.isHiddenEditButton,
-                       config.isShowBottomView {
+                    if config.isShowBottomView {
                         if photoAsset.mediaType == .photo {
-                            bottomView.editBtn.isEnabled = pickerController.config.editorOptions.isPhoto
+                            photoToolbar.updateEditState(pickerController.config.editorOptions.isPhoto)
                         }else if photoAsset.mediaType == .video {
-                            bottomView.editBtn.isEnabled = pickerController.config.editorOptions.contains(.video)
+                            photoToolbar.updateEditState(pickerController.config.editorOptions.contains(.video))
                         }
                     }
                     #endif
-                    pickerController?.previewUpdateCurrentlyDisplayedAsset(
+                    pickerController.previewUpdateCurrentlyDisplayedAsset(
                         photoAsset: photoAsset,
                         index: currentPreviewIndex
                     )
@@ -380,36 +420,8 @@ extension PhotoPreviewViewController {
         if !config.isShowBottomView {
             return
         }
-        var bottomHeight: CGFloat = 0
-        if isExternalPreview {
-            if let isEmpty = pickerController?.selectedAssetArray.isEmpty {
-                if isEmpty {
-                    bottomHeight = 0
-                }else {
-                    bottomHeight = UIDevice.bottomMargin + 70
-                }
-            }else {
-                bottomHeight = 0
-            }
-            #if HXPICKER_ENABLE_EDITOR
-            if !config.bottomView.isShowSelectedView && config.bottomView.isHiddenEditButton {
-                if config.bottomView.isHiddenEditButton {
-                    bottomHeight = 0
-                }else {
-                    bottomHeight = UIDevice.bottomMargin + 50
-                }
-            }
-            #endif
-        }else {
-            if let picker = pickerController {
-                bottomHeight = picker.selectedAssetArray.isEmpty ?
-                    50 + UIDevice.bottomMargin : 50 + UIDevice.bottomMargin + 70
-            }
-            if !config.bottomView.isShowSelectedView || !isMultipleSelect {
-                bottomHeight = 50 + UIDevice.bottomMargin
-            }
-        }
-        bottomView.frame = CGRect(
+        let bottomHeight = photoToolbar.viewHeight()
+        photoToolbar.frame = CGRect(
             x: 0,
             y: view.height - bottomHeight,
             width: view.width,
@@ -428,8 +440,8 @@ extension PhotoPreviewViewController {
         let indexPath = IndexPath(item: item, section: 0)
         collectionView.reloadItems(at: [indexPath])
         if config.isShowBottomView {
-            bottomView.selectedView.reloadData(photoAsset: photoAsset)
-            bottomView.requestAssetBytes()
+            photoToolbar.reloadSelectedAsset(photoAsset)
+            photoToolbar.requestOriginalAssetBtyes()
         }
     }
     func getCell(for item: Int) -> PhotoPreviewViewCell? {
@@ -575,7 +587,7 @@ extension PhotoPreviewViewController {
         }
         collectionView.deleteItems(at: indexPaths)
         if config.isShowBottomView {
-            bottomView.selectedView.removePhotoAssets(photoAssets)
+            photoToolbar.removeSelectedAssets(photoAssets)
         }
         if let pickerController = pickerController {
             pickerController.pickerDelegate?.pickerController(
@@ -601,15 +613,11 @@ extension PhotoPreviewViewController {
     }
     func addedCameraPhotoAsset(_ photoAsset: PhotoAsset) {
         guard let picker = pickerController else { return }
-        if config.bottomView.isShowSelectedView &&
-            (isMultipleSelect || isExternalPreview) &&
-            config.isShowBottomView {
-            bottomView.selectedView.reloadData(
-                photoAssets: picker.selectedAssetArray
-            )
+        if config.isShowBottomView {
+            photoToolbar.updateSelectedAssets(picker.selectedAssetArray)
             configBottomViewFrame()
-            bottomView.layoutSubviews()
-            bottomView.updateFinishButtonTitle()
+            photoToolbar.layoutSubviews()
+            photoToolbar.selectedAssetDidChanged(picker.selectedAssetArray)
         }
         getCell(for: currentPreviewIndex)?.cancelRequest()
         previewAssets.insert(

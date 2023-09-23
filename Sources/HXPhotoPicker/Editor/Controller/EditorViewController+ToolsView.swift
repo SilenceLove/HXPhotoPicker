@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import PencilKit
 
 extension EditorViewController: EditorToolsViewDelegate {
     func toolsView(_ toolsView: EditorToolsView, didSelectItemAt model: EditorConfiguration.ToolsView.Options) {
@@ -14,6 +15,21 @@ extension EditorViewController: EditorToolsViewDelegate {
         }
         editorView.deselectedSticker()
         switch model.type {
+        case .graffiti:
+            if #available(iOS 13.0, *), editorView.drawType == .canvas {
+                hideLastToolView()
+                hideToolsView(isCanvasGraffiti: true)
+                selectedTool = model
+                showCanvasViews()
+                editorView.isStickerEnabled = false
+                startCanvasDrawing()
+                updateBottomMaskLayer()
+                lastSelectedTool = model
+                return
+            }else {
+                hideChangeButton()
+                selectedTool = model
+            }
         case .text:
             presentText()
             return
@@ -97,9 +113,14 @@ extension EditorViewController: EditorToolsViewDelegate {
         if !toolsView.isHidden && toolsView.alpha == 1 {
             return
         }
+        if let tool = selectedTool, tool.type == .graffiti, editorView.drawType == .canvas {
+            return
+        }
         toolsView.isHidden = false
         cancelButton.isHidden = false
         finishButton.isHidden = false
+        topMaskView.isHidden = false
+        bottomMaskView.isHidden = false
         UIView.animate(withDuration: 0.2) {
             self.toolsView.alpha = 1
             self.cancelButton.alpha = 1
@@ -127,7 +148,7 @@ extension EditorViewController: EditorToolsViewDelegate {
         }
     }
     
-    func hideToolsView() {
+    func hideToolsView(isCanvasGraffiti: Bool = false) {
         if toolsView.isHidden || toolsView.alpha == 0 {
             return
         }
@@ -151,13 +172,19 @@ extension EditorViewController: EditorToolsViewDelegate {
             self.toolsView.alpha = 0
             self.cancelButton.alpha = 0
             self.finishButton.alpha = 0
-            self.topMaskView.alpha = 0
+            if !isCanvasGraffiti {
+                self.topMaskView.alpha = 0
+            }
             self.bottomMaskView.alpha = 0
         } completion: {
             if $0 {
-                self.toolsView.isHidden = false
-                self.cancelButton.isHidden = false
-                self.finishButton.isHidden = false
+                self.toolsView.isHidden = true
+                self.cancelButton.isHidden = true
+                self.finishButton.isHidden = true
+                if !isCanvasGraffiti {
+                    self.topMaskView.isHidden = true
+                }
+                self.bottomMaskView.isHidden = true
             }
         }
     }
@@ -236,7 +263,163 @@ extension EditorViewController: EditorToolsViewDelegate {
         }
     }
     
+    @available(iOS 13.0, *)
+    func startCanvasDrawing(_ isRotate: Bool = false) {
+        let toolPicker: PKToolPicker
+        if isRotate {
+            guard let _toolPicker = editorView.enterCanvasDrawing() else {
+                return
+            }
+            toolPicker = _toolPicker
+        }else {
+            guard let _toolPicker = editorView.startCanvasDrawing() else {
+                return
+            }
+            toolPicker = _toolPicker
+        }
+        editorView.setZoomScale(1, animated: true)
+        editorView.setContentOffset(.zero, animated: true)
+        
+        let topHeight = topMaskView.height
+        let rect = toolPicker.frameObscured(in: view)
+        let maxHeight: CGFloat
+        if rect.isNull {
+            let bottomMargin: CGFloat
+            if isFullScreen {
+                bottomMargin = UIDevice.bottomMargin + 10
+            }else {
+                bottomMargin = 20
+            }
+            maxHeight = view.height - topHeight - bottomMargin
+        }else {
+            maxHeight = rect.minY - topMaskView.height
+        }
+        let contentHeight = editorView.contentSize.height
+        backgroundView.bouncesZoom = true
+        editorView.isCanZoomScale = false
+        backgroundView.maximumZoomScale = 20
+        if contentHeight > maxHeight {
+            let zoomScale = maxHeight / contentHeight
+            let minWidth = view.width * zoomScale
+            
+            backgroundInsetRect = .init(x: (view.width - minWidth) / 2, y: topHeight, width: minWidth, height: maxHeight)
+            let editorHeight = editorView.height * zoomScale
+            if editorHeight < backgroundInsetRect.height, contentHeight > editorHeight {
+                backgroundView.contentSize = editorView.contentSize
+                editorView.height = contentHeight
+            }
+            backgroundView.minimumZoomScale = zoomScale
+            UIView.animate {
+                self.backgroundView.zoomScale = zoomScale
+            }
+        }else {
+            backgroundView.minimumZoomScale = 1
+            let padding = (maxHeight - contentHeight) / 2
+            let top = topHeight + padding
+            backgroundInsetRect = .init(x: 0, y: top, width: view.width, height: contentHeight)
+            let offsetY = (view.height - contentHeight) / 2 - top
+            UIView.animate {
+                self.backgroundView.contentOffset = .init(x: 0, y: offsetY)
+            }
+        }
+    }
+    
+    func showCanvasViews() {
+        if editorView.drawType != .canvas {
+            return
+        }
+        if !drawCancelButton.isHidden && drawCancelButton.alpha == 1 {
+            return
+        }
+        editorView.hideStickersView()
+        drawCancelButton.isHidden = false
+        drawFinishButton.isHidden = false
+        drawUndoBtn.isHidden = false
+        drawRedoBtn.isHidden = false
+        drawUndoAllBtn.isHidden = false
+        topMaskView.isHidden = false
+        UIView.animate {
+            self.drawCancelButton.alpha = 1
+            self.drawFinishButton.alpha = 1
+            self.drawUndoBtn.alpha = 1
+            self.drawRedoBtn.alpha = 1
+            self.drawUndoAllBtn.alpha = 1
+            self.topMaskView.alpha = 1
+        }
+    }
+    
+    func hideCanvasViews(_ isRotate: Bool = false, animated: Bool = true) {
+        if editorView.drawType != .canvas {
+            return
+        }
+        if drawCancelButton.isHidden || drawCancelButton.alpha == 0 {
+            return
+        }
+        if !isRotate {
+            editorView.showStickersView()
+            editorView.isCanZoomScale = true
+        }
+        backgroundView.contentSize = view.size
+        if animated {
+            UIView.animate  {
+                self.backgroundView.zoomScale = 1
+                self.scrollViewDidZoom(self.backgroundView)
+                self.backgroundView.contentOffset = .zero
+                self.editorView.zoomScale = 1
+                self.drawCancelButton.alpha = 0
+                self.drawFinishButton.alpha = 0
+                self.drawUndoBtn.alpha = 0
+                self.drawRedoBtn.alpha = 0
+                self.drawUndoAllBtn.alpha = 0
+                if self.config.buttonType == .bottom && UIDevice.isPortrait {
+                    self.topMaskView.alpha = 0
+                }
+            } completion: {
+                if $0 {
+                    self.backgroundView.maximumZoomScale = 1
+                    self.backgroundView.minimumZoomScale = 1
+                    self.backgroundView.bouncesZoom = false
+                    self.drawCancelButton.isHidden = true
+                    self.drawFinishButton.isHidden = true
+                    self.drawUndoBtn.isHidden = true
+                    self.drawRedoBtn.isHidden = true
+                    self.drawUndoAllBtn.isHidden = true
+                    if self.config.buttonType == .bottom && UIDevice.isPortrait {
+                        self.topMaskView.isHidden = true
+                    }
+                }
+            }
+        }else {
+            self.backgroundView.zoomScale = 1
+            self.scrollViewDidZoom(self.backgroundView)
+            self.backgroundView.contentOffset = .zero
+            self.backgroundView.maximumZoomScale = 1
+            self.backgroundView.minimumZoomScale = 1
+            self.backgroundView.bouncesZoom = false
+            self.editorView.zoomScale = 1
+            self.drawCancelButton.alpha = 0
+            self.drawFinishButton.alpha = 0
+            self.drawUndoBtn.alpha = 0
+            self.drawRedoBtn.alpha = 0
+            self.drawUndoAllBtn.alpha = 0
+            if self.config.buttonType == .bottom && UIDevice.isPortrait {
+                self.topMaskView.alpha = 0
+            }
+            self.drawCancelButton.isHidden = true
+            self.drawFinishButton.isHidden = true
+            self.drawUndoBtn.isHidden = true
+            self.drawRedoBtn.isHidden = true
+            self.drawUndoAllBtn.isHidden = true
+            if self.config.buttonType == .bottom && UIDevice.isPortrait {
+                self.topMaskView.isHidden = true
+            }
+        }
+    }
+    
     func showBrushColorView() {
+        if editorView.drawType == .canvas {
+            return
+        }
         if !brushColorView.isHidden && brushColorView.alpha == 1 {
             return
         }

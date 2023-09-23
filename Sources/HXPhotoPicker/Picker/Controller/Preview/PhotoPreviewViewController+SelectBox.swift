@@ -33,10 +33,8 @@ extension PhotoPreviewViewController {
             func addAsset() {
                 if picker.addedPhotoAsset(photoAsset: photoAsset) {
                     canUpdate = true
-                    if config.bottomView.isShowSelectedView && isMultipleSelect && config.isShowBottomView {
-                        bottomView.selectedView.insertPhotoAsset(
-                            photoAsset: photoAsset
-                        )
+                    if config.isShowBottomView {
+                        photoToolbar.insertSelectedAsset(photoAsset)
                     }
                     if beforeIsEmpty {
                         bottomNeedAnimated = true
@@ -66,12 +64,8 @@ extension PhotoPreviewViewController {
             if !beforeIsEmpty && picker.selectedAssetArray.isEmpty {
                 bottomNeedAnimated = true
             }
-            if config.bottomView.isShowSelectedView &&
-                isMultipleSelect &&
-                config.isShowBottomView {
-                bottomView.selectedView.removePhotoAsset(
-                    photoAsset: photoAsset
-                )
+            if config.isShowBottomView {
+                photoToolbar.removeSelectedAssets([photoAsset])
             }
             #if HXPICKER_ENABLE_EDITOR
             if photoAsset.videoEditedResult != nil, picker.config.isDeselectVideoRemoveEdited {
@@ -101,13 +95,11 @@ extension PhotoPreviewViewController {
         pickerUpdateCell: Bool,
         bottomNeedAnimated: Bool
     ) {
-        if config.bottomView.isShowSelectedView &&
-            isMultipleSelect &&
-            config.isShowBottomView {
+        if config.isShowBottomView {
             if bottomNeedAnimated {
                 UIView.animate(withDuration: 0.25) {
                     self.configBottomViewFrame()
-                    self.bottomView.layoutSubviews()
+                    self.photoToolbar.layoutSubviews()
                 }
             }else {
                 configBottomViewFrame()
@@ -125,7 +117,8 @@ extension PhotoPreviewViewController {
             updateCell: pickerUpdateCell
         )
         if config.isShowBottomView {
-            bottomView.updateFinishButtonTitle()
+            photoToolbar.requestOriginalAssetBtyes()
+            photoToolbar.selectedAssetDidChanged(pickerController!.selectedAssetArray)
         }
         selectBoxControl.layer.removeAnimation(
             forKey: "SelectControlAnimation"

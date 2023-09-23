@@ -119,20 +119,15 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
                     selectBoxControl.isSelected = photoAsset.isSelected
                 }
             }
-            if !firstLayoutSubviews &&
-                config.bottomView.isShowSelectedView &&
-                (isMultipleSelect || isExternalPreview) &&
-                config.isShowBottomView {
-                bottomView.selectedView.scrollTo(photoAsset: photoAsset)
+            if !firstLayoutSubviews && config.isShowBottomView {
+                photoToolbar.selectedViewScrollTo(photoAsset, animated: true)
             }
             #if HXPICKER_ENABLE_EDITOR
-            if let pickerController = pickerController,
-               !config.bottomView.isHiddenEditButton,
-               config.isShowBottomView {
+            if let pickerController = pickerController, config.isShowBottomView {
                 if photoAsset.mediaType == .photo {
-                    bottomView.editBtn.isEnabled = pickerController.config.editorOptions.isPhoto
+                    photoToolbar.updateEditState(pickerController.config.editorOptions.isPhoto)
                 }else if photoAsset.mediaType == .video {
-                    bottomView.editBtn.isEnabled = pickerController.config.editorOptions.contains(.video)
+                    photoToolbar.updateEditState(pickerController.config.editorOptions.contains(.video))
                 }
             }
             #endif
@@ -183,7 +178,7 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
         let videoCell = currentCell as? PreviewVideoViewCell
         if !statusBarShouldBeHidden {
             if config.isShowBottomView {
-                bottomView.isHidden = false
+                photoToolbar.isHidden = false
             }
             if currentCell?.photoAsset.mediaType == .video && config.singleClickCellAutoPlayVideo {
                 currentCell?.scrollContentView.videoView.stopPlay()
@@ -203,9 +198,9 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
         }
         if config.isShowBottomView {
             UIView.animate(withDuration: 0.25) {
-                self.bottomView.alpha = self.statusBarShouldBeHidden ? 0 : 1
+                self.photoToolbar.alpha = self.statusBarShouldBeHidden ? 0 : 1
             } completion: { _ in
-                self.bottomView.isHidden = self.statusBarShouldBeHidden
+                self.photoToolbar.isHidden = self.statusBarShouldBeHidden
             }
         }
         if let pickerController = pickerController {
@@ -238,7 +233,7 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
         }
         delegate?.previewViewController(self, networkImagedownloadSuccess: photoCell.photoAsset)
         if config.isShowBottomView {
-            bottomView.requestAssetBytes()
+            photoToolbar.requestOriginalAssetBtyes()
         }
         #endif
     }

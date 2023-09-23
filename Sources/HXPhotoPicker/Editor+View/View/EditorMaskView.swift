@@ -12,6 +12,8 @@ class EditorMaskView: UIView {
     private var customMaskView: UIView!
     private var maskImageView: UIImageView!
     private var customMaskEffectView: UIVisualEffectView!
+    private var customMaskEffect: UIVisualEffect?
+    private var visualEffect: UIVisualEffect?
     private var visualEffectView: UIVisualEffectView!
     private var blackMaskView: UIView!
     private var maskLayer: CAShapeLayer!
@@ -51,23 +53,25 @@ class EditorMaskView: UIView {
                 switch maskType {
                 case .customColor(let color):
                     backgroundColor = color
-                    visualEffectView.alpha = 0
+                    visualEffectView.effect = nil
+                    visualEffect = nil
                 case .blurEffect(let style):
                     backgroundColor = .clear
                     let visualEffect = UIBlurEffect(style: style)
                     visualEffectView.effect = visualEffect
-                    visualEffectView.alpha = 1
+                    self.visualEffect = visualEffect
                 }
             case .customMask:
                 switch maskType {
                 case .customColor(let color):
                     customMaskView.backgroundColor = color
-                    customMaskEffectView.alpha = 0
+                    customMaskEffectView.effect = nil
+                    customMaskEffect = nil
                 case .blurEffect(let style):
                     customMaskView.backgroundColor = .clear
                     let visualEffect = UIBlurEffect(style: style)
                     customMaskEffectView.effect = visualEffect
-                    customMaskEffectView.alpha = 1
+                    self.customMaskEffect = visualEffect
                 }
             default:
                 break
@@ -148,9 +152,9 @@ class EditorMaskView: UIView {
             switch maskType {
             case .customColor(let color):
                 backgroundColor = color
-                visualEffectView.alpha = 0
+                visualEffectView.effect = nil
             case .blurEffect:
-                visualEffectView.alpha = 1
+                break
             }
             addSubview(visualEffectView)
             maskLayer = CAShapeLayer()
@@ -246,8 +250,8 @@ class EditorMaskView: UIView {
             style = .light
         }
         let visualEffect = UIBlurEffect(style: style)
-        
         visualEffectView = UIVisualEffectView(effect: visualEffect)
+        self.visualEffect = visualEffect
         visualEffectView.isUserInteractionEnabled = false
     }
     
@@ -272,9 +276,9 @@ class EditorMaskView: UIView {
         switch maskType {
         case .customColor(let color):
             customMaskView.backgroundColor = color
-            customMaskEffectView.alpha = 0
+            customMaskEffectView.effect = nil
         case .blurEffect:
-            customMaskEffectView.alpha = 1
+            self.customMaskEffect = visualEffect
         }
         customMaskView.addSubview(customMaskEffectView)
         customMaskView.mask = maskImageView
@@ -516,6 +520,9 @@ extension EditorMaskView {
     }
     
     func showMaskView(_ animated: Bool = true) {
+        if !maskViewIsHidden {
+            return
+        }
         maskViewIsHidden = false
         func animationHnadler() {
             switch type {
@@ -525,7 +532,7 @@ extension EditorMaskView {
                     backgroundColor = color
                 default:
                     backgroundColor = .clear
-                    visualEffectView.alpha = 1
+                    visualEffectView.effect = visualEffect
                 }
             case .customMask:
                 switch maskType {
@@ -533,14 +540,14 @@ extension EditorMaskView {
                     customMaskView.backgroundColor = color
                 default:
                     customMaskView.backgroundColor = .clear
-                    customMaskEffectView.alpha = 1
+                    customMaskEffectView.effect = customMaskEffect
                 }
             default:
                 break
             }
         }
         if animated {
-            UIView.animate(withDuration: 0.2) {
+            UIView.animate {
                 animationHnadler()
             }
         }else {
@@ -549,6 +556,9 @@ extension EditorMaskView {
     }
     
     func hideMaskView(_ animated: Bool = true, isAll: Bool = false) {
+        if maskViewIsHidden {
+            return
+        }
         maskViewIsHidden = true
         func animationHnadler() {
             switch type {
@@ -562,7 +572,7 @@ extension EditorMaskView {
                 case .customColor:
                     break
                 default:
-                    visualEffectView.alpha = 0
+                    visualEffectView.effect = nil
                 }
             case .customMask:
                 customMaskView.backgroundColor = .black.withAlphaComponent(0.3)
@@ -570,7 +580,7 @@ extension EditorMaskView {
                 case .customColor:
                     break
                 default:
-                    customMaskEffectView.alpha = 0
+                    customMaskEffectView.effect = nil
                 }
             default:
                 if isAll {
@@ -581,7 +591,7 @@ extension EditorMaskView {
             }
         }
         if animated {
-            UIView.animate(withDuration: 0.2) {
+            UIView.animate {
                 animationHnadler()
             }
         }else {
@@ -596,7 +606,7 @@ extension EditorMaskView {
                 customMaskView.backgroundColor = color
             default:
                 customMaskView.backgroundColor = .clear
-                customMaskEffectView.alpha = 1
+                customMaskEffectView.effect = customMaskEffect
             }
         }
         if animated {
@@ -615,7 +625,7 @@ extension EditorMaskView {
             case .customColor:
                 break
             default:
-                customMaskEffectView.alpha = 0
+                customMaskEffectView.effect = nil
             }
         }
         if animated {

@@ -7,6 +7,7 @@
 
 import UIKit
 import AVFoundation
+import PencilKit
 
 protocol EditorAdjusterViewDelegate: AnyObject {
     /// 编辑状态发生改变
@@ -22,7 +23,7 @@ protocol EditorAdjusterViewDelegate: AnyObject {
     /// 已经结束编辑状态
     func editorAdjusterView(editDidDisappear adjusterView: EditorAdjusterView)
     /// 画笔/涂鸦/贴图发生改变
-    func editorAdjusterView(contentViewBeganDraw adjusterView: EditorAdjusterView)
+    func editorAdjusterView(contentViewBeginDraw adjusterView: EditorAdjusterView)
     /// 画笔/涂鸦/贴图结束改变
     func editorAdjusterView(contentViewEndDraw adjusterView: EditorAdjusterView)
     /// 点击的贴纸
@@ -52,4 +53,8 @@ protocol EditorAdjusterViewDelegate: AnyObject {
         videoApplyFilter sourceImage: CIImage,
         at time: CMTime
     ) -> CIImage
+    
+    
+    @available(iOS 13.0, *)
+    func editorAdjusterView(_ editorAdjusterView: EditorAdjusterView, toolPickerFramesObscuredDidChange toolPicker: PKToolPicker)
 }

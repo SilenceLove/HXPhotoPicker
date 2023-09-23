@@ -31,19 +31,14 @@ public class PhotoPickerViewController: BaseViewController {
     var titleView: AlbumTitleView!
     var albumBackgroudView: UIView!
     var albumView: AlbumView!
-    var bottomView: PhotoPickerBottomView!
-    var bottomPromptView: PhotoPickerBottomPromptView!
+    
+    var photoToolbar: PhotoToolBarProtocol!
     
     var showLoading: Bool = false
-    /// 允许加载系统相册库
     var allowLoadPhotoLibrary: Bool = true
-    /// 是否为多选模式
     var isMultipleSelect: Bool = false
-    /// 视频 Cell 为单选类型
     var videoLoadSingleCell = false
-    /// 照片数量
     var photoCount: Int = 0
-    /// 视频数量
     var videoCount: Int = 0
     
     var allPhotoCount: Int = 0
@@ -234,17 +229,14 @@ public class PhotoPickerViewController: BaseViewController {
                 titleLabel.size = CGSize(width: titleWidth, height: 30)
             }
         }
-        var promptHeight: CGFloat = 0
+        var promptHeight: CGFloat = UIDevice.bottomMargin
         if isMultipleSelect {
-            if allowShowPrompt {
-                promptHeight = 70
-            }
-            let bottomHeight: CGFloat = 50 + UIDevice.bottomMargin + promptHeight
-            bottomView.frame = CGRect(x: 0, y: view.height - bottomHeight, width: view.width, height: bottomHeight)
+            let bottomHeight: CGFloat = photoToolbar.viewHeight()
+            photoToolbar.frame = .init(x: 0, y: view.height - bottomHeight, width: view.width, height: bottomHeight)
             collectionView.contentInset = UIEdgeInsets(
                 top: collectionTop,
                 left: 0,
-                bottom: bottomView.height + 0.5,
+                bottom: photoToolbar.height + 0.5,
                 right: 0
             )
             collectionView.scrollIndicatorInsets = UIEdgeInsets(
@@ -255,14 +247,13 @@ public class PhotoPickerViewController: BaseViewController {
             )
         }else {
             if allowShowPrompt {
-                promptHeight = 55
-                let bottomHeight = UIDevice.bottomMargin + promptHeight
-                bottomPromptView.frame = .init(x: 0, y: view.height - bottomHeight, width: view.width, height: bottomHeight)
+                promptHeight = photoToolbar.viewHeight()
+                photoToolbar.frame = .init(x: 0, y: view.height - promptHeight, width: view.width, height: promptHeight)
             }
             collectionView.contentInset = UIEdgeInsets(
                 top: collectionTop,
                 left: 0,
-                bottom: UIDevice.bottomMargin + promptHeight,
+                bottom: promptHeight,
                 right: 0
             )
         }
@@ -337,7 +328,6 @@ public class PhotoPickerViewController: BaseViewController {
 extension PhotoPickerViewController {
     
     private func initView() {
-        guard let picker = pickerController else { return }
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
         collectionViewLayout = UICollectionViewFlowLayout()
@@ -398,9 +388,9 @@ extension PhotoPickerViewController {
         }
         if config.isShowAssetNumber {
             collectionView.register(
-                PhotoPickerBottomNumberView.self,
+                BottomNumberView.self,
                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                withReuseIdentifier: NSStringFromClass(PhotoPickerBottomNumberView.classForCoder())
+                withReuseIdentifier: NSStringFromClass(BottomNumberView.classForCoder())
             )
         }
         if #available(iOS 11.0, *) {
@@ -409,55 +399,17 @@ extension PhotoPickerViewController {
             automaticallyAdjustsScrollViewInsets = false
         }
         
+        view.addSubview(collectionView)
+        
         emptyView = EmptyView(frame: CGRect(x: 0, y: 0, width: view.width, height: 0))
         emptyView.config = config.emptyView
         emptyView.layoutSubviews()
         
-        titleLabel = UILabel()
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        titleLabel.textAlignment = .center
-        
-        titleView = AlbumTitleView.init(config: config.titleView)
-        titleView.addTarget(self, action: #selector(didTitleViewClick(control:)), for: .touchUpInside)
-        
-        albumBackgroudView = UIView()
-        albumBackgroudView.isHidden = true
-        albumBackgroudView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
-        albumBackgroudView.addGestureRecognizer(
-            UITapGestureRecognizer(
-                target: self,
-                action: #selector(didAlbumBackgroudViewClick)
-            )
-        )
-        
-        albumView = AlbumView(config: pickerController!.config.albumList)
-        albumView.delegate = self
-        
-        bottomView = PhotoPickerBottomView(
-            config: config.bottomView,
-            allowLoadPhotoLibrary: allowLoadPhotoLibrary
-        )
-        bottomView.hx_delegate = self
-        bottomView.boxControl.isSelected = pickerController!.isOriginal
-        
-        bottomPromptView = PhotoPickerBottomPromptView(config: config.bottomView)
-        
-        view.addSubview(collectionView)
-        if isMultipleSelect {
-            view.addSubview(bottomView)
-            bottomView.updateFinishButtonTitle()
-        }else {
-            if allowShowPrompt {
-                view.addSubview(bottomPromptView)
-            }
-        }
-        if picker.config.albumShowMode == .popup {
-            view.addSubview(albumBackgroudView)
-            view.addSubview(albumView)
-        }
-        
+        initToolbar()
+        initAlbumView()
         updateTitle()
     }
+    
     func initNavItems(_ addFilter: Bool = true) {
         guard let picker = pickerController else { return }
         
@@ -753,17 +705,6 @@ extension PhotoPickerViewController {
         if picker.config.albumShowMode == .popup {
             albumView.tableView.reloadData()
             albumView.updatePrompt()
-        }
-    }
-    func updateBottomPromptView() {
-        if isMultipleSelect {
-            bottomView.updatePromptView()
-        }else {
-            if allowShowPrompt {
-                if bottomPromptView.superview != view {
-                    view.addSubview(bottomPromptView)
-                }
-            }
         }
     }
     func updateCellSelectedTitle() {

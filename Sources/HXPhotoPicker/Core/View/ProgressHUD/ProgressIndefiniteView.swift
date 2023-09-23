@@ -28,7 +28,7 @@ class ProgressIndefiniteView: UIView {
         }
     }
     
-    init(frame: CGRect, lineWidth: CGFloat = 3.5) {
+    init(frame: CGRect, lineWidth: CGFloat = 5) {
         self.lineWidth = lineWidth
         super.init(frame: frame)
         initViews()

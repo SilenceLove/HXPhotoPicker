@@ -10,10 +10,10 @@ import UIKit
 extension EditorView: UIScrollViewDelegate {
     
     public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        allowZoom ? adjusterView : nil
+        (allowZoom && isCanZoomScale) ? adjusterView : nil
     }
     public func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        if !allowZoom {
+        if !allowZoom || !isCanZoomScale {
             return
         }
         let viewWidth = scrollView.width - scrollView.contentInset.left - scrollView.contentInset.right

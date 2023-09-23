@@ -363,7 +363,8 @@ extension PhotoPickerViewController {
                 }
             }
         }
-        bottomView.updateFinishButtonTitle()
+        photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+        requestSelectedAssetFileSize()
         if pickerController.selectArrayIsFull() && showHUD {
             swipeSelectPanGR?.isEnabled = false
             ProgressHUD.showWarning(

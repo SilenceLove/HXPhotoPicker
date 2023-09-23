@@ -247,7 +247,9 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
                 self.albumView.tableView.reloadData()
             }
             self.addedPhotoAsset(for: photoAsset)
-            self.bottomView.updateFinishButtonTitle()
+            self.photoToolbar.selectedAssetDidChanged(picker.selectedAssetArray)
+            self.requestSelectedAssetFileSize()
+//            self.bottomView.updateFinishButtonTitle()
             self.setupEmptyView()
             if picker.config.selectMode == .single && self.config.finishSelectionAfterTakingPhoto {
                 self.quickSelect(photoAsset, isCapture: isCapture)

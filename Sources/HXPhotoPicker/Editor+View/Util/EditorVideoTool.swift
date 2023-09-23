@@ -487,21 +487,16 @@ fileprivate extension EditorVideoTool {
             ) else {
                 continue
             }
-            let audioTimeRange: CMTimeRange = .init(
-                start: .zero,
-                duration: .init(
-                    seconds: audioTrack.timeRange.duration.seconds,
-                    preferredTimescale: audioTrack.timeRange.duration.timescale
-                )
-            )
+            let audioTimeRange: CMTimeRange
+            if duration.seconds < audioTrack.timeRange.duration.seconds {
+                audioTimeRange = .init(start: .zero, duration: duration)
+            }else {
+                audioTimeRange = audioTrack.timeRange
+            }
             try track.insertTimeRange(audioTimeRange, of: audioTrack, at: .zero)
             track.preferredTransform = audioTrack.preferredTransform
             let audioInputParam = AVMutableAudioMixInputParameters(track: track)
-            audioInputParam.setVolumeRamp(
-                fromStartVolume: factor.volume,
-                toEndVolume: factor.volume,
-                timeRange: audioTimeRange
-            )
+            audioInputParam.setVolume(factor.volume, at: .zero)
             audioInputParam.trackID = track.trackID
             audioInputParams.append(audioInputParam)
         }
@@ -589,11 +584,7 @@ fileprivate extension EditorVideoTool {
                 }
             }
             let audioInputParam = AVMutableAudioMixInputParameters(track: audioTrack)
-            audioInputParam.setVolumeRamp(
-                fromStartVolume: audio.volume,
-                toEndVolume: audio.volume,
-                timeRange: .init(start: .zero, duration: duration)
-            )
+            audioInputParam.setVolume(audio.volume, at: .zero)
             audioInputParam.trackID = audioTrack.trackID
             audioInputParams.append(audioInputParam)
         }

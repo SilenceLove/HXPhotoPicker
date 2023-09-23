@@ -13,7 +13,7 @@ open class PhotoPreviewSelectedViewCell: UICollectionViewCell {
     
     public var photoView: PhotoThumbnailView!
     public var selectedView: UIView!
-    public var tickView: AlbumTickView!
+    var tickView: TickView!
     
     open var tickColor: UIColor? {
         didSet {
@@ -56,7 +56,7 @@ open class PhotoPreviewSelectedViewCell: UICollectionViewCell {
         selectedView.backgroundColor = .black.withAlphaComponent(0.6)
         contentView.addSubview(selectedView)
         
-        tickView = AlbumTickView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        tickView = TickView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
         selectedView.addSubview(tickView)
     }
     

@@ -558,6 +558,7 @@ public struct EditAdjustmentData: CustomStringConvertible {
     let content: Content
     let maskImage: UIImage?
     let drawView: [EditorDrawView.BrushInfo]
+    let canvasData: EditorCanvasData?
     let mosaicView: [EditorMosaicView.MosaicData]
     let stickersView: EditorStickersView.Item?
     
@@ -694,6 +695,7 @@ extension EditAdjustmentData: Codable {
     enum CodingKeys: CodingKey {
         case content
         case maskImage
+        case canvasData
         case drawView
         case mosaicView
         case stickersView
@@ -712,6 +714,7 @@ extension EditAdjustmentData: Codable {
         }else {
             maskImage = nil
         }
+        canvasData = try container.decode(EditorCanvasData.self, forKey: .canvasData)
         drawView = try container.decode([EditorDrawView.BrushInfo].self, forKey: .drawView)
         mosaicView = try container.decode([EditorMosaicView.MosaicData].self, forKey: .mosaicView)
         stickersView = try? container.decode(EditorStickersView.Item.self, forKey: .stickersView)
@@ -729,6 +732,7 @@ extension EditAdjustmentData: Codable {
                 try container.encode(imageData, forKey: .maskImage)
             }
         }
+        try container.encode(canvasData, forKey: .canvasData)
         try container.encode(drawView, forKey: .drawView)
         try container.encode(mosaicView, forKey: .mosaicView)
         try? container.encode(stickersView, forKey: .stickersView)

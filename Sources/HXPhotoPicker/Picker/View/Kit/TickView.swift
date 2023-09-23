@@ -1,5 +1,5 @@
 //
-//  AlbumTickView.swift
+//  TickView.swift
 //  HXPhotoPicker
 //
 //  Created by Slience on 2020/12/29.
@@ -8,9 +8,9 @@
 
 import UIKit
 
-public class AlbumTickView: UIView {
+class TickView: UIView {
     
-    public var tickLayer: CAShapeLayer!
+    var tickLayer: CAShapeLayer!
     
     override init(frame: CGRect) {
         super.init(frame: frame)

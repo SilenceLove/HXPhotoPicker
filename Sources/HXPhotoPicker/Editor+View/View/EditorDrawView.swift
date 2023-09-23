@@ -8,7 +8,7 @@
 import UIKit
 
 protocol EditorDrawViewDelegate: AnyObject {
-    func drawView(beganDraw drawView: EditorDrawView)
+    func drawView(beginDraw drawView: EditorDrawView)
     func drawView(endDraw drawView: EditorDrawView)
 }
 
@@ -75,7 +75,7 @@ class EditorDrawView: UIView {
             let point = panGR.location(in: self)
             let path = linePaths.last
             if path?.currentPoint.equalTo(point) == false {
-                delegate?.drawView(beganDraw: self)
+                delegate?.drawView(beginDraw: self)
                 isTouching = true
                 
                 path?.addLine(to: point)

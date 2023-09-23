@@ -7,15 +7,7 @@
 
 import UIKit
 
-// MARK: PhotoPickerBottomViewDelegate
-extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
-    
-    func bottomView(didEditButtonClick bottomView: PhotoPickerBottomView) {
-        guard let photoAsset = photoAsset(for: currentPreviewIndex) else {
-            return
-        }
-        openEditor(photoAsset)
-    }
+extension PhotoPreviewViewController {
     
     func openEditor(_ photoAsset: PhotoAsset) {
         guard let picker = pickerController else { return }
@@ -153,9 +145,8 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
         }
         #endif
     }
-    func bottomView(
-        didFinishButtonClick bottomView: PhotoPickerBottomView
-    ) {
+    
+    func didFinishClick() {
         guard let pickerController = pickerController else {
             return
         }
@@ -256,26 +247,13 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             addAsset()
         }
     }
-    func bottomView(
-        _ bottomView: PhotoPickerBottomView,
-        didOriginalButtonClick isOriginal: Bool
-    ) {
-        delegate?.previewViewController(
-            self,
-            didOriginalButton: isOriginal
-        )
-        pickerController?.originalButtonCallback()
+    
+    func requestSelectedAssetFileSize() {
+        pickerController?.requestSelectedAssetFileSize(isPreview: true, completion: { [weak self] in
+            self?.photoToolbar.originalAssetBytes($0, bytesString: $1)
+        })
     }
-    func bottomView(
-        _ bottomView: PhotoPickerBottomView,
-        didSelectedItemAt photoAsset: PhotoAsset
-    ) {
-        if previewAssets.contains(photoAsset) {
-            scrollToPhotoAsset(photoAsset)
-        }else {
-            bottomView.selectedView.scrollTo(photoAsset: nil)
-        }
-    }
+    
     func setupRequestPreviewTimer() {
         requestPreviewTimer?.invalidate()
         requestPreviewTimer = Timer(
@@ -304,13 +282,11 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
     }
     
     public func setOriginal(_ isOriginal: Bool) {
-        bottomView.boxControl.isSelected =  isOriginal
+        photoToolbar.updateOriginalState(isOriginal)
         if !isOriginal {
-            // 取消
-            bottomView.cancelRequestAssetFileSize()
+            pickerController?.cancelRequestAssetFileSize(isPreview: true)
         }else {
-            // 选中
-            bottomView.requestAssetBytes()
+            requestSelectedAssetFileSize()
         }
         pickerController?.isOriginal = isOriginal
         pickerController?.originalButtonCallback()
@@ -320,27 +296,4 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
         )
     }
     
-    func bottomView(_ bottomView: PhotoPickerBottomView, moveItemAt fromIndex: Int, toIndex: Int) {
-        delegate?.previewViewController(self, moveItem: fromIndex, toIndex: toIndex)
-        guard let pickerController = pickerController else {
-            return
-        }
-        pickerController.movePhotoAsset(fromIndex: fromIndex, toIndex: toIndex)
-        if isPreviewSelect {
-            let fromAsset = previewAssets[fromIndex]
-            previewAssets.remove(at: fromIndex)
-            previewAssets.insert(fromAsset, at: toIndex)
-            getCell(for: currentPreviewIndex)?.cancelRequest()
-            collectionView.reloadData()
-            setupRequestPreviewTimer()
-        }
-        bottomView.selectedView.reloadData(photoAssets: pickerController.selectedAssetArray)
-        if let asset = photoAsset(for: currentPreviewIndex) {
-            updateSelectBox(asset.isSelected, photoAsset: asset)
-            DispatchQueue.main.async {
-                bottomView.selectedView.scrollTo(photoAsset: asset)
-            }
-        }
-        delegate?.previewViewController(movePhotoAsset: self)
-    }
 }

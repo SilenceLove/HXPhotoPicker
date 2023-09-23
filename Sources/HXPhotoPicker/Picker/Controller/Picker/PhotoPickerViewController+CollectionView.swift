@@ -579,9 +579,9 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             let view = collectionView
                 .dequeueReusableSupplementaryView(
                     ofKind: kind,
-                    withReuseIdentifier: NSStringFromClass(PhotoPickerBottomNumberView.classForCoder()),
+                    withReuseIdentifier: NSStringFromClass(BottomNumberView.classForCoder()),
                     for: indexPath
-                ) as! PhotoPickerBottomNumberView
+                ) as! BottomNumberView
             view.photoCount = photoCount
             view.videoCount = videoCount
             view.config = config.assetNumber

@@ -24,6 +24,9 @@ class PhotoPreviewSelectedView: UIView,
     var collectionView: UICollectionView!
     var tickColor: UIColor?
     
+    var allowDrop: Bool = true
+    var assetCount: Int { photoAssetArray.count }
+    
     private var photoAssetArray: [PhotoAsset] = []
     private var currentSelectedIndexPath: IndexPath?
     
@@ -125,9 +128,6 @@ class PhotoPreviewSelectedView: UIView,
         }
     }
     
-    func removePhotoAsset(photoAsset: PhotoAsset) {
-        removePhotoAssets([photoAsset])
-    }
     func replacePhotoAsset(at index: Int, with photoAsset: PhotoAsset) {
         photoAssetArray[index] = photoAsset
         collectionView.reloadItems(at: [IndexPath.init(item: index, section: 0)])
@@ -227,6 +227,9 @@ extension PhotoPreviewSelectedView: UICollectionViewDragDelegate, UICollectionVi
         itemsForBeginning session: UIDragSession,
         at indexPath: IndexPath
     ) -> [UIDragItem] {
+        if !allowDrop {
+            return []
+        }
         let itemProvider = NSItemProvider.init()
         let dragItem = UIDragItem.init(itemProvider: itemProvider)
         dragItem.localObject = indexPath
@@ -234,7 +237,7 @@ extension PhotoPreviewSelectedView: UICollectionViewDragDelegate, UICollectionVi
     }
     
     func collectionView(_ collectionView: UICollectionView, canHandle session: UIDropSession) -> Bool {
-        true
+        allowDrop
     }
     
     func collectionView(

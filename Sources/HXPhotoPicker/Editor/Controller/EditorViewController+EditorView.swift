@@ -18,6 +18,10 @@ extension EditorViewController: EditorViewDelegate {
         }
         if let selectedTool = selectedTool {
             switch selectedTool.type {
+            case .graffiti:
+                if editorView.drawType == .canvas {
+                    return
+                }
             case .cropSize:
                 return
             case .music:
@@ -94,12 +98,18 @@ extension EditorViewController: EditorViewDelegate {
         checkFinishButtonState()
     }
     /// 画笔/涂鸦/贴图发生改变
-    public func editorView(contentViewBeganDraw editorView: EditorView) {
+    public func editorView(contentViewBeginDraw editorView: EditorView) {
         if let type = selectedTool?.type {
             switch type {
             case .graffiti:
-                if config.brush.isHideStickersDuringDrawing {
-                    editorView.hideStickersView()
+                if editorView.drawType == .canvas {
+                    checkCanvasButtons()
+                    checkFinishButtonState()
+                    return
+                }else {
+                    if config.brush.isHideStickersDuringDrawing {
+                        editorView.hideStickersView()
+                    }
                 }
             case .mosaic:
                 if config.mosaic.isHideStickersDuringDrawing {
@@ -117,8 +127,14 @@ extension EditorViewController: EditorViewDelegate {
         if let type = selectedTool?.type {
             switch type {
             case .graffiti:
-                if config.brush.isHideStickersDuringDrawing {
-                    editorView.showStickersView()
+                if editorView.drawType == .canvas {
+                    checkCanvasButtons()
+                    checkFinishButtonState()
+                    return
+                }else {
+                    if config.brush.isHideStickersDuringDrawing {
+                        editorView.showStickersView()
+                    }
                 }
             case .mosaic:
                 if config.mosaic.isHideStickersDuringDrawing {

@@ -7,6 +7,7 @@
 
 import UIKit
 import AVFoundation
+import PencilKit
 
 public extension EditorView {
     
@@ -220,7 +221,91 @@ public extension EditorView {
         adjusterView
     }
     
-    // MARK: 绘画
+    var isHEICImage: Bool {
+        get { adjusterView.isHEICImage }
+        set { adjusterView.isHEICImage = newValue }
+    }
+}
+
+// MARK: 绘画
+@available(iOS 13.0, *)
+public extension EditorView {
+    
+    /// 画布内容是否为空
+    var isCanvasEmpty: Bool {
+        adjusterView.isCanvasEmpty
+    }
+    
+    /// 画布绘制的内容
+    var canvasImage: UIImage {
+        adjusterView.canvasImage
+    }
+    
+    /// 画布是否可以撤销
+    var isCanvasCanUndo: Bool {
+        adjusterView.isCanvasCanUndo
+    }
+    
+    /// 画布是否可以反撤销
+    var isCanvasCanRedo: Bool {
+        adjusterView.isCanvasCanRedo
+    }
+    
+    /// 画布反撤销绘制内容
+    func canvasRedo() {
+        adjusterView.canvasRedo()
+    }
+    
+    /// 画布撤销绘制内容
+    func canvasUndo() {
+        adjusterView.canvasUndo()
+    }
+    
+    /// 画布撤销本次绘制的所有内容
+    func canvasUndoCurrentAll() {
+        adjusterView.canvasUndoCurrentAll()
+    }
+    
+    /// 画布撤销所有绘制内容
+    func canvasUndoAll() {
+        adjusterView.canvasUndoAll()
+    }
+    
+    /// 画布开始绘制
+    @discardableResult
+    func startCanvasDrawing() -> PKToolPicker? {
+        adjusterView.startCanvasDrawing()
+    }
+    
+    /// 确定画布当前绘制的内容
+    func finishCanvasDrawing() {
+        adjusterView.finishCanvasDrawing()
+    }
+    
+    /// 取消当前绘制的内容
+    func cancelCanvasDrawing() {
+        adjusterView.cancelCanvasDrawing()
+    }
+    
+    /// 画布进入绘制
+    @discardableResult
+    func enterCanvasDrawing() -> PKToolPicker? {
+        adjusterView.enterCanvasDrawing()
+    }
+    
+    /// 画布退出绘制
+    func quitCanvasDrawing() {
+        adjusterView.quitCanvasDrawing()
+    }
+}
+    
+public extension EditorView {
+    
+    var drawType: EditorDarwType {
+        get { adjusterView.drawType }
+        set { adjusterView.drawType = newValue }
+    }
+    
     /// The drawing function cannot be opened in the editing state
     /// It will be automatically closed when entering the editing mode, and it needs to be opened manually after editing
     /// 绘画功能，编辑状态下无法开启
@@ -260,9 +345,11 @@ public extension EditorView {
     func undoAllDraw() {
         adjusterView.undoAllDraw()
     }
+}
     
-    // MARK: 马赛克涂抹
-    //  视频不支持马赛克涂抹
+// MARK: 马赛克涂抹
+//  视频不支持马赛克涂抹
+public extension EditorView {
     /// 马赛克图片
     var mosaicImage: UIImage? {
         get { adjusterView.mosaicOriginalImage }
@@ -321,6 +408,9 @@ public extension EditorView {
     func undoAllMosaic() {
         adjusterView.undoAllMosaic()
     }
+}
+    
+public extension EditorView {
     
     /// Whether to allow dragging of textures
     /// It will be automatically closed when entering the editing mode, and it needs to be opened manually after editing
@@ -426,8 +516,11 @@ public extension EditorView {
     func hideStickersView() {
         adjusterView.hideStickersView()
     }
+}
+
+// MARK: 自定义遮罩
+public extension EditorView {
     
-    // MARK: 自定义遮罩
     /// 遮罩类型
     var maskType: MaskType {
         get {
@@ -705,8 +798,11 @@ public extension EditorView {
     func removeVideoURLCache() {
         adjusterView.lastVideoFator = nil
     }
+}
+
+// MARK: 旋转
+public extension EditorView {
     
-    // MARK: 旋转
     /// current rotation angle
     /// 当前旋转的角度
     var angle: CGFloat {
@@ -813,8 +909,11 @@ public extension EditorView {
         }
         adjusterView.reset(animated, completion: completion)
     }
+}
+
+// MARK: 修改frame后更新视图
+public extension EditorView {
     
-    // MARK: 修改frame后更新视图
     /// Update Views
     /// 更新内部视图的frame
     func update() {

@@ -258,27 +258,31 @@ open class PhotoPickerController: UINavigationController {
             modalPresentationCapturesStatusBarAppearance = true
         }
     }
-    var disablesCustomDismiss = false
     
-    /// 所有资源集合
     var assetCollectionsArray: [PhotoAssetCollection] = []
     var fetchAssetCollectionsCompletion: (([PhotoAssetCollection]) -> Void)?
-    
-    /// 相机胶卷资源集合
     var cameraAssetCollection: PhotoAssetCollection?
     var fetchCameraAssetCollectionCompletion: ((PhotoAssetCollection?) -> Void)?
-    var canAddAsset: Bool = true
-    private var isFirstAuthorization: Bool = false
     var selectOptions: PickerAssetOptions!
     var selectedPhotoAssetArray: [PhotoAsset] = []
     var selectedVideoAssetArray: [PhotoAsset] = []
-    var singleVideo: Bool = false
     
     var deniedView: DeniedAuthorizationView!
     var assetCollectionsQueue: OperationQueue!
     var assetsQueue: OperationQueue!
     var requestAssetBytesQueue: OperationQueue!
     var previewRequestAssetBytesQueue: OperationQueue!
+    var disablesCustomDismiss = false
+    var canAddAsset: Bool = true
+    var singleVideo: Bool = false
+    var interactiveTransition: PickerInteractiveTransition?
+    var dismissInteractiveTransition: PickerControllerInteractiveTransition?
+    #if HXPICKER_ENABLE_EDITOR
+    var editedPhotoAssetArray: [PhotoAsset] = []
+    #endif
+    var isDismissed: Bool = false
+    var pickerTask: Any?
+    private var isFirstAuthorization: Bool = false
     
     public override var modalPresentationStyle: UIModalPresentationStyle {
         didSet {
@@ -288,16 +292,6 @@ open class PhotoPickerController: UINavigationController {
             }
         }
     }
-    var interactiveTransition: PickerInteractiveTransition?
-    
-    var dismissInteractiveTransition: PickerControllerInteractiveTransition?
-    
-    #if HXPICKER_ENABLE_EDITOR
-    var editedPhotoAssetArray: [PhotoAsset] = []
-    #endif
-    
-    var isDismissed: Bool = false
-    var pickerTask: Any?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -433,6 +427,7 @@ open class PhotoPickerController: UINavigationController {
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     deinit {
         PhotoManager.shared.thumbnailLoadMode = .complete
         PhotoManager.shared.firstLoadAssets = false
@@ -522,7 +517,6 @@ extension PhotoPickerController {
                 self.fetchData(status: status)
                 self.albumViewController?.updatePrompt()
                 self.pickerViewController?.reloadAlbumData()
-                self.pickerViewController?.updateBottomPromptView()
                 PhotoManager.shared.registerPhotoChangeObserver()
             }
         }

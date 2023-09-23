@@ -82,6 +82,8 @@ extension PhotoPickerViewController: PhotoPickerViewCellDelegate {
                 addAsset()
             }
         }
-        bottomView.updateFinishButtonTitle()
+        photoToolbar.selectedAssetDidChanged(picker.selectedAssetArray)
+        requestSelectedAssetFileSize()
+//        bottomView.updateFinishButtonTitle()
     }
 }

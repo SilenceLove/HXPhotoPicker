@@ -725,6 +725,7 @@ extension EditorViewController {
             return
         }
         let isHEIC = photoAsset.photoFormat == "heic"
+        editorView.isHEICImage = isHEIC
         photoAsset.requestImageData(
             filterEditor: true
         ) { [weak self] _, result in

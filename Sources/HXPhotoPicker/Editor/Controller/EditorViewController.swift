@@ -77,7 +77,13 @@ open class EditorViewController: BaseViewController {
     var scaleSwitchView: UIView!
     var scaleSwitchLeftBtn: UIButton!
     var scaleSwitchRightBtn: UIButton!
+    var drawCancelButton: UIButton!
+    var drawFinishButton: UIButton!
+    var drawUndoBtn: UIButton!
+    var drawUndoAllBtn: UIButton!
+    var drawRedoBtn: UIButton!
     var editorView: EditorView!
+    var backgroundView: UIScrollView!
     
     var finishScaleAngle: CGFloat = 0
     var lastScaleAngle: CGFloat = 0
@@ -85,6 +91,8 @@ open class EditorViewController: BaseViewController {
     
     var scaleSwitchSelectType: Int?
     var finishScaleSwitchSelectType: Int?
+    
+    var backgroundInsetRect: CGRect = .zero
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -302,21 +310,73 @@ open class EditorViewController: BaseViewController {
         scaleSwitchView.addSubview(scaleSwitchRightBtn)
         
         editorView = EditorView()
+        if #available(iOS 13.0, *) {
+            backgroundView = UIScrollView()
+            backgroundView.maximumZoomScale = 1
+            backgroundView.showsVerticalScrollIndicator = false
+            backgroundView.showsHorizontalScrollIndicator = false
+            backgroundView.clipsToBounds = false
+            backgroundView.scrollsToTop = false
+            backgroundView.isScrollEnabled = false
+            backgroundView.bouncesZoom = false
+            backgroundView.delegate = self
+            backgroundView.contentInsetAdjustmentBehavior = .never
+            editorView.drawType = .canvas
+            
+            drawCancelButton = UIButton(type: .custom)
+            drawCancelButton.setTitle("取消".localized, for: .normal)
+            drawCancelButton.setTitleColor(config.cancelButtonTitleColor, for: .normal)
+            drawCancelButton.setTitleColor(config.cancelButtonTitleColor.withAlphaComponent(0.5), for: .highlighted)
+            drawCancelButton.titleLabel?.font = UIFont.regularPingFang(ofSize: 17)
+            drawCancelButton.contentHorizontalAlignment = .left
+            drawCancelButton.alpha = 0
+            drawCancelButton.isHidden = true
+            drawCancelButton.addTarget(self, action: #selector(didCancelButtonClick(button:)), for: .touchUpInside)
+            
+            drawFinishButton = UIButton(type: .custom)
+            drawFinishButton.setTitle("完成".localized, for: .normal)
+            drawFinishButton.setTitleColor(config.finishButtonTitleNormalColor, for: .normal)
+            drawFinishButton.setTitleColor(config.finishButtonTitleNormalColor.withAlphaComponent(0.5), for: .highlighted)
+            drawFinishButton.setTitleColor(config.finishButtonTitleDisableColor.withAlphaComponent(0.5), for: .disabled)
+            drawFinishButton.titleLabel?.font = UIFont.regularPingFang(ofSize: 17)
+            drawFinishButton.contentHorizontalAlignment = .right
+            drawFinishButton.alpha = 0
+            drawFinishButton.isHidden = true
+            drawFinishButton.addTarget(self, action: #selector(didFinishButtonClick(button:)), for: .touchUpInside)
+            
+            drawUndoBtn = UIButton(type: .custom)
+            drawUndoBtn.setImage("hx_editor_canvas_draw_undo".image, for: .normal)
+            drawUndoBtn.size = drawUndoBtn.currentImage?.size ?? .zero
+            drawUndoBtn.isEnabled = false
+            drawUndoBtn.alpha = 0
+            drawUndoBtn.isHidden = true
+            drawUndoBtn.addTarget(self, action: #selector(didDrawUndoBtn(button:)), for: .touchUpInside)
+            
+            drawUndoAllBtn = UIButton(type: .custom)
+            drawUndoAllBtn.setImage("hx_editor_canvas_draw_undo_all".image, for: .normal)
+            drawUndoAllBtn.size = drawUndoAllBtn.currentImage?.size ?? .zero
+            drawUndoAllBtn.isEnabled = false
+            drawUndoAllBtn.alpha = 0
+            drawUndoAllBtn.isHidden = true
+            drawUndoAllBtn.addTarget(self, action: #selector(didDrawUndoAllBtn(button:)), for: .touchUpInside)
+            
+            drawRedoBtn = UIButton(type: .custom)
+            drawRedoBtn.setImage("hx_editor_canvas_draw_redo".image, for: .normal)
+            drawRedoBtn.size = drawRedoBtn.currentImage?.size ?? .zero
+            drawRedoBtn.isEnabled = false
+            drawRedoBtn.alpha = 0
+            drawRedoBtn.isHidden = true
+            drawRedoBtn.addTarget(self, action: #selector(didDrawRedoBtn(button:)), for: .touchUpInside)
+        }
         editorView.editContentInset = { [weak self] _ in
             guard let self = self else {
                 return .zero
             }
             if UIDevice.isPortrait {
-                let isFullScreen: Bool
-                if let nav = self.navigationController {
-                    isFullScreen = nav.modalPresentationStyle == .fullScreen || nav.modalPresentationStyle == .custom
-                }else {
-                    isFullScreen = self.modalPresentationStyle == .fullScreen || self.modalPresentationStyle == .custom
-                }
                 let top: CGFloat
                 let bottom: CGFloat
                 if self.config.buttonType == .bottom {
-                    if isFullScreen {
+                    if self.isFullScreen {
                         top = UIDevice.isPad ? 50 : UIDevice.topMargin + 10
                     }else {
                         top = 30
@@ -329,7 +389,7 @@ open class EditorViewController: BaseViewController {
                     }else {
                         navHeight = UIDevice.navigationBarHeight - UIDevice.generalStatusBarHeight
                     }
-                    if isFullScreen {
+                    if self.isFullScreen {
                         let navY: CGFloat
                         if UIDevice.isPad {
                             navY = UIDevice.generalStatusBarHeight
@@ -345,7 +405,7 @@ open class EditorViewController: BaseViewController {
                         top = navHeight + 10
                     }
                     if UIDevice.isPad {
-                        bottom = UIDevice.bottomMargin + 150
+                        bottom = UIDevice.bottomMargin + 160
                     }else {
                         bottom = UIDevice.bottomMargin + 140
                     }
@@ -400,7 +460,12 @@ open class EditorViewController: BaseViewController {
     private func addViews() {
         view.clipsToBounds = true
         view.backgroundColor = .black
-        view.addSubview(editorView)
+        if #available(iOS 13.0, *) {
+            view.addSubview(backgroundView)
+            backgroundView.addSubview(editorView)
+        }else {
+            view.addSubview(editorView)
+        }
         view.addSubview(bottomMaskView)
         view.addSubview(topMaskView)
         view.addSubview(videoControlView)
@@ -424,6 +489,14 @@ open class EditorViewController: BaseViewController {
         view.addSubview(resetButton)
         view.addSubview(cancelButton)
         view.addSubview(finishButton)
+        
+        if #available(iOS 13.0, *) {
+            view.addSubview(drawUndoBtn)
+            view.addSubview(drawRedoBtn)
+            view.addSubview(drawUndoAllBtn)
+            view.addSubview(drawCancelButton)
+            view.addSubview(drawFinishButton)
+        }
         
         view.addSubview(leftRotateButton)
         view.addSubview(rightRotateButton)
@@ -547,14 +620,33 @@ open class EditorViewController: BaseViewController {
             videoControlView.stopLineAnimation()
             videoControlInfo = videoControlView.controlInfo
         }
+        if #available(iOS 13.0, *), editorView.drawType == .canvas, selectedTool?.type == .graffiti {
+            hideCanvasViews(true, animated: false)
+            editorView.quitCanvasDrawing()
+        }
+    }
+    
+    open override func deviceOrientationDidChanged(notify: Notification) {
+        if #available(iOS 13.0, *), editorView.drawType == .canvas, selectedTool?.type == .graffiti {
+            showCanvasViews()
+            startCanvasDrawing(true)
+        }
     }
     
     var navFrame: CGRect?
-    
     var firstAppear = true
+    var isFullScreen: Bool {
+        if let nav = navigationController {
+            return nav.modalPresentationStyle == .fullScreen || nav.modalPresentationStyle == .custom
+        }else {
+            return modalPresentationStyle == .fullScreen || modalPresentationStyle == .custom
+        }
+    }
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        editorView.frame = view.bounds
+        if selectedTool?.type != .graffiti || orientationDidChange {
+            editorView.frame = view.bounds
+        }
         let buttonHeight: CGFloat
         if UIDevice.isPortrait && config.buttonType == .bottom {
             buttonHeight = 50
@@ -596,6 +688,23 @@ open class EditorViewController: BaseViewController {
         }
         cancelButton.x = UIDevice.leftMargin + buttonMargin
         finishButton.x = view.width - finishButton.width - buttonMargin - UIDevice.rightMargin
+        
+        if #available(iOS 13.0, *) {
+            if selectedTool?.type != .graffiti || orientationDidChange {
+                backgroundView.frame = view.bounds
+                backgroundView.contentSize = view.size
+            }
+            let padding: CGFloat = UIDevice.isPad ? 20 : 15
+            
+            drawCancelButton.size = cancelButton.size
+            drawFinishButton.size = finishButton.size
+            drawCancelButton.x = UIDevice.leftMargin + buttonMargin
+            drawFinishButton.x = view.width - drawFinishButton.width - buttonMargin - UIDevice.rightMargin
+            
+            drawUndoBtn.x = drawCancelButton.frame.maxX + padding
+            drawRedoBtn.x = drawUndoBtn.frame.maxX + padding
+            drawUndoAllBtn.x = drawFinishButton.x - padding - drawUndoAllBtn.width
+        }
         
         resetButton.size = .init(width: resetWidth, height: buttonHeight)
         resetButton.centerX = view.width * 0.5
@@ -645,19 +754,55 @@ open class EditorViewController: BaseViewController {
         bottomMaskLayer = PhotoTools.getGradientShadowLayer(false)
         bottomMaskView.layer.addSublayer(bottomMaskLayer)
         if isToolsDisplay {
+            let isCanvasGraffiti = selectedTool?.type == .graffiti && editorView.drawType == .canvas
             if config.buttonType == .bottom {
-                topMaskView.alpha = 0
-                topMaskView.isHidden = true
+                if isCanvasGraffiti {
+                    topMaskView.alpha = 1
+                    topMaskView.isHidden = false
+                }else {
+                    topMaskView.alpha = 0
+                    topMaskView.isHidden = true
+                }
             }else {
                 if isTransitionCompletion && !isPopTransition {
                     topMaskView.alpha = 1
                 }
                 topMaskView.isHidden = false
             }
-            if isTransitionCompletion && !isPopTransition {
-                bottomMaskView.alpha = 1
+            if isCanvasGraffiti {
+                bottomMaskView.alpha = 0
+                bottomMaskView.isHidden = true
+            }else {
+                if isTransitionCompletion && !isPopTransition {
+                    bottomMaskView.alpha = 1
+                }
+                bottomMaskView.isHidden = false
             }
-            bottomMaskView.isHidden = false
+        }
+        
+        if navFrame == nil {
+            navFrame = navigationController?.navigationBar.frame
+        }
+        let navHeight: CGFloat
+        if let frameHeight = navFrame?.height {
+            navHeight = frameHeight
+        }else {
+            navHeight = UIDevice.navigationBarHeight - UIDevice.generalStatusBarHeight
+        }
+        var navY: CGFloat = 0
+        if isFullScreen {
+            if UIDevice.isPad {
+                navY = UIDevice.generalStatusBarHeight
+            }else {
+                if let minY = navFrame?.minY, minY >= 0 {
+                    navY = minY
+                }else {
+                    navY = UIDevice.generalStatusBarHeight
+                }
+            }
+            topMaskView.frame = .init(x: 0, y: 0, width: view.width, height: navY + navHeight + 10)
+        }else {
+            topMaskView.frame = .init(x: 0, y: 0, width: view.width, height: navHeight)
         }
         
         if config.buttonType == .bottom {
@@ -692,41 +837,14 @@ open class EditorViewController: BaseViewController {
                 ratioToolHeight = 40
             }
             #endif
-            let isFullScreen: Bool
-            if let nav = navigationController {
-                isFullScreen = nav.modalPresentationStyle == .fullScreen || nav.modalPresentationStyle == .custom
-            }else {
-                isFullScreen = modalPresentationStyle == .fullScreen || modalPresentationStyle == .custom
-            }
-            if navFrame == nil {
-                navFrame = navigationController?.navigationBar.frame
-            }
-            let navHeight: CGFloat
-            if let frameHeight = navFrame?.height {
-                navHeight = frameHeight
-            }else {
-                navHeight = UIDevice.navigationBarHeight - UIDevice.generalStatusBarHeight
-            }
             if isFullScreen {
-                let navY: CGFloat
-                if UIDevice.isPad {
-                    navY = UIDevice.generalStatusBarHeight
-                }else {
-                    if let minY = navFrame?.minY, minY >= 0 {
-                        navY = minY
-                    }else {
-                        navY = UIDevice.generalStatusBarHeight
-                    }
-                }
                 cancelButton.centerY = navY + navHeight / 2
-                topMaskView.frame = .init(x: 0, y: 0, width: view.width, height: navY + navHeight + 10)
             }else {
                 cancelButton.centerY = navHeight / 2
-                topMaskView.frame = .init(x: 0, y: 0, width: view.width, height: navHeight)
             }
             finishButton.centerY = cancelButton.centerY
             resetButton.centerY = cancelButton.centerY
-            
+             
             toolsView.frame = CGRect(
                 x: 0,
                 y: view.height - UIDevice.bottomMargin - toolsHeight,
@@ -737,7 +855,7 @@ open class EditorViewController: BaseViewController {
             if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
                 rotateBottom = UIDevice.bottomMargin + 5
             }else {
-                rotateBottom = UIDevice.bottomMargin
+                rotateBottom = UIDevice.isPad ? UIDevice.bottomMargin + 10 : UIDevice.bottomMargin
             }
             if !config.cropSize.aspectRatios.isEmpty {
                 ratioToolView.frame = .init(
@@ -769,6 +887,18 @@ open class EditorViewController: BaseViewController {
                 maskListButton.y = rotateScaleView.y - maskListButton.height - 10
                 maskListButton.centerX = view.width / 2
             }
+        }
+        
+        if #available(iOS 13.0, *) {
+            if isFullScreen {
+                drawCancelButton.centerY = navY + navHeight / 2
+            }else {
+                drawCancelButton.centerY = navHeight / 2
+            }
+            drawUndoBtn.centerY = drawCancelButton.centerY
+            drawRedoBtn.centerY = drawCancelButton.centerY
+            drawUndoAllBtn.centerY = drawCancelButton.centerY
+            drawFinishButton.centerY = drawCancelButton.centerY
         }
         
         filtersView.frame = .init(x: 0, y: toolsView.y - 120, width: view.width, height: 120)
@@ -844,6 +974,15 @@ open class EditorViewController: BaseViewController {
         finishButton.centerY = cancelButton.centerY
         resetButton.centerY = cancelButton.centerY
         changeButton.centerY = cancelButton.centerY
+        
+        
+        if #available(iOS 13.0, *) {
+            drawCancelButton.y = UIDevice.topMargin
+            drawUndoBtn.centerY = drawCancelButton.centerY
+            drawRedoBtn.centerY = drawCancelButton.centerY
+            drawUndoAllBtn.centerY = drawCancelButton.centerY
+            drawFinishButton.centerY = drawCancelButton.centerY
+        }
         
         leftRotateButton.centerY = cancelButton.centerY
         leftRotateButton.x = cancelButton.frame.maxX + 15
@@ -953,7 +1092,13 @@ open class EditorViewController: BaseViewController {
             let layerHeight: CGFloat
             if let selectedTool = selectedTool {
                 switch selectedTool.type {
-                case .graffiti, .mosaic:
+                case .graffiti:
+                    if editorView.drawType == .canvas {
+                        layerHeight = UIDevice.bottomMargin + 55
+                    }else {
+                        layerHeight = UIDevice.bottomMargin + 130
+                    }
+                case .mosaic:
                     layerHeight = UIDevice.bottomMargin + 130
                 case .music:
                     layerHeight = UIDevice.bottomMargin + 55
@@ -968,7 +1113,13 @@ open class EditorViewController: BaseViewController {
             let layerWidth: CGFloat
             if let selectedTool = selectedTool, selectedTool.type != .time {
                 switch selectedTool.type {
-                case .graffiti, .mosaic:
+                case .graffiti:
+                    if editorView.drawType == .canvas {
+                        layerWidth = 65 + UIDevice.rightMargin
+                    }else {
+                        layerWidth = 130 + UIDevice.rightMargin
+                    }
+                case .mosaic:
                     layerWidth = 130 + UIDevice.rightMargin
                 case .music:
                     layerWidth = 65 + UIDevice.rightMargin
@@ -1152,5 +1303,59 @@ open class EditorViewController: BaseViewController {
     
     deinit {
         removeVideo()
+    }
+}
+
+extension EditorViewController: UIScrollViewDelegate {
+    
+    public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        if scrollView != backgroundView {
+            return nil
+        }
+        return editorView
+    }
+    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        if scrollView != backgroundView {
+            return
+        }
+        if editorView.isCanZoomScale {
+            scrollView.contentInset = .zero
+            scrollView.contentSize = view.size
+            editorView.y = 0
+            editorView.height = view.height
+        }else {
+            scrollView.contentSize = .init(
+                width: editorView.contentSize.width * scrollView.zoomScale,
+                height: editorView.contentSize.height * scrollView.zoomScale
+            )
+            let top = backgroundInsetRect.minY
+            let left = backgroundInsetRect.minX
+            let right = backgroundInsetRect.minX
+            let bottom = view.height - backgroundInsetRect.maxY
+            scrollView.contentInset = .init(
+                top: top,
+                left: left,
+                bottom: bottom,
+                right: right
+            )
+            
+            let contentHeight = scrollView.contentSize.height
+            let viewWidth = scrollView.width - scrollView.contentInset.left - scrollView.contentInset.right
+            let viewHeight = scrollView.height - scrollView.contentInset.top - scrollView.contentInset.bottom
+            let offsetX = (viewWidth > scrollView.contentSize.width) ?
+                (viewWidth - scrollView.contentSize.width) * 0.5 : 0
+            let offsetY = (viewHeight > contentHeight) ?
+            (viewHeight - contentHeight) * 0.5 : 0
+            let centerX = scrollView.contentSize.width * 0.5 + offsetX
+            let centerY = contentHeight * 0.5 + offsetY
+            editorView.center = CGPoint(x: centerX, y: centerY)
+        }
+    }
+    
+    public func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
+        if scrollView != backgroundView {
+            return
+        }
+        editorView.innerZoomScale = scale
     }
 }

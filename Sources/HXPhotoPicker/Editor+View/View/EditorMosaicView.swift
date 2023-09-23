@@ -11,7 +11,7 @@ import CoreGraphics
 
 protocol EditorMosaicViewDelegate: AnyObject {
     func mosaicView(_  mosaicView: EditorMosaicView, splashColor atPoint: CGPoint) -> UIColor?
-    func mosaicView(beganDraw mosaicView: EditorMosaicView)
+    func mosaicView(beginDraw mosaicView: EditorMosaicView)
     func mosaicView(endDraw mosaicView: EditorMosaicView)
 }
 
@@ -167,7 +167,7 @@ class EditorMosaicView: UIView {
             }
             if didChanged {
                 if isBegan {
-                    delegate?.mosaicView(beganDraw: self)
+                    delegate?.mosaicView(beginDraw: self)
                 }
                 isTouching = true
                 isBegan = false

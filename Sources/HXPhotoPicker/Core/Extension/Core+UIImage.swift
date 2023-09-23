@@ -307,29 +307,4 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return image
     }
-    
-    @available(iOS 11.0, *)
-    func heicData(compressionQuality: CGFloat) -> Data? {
-        autoreleasepool {
-            let data = NSMutableData()
-            guard let imageDestination = CGImageDestinationCreateWithData(
-                data, AVFileType.heic as CFString, 1, nil
-            ) else {
-                return nil
-            }
-          
-            guard let cgImage = self.cgImage else {
-                return nil
-            }
-          
-            let options: NSDictionary = [
-                kCGImageDestinationLossyCompressionQuality: compressionQuality
-            ]
-            CGImageDestinationAddImage(imageDestination, cgImage, options)
-            guard CGImageDestinationFinalize(imageDestination) else {
-                return nil
-            }
-            return data as Data
-        }
-    }
 }

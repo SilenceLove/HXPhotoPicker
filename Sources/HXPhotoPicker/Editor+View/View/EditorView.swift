@@ -55,6 +55,23 @@ open class EditorView: UIScrollView {
         }
     }
     
+    public var contentCompletionHandler: ((EditorView) -> Void)?
+    
+    /// 是否可以双指缩放大小
+    public var isCanZoomScale: Bool = true {
+        didSet {
+            pinchGestureRecognizer?.isEnabled = isCanZoomScale
+        }
+    }
+    
+    public var innerZoomScale: CGFloat = 1 {
+        didSet {
+            if !isCanZoomScale {
+                adjusterView.zoomScale = innerZoomScale
+            }
+        }
+    }
+    
     open override var backgroundColor: UIColor? {
         didSet {
             guard let backgroundColor = backgroundColor, backgroundColor != .clear else {
@@ -155,6 +172,13 @@ open class EditorView: UIScrollView {
             }
         }
         return view
+    }
+    
+    open override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        if isDrawEnabled, drawType == .canvas {
+            return adjusterView.point(inside: point, with: event)
+        }
+        return super.point(inside: point, with: event)
     }
     
     required public init?(coder: NSCoder) {
@@ -264,6 +288,7 @@ extension EditorView {
         if !operates.isEmpty {
             operatesHandler()
         }
+        contentCompletionHandler?(self)
     }
     
     func resetZoomScale(

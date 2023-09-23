@@ -198,53 +198,38 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             }
             backgroundView.alpha = alpha
             let toVC = transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
-            var isMultipleBottom: Bool = false
-            var isPromptBottom: Bool = false
-            if let toVC = toVC {
-                if toVC.isMultipleSelect {
-                    isMultipleBottom = true
-                }else {
-                    if toVC.allowShowPrompt {
-                        isPromptBottom = true
-                    }
-                }
-            }
             if !previewViewController.statusBarShouldBeHidden {
-                let hasPreviewMask = previewViewController.bottomView.mask != nil
-                if hasPreviewMask {
-                    var bottomViewAlpha = 1 - scale * 1.5
-                    if bottomViewAlpha < 0 {
-                        bottomViewAlpha = 0
-                    }
-                    previewViewController.bottomView.alpha = bottomViewAlpha
-                }else {
-                    previewViewController.bottomView.alpha = alpha
+                var bottomViewAlpha = 1 - scale * 1.5
+                if bottomViewAlpha < 0 {
+                    bottomViewAlpha = 0
                 }
+                previewViewController.photoToolbar.alpha = bottomViewAlpha
                 if type == .pop {
                     var maskScale = 1 - scale * 2.85
                     if maskScale < 0 {
                         maskScale = 0
                     }
-                    if hasPreviewMask {
-                        let maskY = 70 * (1 - maskScale)
-                        let maskWidth = previewViewController.bottomView.width
-                        let maskHeight = previewViewController.bottomView.height - maskY
-                        previewViewController.bottomView.mask?.frame = CGRect(
+                    if let previewToolbar = previewViewController.photoToolbar,
+                       let photoToolbar = toVC?.photoToolbar {
+                        let previewToolbarHeight = previewToolbar.toolbarHeight()
+                        let previewViewHeight = previewToolbar.viewHeight()
+                        let previewTopHeight = (previewViewHeight - previewToolbarHeight)
+                        let previewMaskY = previewTopHeight * (1 - maskScale)
+                        let previewMaskWidth = previewToolbar.width
+                        let previewMaskHeight = previewToolbar.height - previewMaskY
+                        previewToolbar.mask?.frame = CGRect(
                             x: 0,
-                            y: maskY,
-                            width: maskWidth,
-                            height: maskHeight
+                            y: previewMaskY,
+                            width: previewMaskWidth,
+                            height: previewMaskHeight
                         )
-                    }
-                    if isMultipleBottom && toVC?.bottomView.mask != nil {
-                        let maskY = 70 * maskScale
-                        let maskWidth = previewViewController.bottomView.width
-                        let maskHeight = 50 + UIDevice.bottomMargin + 70 * (1 - maskScale)
-                        toVC?.bottomView.mask?.frame = CGRect(x: 0, y: maskY, width: maskWidth, height: maskHeight)
-                        
-                    }
-                    if isPromptBottom {
-                        toVC?.bottomPromptView.alpha = 1 - alpha
+                        let pickerToolbarHeight = photoToolbar.toolbarHeight()
+                        let pickerViewHeight = photoToolbar.viewHeight()
+                        let pickerTopHeight = pickerViewHeight - pickerToolbarHeight
+                        let pickerMaskY = pickerTopHeight * maskScale
+                        let pickerMaskWidth = photoToolbar.width
+                        let pickerMaskHeight = pickerToolbarHeight + pickerTopHeight * (1 - maskScale)
+                        photoToolbar.mask?.frame = CGRect(x: 0, y: pickerMaskY, width: pickerMaskWidth, height: pickerMaskHeight)
                     }
                 }else {
                     previewViewController.navigationController?.navigationBar.alpha = alpha
@@ -253,12 +238,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             }else {
                 if type == .pop {
                     toVC?.navigationController?.navigationBar.alpha = 1 - alpha
-                    if isMultipleBottom {
-                        toVC?.bottomView.alpha = 1 - alpha
-                    }
-                    if isPromptBottom {
-                        toVC?.bottomPromptView.alpha = 1 - alpha
-                    }
+                    toVC?.photoToolbar.alpha = 1 - alpha
                 }
             }
             if let picker = pickerController {
@@ -301,28 +281,17 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             panGestureRecognizer.isEnabled = false
             previewViewController.navigationController?.view.isUserInteractionEnabled = false
             let toVC = self.transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
-            var isMultipleBottom: Bool = false
-            var isPromptBottom: Bool = false
-            if let toVC = toVC {
-                if toVC.isMultipleSelect {
-                    isMultipleBottom = true
-                }else {
-                    if toVC.allowShowPrompt {
-                        isPromptBottom = true
-                    }
-                }
-            }
             UIView.animate(withDuration: 0.25) {
                 previewView.transform = .identity
                 previewView.center = self.previewCenter
                 self.backgroundView.alpha = 1
                 if !previewViewController.statusBarShouldBeHidden {
-                    previewViewController.bottomView.alpha = 1
+                    previewViewController.photoToolbar.alpha = 1
                     if self.type == .pop {
-                        let maskWidth = previewViewController.bottomView.width
-                        if previewViewController.bottomView.mask != nil {
-                            let maskHeight = previewViewController.bottomView.height
-                            previewViewController.bottomView.mask?.frame = CGRect(
+                        let maskWidth = previewViewController.photoToolbar.width
+                        if previewViewController.photoToolbar.mask != nil {
+                            let maskHeight = previewViewController.photoToolbar.height
+                            previewViewController.photoToolbar.mask?.frame = CGRect(
                                 origin: .zero,
                                 size: CGSize(
                                     width: maskWidth,
@@ -330,12 +299,10 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                                 )
                             )
                         }
-                        if isMultipleBottom && toVC?.bottomView.mask != nil {
-                            let maskHeight = 50 + UIDevice.bottomMargin
-                            toVC?.bottomView.mask?.frame = CGRect(x: 0, y: 70, width: maskWidth, height: maskHeight)
-                        }
-                        if isPromptBottom {
-                            toVC?.bottomPromptView.alpha = 0
+                        if let toolbar = toVC?.photoToolbar, toolbar.mask != nil {
+                            let viewheight = toolbar.viewHeight()
+                            let maskHeight = toolbar.toolbarHeight()
+                            toolbar.mask?.frame = CGRect(x: 0, y: viewheight - maskHeight, width: maskWidth, height: maskHeight)
                         }
                     }else {
                         previewViewController.navigationController?.navigationBar.alpha = 1
@@ -343,12 +310,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 }else {
                     if self.type == .pop {
                         toVC?.navigationController?.navigationBar.alpha = 0
-                        if isMultipleBottom {
-                            toVC?.bottomView.alpha = 0
-                        }
-                        if isPromptBottom {
-                            toVC?.bottomPromptView.alpha = 0
-                        }
+                        toVC?.photoToolbar.alpha = 0
                     }
                 }
                 if let picker = self.pickerController {
@@ -356,24 +318,17 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                         .pickerController(picker, interPercentDidCancelAnimation: self.type)
                 }
             } completion: { _ in
-                previewViewController.bottomView.mask = nil
-                if isMultipleBottom {
-                    toVC?.bottomView.mask = nil
-                }
+                previewViewController.photoToolbar.mask = nil
+                toVC?.photoToolbar.mask = nil
                 self.toView?.isHidden = false
                 let toVC = self.transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
                 if previewViewController.statusBarShouldBeHidden {
                     if self.type == .pop {
                         previewViewController.navigationController?.setNavigationBarHidden(true, animated: false)
                         toVC?.navigationController?.setNavigationBarHidden(true, animated: false)
-                        if isMultipleBottom {
-                            toVC?.bottomView.alpha = 1
-                        }
+                        toVC?.photoToolbar.alpha = 1
                         toVC?.navigationController?.navigationBar.alpha = 1
                     }
-                }
-                if self.type == .pop && isPromptBottom {
-                    toVC?.bottomPromptView.alpha = 1
                 }
                 self.resetScrollView(for: true)
                 previewView.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -421,17 +376,6 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             backgroundView.isUserInteractionEnabled = false
             previewView.isUserInteractionEnabled = false
             fromVC?.view.isUserInteractionEnabled = false
-            var isMultipleBottom: Bool = false
-            var isPromptBottom: Bool = false
-            if let toVC = toVC {
-                if toVC.isMultipleSelect {
-                    isMultipleBottom = true
-                }else {
-                    if toVC.allowShowPrompt {
-                        isPromptBottom = true
-                    }
-                }
-            }
             if type == .pop {
                 UIView.animate(
                     withDuration: 0.175,
@@ -440,29 +384,28 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 ) {
                     self.backgroundView.alpha = 0
                     if !previewViewController.statusBarShouldBeHidden {
-                        previewViewController.bottomView.alpha = 0
-                        let maskWidth = previewViewController.bottomView.width
-                        if previewViewController.bottomView.mask != nil {
-                            let maskHeight = previewViewController.bottomView.height - 70
-                            previewViewController.bottomView.mask?.frame = CGRect(
+                        previewViewController.photoToolbar.alpha = 0
+                        let maskWidth = previewViewController.photoToolbar.width
+                        if let toolbar = previewViewController.photoToolbar,
+                           toolbar.mask != nil {
+                            let viewHeight = toolbar.viewHeight()
+                            let toolbarHeight = toolbar.toolbarHeight()
+                            let maskY = viewHeight - toolbarHeight
+                            let maskHeight = toolbarHeight
+                            toolbar.mask?.frame = CGRect(
                                 x: 0,
-                                y: 70,
+                                y: maskY,
                                 width: maskWidth,
                                 height: maskHeight
                             )
                         }
-                        if isMultipleBottom && toVC?.bottomView.mask != nil {
-                            let maskHeight = UIDevice.bottomMargin + 120
-                            toVC?.bottomView.mask?.frame = CGRect(x: 0, y: 0, width: maskWidth, height: maskHeight)
+                        if let toolbar = toVC?.photoToolbar, toolbar.mask != nil {
+                            let maskHeight = toolbar.viewHeight()
+                            toolbar.mask?.frame = CGRect(x: 0, y: 0, width: maskWidth, height: maskHeight)
                         }
                     }else {
-                        if isMultipleBottom {
-                            toVC?.bottomView.alpha = 1
-                        }
+                        toVC?.photoToolbar.alpha = 1
                         toVC?.navigationController?.navigationBar.alpha = 1
-                    }
-                    if isPromptBottom {
-                        toVC?.bottomPromptView.alpha = 1
                     }
                 } completion: { _ in
                     self.backgroundView.removeFromSuperview()
@@ -495,7 +438,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     self.backgroundView.alpha = 0
                 }
                 if !previewViewController.statusBarShouldBeHidden {
-                    previewViewController.bottomView.alpha = 0
+                    previewViewController.photoToolbar.alpha = 0
                     previewViewController.navigationController?.navigationBar.alpha = 0
                 }
                 if let picker = self.pickerController {
@@ -503,10 +446,8 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                         .pickerController(picker, interPercentDidFinishAnimation: self.type)
                 }
             } completion: { _ in
-                previewViewController.bottomView.mask = nil
-                if isMultipleBottom {
-                    toVC?.bottomView.mask = nil
-                }
+                previewViewController.photoToolbar.mask = nil
+                toVC?.photoToolbar.mask = nil
                 self.toView?.isHidden = false
                 UIView.animate(withDuration: 0.2) {
                     previewView.alpha = 0
@@ -544,12 +485,10 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         }
     }
     func popTransition(_ transitionContext: UIViewControllerContextTransitioning) {
-        guard let previewViewController = transitionContext.viewController(
-            forKey: .from
-        ) as? PhotoPreviewViewController,
-              let pickerViewController = transitionContext.viewController(
-                forKey: .to
-              ) as? PhotoPickerViewController
+        guard let previewViewController = transitionContext.viewController(forKey: .from)
+                as? PhotoPreviewViewController,
+              let pickerViewController = transitionContext.viewController(forKey: .to)
+                as? PhotoPickerViewController
         else {
             canInteration = false
             beganInterPercent = false
@@ -560,20 +499,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         
         previewBackgroundColor = previewViewController.view.backgroundColor
         previewViewController.view.backgroundColor = .clear
-        
-        var isMultipleBottom: Bool = false
-        var isPromptBottom: Bool = false
-        if pickerViewController.isMultipleSelect {
-            isMultipleBottom = true
-        }else {
-            if pickerViewController.allowShowPrompt {
-                isPromptBottom = true
-            }
-        }
-        
-        if isPromptBottom {
-            pickerViewController.bottomPromptView.alpha = 0
-        }
+         
         let containerView = transitionContext.containerView
         containerView.addSubview(pickerViewController.view)
         containerView.addSubview(previewViewController.view)
@@ -584,13 +510,8 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             self.cancel()
             UIView.animate(withDuration: 0.25) {
                 if !previewViewController.statusBarShouldBeHidden {
-                    previewViewController.bottomView.alpha = 1
-                    if AssetManager.authorizationStatusIsLimited() &&
-                        pickerViewController.config.bottomView.isShowPrompt {
-                        if isMultipleBottom {
-                            pickerViewController.bottomView.alpha = 0
-                        }
-                    }
+                    previewViewController.photoToolbar.alpha = 1
+                    pickerViewController.photoToolbar.alpha = 0
                 }
             } completion: { (_) in
                 transitionContext.completeTransition(false)
@@ -633,51 +554,34 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             previewCenter = previewView.center
             pickerViewController.view.insertSubview(previewView, aboveSubview: backgroundView)
         }
-        var pickerShowParompt = false
-        var previewShowSelectedView = false
         if previewViewController.statusBarShouldBeHidden {
-            if isMultipleBottom {
-                pickerViewController.bottomView.alpha = 0
-            }
+            pickerViewController.photoToolbar.alpha = 0
             pickerViewController.navigationController?.navigationBar.alpha = 0
             previewViewController.navigationController?.setNavigationBarHidden(false, animated: false)
-        }else {
-            if previewViewController.config.bottomView.isShowSelectedView == true &&
-                previewViewController.pickerController?.config.selectMode == .multiple &&
-                !previewViewController.statusBarShouldBeHidden {
-                if previewViewController.pickerController?.selectedAssetArray.isEmpty == false {
-                    previewShowSelectedView = true
-                }
-            }
-            if AssetManager.authorizationStatusIsLimited() && previewViewController.config.bottomView.isShowPrompt {
-                pickerShowParompt = true
-            }
         }
-        if previewShowSelectedView && !pickerShowParompt {
-            let maskView = UIView(
-                frame: CGRect(
-                    x: 0,
-                    y: 0,
-                    width: previewViewController.view.width,
-                    height: 120 + UIDevice.bottomMargin
-                )
+        let previewMaskView = UIView(
+            frame: CGRect(
+                x: 0,
+                y: 0,
+                width: previewViewController.view.width,
+                height: previewViewController.photoToolbar.viewHeight()
             )
-            maskView.backgroundColor = .white
-            previewViewController.bottomView.mask = maskView
-        }else if !previewShowSelectedView && pickerShowParompt {
-            let maskView = UIView(
-                frame: CGRect(
-                    x: 0,
-                    y: 70,
-                    width: previewViewController.view.width,
-                    height: 50 + UIDevice.bottomMargin
-                )
+        )
+        previewMaskView.backgroundColor = .white
+        previewViewController.photoToolbar.mask = previewMaskView
+        
+        let pickerToolbarHeight = pickerViewController.photoToolbar.toolbarHeight()
+        let pickerViewHeight = pickerViewController.photoToolbar.viewHeight()
+        let pickerMaskView = UIView(
+            frame: CGRect(
+                x: 0,
+                y: pickerViewHeight - pickerToolbarHeight,
+                width: previewViewController.view.width,
+                height: pickerToolbarHeight
             )
-            maskView.backgroundColor = .white
-            if isMultipleBottom {
-                pickerViewController.bottomView.mask = maskView
-            }
-        }
+        )
+        pickerMaskView.backgroundColor = .white
+        pickerViewController.photoToolbar.mask = pickerMaskView
         resetScrollView(for: false)
         toView?.isHidden = true
         beganInterPercent = true

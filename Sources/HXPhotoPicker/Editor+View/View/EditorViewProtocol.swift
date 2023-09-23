@@ -7,6 +7,7 @@
 
 import UIKit
 import AVFoundation
+import PencilKit
 
 public protocol EditorViewDelegate: AnyObject {
     /// 编辑状态将要发生改变
@@ -22,7 +23,7 @@ public protocol EditorViewDelegate: AnyObject {
     /// 已经结束编辑状态
     func editorView(editDidDisappear editorView: EditorView)
     /// 画笔/涂鸦/贴图发生改变
-    func editorView(contentViewBeganDraw editorView: EditorView)
+    func editorView(contentViewBeginDraw editorView: EditorView)
     /// 画笔/涂鸦/贴图结束改变
     func editorView(contentViewEndDraw editorView: EditorView)
     /// 点击了贴纸
@@ -60,6 +61,9 @@ public protocol EditorViewDelegate: AnyObject {
     
     /// 视频添加滤镜
     func editorView(_ editorView: EditorView, videoApplyFilter sourceImage: CIImage, at time: CMTime) -> CIImage
+    
+    @available(iOS 13.0, *)
+    func editorView(_ editorView: EditorView, toolPickerFramesObscuredDidChange toolPicker: PKToolPicker)
 }
 
 public extension EditorViewDelegate {
@@ -69,7 +73,7 @@ public extension EditorViewDelegate {
     func editorView(editDidAppear editorView: EditorView) { }
     func editorView(editWillDisappear editorView: EditorView) { }
     func editorView(editDidDisappear editorView: EditorView) { }
-    func editorView(contentViewBeganDraw editorView: EditorView) { }
+    func editorView(contentViewBeginDraw editorView: EditorView) { }
     func editorView(contentViewEndDraw editorView: EditorView) { }
     func editorView(_ editorView: EditorView, didTapStickerItem itemView: EditorStickersItemBaseView) { }
     func editorView(_ editorView: EditorView, shouldRemoveStickerItem itemView: EditorStickersItemBaseView) { }
@@ -94,4 +98,8 @@ public extension EditorViewDelegate {
         videoApplyFilter sourceImage: CIImage,
         at time: CMTime
     ) -> CIImage { sourceImage }
+    
+    
+    @available(iOS 13.0, *)
+    func editorView(_ editorView: EditorView, toolPickerFramesObscuredDidChange toolPicker: PKToolPicker) { }
 }

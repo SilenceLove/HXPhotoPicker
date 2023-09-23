@@ -20,8 +20,13 @@ extension EditorAdjusterView {
         if contentView.stickerView.count > 0 {
             stickersLayer = contentView.stickerView.layer
         }
+        var canvasImage: UIImage?
+        if #available(iOS 13.0, *) {
+            canvasImage = contentView.isCanvasEmpty ? nil : contentView.canvasImage
+        }
         let cropFactor = CropFactor(
             drawLayer: drawLayer,
+            canvasImage: canvasImage,
             mosaicLayer: nil,
             stickersLayer: stickersLayer,
             isCropImage: isCropImage,
@@ -99,6 +104,7 @@ extension EditorAdjusterView {
         let waterRatio = getVideoWaterCropOption()
         let cropFactor = CropFactor(
             drawLayer: nil,
+            canvasImage: nil,
             mosaicLayer: nil,
             stickersLayer: nil,
             isCropImage: isCropImage,
@@ -178,10 +184,17 @@ extension EditorAdjusterView {
                 }
             }
         }
+        var watermarkImages: [UIImage] = []
+        if #available(iOS 13.0, *) {
+            if let canvasImage = contentView.isCanvasEmpty ? nil : contentView.canvasImage {
+                watermarkImages.append(canvasImage)
+            }
+        }
+        let watermark: EditorVideoTool.Watermark = .init(layers: layers, images: watermarkImages)
         exportVideo(
             outputURL: urlConfig.url,
             factor: factor,
-            watermark: .init(layers: layers, images: []),
+            watermark: watermark,
             stickers: contentView.stickerView.getStickerInfo(),
             cropFactor: cropFactor,
             filter: filter,

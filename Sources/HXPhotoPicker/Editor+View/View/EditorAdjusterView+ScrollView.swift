@@ -36,7 +36,7 @@ extension EditorAdjusterView: UIScrollViewDelegate {
     }
     
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return contentView
+        contentView
     }
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {

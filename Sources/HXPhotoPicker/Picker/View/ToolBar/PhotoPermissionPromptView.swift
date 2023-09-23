@@ -1,14 +1,14 @@
 //
-//  PhotoPickerBottomPromptView.swift
+//  PhotoPermissionPromptView.swift
 //  HXPhotoPicker
 //
-//  Created by Silence on 2023/7/29.
+//  Created by Silence on 2023/9/14.
 //  Copyright © 2023 洪欣. All rights reserved.
 //
 
 import UIKit
 
-class PhotoPickerBottomPromptView: UIToolbar {
+class PhotoPermissionPromptView: UIView {
     let config: PickerBottomViewConfiguration
     init(config: PickerBottomViewConfiguration) {
         self.config = config
@@ -54,16 +54,10 @@ class PhotoPickerBottomPromptView: UIToolbar {
     
     private func configColor() {
         if PhotoManager.isDark {
-            backgroundColor = config.backgroundDarkColor
-            barTintColor = config.barTintDarkColor
-            barStyle = config.barDarkStyle
             promptLb.textColor = config.promptTitleDarkColor
             promptIcon.tintColor = config.promptIconDarkColor
             promptArrow.tintColor = config.promptArrowDarkColor
         }else {
-            backgroundColor = config.backgroundColor
-            barTintColor = config.barTintColor
-            barStyle = config.barStyle
             promptLb.textColor = config.promptTitleColor
             promptIcon.tintColor = config.promptIconColor
             promptArrow.tintColor = config.promptArrowColor
@@ -72,7 +66,7 @@ class PhotoPickerBottomPromptView: UIToolbar {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        let viewHeight = height - UIDevice.bottomMargin
+        let viewHeight = height
         promptIcon.x = 12 + UIDevice.leftMargin
         promptIcon.centerY = viewHeight * 0.5
         promptArrow.x = width - 12 - promptArrow.width - UIDevice.rightMargin

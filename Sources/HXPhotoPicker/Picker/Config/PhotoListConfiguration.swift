@@ -95,8 +95,11 @@ public struct PhotoListConfiguration {
     /// cell相关配置
     public var cell: PhotoListCellConfiguration = .init()
     
+    /// 自定义底部工具栏视图
+    public var photoToolbar: PhotoToolBarProtocol.Type = PhotoToolBar.self
+    
     /// Bottom view related configuration
-    /// 底部视图相关配置
+    /// 默认的底部视图相关配置
     public var bottomView: PickerBottomViewConfiguration = .init()
     
     /// Allow adding cameras

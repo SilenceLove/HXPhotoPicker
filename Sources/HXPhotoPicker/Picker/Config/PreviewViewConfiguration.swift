@@ -51,7 +51,10 @@ public struct PreviewViewConfiguration {
     /// 显示底部视图
     public var isShowBottomView: Bool = true
     
-    /// 底部视图相关配置
+    /// 自定义底部工具栏视图
+    public var photoToolbar: PhotoToolBarProtocol.Type = PhotoToolBar.self
+    
+    /// 默认的底部视图相关配置
     public var bottomView: PickerBottomViewConfiguration
     
     /// 取消按钮的配置只有当是外部预览时才有效，文字和图片颜色通过 navigationTintColor 设置
@@ -70,12 +73,7 @@ public struct PreviewViewConfiguration {
     public init() {
         PhotoManager.shared.loadNetworkVideoMode = loadNetworkVideoMode
         var bottomConfig = PickerBottomViewConfiguration()
-        bottomConfig.isHiddenPreviewButton = true
         bottomConfig.disableFinishButtonWhenNotSelected = false
-        #if HXPICKER_ENABLE_EDITOR
-        bottomConfig.isHiddenEditButton = false
-        #endif
-        bottomConfig.isShowSelectedView = true
         self.bottomView = bottomConfig
     }
 }

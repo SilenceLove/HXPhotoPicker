@@ -1,5 +1,5 @@
 //
-//  PhotoPickerBottomNumberView.swift
+//  BottomNumberView.swift
 //  HXPhotoPicker
 //
 //  Created by Slience on 2021/10/25.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PhotoPickerBottomNumberView: UICollectionReusableView {
+class BottomNumberView: UICollectionReusableView {
     
     private var contentLb: UILabel!
     private var filterLb: UILabel!

@@ -73,6 +73,7 @@ public struct EditorConfiguration: IndicatorTypeConfig {
      
     /// brush configuration
     /// 画笔
+    /// iOS 13.0 以上此属性无效，绘制功能更换为 PKCanvasView
     public var brush: Brush = .init()
     
     /// chartlet configuration

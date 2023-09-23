@@ -218,7 +218,7 @@ public extension PhotoTools {
         }
         return nil
     }
-    static func getImageData(_ image: UIImage, queueLabel: String, completion: @escaping (Data?) -> Void) {
+    static func getImageData(_ image: UIImage, isHEIC: Bool = false, queueLabel: String, completion: @escaping (Data?) -> Void) {
         let serialQueue = DispatchQueue(
             label: queueLabel,
             qos: .userInitiated,
@@ -228,6 +228,14 @@ public extension PhotoTools {
         )
         serialQueue.async {
             autoreleasepool {
+                if isHEIC {
+                    guard let data = image.jpegData(compressionQuality: 0.5) else {
+                        completion(nil)
+                        return
+                    }
+                    completion(data)
+                    return
+                }
                 guard let imageData = self.getImageData(for: image) else {
                     completion(nil)
                     return

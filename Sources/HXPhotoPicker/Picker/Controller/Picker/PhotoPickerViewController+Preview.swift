@@ -37,7 +37,8 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         editAssetFinished photoAsset: PhotoAsset
     ) {
         reloadCell(for: photoAsset)
-        bottomView.updateFinishButtonTitle()
+        photoToolbar.selectedAssetDidChanged(pickerController!.selectedAssetArray)
+        requestSelectedAssetFileSize()
         if filterOptions.contains(.edited) {
             filterPhotoAssets()
         }
@@ -47,8 +48,8 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         didOriginalButton isOriginal: Bool
     ) {
         if isMultipleSelect {
-            bottomView.boxControl.isSelected = isOriginal
-            bottomView.requestAssetBytes()
+            photoToolbar.updateOriginalState(isOriginal)
+            requestSelectedAssetFileSize()
         }
     }
     func previewViewController(
@@ -63,7 +64,8 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
             cell?.photoAsset = photoAsset
         }
         updateCellSelectedTitle()
-        bottomView.updateFinishButtonTitle()
+        photoToolbar.selectedAssetDidChanged(pickerController!.selectedAssetArray)
+        requestSelectedAssetFileSize()
     }
     
     func previewViewController(
@@ -74,7 +76,8 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
             cell.requestThumbnailImage()
         }
         if photoAsset.isSelected {
-            bottomView.updateFinishButtonTitle()
+            photoToolbar.selectedAssetDidChanged(pickerController!.selectedAssetArray)
+            requestSelectedAssetFileSize()
         }
     }
     

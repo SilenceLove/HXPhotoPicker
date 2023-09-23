@@ -7,6 +7,7 @@
 
 import UIKit
 import AVFoundation
+import PencilKit
 
 protocol EditorContentViewDelegate: AnyObject {
     func contentView(_ contentView: EditorContentView, videoDidPlayAt time: CMTime)
@@ -18,7 +19,7 @@ protocol EditorContentViewDelegate: AnyObject {
     func contentView(_ contentView: EditorContentView, didChangedBuffer time: CMTime)
     func contentView(_ contentView: EditorContentView, didChangedTimeAt time: CMTime)
     
-    func contentView(drawViewBeganDraw contentView: EditorContentView)
+    func contentView(drawViewBeginDraw contentView: EditorContentView)
     func contentView(drawViewEndDraw contentView: EditorContentView)
     func contentView(_ contentView: EditorContentView, didTapSticker itemView: EditorStickersItemView)
     func contentView(_ contentView: EditorContentView, shouldRemoveSticker itemView: EditorStickersItemView)
@@ -41,6 +42,9 @@ protocol EditorContentViewDelegate: AnyObject {
         videoApplyFilter sourceImage: CIImage,
         at time: CMTime
     ) -> CIImage
+    
+    @available(iOS 13.0, *)
+    func contentView(_ contentView: EditorContentView, toolPickerFramesObscuredDidChange toolPicker: PKToolPicker)
     
 }
 
@@ -141,16 +145,43 @@ class EditorContentView: UIView {
     /// 缩放比例
     var zoomScale: CGFloat = 1 {
         didSet {
+            if #available(iOS 13.0, *), let canvasView = canvasView as? EditorCanvasView {
+                canvasView.scale = zoomScale
+            }
             drawView.scale = zoomScale
             mosaicView.scale = zoomScale
             stickerView.scale = zoomScale
         }
     }
     
+    var drawType: EditorDarwType = .normal {
+        didSet {
+            switch drawType {
+            case .normal:
+                drawView.isHidden = false
+                if #available(iOS 13.0, *) {
+                    canvasView.isHidden = true
+                }
+            case .canvas:
+                if #available(iOS 13.0, *) {
+                    drawView.isHidden = true
+                    canvasView.isHidden = false
+                }
+            }
+        }
+    }
+    
     var isDrawEnabled: Bool {
-        get { drawView.isEnabled }
+        get {
+            if drawType == .canvas {
+                return canvasView.isUserInteractionEnabled
+            }
+            return drawView.isEnabled
+        }
         set {
-            drawView.isEnabled = newValue
+            if drawType == .normal {
+                drawView.isEnabled = newValue
+            }
             stickerView.deselectedSticker()
         }
     }
@@ -294,11 +325,6 @@ class EditorContentView: UIView {
     init() {
         super.init(frame: .zero)
         initViews()
-        addSubview(imageView)
-        addSubview(mosaicView)
-        addSubview(videoView)
-        addSubview(drawView)
-        addSubview(stickerView)
     }
     
     override func layoutSubviews() {
@@ -310,6 +336,9 @@ class EditorContentView: UIView {
                 videoView.frame = bounds
             }
         }
+        if #available(iOS 13.0, *) {
+            canvasView.frame = bounds
+        }
         drawView.frame = bounds
         stickerView.frame = bounds
     }
@@ -317,6 +346,7 @@ class EditorContentView: UIView {
     // MARK: SubViews
     var imageView: ImageView!
     var videoView: EditorVideoPlayerView!
+    var canvasView: UIView!
     var drawView: EditorDrawView!
     var mosaicView: EditorMosaicView!
     var stickerView: EditorStickersView!
@@ -326,21 +356,34 @@ class EditorContentView: UIView {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.isHidden = true
+        addSubview(imageView)
+        
+        mosaicView = EditorMosaicView()
+        mosaicView.delegate = self
+        mosaicView.isHidden = true
+        addSubview(mosaicView)
         
         videoView = EditorVideoPlayerView()
         videoView.size = UIDevice.screenSize
         videoView.delegate = self
         videoView.isHidden = true
+        addSubview(videoView)
+        
+        if #available(iOS 13.0, *) {
+            let canvasView = EditorCanvasView()
+            canvasView.delegate = self
+            canvasView.isHidden = true
+            addSubview(canvasView)
+            self.canvasView = canvasView
+        }
         
         drawView = EditorDrawView()
         drawView.delegate = self
-        
-        mosaicView = EditorMosaicView()
-        mosaicView.delegate = self
-        mosaicView.isHidden = true
+        addSubview(drawView)
         
         stickerView = EditorStickersView()
         stickerView.delegate = self
+        addSubview(stickerView)
     }
     
     required init?(coder: NSCoder) {
@@ -460,9 +503,119 @@ extension EditorContentView: EditorVideoPlayerViewDelegate {
     }
 }
 
+@available(iOS 13.0, *)
+extension EditorContentView: EditorCanvasViewDelegate {
+    
+    var canvasImage: UIImage {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return .init()
+        }
+        return canvasView.image
+    }
+    
+    var isCanvasEmpty: Bool {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return true
+        }
+        return canvasView.isEmpty
+    }
+    
+    var isCanvasCanUndo: Bool {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return false
+        }
+        return canvasView.isCanUndo
+    }
+    
+    var isCanvasCanRedo: Bool {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return false
+        }
+        return canvasView.isCanRedo
+    }
+    
+    func canvasRedo() {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return
+        }
+        canvasView.redo()
+    }
+    
+    func canvasUndo() {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return
+        }
+        canvasView.undo()
+    }
+    
+    func canvasUndoCurrentAll() {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return
+        }
+        canvasView.undoCurrentAll()
+    }
+    
+    func canvasUndoAll() {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return
+        }
+        canvasView.undoAll()
+    }
+    
+    func startCanvasDrawing() -> PKToolPicker? {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return nil
+        }
+        stickerView.deselectedSticker()
+        return canvasView.startDrawing()
+    }
+    
+    func finishCanvasDrawing() {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return
+        }
+        canvasView.finishDrawing()
+        stickerView.deselectedSticker()
+    }
+     
+    func cancelCanvasDrawing() {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return
+        }
+        canvasView.cancelDrawing()
+        stickerView.deselectedSticker()
+    }
+    
+    func enterCanvasDrawing() -> PKToolPicker? {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return nil
+        }
+        return canvasView.enterDrawing()
+    }
+    
+    func quitCanvasDrawing() {
+        guard let canvasView = canvasView as? EditorCanvasView else {
+            return
+        }
+        canvasView.quitDrawing()
+    }
+    
+    func canvasView(beginDraw canvasView: EditorCanvasView) {
+        delegate?.contentView(drawViewBeginDraw: self)
+    }
+    
+    func canvasView(endDraw canvasView: EditorCanvasView) {
+        delegate?.contentView(drawViewEndDraw: self)
+    }
+    
+    func canvasView(_ canvasView: EditorCanvasView, toolPickerFramesObscuredDidChange toolPicker: PKToolPicker) {
+        delegate?.contentView(self, toolPickerFramesObscuredDidChange: toolPicker)
+    }
+}
+
 extension EditorContentView: EditorDrawViewDelegate {
-    func drawView(beganDraw drawView: EditorDrawView) {
-        delegate?.contentView(drawViewBeganDraw: self)
+    func drawView(beginDraw drawView: EditorDrawView) {
+        delegate?.contentView(drawViewBeginDraw: self)
     }
     
     func drawView(endDraw drawView: EditorDrawView) {
@@ -474,8 +627,8 @@ extension EditorContentView: EditorMosaicViewDelegate {
     func mosaicView(_  mosaicView: EditorMosaicView, splashColor atPoint: CGPoint) -> UIColor? {
         imageView.color(for: atPoint)
     }
-    func mosaicView(beganDraw mosaicView: EditorMosaicView) {
-        delegate?.contentView(drawViewBeganDraw: self)
+    func mosaicView(beginDraw mosaicView: EditorMosaicView) {
+        delegate?.contentView(drawViewBeginDraw: self)
     }
     func mosaicView(endDraw mosaicView: EditorMosaicView) {
         delegate?.contentView(drawViewEndDraw: self)
@@ -498,7 +651,7 @@ extension EditorContentView: EditorStickersViewDelegate {
     }
     
     func stickerView(touchBegan stickerView: EditorStickersView) {
-        delegate?.contentView(drawViewBeganDraw: self)
+        delegate?.contentView(drawViewBeginDraw: self)
     }
     func stickerView(touchEnded stickerView: EditorStickersView) {
         delegate?.contentView(drawViewEndDraw: self)

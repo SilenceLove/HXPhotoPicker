@@ -117,7 +117,7 @@ public struct PickerBottomViewConfiguration {
     /// Currently only supports preview interface display
     /// 隐藏编辑按钮
     /// 目前只支持预览界面显示
-    public var isHiddenEditButton: Bool = true
+    public var isHiddenEditButton: Bool = false
     
     /// Edit button title color
     /// 编辑按钮标题颜色
@@ -163,7 +163,7 @@ public struct PickerBottomViewConfiguration {
     
     /// Show selected resources
     /// 显示已选资源
-    public var isShowSelectedView: Bool = false
+    public var isShowSelectedView: Bool = true
     
     /// Custom cell, inherit PhotoPreviewSelectedViewCell and modify it
     /// 自定义cell，继承 PhotoPreviewSelectedViewCell 加以修改

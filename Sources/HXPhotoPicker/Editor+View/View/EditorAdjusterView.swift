@@ -20,7 +20,13 @@ class EditorAdjusterView: UIView {
     var contentInsets: UIEdgeInsets = .zero
     var setContentInsets: (() -> UIEdgeInsets)?
     var maximumZoomScale: CGFloat = 20
-    var exportScale: CGFloat = UIScreen.main.scale
+    var exportScale: CGFloat = UIScreen.main.scale {
+        didSet {
+            if #available(iOS 13.0, *), let canvasView = contentView.canvasView as? EditorCanvasView {
+                canvasView.exportScale = exportScale
+            }
+        }
+    }
     
     var baseContentSize: CGSize = .zero
     var zoomScale: CGFloat = 1 {
@@ -41,7 +47,7 @@ class EditorAdjusterView: UIView {
             }
         }
     }
-    
+    var isHEICImage: Bool = false
     var lastRatationMinimumZoomScale: CGFloat = 1
     
     var adjustedFactor: AdjustedFactor = .init()
@@ -86,6 +92,9 @@ class EditorAdjusterView: UIView {
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         if state == .edit {
             return true
+        }
+        if isDrawEnabled, drawType == .canvas {
+            return containerView.point(inside: point, with: event)
         }
         return super.point(inside: point, with: event)
     }
@@ -166,6 +175,7 @@ class EditorAdjusterView: UIView {
     var beforeDrawBrushInfos: [EditorDrawView.BrushInfo] = []
     var beforeMosaicDatas: [EditorMosaicView.MosaicData] = []
     var beforeStickerItem: EditorStickersView.Item?
+    var beforeCanvasData: EditorCanvasData?
     
     deinit {
         videoTool?.cancelExport()
@@ -875,6 +885,10 @@ extension EditorAdjusterView {
         }else {
             maskImage = oldMaskImage
         }
+        var canvasData: EditorCanvasData?
+        if #available(iOS 13.0, *), let canvasView = contentView.canvasView as? EditorCanvasView {
+            canvasData = canvasView.data
+        }
         return .init(
             content: .init(
                 editSize: adjustedData.1,
@@ -890,6 +904,7 @@ extension EditorAdjusterView {
             ),
             maskImage: maskImage,
             drawView: contentView.drawView.getBrushData(),
+            canvasData: canvasData,
             mosaicView: contentView.mosaicView.getMosaicData(),
             stickersView: contentView.stickerView.getStickerItem()
         )
@@ -970,6 +985,9 @@ extension EditorAdjusterView {
         scrollView.contentOffset = CGPoint(x: offsetX, y: offsetY)
         contentView.zoomScale = zoomScale * scrollView.zoomScale
         contentView.drawView.setBrushData(factor.drawView, viewSize: contentView.bounds.size)
+        if #available(iOS 13.0, *), let canvasView = contentView.canvasView as? EditorCanvasView {
+            canvasView.setData(data: factor.canvasData, viewSize: contentView.bounds.size)
+        }
         contentView.mosaicView.setMosaicData(mosaicDatas: factor.mosaicView, viewSize: contentView.bounds.size)
         contentView.stickerView.setStickerItem(factor.stickersView, viewSize: contentView.bounds.size)
     }
