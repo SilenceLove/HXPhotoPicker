@@ -438,8 +438,10 @@ class PickerResultViewController: UIViewController,
         view.hx.show(animated: true)
 //        let compression = PhotoAsset.Compression(
 //            imageCompressionQuality: 0.5,
-//            videoExportPreset: .ratio_960x540,
-//            videoQuality: 6
+//            videoExportParameter: .init(
+//                preset: .ratio_960x540,
+//                quality: 6
+//            )
 //        )
         if #available(iOS 13.0, *) {
             Task {
