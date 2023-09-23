@@ -1,5 +1,14 @@
 # Release Notes
 
+## 4.0.7
+
+### Added
+
+- Picker
+  - The bottom view of the photo list and preview interface supports customization. You only need to implement the methods in the `PhotoToolBarProtocol` protocol and assign it to the `photoToolbar` of the configuration class.
+- Editor
+  - The drawing function `iOS 13.0` and above is replaced by `PencilKit`
+
 ## 4.0.6
 
 ### Added

@@ -1,5 +1,14 @@
 # 更新日志
 
+## 4.0.7
+
+### 新增
+
+- Picker
+  - 照片列表、预览界面的底部视图支持自定义，只需实现`PhotoToolBarProtocol`协议里的方法然后赋值给配置类的`photoToolbar`即可
+- Editor
+  - 绘画功能`iOS 13.0`以上更换为`PencilKit`
+
 ## 4.0.6
 
 ### 新增
