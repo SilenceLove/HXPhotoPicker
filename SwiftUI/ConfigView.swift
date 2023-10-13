@@ -19,8 +19,8 @@ struct ConfigView: UIViewControllerRepresentable {
         let vc = PickerConfigurationViewController(style: .insetGrouped)
         vc.showOpenPickerButton = false
         vc.config = config
-        vc.didDoneHandler = {
-            config = $0
+        vc.didDoneHandler = { config, _ in
+            self.config = config
         }
         return UINavigationController.init(rootViewController: vc)
     }

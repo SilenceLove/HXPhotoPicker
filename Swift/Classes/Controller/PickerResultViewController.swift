@@ -55,6 +55,7 @@ class PickerResultViewController: UIViewController,
     
     var preselect: Bool = false
     var isPublish: Bool = false
+    var isSplit: Bool = false
     
     var localCachePath: String {
         var cachePath = FileManager.cachesPath
@@ -310,7 +311,7 @@ class PickerResultViewController: UIViewController,
     func getCollectionViewrowCount() -> Int {
         let assetCount = canSetAddCell ? selectedAssets.count + 1 : selectedAssets.count
         var rowCount = assetCount / row_Count + 1
-        if assetCount % 3 == 0 {
+        if assetCount % row_Count == 0 {
             rowCount -= 1
         }
         return rowCount
@@ -344,8 +345,10 @@ class PickerResultViewController: UIViewController,
         }
         pickerConfigVC.showOpenPickerButton = false
         pickerConfigVC.config = config
+        pickerConfigVC.isSplitAction = isSplit
         pickerConfigVC.didDoneHandler = { [weak self] in
             self?.config = $0
+            self?.isSplit = $1
         }
         present(UINavigationController.init(rootViewController: pickerConfigVC), animated: true, completion: nil)
     }
@@ -415,14 +418,26 @@ class PickerResultViewController: UIViewController,
                 config.modalPresentationStyle = .automatic
             }
         }
-        let pickerController = PhotoPickerController.init(picker: config)
-        pickerController.pickerDelegate = self
-        pickerController.selectedAssetArray = selectedAssets
-        pickerController.localCameraAssetArray = localCameraAssetArray
-        pickerController.isOriginal = isOriginal
-        pickerController.localAssetArray = localAssetArray
-        pickerController.autoDismiss = false
-        present(pickerController, animated: true, completion: nil)
+        if UIDevice.isPad || isSplit {
+            let picker = PhotoPickerController(splitPicker: config)
+            picker.pickerDelegate = self
+            picker.selectedAssetArray = selectedAssets
+            picker.localCameraAssetArray = localCameraAssetArray
+            picker.isOriginal = isOriginal
+            picker.localAssetArray = localAssetArray
+            picker.autoDismiss = false
+            let split = PhotoSplitViewController(picker: picker)
+            present(split, animated: true, completion: nil)
+        }else {
+            let pickerController = PhotoPickerController(picker: config)
+            pickerController.pickerDelegate = self
+            pickerController.selectedAssetArray = selectedAssets
+            pickerController.localCameraAssetArray = localCameraAssetArray
+            pickerController.isOriginal = isOriginal
+            pickerController.localAssetArray = localAssetArray
+            pickerController.autoDismiss = false
+            present(pickerController, animated: true, completion: nil)
+        }
     }
     /// 获取已选资源的地址
     @IBAction func didRequestSelectedAssetURL(_ sender: Any) {
@@ -602,13 +617,13 @@ class PickerResultViewController: UIViewController,
                 style: .default,
                 handler: { alertAction in
             photoBrowser.view.hx.show(animated: true)
-            func saveAlbum(_ type: AssetManager.SaveType) {
-                AssetManager.saveSystemAlbum(type: type) { result in
+            func saveAlbum(_ type: AssetManager.PhotoSaveType) {
+                AssetManager.save(type: type) { result in
                     photoBrowser.view.hx.hide(animated: true)
                     switch result {
-                    case .success(_):
+                    case .success:
                         photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
-                    case .failure(_):
+                    case .failure:
                         photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
                     }
                 }
@@ -835,19 +850,20 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
 //        } completionHandler: { (images) in
 //            print(images)
 //        }
-        pickerController.dismiss(animated: true, completion: nil)
+        pickerController.dismiss(true)
     }
     
     func pickerController(
         _ pickerController: PhotoPickerController,
-        didEditAsset photoAsset: PhotoAsset, atIndex: Int) {
-        if pickerController.isPreviewAsset {
+        didEditAsset photoAsset: PhotoAsset, atIndex: Int
+    ) {
+        if pickerController.previewType == .picker {
             selectedAssets[atIndex] = photoAsset
             collectionView.reloadItems(at: [IndexPath.init(item: atIndex, section: 0)])
         }
     }
     func pickerController(didCancel pickerController: PhotoPickerController) {
-        pickerController.dismiss(animated: true, completion: nil)
+        pickerController.dismiss(true)
     }
     func pickerController(
         _ pickerController: PhotoPickerController,
@@ -857,8 +873,9 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
     }
     func pickerController(
         _ pickerController: PhotoPickerController,
-        viewControllersWillAppear viewController: UIViewController) {
-        if pickerController.isPreviewAsset {
+        viewControllersWillAppear viewController: UIViewController
+    ) {
+        if pickerController.previewType == .picker {
             let navHeight = viewController.navigationController?.navigationBar.height ?? 0
             viewController.navigationController?.navigationBar.setBackgroundImage(
                 UIImage.gradualShadowImage(
@@ -912,8 +929,9 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
     func pickerController(
         _ pickerController: PhotoPickerController,
         previewNetworkImageDownloadSuccess photoAsset: PhotoAsset,
-        atIndex: Int) {
-        if pickerController.isPreviewAsset {
+        atIndex: Int
+    ) {
+        if pickerController.previewType == .picker {
             let cell = collectionView.cellForItem(at: IndexPath(item: atIndex, section: 0)) as! ResultViewCell
             if cell.downloadStatus == .failed {
                 cell.requestThumbnailImage()

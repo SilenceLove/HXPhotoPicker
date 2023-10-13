@@ -111,7 +111,7 @@ extension PickerColorConfigurationViewController {
             case .cellBackgroundColor:
                 return config.albumList.cellBackgroundColor
             case .cellbackgroundDarkColor:
-                return config.albumList.cellbackgroundDarkColor
+                return config.albumList.cellBackgroundDarkColor
             case .cellSelectedColor:
                 return config.albumList.cellSelectedColor
             case .cellSelectedDarkColor:
@@ -241,7 +241,7 @@ extension PickerColorConfigurationViewController: UIColorPickerViewControllerDel
                 case .cellBackgroundColor:
                     config.albumList.cellBackgroundColor = color
                 case .cellbackgroundDarkColor:
-                    config.albumList.cellbackgroundDarkColor = color
+                    config.albumList.cellBackgroundDarkColor = color
                 case .cellSelectedColor:
                     config.albumList.cellSelectedColor = color
                 case .cellSelectedDarkColor:

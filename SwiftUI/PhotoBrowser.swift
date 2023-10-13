@@ -15,6 +15,7 @@ import Foundation
 struct PhotoBrowser {
     
     let pageIndex: Int
+    let rowCount: CGFloat
     @Binding var photoAssets: [PhotoAsset]
     @Binding var assets: [Asset]
     
@@ -28,8 +29,8 @@ struct PhotoBrowser {
             transitionalImage: image
         ) { index in
             let count = index + 1
-            var row = CGFloat(count / 3)
-            let remainder = CGFloat(count).truncatingRemainder(dividingBy: 3)
+            var row = CGFloat(count / Int(rowCount))
+            let remainder = CGFloat(count).truncatingRemainder(dividingBy: rowCount)
             var xPadding: CGFloat = remainder
             if remainder != 0 {
                 row += 1
@@ -56,4 +57,24 @@ struct PhotoBrowser {
         }
     }
     
+}
+
+
+@available(iOS 13.0, *)
+struct Editor {
+    
+    let asset: EditorAsset
+    let config: EditorConfiguration
+    
+    @Binding var resultAsset: EditorAsset
+    func start() {
+        Task {
+            do {
+                let result = try await Photo.edit(asset, config: config)
+                resultAsset = result
+            } catch {
+                
+            }
+        }
+    }
 }

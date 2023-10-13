@@ -28,12 +28,15 @@ class WeChatViewController: UIViewController {
         return button
     }()
     @objc func didPickerClick() {
-        let config = PhotoTools.getWXPickerConfig()
-        let picker = PhotoPickerController(
-            picker: config,
-            delegate: self
-        )
-        present(picker, animated: true, completion: nil)
+        var config = PhotoTools.getWXPickerConfig()
+        if UIDevice.isPad {
+            let picker = PhotoPickerController(splitPicker: config)
+            let split = PhotoSplitViewController(picker: picker)
+            present(split, animated: true, completion: nil)
+        }else {
+            let picker = PhotoPickerController(picker: config, delegate: self)
+            present(picker, animated: true, completion: nil)
+        }
     }
     
     var photoAssets: [PhotoAsset] = []

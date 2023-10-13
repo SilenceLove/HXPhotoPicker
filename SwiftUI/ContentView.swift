@@ -56,6 +56,7 @@ struct ContentView: View {
                                     .onTapGesture {
                                         PhotoBrowser(
                                             pageIndex: index,
+                                            rowCount: itemCount,
                                             photoAssets: $photoAssets,
                                             assets: $assets
                                         ).show(

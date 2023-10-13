@@ -49,10 +49,18 @@ class AvatarPickerConfigurationViewController: UITableViewController {
             config.photoList.cameraType = .custom(cameraConfig)
         }
         #endif
-        let vc = PhotoPickerController.init(config: config)
-        vc.pickerDelegate = self
-        vc.autoDismiss = false
-        present(vc, animated: true, completion: nil)
+        if UIDevice.isPad {
+            let picker = PhotoPickerController(splitPicker: config)
+            picker.pickerDelegate = self
+            picker.autoDismiss = false
+            let split = PhotoSplitViewController(picker: picker)
+            present(split, animated: true, completion: nil)
+        }else {
+            let vc = PhotoPickerController.init(config: config)
+            vc.pickerDelegate = self
+            vc.autoDismiss = false
+            present(vc, animated: true, completion: nil)
+        }
     }
     
     // MARK: - Table view data source

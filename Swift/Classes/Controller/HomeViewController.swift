@@ -82,7 +82,12 @@ class HomeViewController: UITableViewController {
             if rowType == .customCell {
                 let vc = rowType.controller as! PhotoPickerController
                 vc.pickerDelegate = self
-                present(vc, animated: true, completion: nil)
+                if UIDevice.isPad {
+                    let split = PhotoSplitViewController(picker: vc)
+                    present(split, animated: true, completion: nil)
+                }else {
+                    present(vc, animated: true, completion: nil)
+                }
                 return
             }
         }
@@ -228,9 +233,7 @@ extension HomeViewController {
                 config.videoSelectionTapAction = .quickSelect
                 config.photoList.cell.customSingleCellClass = CustomPickerViewCell.self
                 config.photoList.cell.customSelectableCellClass = CustomPickerViewCell.self
-                let pickerController = PhotoPickerController(
-                    config: config
-                )
+                let pickerController: PhotoPickerController = PhotoPickerController(config: config)
                 pickerController.autoDismiss = false
                 return pickerController
             case .weChat:

@@ -18,8 +18,13 @@ struct PhotoPickerView: UIViewControllerRepresentable {
     @Binding var assets: [Asset]
     
 
-    func makeUIViewController(context: Context) -> PhotoPickerController {
-        let controller = PhotoPickerController(config: config)
+    func makeUIViewController(context: Context) -> UIViewController {
+        let controller: PhotoPickerController
+        if UIDevice.isPad {
+            controller = PhotoPickerController(splitPicker: config)
+        }else {
+            controller = PhotoPickerController(config: config)
+        }
         controller.isOriginal = true
         controller.selectedAssetArray = photoAssets
         controller.autoDismiss = false
@@ -41,10 +46,14 @@ struct PhotoPickerView: UIViewControllerRepresentable {
                 print(pickerError)
             }
         }
+        if UIDevice.isPad {
+            let splitVC = PhotoSplitViewController(picker: controller)
+            return splitVC
+        }
         return controller
     }
 
-    func updateUIViewController(_ photoPickerController: PhotoPickerController, context: Context) {
+    func updateUIViewController(_ photoPickerController: UIViewController, context: Context) {
         
         
     }

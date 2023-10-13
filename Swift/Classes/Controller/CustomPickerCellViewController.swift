@@ -29,10 +29,18 @@ class CustomPickerCellViewController: UIViewController {
     }
     
     @objc func openPickerController() {
-        let pickerController = PhotoPickerController.init(config: config)
-        pickerController.pickerDelegate = self
-        pickerController.autoDismiss = false
-        present(pickerController, animated: true, completion: nil)
+        if UIDevice.isPad {
+            let picker = PhotoPickerController(splitPicker: config)
+            picker.pickerDelegate = self
+            picker.autoDismiss = false
+            let split = PhotoSplitViewController(picker: picker)
+            present(split, animated: true, completion: nil)
+        }else {
+            let pickerController = PhotoPickerController.init(config: config)
+            pickerController.pickerDelegate = self
+            pickerController.autoDismiss = false
+            present(pickerController, animated: true, completion: nil)
+        }
     }
 }
 extension CustomPickerCellViewController: PhotoPickerControllerDelegate {

@@ -11,8 +11,11 @@ import HXPhotoPicker
 class PickerConfigurationViewController: UITableViewController {
     
     var config: PickerConfiguration = .init()
-    var didDoneHandler: ((PickerConfiguration) -> Void)?
+    var didDoneHandler: ((PickerConfiguration, Bool) -> Void)?
     var showOpenPickerButton: Bool = true
+    
+    var isSplitAction: Bool = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Picker"
@@ -30,6 +33,14 @@ class PickerConfigurationViewController: UITableViewController {
     
     @objc func openPickerController() {
         if showOpenPickerButton {
+            if isSplitAction {
+                let picker = PhotoPickerController(splitPicker: config)
+                picker.pickerDelegate = self
+                picker.autoDismiss = false
+                let split = PhotoSplitViewController(picker: picker)
+                present(split, animated: true, completion: nil)
+                return
+            }
             #if OCEXAMPLE
             if #available(iOS 13.0.0, *) {
                 Task {
@@ -54,28 +65,36 @@ class PickerConfigurationViewController: UITableViewController {
 //                            self.navigationController?.pushViewController(pickerResultVC, animated: true)
 //                        }
 //                        config.isSelectedOriginal = true
-                        let result = try await Photo.picker(config)
+                        let result = try await Photo.picker(self.config)
 //                        let images: [UIImage] = try await result.objects()
 //                        let urls: [URL] = try await result.objects()
 //                        let urlResults: [AssetURLResult] = try await result.objects()
                         let pickerResultVC = PickerResultViewController()
-                        pickerResultVC.config = config
+                        pickerResultVC.config = self.config
                         pickerResultVC.selectedAssets = result.photoAssets
                         pickerResultVC.isOriginal = result.isOriginal
-                        navigationController?.pushViewController(pickerResultVC, animated: true)
+                        self.navigationController?.pushViewController(pickerResultVC, animated: true)
                     } catch {
                         print(error)
                     }
                 }
             } else {
-                let vc = PhotoPickerController.init(config: config)
-                vc.pickerDelegate = self
-                vc.autoDismiss = false
-                present(vc, animated: true, completion: nil)
+                if UIDevice.isPad {
+                    let picker = PhotoPickerController(splitPicker: config)
+                    picker.pickerDelegate = self
+                    picker.autoDismiss = false
+                    let split = PhotoSplitViewController(picker: picker)
+                    present(split, animated: true, completion: nil)
+                }else {
+                    let vc = PhotoPickerController.init(config: config)
+                    vc.pickerDelegate = self
+                    vc.autoDismiss = false
+                    present(vc, animated: true, completion: nil)
+                }
             }
 #endif
         }else {
-            didDoneHandler?(config)
+            didDoneHandler?(config, isSplitAction)
             dismiss(animated: true, completion: nil)
         }
     }
@@ -130,14 +149,25 @@ class PickerConfigurationViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         if !showOpenPickerButton {
-            return 2
+            return UIDevice.isPad ? 2 : 3
         }
         return ConfigSection.allCases.count
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if !showOpenPickerButton {
-            return ConfigSection.allCases[section + 1].allRowCase.count
+            if !UIDevice.isPad {
+                if section == 0 {
+                    return 1
+                }else {
+                    return ConfigSection.allCases[section].allRowCase.count
+                }
+            }else {
+                return ConfigSection.allCases[section + 1].allRowCase.count
+            }
+        }
+        if UIDevice.isPad, section == 0 {
+            return 1
         }
         return ConfigSection.allCases[section].allRowCase.count
     }
@@ -147,13 +177,20 @@ class PickerConfigurationViewController: UITableViewController {
             withIdentifier: ConfigurationViewCell.reuseIdentifier,
             for: indexPath
         ) as! ConfigurationViewCell
-        var section: Int
+        let rowType: ConfigRowTypeRule
         if !showOpenPickerButton {
-            section = indexPath.section + 1
+            if !UIDevice.isPad {
+                if indexPath.section == 0 {
+                    rowType = ConfigSection.allCases[indexPath.section].allRowCase[1]
+                }else {
+                    rowType = ConfigSection.allCases[indexPath.section].allRowCase[indexPath.row]
+                }
+            }else {
+                rowType = ConfigSection.allCases[indexPath.section + 1].allRowCase[indexPath.row]
+            }
         }else {
-            section = indexPath.section
+            rowType = ConfigSection.allCases[indexPath.section].allRowCase[indexPath.row]
         }
-        let rowType = ConfigSection.allCases[section].allRowCase[indexPath.row]
         cell.setupData(rowType, getRowContent(rowType))
         return cell
     }
@@ -162,30 +199,32 @@ class PickerConfigurationViewController: UITableViewController {
     }
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        var section: Int
+        let rowType: ConfigRowTypeRule
         if !showOpenPickerButton {
-            section = indexPath.section + 1
+            if !UIDevice.isPad {
+                if indexPath.section == 0 {
+                    rowType = ConfigSection.allCases[indexPath.section].allRowCase[1]
+                }else {
+                    rowType = ConfigSection.allCases[indexPath.section].allRowCase[indexPath.row]
+                }
+            }else {
+                rowType = ConfigSection.allCases[indexPath.section + 1].allRowCase[indexPath.row]
+            }
         }else {
-            section = indexPath.section
+            rowType = ConfigSection.allCases[indexPath.section].allRowCase[indexPath.row]
         }
-        let rowType = ConfigSection.allCases[section].allRowCase[indexPath.row]
         rowType.getFunction(self)(indexPath)
     }
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if showOpenPickerButton {
-            if section == 0 {
-                return 40
-            }
-            return 20
-        }
-        return 40
+        40
     }
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if !showOpenPickerButton {
-            return ConfigSection.allCases[section + 1].title
-        }else {
-            return ConfigSection.allCases[section].title
+            if UIDevice.isPad {
+                return ConfigSection.allCases[section + 1].title
+            }
         }
+        return ConfigSection.allCases[section].title
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -250,6 +289,11 @@ extension PickerConfigurationViewController {
         }
         self.tableView.reloadRows(at: [indexPath], with: .fade)
     }
+    func isSplitAction(_ indexPath: IndexPath) {
+        isSplitAction = !isSplitAction
+        self.tableView.reloadRows(at: [indexPath], with: .fade)
+    }
+    
     func languageTypeAction(_ indexPath: IndexPath) {
         let alert = UIAlertController.init(title: "languageType", message: nil, preferredStyle: .alert)
         let titles = [
@@ -571,8 +615,13 @@ extension PickerConfigurationViewController {
                 return config.photoList.allowAddCamera ? "true" : "false"
             }
         }
-        if rowType is ViewControllerOptionsRowType {
-            return config.modalPresentationStyle == .fullScreen ? "true" : "false"
+        if let type = rowType as? ViewControllerOptionsRowType {
+            switch type {
+            case .presentStyle:
+                return config.modalPresentationStyle == .fullScreen ? "true" : "false"
+            case .isSplit:
+                return isSplitAction ? "true" : "false"
+            }
         }
         return ""
     }
@@ -613,21 +662,36 @@ extension PickerConfigurationViewController {
     }
     enum ViewControllerOptionsRowType: String, CaseIterable, ConfigRowTypeRule {
         case presentStyle
+        case isSplit
         
         var title: String {
-            "是否全屏"
+            switch self {
+            case .presentStyle:
+                return "是否全屏"
+            case .isSplit:
+                return "Use UISplitViewController"
+            }
         }
         
         var detailTitle: String {
-            "modalPresentationStyle"
+            switch self {
+            case .presentStyle:
+                return "modalPresentationStyle"
+            case .isSplit:
+                return "PhotoSplitViewController"
+            }
         }
         
         func getFunction<T>(
-            _ controller: T) -> (
-                (IndexPath) -> Void
-            ) where T: UIViewController {
+            _ controller: T
+        ) -> ((IndexPath) -> Void) where T: UIViewController {
             guard let controller = controller as? PickerConfigurationViewController else { return { _ in } }
-            return controller.presentStyleAction(_:)
+            switch self {
+            case .presentStyle:
+                return controller.presentStyleAction(_:)
+            case .isSplit:
+                return controller.isSplitAction(_:)
+            }
         }
     }
     enum ColorRowType: String, CaseIterable, ConfigRowTypeRule {
