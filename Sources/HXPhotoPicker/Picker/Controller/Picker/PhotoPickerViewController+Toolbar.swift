@@ -10,12 +10,8 @@ import UIKit
 extension PhotoPickerViewController {
     
     func initToolbar() {
-        guard let picker = pickerController else {
-            return
-        }
-        photoToolbar = config.photoToolbar.init()
-        photoToolbar.initViews(picker.config, type: .picker)
-        photoToolbar.updateOriginalState(picker.isOriginal)
+        photoToolbar = config.photoToolbar.init(pickerConfig, type: .picker)
+        photoToolbar.updateOriginalState(pickerController.isOriginal)
         photoToolbar.previewHandler = { [weak self] in
             guard let picker = self?.pickerController else { return }
             self?.pushPreviewViewController(
@@ -26,41 +22,44 @@ extension PhotoPickerViewController {
             )
         }
         photoToolbar.originalHandler = { [weak self] in
-            self?.pickerController?.isOriginal = $0
-            self?.pickerController?.originalButtonCallback()
+            self?.pickerController.isOriginal = $0
+            self?.pickerController.originalButtonCallback()
             if $0 {
                 self?.requestSelectedAssetFileSize()
             }else {
-                self?.pickerController?.cancelRequestAssetFileSize(isPreview: false)
+                self?.pickerController.pickerData.cancelRequestAssetFileSize(isPreview: false)
             }
         }
         photoToolbar.finishHandler = { [weak self] in
-            self?.pickerController?.finishCallback()
+            self?.pickerController.finishCallback()
         }
         
         view.addSubview(photoToolbar)
-        if isMultipleSelect {
-            if picker.isOriginal {
+        if pickerConfig.isMultipleSelect {
+            if pickerController.isOriginal {
                 photoToolbar.requestOriginalAssetBtyes()
             }
-            photoToolbar.selectedAssetDidChanged(picker.selectedAssetArray)
+            photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
         }
     }
     
     func requestSelectedAssetFileSize() {
-        pickerController?.requestSelectedAssetFileSize(isPreview: false, completion: { [weak self] in
+        pickerController.pickerData.requestSelectedAssetFileSize(isPreview: false, completion: { [weak self] in
             self?.photoToolbar.originalAssetBytes($0, bytesString: $1)
         })
     }
     
     public func setOriginal(_ isOriginal: Bool) {
+        guard let photoToolbar = photoToolbar else {
+            return
+        }
         photoToolbar.updateOriginalState(isOriginal)
         if !isOriginal {
-            pickerController?.cancelRequestAssetFileSize(isPreview: false)
+            pickerController.pickerData.cancelRequestAssetFileSize(isPreview: false)
         }else {
             photoToolbar.requestOriginalAssetBtyes()
         }
-        pickerController?.isOriginal = isOriginal
-        pickerController?.originalButtonCallback()
+        pickerController.isOriginal = isOriginal
+        pickerController.originalButtonCallback()
     }
 }

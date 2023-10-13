@@ -11,8 +11,8 @@ import Photos
 public enum EditorTransitionMode {
     case push
     case pop
-//    case present
-//    case dismiss
+    case present
+    case dismiss
 }
 
 // swiftlint:disable type_body_length
@@ -32,20 +32,20 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
     }
 
     func transitionDuration(
-        using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        using transitionContext: UIViewControllerContextTransitioning?
+    ) -> TimeInterval {
         if let editorVC = transitionContext?.viewController(
-            forKey: mode == .push ? .to : .from
-        ) as? EditorViewController {
-            return editorVC.delegate?.editorViewController(editorVC, transitionDuration: mode) ?? 0.55
+            forKey: (mode == .push || mode == .present) ? .to : .from) as? EditorViewController,
+           let duration = editorVC.delegate?.editorViewController(
+            editorVC, transitionDuration: mode) {
+            return duration
         }
         return 0.55
     }
     func animateTransition(
         using transitionContext: UIViewControllerContextTransitioning
     ) {
-        if mode == .push || mode == .pop {
-            pushTransition(using: transitionContext)
-        }
+        pushTransition(using: transitionContext)
     }
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
@@ -60,11 +60,18 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
         }
         let containerView = transitionContext.containerView
         let contentView = UIView(frame: fromVC.view.bounds)
-        if mode == .push {
-            containerView.addSubview(fromVC.view)
+        let editorVC: UIViewController
+        switch mode {
+        case .push, .present:
+            if mode == .push {
+                containerView.addSubview(fromVC.view)
+            }
             containerView.addSubview(toVC.view)
             #if HXPICKER_ENABLE_PICKER
-            if fromVC is PhotoPickerViewController || fromVC is PhotoPreviewViewController {
+            if  fromVC is PhotoPickerViewController ||
+                fromVC is PhotoPreviewViewController {
+                fromVC.view.insertSubview(contentView, at: 1)
+            }else if fromVC is PhotoSplitViewController {
                 fromVC.view.insertSubview(contentView, at: 1)
             }else {
                 fromVC.view.addSubview(contentView)
@@ -73,9 +80,12 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             fromVC.view.addSubview(contentView)
             #endif
             contentView.backgroundColor = .clear
-        }else {
-            containerView.addSubview(toVC.view)
-            containerView.addSubview(fromVC.view)
+            editorVC = toVC
+        case .pop, .dismiss:
+            if mode == .pop {
+                containerView.addSubview(toVC.view)
+                containerView.addSubview(fromVC.view)
+            }
             #if HXPICKER_ENABLE_PICKER
             if let pickerVC = toVC as? PhotoPickerViewController {
                 pickerVC.photoToolbar.alpha = 0
@@ -83,6 +93,36 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             }else if let previewVC = toVC as? PhotoPreviewViewController {
                 previewVC.photoToolbar.alpha = 0
                 toVC.view.insertSubview(contentView, at: 1)
+            }else if toVC is PhotoPickerController || toVC is PhotoSplitViewController {
+                var picker: PhotoPickerController?
+                if let pickerController = toVC as? PhotoPickerController {
+                    if let controller = pickerController.topViewController as? PhotoPickerController {
+                        picker = controller
+                    }else {
+                        picker = pickerController
+                    }
+                }else if let splitVC = toVC as? PhotoSplitViewController {
+                    if UIDevice.isPad {
+                        toVC.view.addSubview(contentView)
+                    }else {
+                        if let pickerController = splitVC.viewControllers.last as? PhotoPickerController {
+                            pickerController.navigationBar.alpha = 0
+                            if let controller = pickerController.topViewController as? PhotoPickerController {
+                                picker = controller
+                            }else {
+                                picker = pickerController
+                            }
+                        }
+                    }
+                }
+                if let vc = picker?.topViewController as? PhotoPickerViewController {
+                    vc.photoToolbar.alpha = 0
+                    vc.view.insertSubview(contentView, at: 1)
+                }else if let vc = picker?.topViewController as? PhotoPreviewViewController {
+                    vc.photoToolbar.alpha = 0
+                    vc.view.insertSubview(contentView, at: 1)
+                }
+                picker?.navigationBar.alpha = 0
             }else {
                 toVC.view.addSubview(contentView)
             }
@@ -90,6 +130,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             toVC.view.addSubview(contentView)
             #endif
             contentView.backgroundColor = .black
+            editorVC = fromVC
         }
         contentView.addSubview(previewView)
         #if HXPICKER_ENABLE_PICKER
@@ -97,10 +138,10 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
         #endif
         var fromRect: CGRect = .zero
         var toRect: CGRect = .zero
-        let editorVC = mode == .push ? toVC : fromVC
         let isSpring: Bool = true
         if let editorVC = editorVC as? EditorViewController {
-            if mode == .push {
+            switch mode {
+            case .push, .present:
                 editorVC.isTransitionCompletion = false
                 editorVC.transitionHide()
                 if let view = editorVC.delegate?.editorViewController(transitioStartPreviewView: editorVC) {
@@ -161,7 +202,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 if toRect.height < editorVC.view.height {
                     toRect.origin.y = (editorVC.view.height - toRect.height) * 0.5
                 }
-            }else {
+            case .pop, .dismiss:
                 let view = editorVC.editorView.contentView
                 let imageView = UIImageView()
                 imageView.contentMode = .scaleAspectFill
@@ -195,10 +236,10 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
         }else {
             previewView.removeFromSuperview()
             contentView.removeFromSuperview()
-            transitionContext.completeTransition(true)
+            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
             return
         }
-        if mode == .push {
+        if mode == .push || mode == .present {
             #if HXPICKER_ENABLE_PICKER
             if let photoAsset = photoAsset, !(fromVC is PhotoPreviewViewController) {
                 var reqeustAsset = photoAsset.phAsset != nil
@@ -217,28 +258,75 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
         transitionView?.isHidden = true
         let duration = transitionDuration(using: transitionContext)
         UIView.animate(withDuration: duration - 0.15) {
-            contentView.backgroundColor = self.mode == .push ? .black : .clear
-            if self.mode == .push {
+            switch self.mode {
+            case .push, .present:
+                contentView.backgroundColor = .black
                 #if HXPICKER_ENABLE_PICKER
                 if let pickerVC = fromVC as? PhotoPickerViewController {
                     pickerVC.photoToolbar.alpha = 0
                 }else if let previewVC = fromVC as? PhotoPreviewViewController {
                     previewVC.photoToolbar.alpha = 0
+                }else if fromVC is PhotoPickerController || fromVC is PhotoSplitViewController {
+                    var picker: PhotoPickerController?
+                    if let pickerController = fromVC as? PhotoPickerController {
+                        if let controller = pickerController.topViewController as? PhotoPickerController {
+                            picker = controller
+                        }else {
+                            picker = pickerController
+                        }
+                    }else if let splitVC = fromVC as? PhotoSplitViewController {
+                        if let pickerController = splitVC.viewControllers.last as? PhotoPickerController {
+                            if let controller = pickerController.topViewController as? PhotoPickerController {
+                                picker = controller
+                            }else {
+                                picker = pickerController
+                            }
+                        }
+                    }
+                    if let vc = picker?.topViewController as? PhotoPickerViewController {
+                        vc.photoToolbar.alpha = 0
+                    }else if let vc = picker?.topViewController as? PhotoPreviewViewController {
+                        vc.photoToolbar.alpha = 0
+                    }
                 }
                 #endif
-            }else if self.mode == .pop {
+                if let editorVC = editorVC as? EditorViewController {
+                    editorVC.transitionShow()
+                }
+            case .pop, .dismiss:
+                contentView.backgroundColor = .clear
                 #if HXPICKER_ENABLE_PICKER
                 if let pickerVC = toVC as? PhotoPickerViewController {
                     pickerVC.photoToolbar.alpha = 1
                 }else if let previewVC = toVC as? PhotoPreviewViewController {
                     previewVC.photoToolbar.alpha = 1
+                }else if toVC is PhotoPickerController || toVC is PhotoSplitViewController {
+                    var picker: PhotoPickerController?
+                    if let pickerController = toVC as? PhotoPickerController {
+                        if let controller = pickerController.topViewController as? PhotoPickerController {
+                            picker = controller
+                        }else {
+                            picker = pickerController
+                        }
+                    }else if let splitVC = toVC as? PhotoSplitViewController {
+                        if let pickerController = splitVC.viewControllers.last as? PhotoPickerController {
+                            pickerController.navigationBar.alpha = 1
+                            if let controller = pickerController.topViewController as? PhotoPickerController {
+                                picker = controller
+                            }else {
+                                picker = pickerController
+                            }
+                        }
+                    }
+                    if let vc = picker?.topViewController as? PhotoPickerViewController {
+                        vc.photoToolbar.alpha = 1
+                    }else if let vc = picker?.topViewController as? PhotoPreviewViewController {
+                        vc.photoToolbar.alpha = 1
+                    }
+                    picker?.navigationBar.alpha = 1
                 }
                 #endif
-            }
-            if let editorVC = editorVC as? EditorViewController {
-                if self.mode == .push {
-                    editorVC.transitionShow()
-                }else {
+                if let editorVC = editorVC as? EditorViewController {
                     editorVC.transitionHide()
                 }
             }
@@ -271,11 +359,12 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
         } completion: { [weak self] _ in
             guard let self = self else {
                 contentView.removeFromSuperview()
-                transitionContext.completeTransition(true)
+                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
                 return
             }
             self.transitionView?.isHidden = false
-            if self.mode == .push {
+            switch self.mode {
+            case .push, .present:
                 if let requestID = self.requestID {
                     PHImageManager.default().cancelImageRequest(requestID)
                     self.requestID = nil
@@ -285,6 +374,28 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     pickerVC.photoToolbar.alpha = 1
                 }else if let previewVC = fromVC as? PhotoPreviewViewController {
                     previewVC.photoToolbar.alpha = 1
+                }else if fromVC is PhotoPickerController || fromVC is PhotoSplitViewController {
+                    var picker: PhotoPickerController?
+                    if let pickerController = fromVC as? PhotoPickerController {
+                        if let controller = pickerController.topViewController as? PhotoPickerController {
+                            picker = controller
+                        }else {
+                            picker = pickerController
+                        }
+                    }else if let splitVC = fromVC as? PhotoSplitViewController {
+                        if let pickerController = splitVC.viewControllers.last as? PhotoPickerController {
+                            if let controller = pickerController.topViewController as? PhotoPickerController {
+                                picker = controller
+                            }else {
+                                picker = pickerController
+                            }
+                        }
+                    }
+                    if let vc = picker?.topViewController as? PhotoPickerViewController {
+                        vc.photoToolbar.alpha = 1
+                    }else if let vc = picker?.topViewController as? PhotoPreviewViewController {
+                        vc.photoToolbar.alpha = 1
+                    }
                 }
                 #endif
                 if let editorVC = editorVC as? EditorViewController {
@@ -295,8 +406,8 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 }
                 self.previewView.removeFromSuperview()
                 contentView.removeFromSuperview()
-                transitionContext.completeTransition(true)
-            }else if self.mode == .pop {
+                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+            case .pop, .dismiss:
                 #if HXPICKER_ENABLE_PICKER
                 if let previewVC = toVC as? PhotoPreviewViewController {
                     previewVC.navigationController?.delegate = previewVC.beforeNavDelegate
@@ -305,12 +416,13 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 UIView.animate(
                     withDuration: 0.25,
                     delay: 0,
-                    options: [.allowUserInteraction]) {
+                    options: [.allowUserInteraction]
+                ) {
                     self.previewView.alpha = 0
                 } completion: { _ in
                     self.previewView.removeFromSuperview()
                     contentView.removeFromSuperview()
-                    transitionContext.completeTransition(true)
+                    transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
                 }
             }
         }
@@ -356,6 +468,10 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             case .success(let dataResult):
                 info = dataResult.info
                 DispatchQueue.global().async {
+                    if dataResult.imageData.count > 10000000 {
+                        self.requestID = nil
+                        return
+                    }
                     var image: UIImage?
                     if dataResult.imageOrientation != .up {
                         image = UIImage(data: dataResult.imageData)?.normalizedImage()

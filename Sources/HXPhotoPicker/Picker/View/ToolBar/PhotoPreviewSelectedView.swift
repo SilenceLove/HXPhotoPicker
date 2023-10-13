@@ -163,10 +163,7 @@ class PhotoPreviewSelectedView: UIView,
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: NSStringFromClass(PhotoPreviewSelectedViewCell.self),
-            for: indexPath
-        ) as! PhotoPreviewSelectedViewCell
+        let cell: PhotoPreviewSelectedViewCell = collectionView.dequeueReusableCell(for: indexPath)
         cell.tickColor = tickColor
         cell.photoAsset = photoAssetArray[indexPath.item]
         return cell

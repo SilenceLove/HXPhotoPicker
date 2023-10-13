@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class PhotoToolBar: UIToolbar, PhotoToolBarProtocol {
+public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     
     public var previewHandler: (() -> Void)?
     public var originalHandler: ((Bool) -> Void)?
@@ -20,8 +20,8 @@ public class PhotoToolBar: UIToolbar, PhotoToolBarProtocol {
     private var editBtn: UIButton!
     #endif
     
-    private var pickerConfig: PickerConfiguration!
-    private var type: PhotoToolBarType!
+    private let pickerConfig: PickerConfiguration
+    private let type: PhotoToolBarType
     private var promptView: PhotoPermissionPromptView!
     private var selectedView: PhotoPreviewSelectedView!
     private var contentView: UIView!
@@ -46,9 +46,18 @@ public class PhotoToolBar: UIToolbar, PhotoToolBarProtocol {
         type == .browser
     }
     
-    public func initViews(_ config: PickerConfiguration, type: PhotoToolBarType) {
+    private var assetCount: Int = 0
+    
+    private var isCanLoadOriginal: Bool {
+        ((type == .picker && pickerConfig.photoList.bottomView.isShowOriginalFileSize) ||
+         (type == .preview && pickerConfig.previewView.bottomView.isShowOriginalFileSize)) &&
+        assetCount > 0
+    }
+    
+    public required init(_ config: PickerConfiguration, type: PhotoToolBarType) {
         pickerConfig = config
         self.type = type
+        super.init(frame: .zero)
         
         contentView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: 50 + UIDevice.bottomMargin))
         
@@ -146,21 +155,18 @@ public class PhotoToolBar: UIToolbar, PhotoToolBarProtocol {
     private func initSelectedView() {
         let viewConfig = pickerConfig.previewView.bottomView
         selectedView = PhotoPreviewSelectedView(frame: CGRect(x: 0, y: 0, width: width, height: 70))
-        if let customSelectedViewCellClass = viewConfig.customSelectedViewCellClass {
+        if let cellClass = viewConfig.customSelectedViewCellClass {
             selectedView.collectionView.register(
-                customSelectedViewCellClass,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(PhotoPreviewSelectedViewCell.self)
+                cellClass,
+                forCellWithReuseIdentifier: PhotoPreviewSelectedViewCell.className
             )
         }else {
             selectedView.collectionView.register(
                 PhotoPreviewSelectedViewCell.self,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(PhotoPreviewSelectedViewCell.self)
+                forCellWithReuseIdentifier: PhotoPreviewSelectedViewCell.className
             )
         }
         selectedView.delegate = self
-        selectedView.tickColor = viewConfig.selectedViewTickColor
         addSubview(selectedView)
     }
     
@@ -200,22 +206,18 @@ public class PhotoToolBar: UIToolbar, PhotoToolBarProtocol {
         if !originalBox.isSelected {
             return
         }
-        if (type == .picker && pickerConfig.photoList.bottomView.isShowOriginalFileSize) ||
-            (type == .preview && pickerConfig.previewView.bottomView.isShowOriginalFileSize) {
+        if isCanLoadOriginal {
             startOriginalLoading()
         }
         originalHandler?(true)
     }
     
     public func originalAssetBytes(_ bytes: Int, bytesString: String) {
-        if !originalBox.isSelected {
+        if !originalBox.isSelected || !isCanLoadOriginal {
             stopOriginalLoading(bytes: 0, bytesString: "")
             return
         }
-        if (type == .picker && pickerConfig.photoList.bottomView.isShowOriginalFileSize) ||
-            (type == .preview && pickerConfig.previewView.bottomView.isShowOriginalFileSize) {
-            stopOriginalLoading(bytes: bytes, bytesString: bytesString)
-        }
+        stopOriginalLoading(bytes: bytes, bytesString: bytesString)
     }
     
     #if HXPICKER_ENABLE_EDITOR
@@ -283,8 +285,7 @@ public class PhotoToolBar: UIToolbar, PhotoToolBarProtocol {
         
         let isSelected = originalBox.isSelected
         if isSelected {
-            if (type == .picker && pickerConfig.photoList.bottomView.isShowOriginalFileSize) ||
-                (type == .preview && pickerConfig.previewView.bottomView.isShowOriginalFileSize) {
+            if isCanLoadOriginal {
                 startOriginalLoading()
             }
         }else {
@@ -316,6 +317,20 @@ public class PhotoToolBar: UIToolbar, PhotoToolBarProtocol {
         finishHandler?()
     }
     
+    public var leftMargin: CGFloat {
+        if let splitViewController = viewController?.splitViewController as? PhotoSplitViewController,
+           !UIDevice.isPortrait,
+           !UIDevice.isPad {
+            if !splitViewController.isSplitShowColumn {
+                return UIDevice.leftMargin
+            }else {
+                return 0
+            }
+        }else {
+            return UIDevice.leftMargin
+        }
+    }
+    
     public override func layoutSubviews() {
         super.layoutSubviews()
         contentView.width = width
@@ -331,7 +346,7 @@ public class PhotoToolBar: UIToolbar, PhotoToolBarProtocol {
             }else {
                 contentView.y = height - contentView.height
             }
-            previewBtn.x = 12 + UIDevice.leftMargin
+            previewBtn.x = 12 + leftMargin
             updateFinishButtonFrame()
             updateOriginalViewFrame()
         }else if type == .preview {
@@ -363,9 +378,13 @@ public class PhotoToolBar: UIToolbar, PhotoToolBarProtocol {
         }
         configColor()
     }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
-extension PhotoToolBar {
+extension PhotoToolBarView {
     
     func configColor() {
         let config = type == .picker ? pickerConfig.photoList.bottomView : pickerConfig.previewView.bottomView
@@ -410,6 +429,9 @@ extension PhotoToolBar {
                 }
             }
             #endif
+            if isShowSelectedView {
+                selectedView.tickColor = isDark ? config.selectedViewTickDarkColor : config.selectedViewTickColor
+            }
         }
         
         if type != .browser {
@@ -447,11 +469,13 @@ extension PhotoToolBar {
                 ),
                 for: .disabled
             )
+        }else {
+            selectedView.tickColor = isDark ? config.selectedViewTickDarkColor : config.selectedViewTickColor
         }
     }
 }
 
-extension PhotoToolBar {
+extension PhotoToolBarView {
     
     func updateOriginalViewFrame() {
         updateOriginalSubviewFrame()
@@ -509,6 +533,7 @@ extension PhotoToolBar {
     
     private func updateFinishButtonTitle(_ photoAssets: [PhotoAsset]) {
         let count = photoAssets.count
+        assetCount = count
         if count > 0 {
             finishBtn.isEnabled = true
             if type == .picker {
@@ -559,7 +584,7 @@ extension PhotoToolBar {
     }
 }
 
-extension PhotoToolBar: PhotoPreviewSelectedViewDelegate {
+extension PhotoToolBarView: PhotoPreviewSelectedViewDelegate {
     
     func selectedView(
         _ selectedView: PhotoPreviewSelectedView,

@@ -172,6 +172,7 @@ public struct PickerBottomViewConfiguration {
     /// The selected tick color of the selected resource
     /// 已选资源选中的勾勾颜色
     public var selectedViewTickColor: UIColor = .white
+    public var selectedViewTickDarkColor: UIColor = .systemBlue
     
     public init() {
         var boxConfig = SelectBoxConfiguration()

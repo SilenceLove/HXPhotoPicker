@@ -20,7 +20,7 @@ extension PhotoPreviewViewController: UICollectionViewDataSource {
     ) -> UICollectionViewCell {
         guard let photoAsset = photoAsset(for: indexPath.item) else {
             return collectionView.dequeueReusableCell(
-                withReuseIdentifier: NSStringFromClass(PreviewPhotoViewCell.self),
+                withReuseIdentifier: PreviewPhotoViewCell.className,
                 for: indexPath
             )
         }
@@ -29,7 +29,7 @@ extension PhotoPreviewViewController: UICollectionViewDataSource {
             if photoAsset.mediaSubType == .livePhoto ||
                 photoAsset.mediaSubType == .localLivePhoto {
                 cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: NSStringFromClass(PreviewLivePhotoViewCell.self),
+                    withReuseIdentifier: PreviewLivePhotoViewCell.className,
                     for: indexPath
                 ) as! PreviewLivePhotoViewCell
                 let livePhotoCell = cell as! PreviewLivePhotoViewCell
@@ -37,13 +37,13 @@ extension PhotoPreviewViewController: UICollectionViewDataSource {
                 livePhotoCell.liveMarkConfig = config.livePhotoMark
             }else {
                 cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: NSStringFromClass(PreviewPhotoViewCell.self),
+                    withReuseIdentifier: PreviewPhotoViewCell.className,
                     for: indexPath
                 ) as! PreviewPhotoViewCell
             }
         }else {
             cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: NSStringFromClass(PreviewVideoViewCell.self),
+                withReuseIdentifier: PreviewVideoViewCell.className,
                 for: indexPath
             ) as! PreviewVideoViewCell
             let videoCell = cell as! PreviewVideoViewCell
@@ -70,13 +70,11 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
             myCell.scrollView.zoomScale = 1
         }
         myCell.checkContentSize()
-        if let pickerController = pickerController {
-            pickerController.pickerDelegate?.pickerController(
-                pickerController,
-                previewCellWillDisplay: myCell.photoAsset,
-                at: indexPath.item
-            )
-        }
+        pickerController.pickerDelegate?.pickerController(
+            pickerController,
+            previewCellWillDisplay: myCell.photoAsset,
+            at: indexPath.item
+        )
     }
     public func collectionView(
         _ collectionView: UICollectionView,
@@ -85,13 +83,11 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
     ) {
         let myCell = cell as! PhotoPreviewViewCell
         myCell.cancelRequest()
-        if let pickerController = pickerController {
-            pickerController.pickerDelegate?.pickerController(
-                pickerController,
-                previewCellDidEndDisplaying: myCell.photoAsset,
-                at: indexPath.item
-            )
-        }
+        pickerController.pickerDelegate?.pickerController(
+            pickerController,
+            previewCellDidEndDisplaying: myCell.photoAsset,
+            at: indexPath.item
+        )
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -108,8 +104,8 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
             currentIndex = 0
         }
         if let photoAsset = photoAsset(for: currentIndex) {
-            if !isExternalPreview {
-                if photoAsset.mediaType == .video && videoLoadSingleCell {
+            if previewType != .browser {
+                if photoAsset.mediaType == .video && pickerConfig.isSingleVideo {
                     selectBoxControl.isHidden = true
                     selectBoxControl.isEnabled = false
                 }else {
@@ -123,7 +119,7 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
                 photoToolbar.selectedViewScrollTo(photoAsset, animated: true)
             }
             #if HXPICKER_ENABLE_EDITOR
-            if let pickerController = pickerController, config.isShowBottomView {
+            if config.isShowBottomView {
                 if photoAsset.mediaType == .photo {
                     photoToolbar.updateEditState(pickerController.config.editorOptions.isPhoto)
                 }else if photoAsset.mediaType == .video {
@@ -131,7 +127,7 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
                 }
             }
             #endif
-            pickerController?.previewUpdateCurrentlyDisplayedAsset(photoAsset: photoAsset, index: currentIndex)
+            pickerController.previewUpdateCurrentlyDisplayedAsset(photoAsset: photoAsset, index: currentIndex)
         }
         self.currentPreviewIndex = currentIndex
     }
@@ -145,7 +141,7 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
         }
         let cell = getCell(for: currentPreviewIndex)
         cell?.requestPreviewAsset()
-        if let pickerController = pickerController, let cell = cell {
+        if let cell = cell {
             pickerController.pickerDelegate?.pickerController(
                 pickerController,
                 previewDidEndDecelerating: cell.photoAsset,
@@ -169,7 +165,8 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
         }
         let isHidden = navigationController.navigationBar.isHidden
         statusBarShouldBeHidden = !isHidden
-        if self.modalPresentationStyle == .fullScreen {
+        if self.modalPresentationStyle == .fullScreen ||
+            pickerController.splitViewController?.modalPresentationStyle == .fullScreen {
             navigationController.setNeedsStatusBarAppearanceUpdate()
         }
         navigationController.setNavigationBarHidden(statusBarShouldBeHidden, animated: true)
@@ -203,28 +200,23 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
                 self.photoToolbar.isHidden = self.statusBarShouldBeHidden
             }
         }
-        if let pickerController = pickerController {
-            pickerController.pickerDelegate?.pickerController(
-                pickerController,
-                previewSingleClick: cell.photoAsset,
-                atIndex: currentPreviewIndex
-            )
-        }
+        pickerController.pickerDelegate?.pickerController(
+            pickerController,
+            previewSingleClick: cell.photoAsset,
+            atIndex: currentPreviewIndex
+        )
     }
     func cell(longPress cell: PhotoPreviewViewCell) {
-        if let pickerController = pickerController {
-            pickerController.pickerDelegate?.pickerController(
-                pickerController,
-                previewLongPressClick: cell.photoAsset,
-                atIndex: currentPreviewIndex
-            )
-        }
+        pickerController.pickerDelegate?.pickerController(
+            pickerController,
+            previewLongPressClick: cell.photoAsset,
+            atIndex: currentPreviewIndex
+        )
     }
     
     func photoCell(networkImagedownloadSuccess photoCell: PhotoPreviewViewCell) {
         #if canImport(Kingfisher)
-        if let pickerController = pickerController,
-           let index = collectionView.indexPath(for: photoCell)?.item {
+        if let index = collectionView.indexPath(for: photoCell)?.item {
             pickerController.pickerDelegate?.pickerController(
                 pickerController,
                 previewNetworkImageDownloadSuccess: photoCell.photoAsset,
@@ -240,8 +232,7 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
     
     func photoCell(networkImagedownloadFailed photoCell: PhotoPreviewViewCell) {
         #if canImport(Kingfisher)
-        if let pickerController = pickerController,
-           let index = collectionView.indexPath(for: photoCell)?.item {
+        if let index = collectionView.indexPath(for: photoCell)?.item {
             pickerController.pickerDelegate?.pickerController(
                 pickerController,
                 previewNetworkImageDownloadFailed: photoCell.photoAsset,

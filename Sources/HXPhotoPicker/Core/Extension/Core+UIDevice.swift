@@ -14,7 +14,7 @@ extension UIDevice {
             return true
         }
         if  statusBarOrientation == .landscapeLeft ||
-                statusBarOrientation == .landscapeRight {
+            statusBarOrientation == .landscapeRight {
             return false
         }
         return true
@@ -23,12 +23,16 @@ extension UIDevice {
         UIApplication.shared.statusBarOrientation
     }
     class var navigationBarHeight: CGFloat {
-        if isPad {
-            if #available(iOS 12, *) {
-                return statusBarHeight + 50
-            }
+        if #available(iOS 12, *), isPad {
+            return statusBarHeight + 50
         }
         return statusBarHeight + 44
+    }
+    class var navBarHeight: CGFloat {
+        if #available(iOS 12, *), isPad {
+            return  50
+        }
+        return 44
     }
     class var generalStatusBarHeight: CGFloat {
         if isPad {
@@ -45,7 +49,7 @@ extension UIDevice {
         if isIPhone12Mini || isIPhone13Mini {
             return 50
         }
-        if isIPhone14Pro || isIPhone14ProMax {
+        if isIPhone14Pro || isIPhone14ProMax || isIPhone15 {
             return 54
         }
         return isAllIPhoneX ? 44 : 20
@@ -75,6 +79,9 @@ extension UIDevice {
             #if HXPICKER_ENABLE_PICKER
             if let controller = UIViewController.topViewController?.navigationController as? PhotoPickerController,
                controller.modalPresentationStyle == .pageSheet {
+                return 0
+            }else if let controller = UIViewController.topViewController as? PhotoSplitViewController,
+                     controller.modalPresentationStyle == .formSheet {
                 return 0
             }
             #endif
@@ -170,6 +177,10 @@ extension UIDevice {
     }
     class var isIPhone14ProMax: Bool {
         phoneIdentifier == "iPhone15,3"
+    }
+    class var isIPhone15: Bool {
+        phoneIdentifier == "iPhone15,4" || phoneIdentifier == "iPhone15,5" ||
+        phoneIdentifier == "iPhone16,1" || phoneIdentifier == "iPhone16,2"
     }
     
     class var belowIphone7: Bool {

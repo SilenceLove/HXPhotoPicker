@@ -49,6 +49,10 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
         photoView.downloadStatus
     }
     
+    /// 是否赋值 photoAsset 时就请求数据
+    /// Whether to request data when assigning photoAsset
+    public var isRequestDirectly = true
+    
     /// 对应资源的 PhotoAsset 对象
     open var photoAsset: PhotoAsset! {
         didSet {
@@ -191,7 +195,6 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
         }
     }
     
-    var isRequestDirectly = true
     var iCloundLoading = false
     var requestICloudCompletion = false
     

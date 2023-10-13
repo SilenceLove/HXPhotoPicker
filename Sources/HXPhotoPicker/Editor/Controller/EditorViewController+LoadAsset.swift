@@ -738,7 +738,7 @@ extension EditorViewController {
                     if dataCount > 3000000 {
                         if let imageData = PhotoTools.imageCompress(
                             dataResult.imageData,
-                            compressionQuality: dataCount.compressionQuality,
+                            compressionQuality: dataCount.editorCompressionQuality,
                             isHEIC: isHEIC
                         ) {
                             image = .init(data: imageData)

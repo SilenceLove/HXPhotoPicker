@@ -8,7 +8,7 @@
 
 import UIKit
  
-class DeniedAuthorizationView: UIView {
+public class DeniedAuthorizationView: UIView, PhotoDeniedAuthorization {
     
     let config: NotAuthorizedConfiguration
     
@@ -18,9 +18,9 @@ class DeniedAuthorizationView: UIView {
     private var subTitleLb: UILabel!
     private var jumpBtn: UIButton!
     
-    init(config: NotAuthorizedConfiguration) {
-        self.config = config
-        super.init(frame: CGRect.zero)
+    required public init(config: PickerConfiguration) {
+        self.config = config.notAuthorized
+        super.init(frame: .zero)
         initViews()
         configViews()
     }
@@ -112,13 +112,18 @@ class DeniedAuthorizationView: UIView {
         PhotoTools.openSettingsURL()
     }
     
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
         var barHeight: CGFloat = 0
         var barY: CGFloat = 0
         if let pickerController = viewController as? PhotoPickerController {
             barHeight = pickerController.navigationBar.height
             if pickerController.modalPresentationStyle == .fullScreen {
+                barY = UIDevice.statusBarHeight
+            }
+        }else if let splitVC = viewController as? PhotoSplitViewController {
+            barHeight = splitVC.photoController.navigationBar.height
+            if splitVC.photoController.modalPresentationStyle == .fullScreen {
                 barY = UIDevice.statusBarHeight
             }
         }
@@ -168,7 +173,18 @@ class DeniedAuthorizationView: UIView {
         jumpBtn.centerX = width * 0.5
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    public override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        true
+    }
+    
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if !config.isHiddenCloseButton, closeBtn.frame.contains(point) {
+            return closeBtn
+        }
+        return super.hitTest(point, with: event)
+    }
+    
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {

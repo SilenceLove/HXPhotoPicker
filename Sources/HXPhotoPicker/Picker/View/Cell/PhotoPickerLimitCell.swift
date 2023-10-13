@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PhotoPickerLimitCell: UICollectionViewCell {
+public class PhotoPickerLimitCell: UICollectionViewCell {
     
     private var lineLayer: CAShapeLayer!
     private var titleLb: UILabel!
@@ -33,7 +33,7 @@ class PhotoPickerLimitCell: UICollectionViewCell {
         contentView.addSubview(titleLb)
     }
     
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
         lineLayer.frame = bounds
         titleLb.x = 0
@@ -71,7 +71,7 @@ class PhotoPickerLimitCell: UICollectionViewCell {
         lineLayer.path = path.cgPath
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {

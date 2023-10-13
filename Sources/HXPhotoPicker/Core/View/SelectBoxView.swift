@@ -33,7 +33,6 @@ public final class SelectBoxView: UIControl {
         }
     }
     
-    
     var textSize: CGSize = CGSize.zero
     
     private var backgroundLayer: CAShapeLayer!

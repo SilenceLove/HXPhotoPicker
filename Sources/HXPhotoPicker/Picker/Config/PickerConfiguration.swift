@@ -10,6 +10,18 @@ import UIKit
 
 public struct PickerConfiguration: IndicatorTypeConfig {
     
+    /// 获取 AssetCollection
+    public var fetchAssetCollection: PhotoFetchAssetCollection.Type = DefaultPhotoFetchAssetCollection.self
+    
+    /// 获取 Asset
+    public var fetchAsset: PhotoFetchAsset.Type = DefaultPhotoFetchAsset.self
+    
+    /// 获取数据
+    public var fetchdata: PhotoFetchData.Type = PhotoFetchData.self
+    
+    /// 选择数据
+    public var pickerData: PhotoPickerData.Type = PhotoPickerData.self
+    
     public var modalPresentationStyle: UIModalPresentationStyle
     
     /// Selector display style, effective when albumShowMode = .popup and fullscreen popup
@@ -210,9 +222,14 @@ public struct PickerConfiguration: IndicatorTypeConfig {
     /// 未授权提示界面相关配置
     public var notAuthorized: NotAuthorizedConfiguration = .init()
     
+    public var notAuthorizedView: PhotoDeniedAuthorization.Type = DeniedAuthorizationView.self
+    
     /// Whether to cache the [Camera Roll/All Photos] album
     /// 是否缓存[相机胶卷/所有照片]相册
     public var isCacheCameraAlbum: Bool = true
+    
+    public var splitSeparatorLineColor: UIColor?
+    public var splitSeparatorLineDarkColor: UIColor?
     
     public init() {
         if #available(iOS 13.0, *) {

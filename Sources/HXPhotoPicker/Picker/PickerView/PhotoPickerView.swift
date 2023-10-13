@@ -110,7 +110,7 @@ open class PhotoPickerView: UIView {
     
     var verticalLayout: PhotoPickerSwitchLayout!
     var horizontalLayout: PhotoPickerSwitchLayout!
-    var emptyView: EmptyView!
+    var emptyView: PhotoPickerEmptyView!
     var deniedView: DeniedAuthorizationView!
     var panGR: UIPanGestureRecognizer!
     var dragView: UIImageView!

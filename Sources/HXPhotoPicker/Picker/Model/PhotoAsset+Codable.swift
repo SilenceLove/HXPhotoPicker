@@ -88,7 +88,7 @@ extension PhotoAsset {
             let decoder = JSONDecoder()
             let simplify = try decoder.decode(Simplify.self, from: data)
             if let phLocalIdentifier = simplify.phLocalIdentifier {
-                if let phAsset = AssetManager.fetchAsset(withLocalIdentifier: phLocalIdentifier) {
+                if let phAsset = AssetManager.fetchAsset(with: phLocalIdentifier) {
                     photoAsset = PhotoAsset(asset: phAsset)
                 }
             }else if let localImageAsset = simplify.localImageAsset {

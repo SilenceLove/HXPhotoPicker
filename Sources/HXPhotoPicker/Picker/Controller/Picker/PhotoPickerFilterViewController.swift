@@ -20,7 +20,7 @@ class PhotoPickerFilterViewController: UITableViewController {
     var didSelectedHandler: ((PhotoPickerFilterViewController) -> Void)?
     
     private var bottomView: UIView!
-    private var numberView: BottomNumberView!
+    private var numberView: PhotoPickerBottomNumberView!
     private var filterLb: UILabel!
     
     override func viewDidLoad() {
@@ -47,7 +47,7 @@ class PhotoPickerFilterViewController: UITableViewController {
         initViews()
         
         tableView.cellLayoutMarginsFollowReadableWidth = true
-        tableView.register(PhotoPickerFilterViewCell.self, forCellReuseIdentifier: "PhotoPickerFilterViewCellID")
+        tableView.register(PhotoPickerFilterViewCell.self)
         let bottomHeight =  UIDevice.bottomMargin + 100
         bottomView.frame = .init(x: 0, y: 20, width: view.width, height: bottomHeight)
         tableView.tableFooterView = bottomView
@@ -90,7 +90,7 @@ class PhotoPickerFilterViewController: UITableViewController {
     }
     
     private func initViews() {
-        numberView = BottomNumberView()
+        numberView = PhotoPickerBottomNumberView()
         numberView.photoCount = photoCount
         numberView.videoCount = videoCount
         numberView.config = .init()
@@ -129,10 +129,7 @@ class PhotoPickerFilterViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(
-            withIdentifier: "PhotoPickerFilterViewCellID",
-            for: indexPath
-        ) as! PhotoPickerFilterViewCell
+        let cell: PhotoPickerFilterViewCell = tableView.dequeueReusableCell()
         let row = sections[indexPath.section].rows[indexPath.row]
         cell.textLabel?.text = row.title
         cell.accessoryType = row.isSelected ? .checkmark : .none
@@ -231,7 +228,7 @@ class PhotoPickerFilterViewCell: UITableViewCell {
     }
 }
 
-class PhotoPickerFilterSection {
+public class PhotoPickerFilterSection {
     var title: String?
     var rows: [Row]
     
@@ -251,7 +248,7 @@ class PhotoPickerFilterSection {
         }
     }
     
-    struct Options: OptionSet {
+    public struct Options: OptionSet {
         public static let photo = Options(rawValue: 1 << 1)
         public static let gif = Options(rawValue: 1 << 2)
         public static let livePhoto = Options(rawValue: 1 << 3)

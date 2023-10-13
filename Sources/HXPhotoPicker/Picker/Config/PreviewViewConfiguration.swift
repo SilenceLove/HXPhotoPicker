@@ -52,7 +52,7 @@ public struct PreviewViewConfiguration {
     public var isShowBottomView: Bool = true
     
     /// 自定义底部工具栏视图
-    public var photoToolbar: PhotoToolBarProtocol.Type = PhotoToolBar.self
+    public var photoToolbar: PhotoToolBar.Type = PhotoToolBarView.self
     
     /// 默认的底部视图相关配置
     public var bottomView: PickerBottomViewConfiguration

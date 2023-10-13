@@ -100,7 +100,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             contentView.addSubview(pushImageView)
             
             if let pickerVC = pickerVC, let photoAsset = photoAsset {
-                if let cell = pickerVC.getCell(for: photoAsset) {
+                if let cell = pickerVC.listView.getCell(for: photoAsset) {
                     pushImageView.image = cell.photoView.image
                     pushImageView.frame = cell.photoView.convert(
                         cell.photoView.bounds,
@@ -139,28 +139,69 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 fromView?.frame = rect
             }
             contentView.addSubview(fromView!)
-            if let pickerVC = pickerVC, let photoAsset = photoAsset {
-                toView = pickerVC.getCell(for: photoAsset)
-                pickerVC.setCellLoadMode(.complete)
-                if toView == nil {
-                    pickerVC.scrollToCenter(for: photoAsset)
-                    pickerVC.reloadCell(for: photoAsset)
-                    DispatchQueue.main.async {
-                        pickerVC.cellReloadImage()
-                    }
-                    toView = pickerVC.getCell(for: photoAsset)
-                }else {
-                    pickerVC.scrollCellToVisibleArea(toView as! PhotoPickerBaseViewCell)
-                    DispatchQueue.main.async {
-                        pickerVC.cellReloadImage()
-                    }
-                }
-            }
-            
             previewVC.collectionView.isHidden = true
             previewVC.view.backgroundColor = UIColor.clear
+            if let pickerVC = pickerVC, let photoAsset = photoAsset {
+                pickerVC.viewDidLayoutSubviews()
+                pickerVC.listView.updateCellLoadMode(.complete)
+                pickerVC.isDisableLayout = true
+                DispatchQueue.main.async {
+                    toView = pickerVC.listView.getCell(for: photoAsset)
+                    if let toView = toView as? PhotoPickerBaseViewCell {
+                        pickerVC.listView.scrollCellToVisibleArea(toView)
+                        DispatchQueue.main.async {
+                            pickerVC.listView.cellReloadImage()
+                        }
+                    }else {
+                        pickerVC.listView.scrollToCenter(for: photoAsset)
+                        pickerVC.listView.reloadCell(for: photoAsset)
+                        DispatchQueue.main.async {
+                            pickerVC.listView.cellReloadImage()
+                        }
+                        toView = pickerVC.listView.getCell(for: photoAsset)
+                    }
+                    self.pushTransitionAnimation(
+                        photoAsset: photoAsset,
+                        toVC: toVC,
+                        previewVC: previewVC,
+                        pickerVC: pickerVC,
+                        containerView: containerView,
+                        contentView: contentView,
+                        fromView: fromView,
+                        toView: toView,
+                        backgroundColor: backgroundColor,
+                        transitionContext: transitionContext
+                    )
+                }
+                return
+            }
         }
-        
+        pushTransitionAnimation(
+            photoAsset: photoAsset,
+            toVC: toVC,
+            previewVC: previewVC,
+            pickerVC: pickerVC,
+            containerView: containerView,
+            contentView: contentView,
+            fromView: fromView,
+            toView: toView,
+            backgroundColor: backgroundColor,
+            transitionContext: transitionContext
+        )
+    }
+    
+    func pushTransitionAnimation(
+        photoAsset: PhotoAsset?,
+        toVC: UIViewController,
+        previewVC: PhotoPreviewViewController,
+        pickerVC: PhotoPickerViewController?,
+        containerView: UIView,
+        contentView: UIView,
+        fromView: UIView?,
+        toView: UIView?,
+        backgroundColor: UIColor,
+        transitionContext: UIViewControllerContextTransitioning
+    ) {
         var rect: CGRect = .zero
         if type == .push {
             let imageSize: CGSize
@@ -326,6 +367,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             }
         }
     }
+    
     // swiftlint:disable function_body_length
     // swiftlint:disable cyclomatic_complexity
     func presentTransition(
@@ -397,7 +439,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 pushImageView.image = image
             }
             var photoAsset: PhotoAsset?
-            if pickerController.isExternalPickerPreview {
+            if pickerController.previewType == .picker {
                 photoAsset = pickerController.previewViewController?.photoAsset(for: currentPreviewIndex)
             }else if !pickerController.selectedAssetArray.isEmpty {
                 photoAsset = pickerController.selectedAssetArray[currentPreviewIndex]
@@ -630,8 +672,12 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 DispatchQueue.global().async {
                     var image: UIImage?
                     let dataCount = CGFloat(dataResult.imageData.count)
-                    if !AssetManager.assetIsDegraded(for: info) &&
-                        dataCount > 1000000 && !isGIF {
+                    if dataCount > 10000000 {
+                        self.requestID = nil
+                        return
+                    }
+                    if !AssetManager.assetIsDegraded(for: info),
+                        dataCount > 1000000, !isGIF {
                         if let imageData = PhotoTools.imageCompress(
                             dataResult.imageData,
                             compressionQuality: dataCount.transitionCompressionQuality,

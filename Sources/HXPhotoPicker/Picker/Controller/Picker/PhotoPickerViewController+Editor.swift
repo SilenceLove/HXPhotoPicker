@@ -10,61 +10,58 @@ import UIKit
 #if HXPICKER_ENABLE_EDITOR && HXPICKER_ENABLE_PICKER
 extension PhotoPickerViewController: EditorViewControllerDelegate {
     public func editorViewController(_ editorViewController: EditorViewController, didFinish asset: EditorAsset) {
-        guard let picker = pickerController else { return }
-        guard let photoAsset = asset.type.photoAsset else {
-            return
-        }
+        guard let photoAsset = asset.type.photoAsset else { return }
         let atIndex: Int
-        if let index = assets.firstIndex(of: photoAsset) {
+        if let index = listView.assets.firstIndex(of: photoAsset) {
             atIndex = index
         }else {
             atIndex = 0
         }
         if let result = asset.result {
             photoAsset.editedResult = result
-            picker.didEditAsset(photoAsset: photoAsset, atIndex: atIndex)
-            if (photoAsset.mediaType == .video && videoLoadSingleCell) || !isMultipleSelect {
-                if picker.canSelectAsset(for: photoAsset, showHUD: true) {
-                    picker.singleFinishCallback(for: photoAsset)
+            pickerController.didEditAsset(photoAsset: photoAsset, atIndex: atIndex)
+            if (photoAsset.mediaType == .video && pickerConfig.isSingleVideo) || !pickerConfig.isMultipleSelect {
+                if pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
+                    pickerController.singleFinishCallback(for: photoAsset)
                 }
                 return
             }
             if !photoAsset.isSelected {
-                let cell = getCell(for: photoAsset)
+                let cell = listView.getCell(for: photoAsset)
                 cell?.isRequestDirectly = true
                 cell?.photoAsset = photoAsset
-                if picker.addedPhotoAsset(photoAsset: photoAsset) {
-                    updateCellSelectedTitle()
+                if pickerController.pickerData.append(photoAsset) {
+                    listView.updateCellSelectedTitle()
                 }
             }else {
-                reloadCell(for: photoAsset)
+                listView.reloadCell(for: photoAsset)
             }
-            photoToolbar.selectedAssetDidChanged(picker.selectedAssetArray)
+            photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
             requestSelectedAssetFileSize()
         }else {
             let beforeHasEdit = photoAsset.editedResult != nil
             photoAsset.editedResult = nil
             if beforeHasEdit {
-                picker.didEditAsset(photoAsset: photoAsset, atIndex: atIndex)
+                pickerController.didEditAsset(photoAsset: photoAsset, atIndex: atIndex)
             }
-            if (photoAsset.mediaType == .video && videoLoadSingleCell) || !isMultipleSelect {
-                if picker.canSelectAsset(for: photoAsset, showHUD: true) {
-                    picker.singleFinishCallback(for: photoAsset)
+            if (photoAsset.mediaType == .video && pickerConfig.isSingleVideo) || !pickerConfig.isMultipleSelect {
+                if pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
+                    pickerController.singleFinishCallback(for: photoAsset)
                 }
                 return
             }
-            let cell = getCell(for: photoAsset)
+            let cell = listView.getCell(for: photoAsset)
             cell?.isRequestDirectly = true
             cell?.photoAsset = photoAsset
             if !photoAsset.isSelected {
-                if picker.addedPhotoAsset(photoAsset: photoAsset) {
-                    updateCellSelectedTitle()
+                if pickerController.pickerData.append(photoAsset) {
+                    listView.updateCellSelectedTitle()
                 }
-                photoToolbar.selectedAssetDidChanged(picker.selectedAssetArray)
+                photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
                 requestSelectedAssetFileSize()
             }
-            if filterOptions.contains(.edited) {
-                filterPhotoAssets()
+            if listView.filterOptions.contains(.edited) {
+                listView.reloadData()
             }
         }
     }
@@ -73,8 +70,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
         _ editorViewController: EditorViewController,
         loadTitleChartlet response: @escaping EditorTitleChartletResponse
     ) {
-        guard let pickerController = pickerController,
-              let pickerDelegate = pickerController.pickerDelegate else {
+        guard let pickerDelegate = pickerController.pickerDelegate else {
             #if canImport(Kingfisher)
             let titles = PhotoTools.defaultTitleChartlet()
             response(titles)
@@ -96,8 +92,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
         titleIndex: Int,
         loadChartletList response: @escaping EditorChartletListResponse
     ) {
-        guard let pickerController = pickerController,
-              let pickerDelegate = pickerController.pickerDelegate else {
+        guard let pickerDelegate = pickerController.pickerDelegate else {
             #if canImport(Kingfisher)
             let chartletList = PhotoTools.defaultNetworkChartlet()
             response(titleIndex, chartletList)
@@ -116,8 +111,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
     }
     
     public func editorViewController(shouldClickMusicTool editorViewController: EditorViewController) -> Bool {
-        if let pickerController = pickerController,
-           let shouldClick = pickerController.pickerDelegate?.pickerController(
+        if let shouldClick = pickerController.pickerDelegate?.pickerController(
             pickerController,
             videoEditorShouldClickMusicTool: editorViewController
            ) {
@@ -130,8 +124,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
         _ editorViewController: EditorViewController,
         loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void
     ) -> Bool {
-        guard let pickerController = pickerController,
-              let pickerDelegate = pickerController.pickerDelegate else {
+        guard let pickerDelegate = pickerController.pickerDelegate else {
             completionHandler(PhotoTools.defaultMusicInfos())
             return false
         }
@@ -147,8 +140,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
         didSearchMusic text: String?,
         completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void
     ) {
-        guard let pickerController = pickerController,
-              let pickerDelegate = pickerController.pickerDelegate else {
+        guard let pickerDelegate = pickerController.pickerDelegate else {
             completionHandler([], false)
             return
         }
@@ -165,8 +157,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
         loadMoreMusic text: String?,
         completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void
     ) {
-        guard let pickerController = pickerController,
-              let pickerDelegate = pickerController.pickerDelegate else {
+        guard let pickerDelegate = pickerController.pickerDelegate else {
             completionHandler([], false)
             return
         }
@@ -182,21 +173,21 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
         guard let photoAsset = editorViewController.selectedAsset.type.photoAsset else {
             return nil
         }
-        return getCell(for: photoAsset)?.photoView.image
+        return listView.getCell(for: photoAsset)?.photoView.image
     }
     
     public func editorViewController(transitioStartPreviewView editorViewController: EditorViewController) -> UIView? {
         guard let photoAsset = editorViewController.selectedAsset.type.photoAsset else {
             return nil
         }
-        return getCell(for: photoAsset)
+        return listView.getCell(for: photoAsset)
     }
     
     public func editorViewController(transitioEndPreviewView editorViewController: EditorViewController) -> UIView? {
         guard let photoAsset = editorViewController.selectedAsset.type.photoAsset else {
             return nil
         }
-        return getCell(for: photoAsset)
+        return listView.getCell(for: photoAsset)
     }
 }
 #endif

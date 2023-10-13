@@ -11,6 +11,10 @@ import UIKit
 // MARK: Photo list configuration class / 照片列表配置类
 public struct PhotoListConfiguration {
     
+    public var listView: PhotoPickerList.Type = PhotoPickerListView.self
+    
+    public var navigationTitle: PhotoPickerNavigationTitle.Type = AlbumTitleView.self
+    
     /// Album title view configuration
     /// 相册标题视图配置
     public var titleView: AlbumTitleViewConfiguration = .init()
@@ -55,6 +59,8 @@ public struct PhotoListConfiguration {
     /// 横屏时每行显示数量
     public var landscapeRowNumber: Int = 7
     
+    public var spltRowNumber: Int = 5
+    
     /// Gap between each photo
     /// 每个照片之间的间隙
     public var spacing: CGFloat = 1
@@ -96,7 +102,7 @@ public struct PhotoListConfiguration {
     public var cell: PhotoListCellConfiguration = .init()
     
     /// 自定义底部工具栏视图
-    public var photoToolbar: PhotoToolBarProtocol.Type = PhotoToolBar.self
+    public var photoToolbar: PhotoToolBar.Type = PhotoToolBarView.self
     
     /// Bottom view related configuration
     /// 默认的底部视图相关配置
@@ -150,6 +156,9 @@ public struct PhotoListConfiguration {
     /// Relevant configuration displayed when there is no resource
     /// 没有资源时展示的相关配置
     public var emptyView: EmptyViewConfiguration = .init()
+    
+    /// 预览样式
+    public var previewStyle: PhotoPickerPreviewStyle = .push
     
     public init() {
         #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)

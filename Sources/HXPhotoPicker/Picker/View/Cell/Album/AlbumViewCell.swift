@@ -9,7 +9,7 @@
 import UIKit
 import Photos
 
-open class AlbumViewCell: UITableViewCell {
+open class AlbumViewCell: AlbumViewBaseCell {
     
     public var albumCoverView: UIImageView!
     public var albumNameLb: UILabel!
@@ -18,11 +18,8 @@ open class AlbumViewCell: UITableViewCell {
     public var selectedBgView: UIView!
     
     /// 配置
-    public var config: AlbumListConfiguration? {
+    public override var config: AlbumListConfiguration! {
         didSet {
-            guard let config = config else {
-                return
-            }
             albumNameLb.font = config.albumNameFont
             photoCountLb.font = config.photoCountFont
             photoCountLb.isHidden = !config.isShowPhotoCount
@@ -31,11 +28,8 @@ open class AlbumViewCell: UITableViewCell {
     }
     
     /// 照片集合
-    public var assetCollection: PhotoAssetCollection? {
+    public override var assetCollection: PhotoAssetCollection! {
         didSet {
-            guard let assetCollection = assetCollection else {
-                return
-            }
             albumNameLb.text = assetCollection.albumName
             photoCountLb.text = String(assetCollection.count)
             tickView.isHidden = !assetCollection.isSelected
@@ -49,6 +43,7 @@ open class AlbumViewCell: UITableViewCell {
     var tickView: TickView!
     
     open func initView() {
+        
         selectedBgView = UIView()
         
         albumCoverView = UIImageView()
@@ -86,6 +81,10 @@ open class AlbumViewCell: UITableViewCell {
         })
     }
     
+    open override func updateSelectedStatus(_ isSelected: Bool) {
+        tickView.isHidden = !isSelected
+    }
+    
     // 颜色配置，重写此方法修改颜色配置
     open func configColor() {
         let isDark = PhotoManager.isDark
@@ -93,7 +92,7 @@ open class AlbumViewCell: UITableViewCell {
         photoCountLb.textColor = isDark ? config?.photoCountDarkColor : config?.photoCountColor
         bottomLineView.backgroundColor = isDark ? config?.separatorLineDarkColor : config?.separatorLineColor
         tickView.tickLayer.strokeColor = isDark ? config?.tickDarkColor.cgColor : config?.tickColor.cgColor
-        backgroundColor = isDark ? config?.cellbackgroundDarkColor : config?.cellBackgroundColor
+        backgroundColor = isDark ? config?.cellBackgroundDarkColor : config?.cellBackgroundColor
         if isDark {
             selectedBgView.backgroundColor = config?.cellSelectedDarkColor
             selectedBackgroundView = selectedBgView
@@ -106,13 +105,19 @@ open class AlbumViewCell: UITableViewCell {
             }
         }
     }
+    
     /// 布局，重写此方法修改布局
     open func layoutView() {
+        let width = contentView.width
         let coverMargin: CGFloat = 5
         let coverWidth = height - (coverMargin * 2)
         albumCoverView.frame = CGRect(x: coverMargin, y: coverMargin, width: coverWidth, height: coverWidth)
         
-        tickView.x = width - 12 - tickView.width - UIDevice.rightMargin
+        if viewController?.splitViewController != nil {
+            tickView.x = width - 12 - tickView.width
+        }else {
+            tickView.x = width - 12 - tickView.width - UIDevice.rightMargin
+        }
         tickView.centerY = height * 0.5
         
         albumNameLb.x = albumCoverView.frame.maxX + 10
@@ -158,6 +163,10 @@ open class AlbumViewCell: UITableViewCell {
     
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    open override var canBecomeFocused: Bool {
+        false
     }
     
     deinit {

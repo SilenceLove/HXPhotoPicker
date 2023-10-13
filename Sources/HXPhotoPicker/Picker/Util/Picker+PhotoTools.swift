@@ -307,6 +307,9 @@ extension PhotoTools {
         config.statusBarStyle = .lightContent
         config.navigationBarStyle = .black
         
+        config.splitSeparatorLineColor = "#434344".color.withAlphaComponent(0.6)
+        
+        config.albumList.splitBackgroundColor = "#2E2F30".color
         config.albumList.backgroundColor = "#2E2F30".color
         config.albumList.cellHeight = 60
         config.albumList.cellBackgroundColor = "#2E2F30".color

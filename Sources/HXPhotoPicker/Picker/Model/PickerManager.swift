@@ -72,38 +72,7 @@ public class PickerManager: NSObject {
     deinit {
         cancelFetchAssetQueue()
         cancelRequestAssetFileSize()
-//        print("deinit\(self)")
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
-    }
-}
-
-public extension PickerManager {
-    
-    /// 获取相册集合
-    /// - Parameters:
-    ///   - options: 获取 PHFetchResult 中的 PHAsset 时的选项
-    ///   - showEmptyCollection: 是否显示空集合
-    /// - Returns: 相册集合
-    func fetchAssetCollections(
-        for options: PHFetchOptions,
-        showEmptyCollection: Bool = false
-    ) -> [PhotoAssetCollection] {
-        var assetCollectionsArray: [PhotoAssetCollection] = []
-        PhotoManager.shared.fetchAssetCollections(
-            for: options,
-            showEmptyCollection: showEmptyCollection
-        ) { (assetCollection, isCameraRoll, stop) in
-            guard let assetCollection = assetCollection else {
-                stop.pointee = true
-                return
-            }
-            if isCameraRoll {
-                assetCollectionsArray.insert(assetCollection, at: 0)
-            }else {
-                assetCollectionsArray.append(assetCollection)
-            }
-        }
-        return assetCollectionsArray
     }
 }
 
@@ -187,20 +156,19 @@ extension PickerManager {
                 NSSortDescriptor(key: "creationDate", ascending: config.creationDate)
             ]
         }
-        PhotoManager.shared.fetchCameraAssetCollection(
-            for: selectOptions,
-            options: options
-        ) { [weak self] (assetCollection) in
-            guard let self = self else { return }
-            var collection = assetCollection
-            if collection.count == 0 {
-                collection = PhotoAssetCollection(
+        DispatchQueue.global().async {
+            let fetchAssetCollection = self.config.fetchAssetCollection
+            let assetCollection: PhotoAssetCollection
+            if let collection = fetchAssetCollection.fetchCameraAssetCollection(self.config, options: self.options) {
+                assetCollection = collection
+            }else {
+                assetCollection = PhotoAssetCollection(
                     albumName: self.config.albumList.emptyAlbumName.localized,
                     coverImage: self.config.albumList.emptyCoverImageName.image
                 )
             }
-            self.cameraAssetCollection = collection
-            completion?(collection)
+            self.cameraAssetCollection = assetCollection
+            completion?(assetCollection)
         }
     }
     

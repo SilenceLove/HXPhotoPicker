@@ -31,6 +31,9 @@ extension EditorViewController {
                         self.ratioToolView.scrollToIndex(at: self.finishRatioIndex, animated: false)
                     }
                 })
+                self.selectedTool = nil
+                self.lastSelectedTool = nil
+                toolsView.deselected()
                 hideCropSizeToolsView()
                 if let lastSelectedTool = lastSelectedTool {
                     switch lastSelectedTool.type {
@@ -85,6 +88,9 @@ extension EditorViewController {
                     return
                 }
                 editorView.finishEdit(true)
+                self.selectedTool = nil
+                self.lastSelectedTool = nil
+                toolsView.deselected()
                 hideCropSizeToolsView()
                 if let lastSelectedTool = lastSelectedTool {
                     switch lastSelectedTool.type {

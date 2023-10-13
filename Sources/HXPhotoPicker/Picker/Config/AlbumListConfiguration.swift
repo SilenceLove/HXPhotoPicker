@@ -11,6 +11,8 @@ import UIKit
 // MARK: Album list configuration class / 相册列表配置类
 public struct AlbumListConfiguration {
     
+    public var albumList: PhotoAlbumList.Type = AlbumListView.self
+    
     /// Prompt color under Accessibility
     /// 可访问权限下的提示语颜色
     public var limitedStatusPromptColor: UIColor = "#999999".hx.color
@@ -35,19 +37,30 @@ public struct AlbumListConfiguration {
     /// 暗黑风格下列表背景颜色
     public var backgroundDarkColor: UIColor = "#2E2F30".hx.color
     
-    /// Customize cell, inherit AlbumViewCell and modify it
-    /// 自定义cell，继承 AlbumViewCell 加以修改
-    public var customCellClass: AlbumViewCell.Type?
+    public var splitBackgroundColor: UIColor = {
+        if #available(iOS 13.0, *) {
+            return .systemGroupedBackground
+        } else {
+            return .groupTableViewBackground
+        }
+    }()
+    
+    public var splitBackgroundDarkColor: UIColor = "#2E2F30".hx.color
+    
+    /// Customize cell, inherit AlbumViewBaseCell and modify it
+    /// 自定义cell，继承 AlbumViewBaseCell 加以修改
+    public var customCellClass: AlbumViewBaseCell.Type?
      
     /// cell高度
     public var cellHeight: CGFloat = 100
+    public var splitCellHeight: CGFloat = 60
     
     /// cell背景颜色
     public var cellBackgroundColor: UIColor = .white
     
     /// Cell background color in dark style
     /// 暗黑风格下cell背景颜色
-    public var cellbackgroundDarkColor: UIColor = "#2E2F30".hx.color
+    public var cellBackgroundDarkColor: UIColor = "#2E2F30".hx.color
     
     /// The color of the cell when it is selected
     /// cell选中时的颜色
@@ -101,7 +114,7 @@ public struct AlbumListConfiguration {
     
     /// Dark style checked tick color
     /// 暗黑风格选中勾勾的颜色
-    public var tickDarkColor: UIColor = "#ffffff".hx.color
+    public var tickDarkColor: UIColor = .systemBlue
     
     public init() {
         albumNameFont = .mediumPingFang(ofSize: 15)

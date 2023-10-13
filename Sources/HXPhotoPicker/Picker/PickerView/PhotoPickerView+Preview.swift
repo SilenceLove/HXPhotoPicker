@@ -15,9 +15,10 @@ extension PhotoPickerView: PhotoPreviewViewControllerDelegate {
         animated: Bool
     ) {
         let previewVC = PhotoPickerController(
-            pickerPreview: manager.config,
+            preview: manager.config,
             previewAssets: previewAssets,
             currentIndex: currentPreviewIndex,
+            previewType: .picker,
             delegate: self
         )
         previewVC.selectedAssetArray = manager.selectedAssetArray
@@ -27,9 +28,11 @@ extension PhotoPickerView: PhotoPreviewViewControllerDelegate {
         viewController?.present(previewVC, animated: animated)
     }
     
-    func previewViewController(didFinishButton previewController: PhotoPreviewViewController) {
-        previewController.pickerController?.disablesCustomDismiss = true
-        let photoAssets = manager.selectedAssetArray
+    func previewViewController(
+        didFinishButton previewController: PhotoPreviewViewController,
+        photoAssets: [PhotoAsset]
+    ) {
+        previewController.pickerController.disablesCustomDismiss = true
         let result = PickerResult(
             photoAssets: photoAssets,
             isOriginal: isOriginal
@@ -94,7 +97,11 @@ extension PhotoPickerView: PhotoPreviewViewControllerDelegate {
         if let cell = getCell(for: photoAsset) {
             self.cell(cell, didSelectControl: !isSelected)
         }else {
-            manager.addedPhotoAsset(photoAsset: photoAsset)
+            if isSelected {
+                manager.addedPhotoAsset(photoAsset: photoAsset)
+            }else {
+                manager.removePhotoAsset(photoAsset: photoAsset)
+            }
             updateCellSelectedTitle()
         }
     }

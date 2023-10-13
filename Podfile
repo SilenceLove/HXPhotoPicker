@@ -18,3 +18,4 @@ end
 target "SwiftUIExample" do
   pod 'HXPhotoPicker', :path => './'
 end
+

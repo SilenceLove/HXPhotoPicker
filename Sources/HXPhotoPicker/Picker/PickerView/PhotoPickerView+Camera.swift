@@ -176,16 +176,18 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
         )
     }
     func saveSystemAlbum(
-        type: AssetManager.SaveType,
-        location: CLLocation? = nil) {
-        AssetManager.saveSystemAlbum(
+        type: AssetManager.PhotoSaveType,
+        location: CLLocation? = nil
+    ) {
+        AssetManager.save(
             type: type,
             customAlbumName: config.customAlbumName,
             location: location
         ) {
-            if let phAsset = $0 {
+            switch $0 {
+            case .success(let phAsset):
                 self.addedCameraPhotoAsset(PhotoAsset(asset: phAsset))
-            }else {
+            case .failure:
                 DispatchQueue.main.async {
                     ProgressHUD.hide(
                         forView: self,
@@ -240,7 +242,7 @@ extension PhotoPickerView: CameraControllerDelegate {
             animated: true
         )
         DispatchQueue.global().async {
-            let saveType: AssetManager.SaveType
+            let saveType: AssetManager.PhotoSaveType
             let photoAsset: PhotoAsset
             switch result {
             case .image(let image):

@@ -118,37 +118,39 @@ open class CameraViewController: BaseViewController {
         )
     }
     private func initViews() {
-        cameraManager = CameraManager(config: config)
-        cameraManager.flashModeDidChanged = { [weak self] in
-            guard let self = self else { return }
-            self.delegate?.cameraViewController(self, flashModeDidChanged: $0)
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            cameraManager = CameraManager(config: config)
+            cameraManager.flashModeDidChanged = { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.cameraViewController(self, flashModeDidChanged: $0)
+            }
+            cameraManager.captureDidOutput = { [weak self] pixelBuffer in
+                guard let self = self else { return }
+                self.previewView.pixelBuffer = pixelBuffer
+            }
+            
+            previewView = CameraPreviewView(
+                config: config,
+                cameraManager: cameraManager
+            )
+            previewView.delegate = self
+            
+            topMaskLayer = PhotoTools.getGradientShadowLayer(true)
+            
+            #if HXPICKER_ENABLE_CAMERA_LOCATION
+            locationManager = CLLocationManager()
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.distanceFilter = kCLDistanceFilterNone
+            locationManager.requestWhenInUseAuthorization()
+            #endif
         }
-        cameraManager.captureDidOutput = { [weak self] pixelBuffer in
-            guard let self = self else { return }
-            self.previewView.pixelBuffer = pixelBuffer
-        }
-        
-        previewView = CameraPreviewView(
-            config: config,
-            cameraManager: cameraManager
-        )
-        previewView.delegate = self
         
         bottomView = CameraBottomView(
             tintColor: config.tintColor,
             takePhotoMode: config.takePhotoMode
         )
         bottomView.delegate = self
-        
-        topMaskLayer = PhotoTools.getGradientShadowLayer(true)
-        
-        #if HXPICKER_ENABLE_CAMERA_LOCATION
-        locationManager = CLLocationManager()
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.distanceFilter = kCLDistanceFilterNone
-        locationManager.requestWhenInUseAuthorization()
-        #endif
     }
     func backClick(_ isCancel: Bool = false) {
         if isCancel {
@@ -207,6 +209,9 @@ open class CameraViewController: BaseViewController {
                 PhotoManager.shared.sampleBuffer = nil
             }
         }
+        if !UIImagePickerController.isSourceTypeAvailable(.camera) {
+            return
+        }
         if config.cameraType == .normal {
             cameraManager.stopRunning()
         }
@@ -234,7 +239,7 @@ open class CameraViewController: BaseViewController {
                 width: size.width, height: size.height
             )
         }
-        if config.cameraType == .normal {
+        if config.cameraType == .normal, UIImagePickerController.isSourceTypeAvailable(.camera) {
             if !didLayoutPreview && AssetManager.cameraAuthorizationStatus() == .authorized {
                 previewView.frame = previewRect
                 didLayoutPreview = true
@@ -258,7 +263,7 @@ open class CameraViewController: BaseViewController {
             width: view.width,
             height: bottomHeight
         )
-        if let nav = navigationController {
+        if let nav = navigationController, UIImagePickerController.isSourceTypeAvailable(.camera) {
             topMaskLayer.frame = CGRect(
                 x: 0,
                 y: 0,

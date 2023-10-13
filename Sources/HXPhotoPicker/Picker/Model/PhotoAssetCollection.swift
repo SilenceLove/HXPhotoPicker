@@ -68,10 +68,16 @@ open class PhotoAssetCollection: Equatable {
             return nil
         }
         if let result = result, result.count > 0 {
+            let targetWidth: CGFloat
+            if UIDevice.isPad {
+                targetWidth = 300
+            }else {
+                targetWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+            }
             let asset = result.object(at: result.count - 1)
             return AssetManager.requestThumbnailImage(
                 for: asset,
-                targetWidth: 160
+                targetWidth: targetWidth
             ) { (image, info) in
                 completion?(image, self, info)
             }
@@ -83,7 +89,7 @@ open class PhotoAssetCollection: Equatable {
     /// 枚举相册里的资源
     open func enumerateAssets(
         options opts: NSEnumerationOptions = .concurrent,
-        usingBlock: ((PhotoAsset, Int, UnsafeMutablePointer<ObjCBool>) -> Void)?
+        usingBlock: @escaping (PhotoAsset, Int, UnsafeMutablePointer<ObjCBool>) -> Void
     ) {
         if result == nil {
             fetchResult()
@@ -96,12 +102,12 @@ open class PhotoAssetCollection: Equatable {
                 options: opts
             ) { asset, index, stop in
                 let photoAsset = PhotoAsset(asset: asset)
-                usingBlock?(photoAsset, index, stop)
+                usingBlock(photoAsset, index, stop)
             }
         }else {
             result.enumerateObjects { asset, index, stop in
                 let photoAsset = PhotoAsset(asset: asset)
-                usingBlock?(photoAsset, index, stop)
+                usingBlock(photoAsset, index, stop)
             }
         }
     }

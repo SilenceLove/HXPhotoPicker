@@ -175,7 +175,8 @@ class EditorAdjusterView: UIView {
     var beforeDrawBrushInfos: [EditorDrawView.BrushInfo] = []
     var beforeMosaicDatas: [EditorMosaicView.MosaicData] = []
     var beforeStickerItem: EditorStickersView.Item?
-    var beforeCanvasData: EditorCanvasData?
+    var beforeCanvasCurrentData: EditorCanvasData?
+    var beforeCanvasHistoryData: EditorCanvasData?
     
     deinit {
         videoTool?.cancelExport()

@@ -150,8 +150,10 @@ extension EditorViewController: EditorViewDelegate {
         if isShowVolume {
             return
         }
-        if let tool = selectedTool, tool.type == .music {
-            return
+        if let tool = selectedTool {
+            if tool.type == .music || tool.type == .cropSize {
+                return
+            }
         }
         if isToolsDisplay {
             showToolsView()

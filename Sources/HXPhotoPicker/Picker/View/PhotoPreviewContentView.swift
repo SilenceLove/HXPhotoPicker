@@ -559,7 +559,7 @@ extension PhotoPreviewContentView {
                             }
                         }
                         if image == nil {
-                            image = UIImage(data: dataResult.imageData)
+                            image = UIImage(data: dataResult.imageData)?.normalizedImage()
                         }
                         DispatchQueue.main.async {
                             if asset == self.photoAsset {

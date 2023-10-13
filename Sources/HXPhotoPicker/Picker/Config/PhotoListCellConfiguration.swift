@@ -42,7 +42,7 @@ public struct PhotoListCellConfiguration {
     
     /// The sharpness of the thumbnail, the bigger the clearer, the smaller the blurrier
     /// 缩略图的清晰度，越大越清楚，越小越模糊
-    public var targetWidth: CGFloat = 350
+    public var targetWidth: CGFloat = UIDevice.isPad ? 400 : min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
     
     /// Whether to display the disabled mask when the cell is not selectable
     /// Not valid if the file size of the photo/video is limited

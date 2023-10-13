@@ -118,7 +118,7 @@ open class PhotoAsset: Equatable {
     /// 根据系统相册里对应的 PHAsset本地唯一标识符 初始化
     /// - Parameter localIdentifier: 系统相册里对应的 PHAsset本地唯一标识符
     public init(localIdentifier: String) {
-        phAsset = AssetManager.fetchAsset(withLocalIdentifier: localIdentifier)
+        phAsset = AssetManager.fetchAsset(with: localIdentifier)
         setMediaType()
     }
     

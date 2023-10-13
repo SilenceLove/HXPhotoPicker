@@ -8,61 +8,86 @@
 
 import UIKit
 
-class AlbumTitleView: UIControl {
-   
-    let config: AlbumTitleViewConfiguration
-    var arrowView: ArrowView!
-
-    private var contentView: UIView!
-    private var titleLb: UILabel!
-
-    var title: String? {
+public class AlbumTitleView: UIControl, PhotoPickerNavigationTitle {
+    let config: PickerConfiguration
+    let isSplit: Bool
+    
+    public var title: String? {
        didSet {
            if let title = title {
                titleLb.text = title
            }else {
-               titleLb.text = "相册".localized
+               titleLb.text = "照片".localized
            }
-           updateTitleFrame()
+           updateFrame()
        }
     }
-    var titleColor: UIColor? {
+    
+    public var titleColor: UIColor? {
        didSet {
            titleLb.textColor = titleColor
        }
     }
     
-    init(config: AlbumTitleViewConfiguration) {
+    public override var isSelected: Bool {
+        didSet {
+            if !isPopupAlbum {
+                return
+            }
+            UIView.animate(withDuration: 0.25) {
+                if self.isSelected {
+                    self.arrowView.transform = .init(rotationAngle: .pi)
+                }else {
+                    self.arrowView.transform = .init(rotationAngle: .pi * 2)
+                }
+            }
+        }
+    }
+    
+    public override var intrinsicContentSize: CGSize {
+        contentSize
+    }
+    
+    required public init(config: PickerConfiguration, isSplit: Bool) {
         self.config = config
-        let width: CGFloat
+        self.isSplit = isSplit
+        super.init(frame: .zero)
+        initViews()
+        configColor()
+        size = contentSize
+        translatesAutoresizingMaskIntoConstraints = false
+    }
+   
+    var arrowView: ArrowView!
+    var contentView: UIView!
+    var titleLb: UILabel!
+    var isPopupAlbum: Bool { config.albumShowMode == .popup && !isSplit }
+    
+    var contentSize: CGSize {
+        let maxWidth: CGFloat
         #if !targetEnvironment(macCatalyst)
         if UIDevice.isPad {
-            width = 300
+            maxWidth = 300
         }else {
-            width = UIDevice.screenSize.width * 0.5
+            maxWidth = UIDevice.screenSize.width * 0.5
         }
         #else
-        width = 300
+        maxWidth = 300
         #endif
-        super.init(frame: .init(x: 0, y: 0, width: width, height: 30))
-        initViews()
-        contentView.addSubview(titleLb)
-        contentView.addSubview(arrowView)
-        addSubview(contentView)
-        configColor()
+        let titleWidth: CGFloat = min(maxWidth, titleLb.textWidth)
+        if isPopupAlbum {
+            return .init(width: titleWidth + 40 , height: 30)
+        }else {
+            return .init(width: titleWidth, height: 30)
+        }
     }
     
     private func initViews() {
-        contentView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 30))
-        contentView.layer.cornerRadius = 15
-        contentView.layer.masksToBounds = true
-        contentView.isUserInteractionEnabled = false
-        
         let text = "相册".localized
         let font = UIFont.semiboldPingFang(ofSize: 18)
         titleLb = UILabel(
             frame: CGRect(
-                x: 10,
+                x: 0,
                 y: 0,
                 width: text.width(ofFont: font, maxHeight: height),
                 height: height
@@ -72,60 +97,73 @@ class AlbumTitleView: UIControl {
         titleLb.font = font
         titleLb.textAlignment = .center
         
-        arrowView = ArrowView(
-         frame: CGRect(
-             x: titleLb.frame.maxX + 5,
-             y: 0,
-             width: 20,
-             height: 20
-         ),
-         config: self.config.arrow
-        )
-    }
-
-    
-    func updateTitleFrame() {
-        var titleWidth: CGFloat = 0
-        if let labelWidth = title?.width(ofFont: titleLb.font, maxHeight: height) {
-            titleWidth = labelWidth
-        }
-       if titleWidth > width - 40 {
-           titleWidth = width - 45
-       }
-       UIView.animate(withDuration: 0.25) {
-           self.titleLb.width = titleWidth
-           self.arrowView.x = self.titleLb.frame.maxX + 5
-           self.contentView.width = self.arrowView.frame.maxX + 5
-           self.contentView.centerX = self.width * 0.5
-       }
-    }
-    func updateViewFrame() {
-        let width: CGFloat
-        #if !targetEnvironment(macCatalyst)
-        if UIDevice.isPad {
-            width = 300
+        if isPopupAlbum {
+            contentView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 30))
+            contentView.layer.cornerRadius = 15
+            contentView.layer.masksToBounds = true
+            contentView.isUserInteractionEnabled = false
+            addSubview(contentView)
+            contentView.addSubview(titleLb)
+            
+            arrowView = ArrowView(frame: CGRect(
+                x: titleLb.frame.maxX + 5,
+                y: 0,
+                width: 20,
+                height: 20
+            ), config: config.photoList.titleView.arrow)
+            contentView.addSubview(arrowView)
         }else {
-            width = UIDevice.screenSize.width * 0.5
+            addSubview(titleLb)
         }
-        #else
-        width = 300
-        #endif
-        size = CGSize(width: width, height: 30)
+    }
+    
+    public func addTarget(_ target: Any?, action: Selector) {
+        if isPopupAlbum {
+            addTarget(target, action: action, for: .touchUpInside)
+        }
+    }
+    
+    public func updateFrame() {
+        size = contentSize
+        invalidateIntrinsicContentSize()
         updateTitleFrame()
     }
+    
+    func updateTitleFrame() {
+        let titleWidth = isPopupAlbum ? width - 40 : width
+        UIView.animate(withDuration: 0.25) {
+            self.titleLb.width = titleWidth
+            if self.isPopupAlbum {
+                self.titleLb.x = 10
+                self.arrowView.x = self.titleLb.frame.maxX + 5
+                self.contentView.width = self.arrowView.frame.maxX + 5
+                self.contentView.centerX = self.width * 0.5
+            }else {
+                self.titleLb.x = 0
+            }
+        }
+    }
 
-    override func layoutSubviews() {
-       super.layoutSubviews()
-       titleLb.height = height
-       arrowView.centerY = titleLb.centerY
-       contentView.height = height
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        titleLb.height = height
+        if isPopupAlbum {
+            arrowView.centerY = titleLb.centerY
+            contentView.height = height
+            contentView.centerX = width / 2
+        }else {
+            titleLb.x = 0
+        }
     }
 
     func configColor() {
-       contentView.backgroundColor = PhotoManager.isDark ? config.backgroudDarkColor : config.backgroundColor
+        if isPopupAlbum {
+            let config = config.photoList.titleView
+            contentView.backgroundColor = PhotoManager.isDark ? config.backgroudDarkColor : config.backgroundColor
+        }
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
        super.traitCollectionDidChange(previousTraitCollection)
        if #available(iOS 13.0, *) {
            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {

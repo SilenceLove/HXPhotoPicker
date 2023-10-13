@@ -39,7 +39,8 @@ protocol PhotoPreviewViewControllerDelegate: AnyObject {
         networkImagedownloadSuccess photoAsset: PhotoAsset
     )
     func previewViewController(
-        didFinishButton previewController: PhotoPreviewViewController
+        didFinishButton previewController: PhotoPreviewViewController,
+        photoAssets: [PhotoAsset]
     )
     func previewViewController(
         _ previewController: PhotoPreviewViewController,
@@ -90,7 +91,8 @@ extension PhotoPreviewViewControllerDelegate {
         networkImagedownloadSuccess photoAsset: PhotoAsset
     ) { }
     func previewViewController(
-        didFinishButton previewController: PhotoPreviewViewController
+        didFinishButton previewController: PhotoPreviewViewController,
+        photoAssets: [PhotoAsset]
     ) { }
     func previewViewController(
         _ previewController: PhotoPreviewViewController,

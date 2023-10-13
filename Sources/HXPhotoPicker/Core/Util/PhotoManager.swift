@@ -146,7 +146,7 @@ public final class PhotoManager: NSObject {
 extension NSNotification.Name {
     static let ThumbnailLoadModeDidChange: NSNotification.Name = .init("ThumbnailLoadModeDidChange")
 }
-extension PhotoManager {
+public extension PhotoManager {
     enum ThumbnailLoadMode {
         case simplify
         case complete

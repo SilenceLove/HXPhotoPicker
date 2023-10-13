@@ -10,8 +10,7 @@ import UIKit
 extension PhotoPreviewViewController {
     
     func openEditor(_ photoAsset: PhotoAsset) {
-        guard let picker = pickerController else { return }
-        let shouldEditAsset = picker.shouldEditAsset(
+        let shouldEditAsset = pickerController.shouldEditAsset(
             photoAsset: photoAsset,
             atIndex: currentPreviewIndex
         )
@@ -20,15 +19,15 @@ extension PhotoPreviewViewController {
         }
         #if HXPICKER_ENABLE_EDITOR && HXPICKER_ENABLE_PICKER
         beforeNavDelegate = navigationController?.delegate
-        let pickerConfig = picker.config
+        let pickerConfig = pickerConfig
         if photoAsset.mediaType == .video && pickerConfig.editorOptions.isVideo {
             let cell = getCell(
                 for: currentPreviewIndex
             )
             cell?.scrollContentView.stopVideo()
             var videoEditorConfig = pickerConfig.editor
-            let isExceedsTheLimit = picker.videoDurationExceedsTheLimit(
-                photoAsset: photoAsset
+            let isExceedsTheLimit = pickerController.pickerData.videoDurationExceedsTheLimit(
+                photoAsset
             )
             if isExceedsTheLimit {
                 videoEditorConfig.video.defaultSelectedToolOption = .time
@@ -36,7 +35,7 @@ extension PhotoPreviewViewController {
                     pickerConfig.maximumSelectedVideoDuration
                 )
             }
-            guard let videoEditorConfig = picker.shouldEditVideoAsset(
+            guard let videoEditorConfig = pickerController.shouldEditVideoAsset(
                 videoAsset: photoAsset,
                 editorConfig: videoEditorConfig,
                 atIndex: currentPreviewIndex
@@ -54,7 +53,7 @@ extension PhotoPreviewViewController {
             videoEditorConfig.indicatorType = pickerConfig.indicatorType
             videoEditorConfig.chartlet.albumPickerConfigHandler = { [weak self] in
                 var pickerConfig: PickerConfiguration
-                if let config = self?.pickerController?.config {
+                if let config = self?.pickerConfig {
                     pickerConfig = config
                 }else {
                     pickerConfig = .init()
@@ -82,11 +81,15 @@ extension PhotoPreviewViewController {
             case .present(let style):
                 if style == .fullScreen {
                     videoEditorVC.modalPresentationStyle = .fullScreen
+                }else if style == .custom {
+                    videoEditorVC.modalPresentationStyle = .custom
+                    videoEditorVC.modalPresentationCapturesStatusBarAppearance = true
+                    videoEditorVC.transitioningDelegate = videoEditorVC
                 }
                 present(videoEditorVC, animated: true)
             }
         }else if pickerConfig.editorOptions.isPhoto {
-            guard let photoEditorConfig = picker.shouldEditPhotoAsset(
+            guard let photoEditorConfig = pickerController.shouldEditPhotoAsset(
                 photoAsset: photoAsset,
                 editorConfig: pickerConfig.editor,
                 atIndex: currentPreviewIndex
@@ -111,7 +114,7 @@ extension PhotoPreviewViewController {
             photoEditorConfig.indicatorType = pickerConfig.indicatorType
             photoEditorConfig.chartlet.albumPickerConfigHandler = { [weak self] in
                 var pickerConfig: PickerConfiguration
-                if let config = self?.pickerController?.config {
+                if let config = self?.pickerConfig {
                     pickerConfig = config
                 }else {
                     pickerConfig = .init()
@@ -139,6 +142,10 @@ extension PhotoPreviewViewController {
             case .present(let style):
                 if style == .fullScreen {
                     photoEditorVC.modalPresentationStyle = .fullScreen
+                }else if style == .custom {
+                    photoEditorVC.modalPresentationStyle = .custom
+                    photoEditorVC.modalPresentationCapturesStatusBarAppearance = true
+                    photoEditorVC.transitioningDelegate = photoEditorVC
                 }
                 present(photoEditorVC, animated: true)
             }
@@ -147,11 +154,8 @@ extension PhotoPreviewViewController {
     }
     
     func didFinishClick() {
-        guard let pickerController = pickerController else {
-            return
-        }
         if !pickerController.selectedAssetArray.isEmpty {
-            delegate?.previewViewController(didFinishButton: self)
+            delegate?.previewViewController(didFinishButton: self, photoAssets: pickerController.selectedAssetArray)
             pickerController.finishCallback()
             return
         }
@@ -169,11 +173,11 @@ extension PhotoPreviewViewController {
         }
         #if HXPICKER_ENABLE_EDITOR
         if photoAsset.mediaType == .video &&
-            pickerController.videoDurationExceedsTheLimit(photoAsset: photoAsset) &&
+            pickerController.pickerData.videoDurationExceedsTheLimit(photoAsset) &&
             pickerController.config.editorOptions.isVideo {
-            if pickerController.canSelectAsset(
-                for: photoAsset,
-                showHUD: true
+            if pickerController.pickerData.canSelect(
+                photoAsset,
+                isShowHUD: true
             ) {
                 openEditor(photoAsset)
             }
@@ -181,12 +185,12 @@ extension PhotoPreviewViewController {
         }
         #endif
         func addAsset() {
-            if !isMultipleSelect {
-                if pickerController.canSelectAsset(
-                    for: photoAsset,
-                    showHUD: true
+            if !pickerConfig.isMultipleSelect {
+                if pickerController.pickerData.canSelect(
+                    photoAsset,
+                    isShowHUD: true
                 ) {
-                    if isExternalPickerPreview {
+                    if previewType == .picker {
                         delegate?.previewViewController(
                             self,
                             didSelectBox: photoAsset,
@@ -194,18 +198,18 @@ extension PhotoPreviewViewController {
                             updateCell: false
                         )
                     }
-                    delegate?.previewViewController(didFinishButton: self)
+                    delegate?.previewViewController(didFinishButton: self, photoAssets: [photoAsset])
                     pickerController.singleFinishCallback(
                         for: photoAsset
                     )
                 }
             }else {
-                if videoLoadSingleCell {
-                    if pickerController.canSelectAsset(
-                        for: photoAsset,
-                        showHUD: true
+                if pickerConfig.isSingleVideo {
+                    if pickerController.pickerData.canSelect(
+                        photoAsset,
+                        isShowHUD: true
                     ) {
-                        if isExternalPickerPreview {
+                        if previewType == .picker {
                             delegate?.previewViewController(
                                 self,
                                 didSelectBox: photoAsset,
@@ -213,16 +217,16 @@ extension PhotoPreviewViewController {
                                 updateCell: false
                             )
                         }
-                        delegate?.previewViewController(didFinishButton: self)
+                        delegate?.previewViewController(didFinishButton: self, photoAssets: [photoAsset])
                         pickerController.singleFinishCallback(
                             for: photoAsset
                         )
                     }
                 }else {
-                    if pickerController.addedPhotoAsset(
-                        photoAsset: photoAsset
+                    if pickerController.pickerData.append(
+                        photoAsset
                     ) {
-                        if isExternalPickerPreview {
+                        if previewType == .picker {
                             delegate?.previewViewController(
                                 self,
                                 didSelectBox: photoAsset,
@@ -230,7 +234,7 @@ extension PhotoPreviewViewController {
                                 updateCell: false
                             )
                         }
-                        delegate?.previewViewController(didFinishButton: self)
+                        delegate?.previewViewController(didFinishButton: self, photoAssets: pickerController.selectedAssetArray)
                         pickerController.finishCallback()
                     }
                 }
@@ -249,12 +253,12 @@ extension PhotoPreviewViewController {
     }
     
     func requestSelectedAssetFileSize() {
-        pickerController?.requestSelectedAssetFileSize(isPreview: true, completion: { [weak self] in
+        pickerController.pickerData.requestSelectedAssetFileSize(isPreview: true, completion: { [weak self] in
             self?.photoToolbar.originalAssetBytes($0, bytesString: $1)
         })
     }
     
-    func setupRequestPreviewTimer() {
+    func startRequestPreviewTimer() {
         requestPreviewTimer?.invalidate()
         requestPreviewTimer = Timer(
             timeInterval: 0.2,
@@ -277,19 +281,22 @@ extension PhotoPreviewViewController {
                 requestPreviewTimer = nil
                 return
             }
-            setupRequestPreviewTimer()
+            startRequestPreviewTimer()
         }
     }
     
     public func setOriginal(_ isOriginal: Bool) {
+        guard let photoToolbar = photoToolbar else {
+            return
+        }
         photoToolbar.updateOriginalState(isOriginal)
         if !isOriginal {
-            pickerController?.cancelRequestAssetFileSize(isPreview: true)
+            pickerController.pickerData.cancelRequestAssetFileSize(isPreview: true)
         }else {
             requestSelectedAssetFileSize()
         }
-        pickerController?.isOriginal = isOriginal
-        pickerController?.originalButtonCallback()
+        pickerController.isOriginal = isOriginal
+        pickerController.originalButtonCallback()
         delegate?.previewViewController(
             self,
             didOriginalButton: isOriginal

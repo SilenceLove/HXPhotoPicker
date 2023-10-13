@@ -72,6 +72,11 @@ public enum PickerPresentStyle {
     }
 }
 
+public enum PhotoPickerPreviewStyle {
+    case push
+    case present
+}
+
 public enum EditorJumpStyle {
     case push(PushStyle = .custom)
     case present(PresentStyle = .automatic)
@@ -83,6 +88,7 @@ public enum EditorJumpStyle {
     public enum PresentStyle {
         case automatic
         case fullScreen
+        case custom
     }
 }
 
@@ -311,4 +317,10 @@ public enum PickerError: Error, LocalizedError, CustomStringConvertible {
     public var description: String {
         errorDescription ?? "nil"
     }
+}
+
+public enum PhotoPreviewType {
+    case none
+    case picker
+    case browser
 }

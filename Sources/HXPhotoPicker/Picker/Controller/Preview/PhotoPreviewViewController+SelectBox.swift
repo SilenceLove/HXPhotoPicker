@@ -9,29 +9,28 @@ import UIKit
 
 extension PhotoPreviewViewController {
     @objc func didSelectBoxControlClick() {
-        guard let picker = pickerController,
-            let photoAsset = photoAsset(for: currentPreviewIndex) else {
+        guard let photoAsset = photoAsset(for: currentPreviewIndex) else {
             return
         }
         let isSelected = !selectBoxControl.isSelected
         var canUpdate = false
         var bottomNeedAnimated = false
         var pickerUpdateCell = false
-        let beforeIsEmpty = picker.selectedAssetArray.isEmpty
+        let beforeIsEmpty = pickerController.selectedAssetArray.isEmpty
         if isSelected {
             // 选中
             #if HXPICKER_ENABLE_EDITOR
             if photoAsset.mediaType == .video &&
-                picker.videoDurationExceedsTheLimit(photoAsset: photoAsset) &&
-                picker.config.editorOptions.isVideo {
-                if picker.canSelectAsset(for: photoAsset, showHUD: true) {
+                pickerController.pickerData.videoDurationExceedsTheLimit(photoAsset) &&
+                pickerConfig.editorOptions.isVideo {
+                if pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
                     openEditor(photoAsset)
                 }
                 return
             }
             #endif
             func addAsset() {
-                if picker.addedPhotoAsset(photoAsset: photoAsset) {
+                if pickerController.pickerData.append(photoAsset) {
                     canUpdate = true
                     if config.isShowBottomView {
                         photoToolbar.insertSelectedAsset(photoAsset)
@@ -42,7 +41,7 @@ extension PhotoPreviewViewController {
                 }
             }
             let inICloud = photoAsset.checkICloundStatus(
-                allowSyncPhoto: picker.config.allowSyncICloudWhenSelectPhoto
+                allowSyncPhoto: pickerConfig.allowSyncICloudWhenSelectPhoto
             ) { _, isSuccess in
                 if isSuccess {
                     addAsset()
@@ -60,15 +59,15 @@ extension PhotoPreviewViewController {
             }
         }else {
             // 取消选中
-            picker.removePhotoAsset(photoAsset: photoAsset)
-            if !beforeIsEmpty && picker.selectedAssetArray.isEmpty {
+            pickerController.pickerData.remove(photoAsset)
+            if !beforeIsEmpty && pickerController.selectedAssetArray.isEmpty {
                 bottomNeedAnimated = true
             }
             if config.isShowBottomView {
                 photoToolbar.removeSelectedAssets([photoAsset])
             }
             #if HXPICKER_ENABLE_EDITOR
-            if photoAsset.videoEditedResult != nil, picker.config.isDeselectVideoRemoveEdited {
+            if photoAsset.videoEditedResult != nil, pickerConfig.isDeselectVideoRemoveEdited {
                 photoAsset.editedResult = nil
                 let cell = getCell(for: currentPreviewIndex)
                 cell?.photoAsset = photoAsset
@@ -118,7 +117,7 @@ extension PhotoPreviewViewController {
         )
         if config.isShowBottomView {
             photoToolbar.requestOriginalAssetBtyes()
-            photoToolbar.selectedAssetDidChanged(pickerController!.selectedAssetArray)
+            photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
         }
         selectBoxControl.layer.removeAnimation(
             forKey: "SelectControlAnimation"

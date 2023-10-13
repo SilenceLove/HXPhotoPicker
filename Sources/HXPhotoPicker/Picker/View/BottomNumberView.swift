@@ -1,5 +1,5 @@
 //
-//  BottomNumberView.swift
+//  PhotoPickerBottomNumberView.swift
 //  HXPhotoPicker
 //
 //  Created by Slience on 2021/10/25.
@@ -7,22 +7,22 @@
 
 import UIKit
 
-class BottomNumberView: UICollectionReusableView {
+public class PhotoPickerBottomNumberView: UICollectionReusableView {
     
     private var contentLb: UILabel!
     private var filterLb: UILabel!
     
-    var didFilterHandler: (() -> Void)?
-    var filterOptions: PhotoPickerFilterSection.Options = .any {
+    public var didFilterHandler: (() -> Void)?
+    public var filterOptions: PhotoPickerFilterSection.Options = .any {
         didSet {
             updateFilter()
         }
     }
     
-    var photoCount: Int = 0
+    public var photoCount: Int = 0
     var videoCount: Int = 0
     
-    var config: PhotoListConfiguration.AssetNumber? {
+    public var config: PhotoListConfiguration.AssetNumber? {
         didSet {
             configData()
         }
@@ -128,7 +128,7 @@ class BottomNumberView: UICollectionReusableView {
         filterLb.attributedText = atbStr
     }
     
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
         contentLb.size = .init(width: width, height: min(height, 30))
         if height < 30 {
@@ -141,7 +141,7 @@ class BottomNumberView: UICollectionReusableView {
         filterLb.y = contentLb.frame.maxY
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {

@@ -25,6 +25,18 @@ extension CGFloat {
         }
     }
     
+    var editorCompressionQuality: CGFloat {
+        if self > 30000000 {
+            return 30000000 / self
+        }else if self > 15000000 {
+            return 12500000 / self
+        }else if self > 10000000 {
+            return 6000000 / self
+        }else {
+            return 3000000 / self
+        }
+    }
+    
     var transitionCompressionQuality: CGFloat {
         if self > 6000000 {
             return 3000000 / self

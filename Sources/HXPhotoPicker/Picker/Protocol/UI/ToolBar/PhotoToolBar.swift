@@ -1,5 +1,5 @@
 //
-//  PhotoToolBarProtocol.swift
+//  PhotoToolBar.swift
 //  HXPhotoPicker
 //
 //  Created by Silence on 2023/9/15.
@@ -20,11 +20,10 @@ public enum PhotoToolBarType {
     case browser
 }
 
-/// 具体实现可参考`PhotoToolbar`
-public protocol PhotoToolBarProtocol: UIView {
+/// 具体实现可参考`PhotoToolbarView`
+public protocol PhotoToolBar: UIView {
     
-    /// 初始化
-    func initViews(_ config: PickerConfiguration, type: PhotoToolBarType)
+    init(_ config: PickerConfiguration, type: PhotoToolBarType)
     
     /// toolbar（预览、原图、完成按钮这一栏）的高度
     func toolbarHeight() -> CGFloat
@@ -96,7 +95,7 @@ public protocol PhotoToolBarProtocol: UIView {
     func deviceOrientationDidChanged()
 }
 
-public extension PhotoToolBarProtocol {
+public extension PhotoToolBar {
     
     var previewHandler: (() -> Void)? { get { nil } set { } }
     

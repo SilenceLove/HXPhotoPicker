@@ -26,6 +26,26 @@ extension EditorViewController: UINavigationControllerDelegate {
     }
 }
 
+extension EditorViewController: UIViewControllerTransitioningDelegate {
+    
+    public func animationController(
+        forPresented presented: UIViewController,
+        presenting: UIViewController,
+        source: UIViewController
+    ) -> UIViewControllerAnimatedTransitioning? {
+        isTransitionCompletion = false
+        return EditorTransition(mode: .present)
+    }
+    
+    public func animationController(
+        forDismissed dismissed: UIViewController
+    ) -> UIViewControllerAnimatedTransitioning? {
+        isPopTransition = true
+        return EditorTransition(mode: .dismiss)
+    }
+}
+
+
 extension EditorViewController {
     
     func setTransitionImage(_ image: UIImage) {

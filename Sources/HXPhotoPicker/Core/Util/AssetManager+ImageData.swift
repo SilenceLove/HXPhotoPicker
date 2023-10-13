@@ -188,7 +188,6 @@ public extension AssetManager {
                 }
             }
         } else {
-            // Fallback on earlier versions
             return PHImageManager.default().requestImageData(
                 for: asset,
                 options: options

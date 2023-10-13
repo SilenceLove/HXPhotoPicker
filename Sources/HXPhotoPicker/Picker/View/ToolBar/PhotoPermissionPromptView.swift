@@ -64,10 +64,24 @@ class PhotoPermissionPromptView: UIView {
         }
     }
     
+    var leftMargin: CGFloat {
+        if let splitViewController = viewController?.splitViewController as? PhotoSplitViewController,
+           !UIDevice.isPortrait,
+           !UIDevice.isPad {
+            if !splitViewController.isSplitShowColumn {
+                return UIDevice.leftMargin
+            }else {
+                return 0
+            }
+        }else {
+            return UIDevice.leftMargin
+        }
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         let viewHeight = height
-        promptIcon.x = 12 + UIDevice.leftMargin
+        promptIcon.x = 12 + leftMargin
         promptIcon.centerY = viewHeight * 0.5
         promptArrow.x = width - 12 - promptArrow.width - UIDevice.rightMargin
         promptLb.x = promptIcon.frame.maxX + 12

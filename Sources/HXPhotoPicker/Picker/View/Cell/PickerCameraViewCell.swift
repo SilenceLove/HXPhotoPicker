@@ -10,7 +10,7 @@ import UIKit
 import AVFoundation
 
 #if !targetEnvironment(macCatalyst)
-class PickerCameraViewCell: UICollectionViewCell {
+public class PickerCameraViewCell: UICollectionViewCell {
     
     private var captureView: CaptureVideoPreviewView!
     private var imageView: UIImageView!
@@ -96,13 +96,13 @@ class PickerCameraViewCell: UICollectionViewCell {
     func stopSession() {
         captureView.stopSession()
     }
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
         captureView.frame = bounds
         imageView.center = CGPoint(x: width * 0.5, y: height * 0.5)
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {

@@ -358,6 +358,8 @@ extension EditorViewController: EditorToolsViewDelegate {
         if !isRotate {
             editorView.showStickersView()
             editorView.isCanZoomScale = true
+        }else {
+            backgroundInsetRect = view.bounds
         }
         backgroundView.contentSize = view.size
         if animated {

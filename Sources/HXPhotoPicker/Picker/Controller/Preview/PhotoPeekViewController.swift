@@ -36,7 +36,7 @@ public class PhotoPeekViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    init(isCamera: Bool) {
+    public init(isCamera: Bool) {
         self.isCamera = isCamera
         super.init(nibName: nil, bundle: nil)
     }

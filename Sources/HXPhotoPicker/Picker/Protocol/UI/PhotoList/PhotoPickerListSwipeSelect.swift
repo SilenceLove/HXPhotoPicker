@@ -1,39 +1,58 @@
 //
-//  PhotoPickerViewController+SwipeSelect.swift
+//  PhotoPickerListSwipeSelect.swift
 //  HXPhotoPicker
 //
-//  Created by Slience on 2020/12/31.
+//  Created by Silence on 2023/10/11.
+//  Copyright © 2023 洪欣. All rights reserved.
 //
 
 import UIKit
 
-// MARK: 滑动选择
-extension PhotoPickerViewController: UIGestureRecognizerDelegate {
-    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        if gestureRecognizer != swipeSelectPanGR {
-            return true
-        }
-        guard let config = pickerController?.config else {
-            return true
-        } 
-        let point = gestureRecognizer.location(in: view)
-        return point.x > config.photoList.swipeSelectIgnoreLeftArea
-    }
+public enum PhotoPickerListSwipeSelectState {
+    case select
+    case unselect
 }
 
-extension PhotoPickerViewController {
-    enum SwipeSelectState {
-        case select
-        case unselect
+public protocol PhotoPickerListSwipeSelect:
+    UIView,
+    PhotoPickerListDelegateProperty,
+    PhotoPickerListCollectionView,
+    PhotoPickerControllerViewFectch,
+    PhotoPickerListFectchCell,
+    PhotoPickerListFetchAssets
+{
+    var swipeSelectBeganIndexPath: IndexPath? { get set }
+    var swipeSelectedIndexArray: [Int]?  { get set }
+    var swipeSelectState: PhotoPickerListSwipeSelectState?  { get set }
+    var swipeSelectAutoScrollTimer: DispatchSourceTimer?  { get set }
+    var swipeSelectPanGR: UIPanGestureRecognizer?  { get set }
+    var swipeSelectLastLocalPoint: CGPoint?  { get set }
+    
+    func addSwipeSelectGestureRecognizer(target: Any?, action: Selector?)
+    func beganPanGestureRecognizer(panGR: UIPanGestureRecognizer, localPoint: CGPoint)
+    func changedPanGestureRecognizer(panGR: UIPanGestureRecognizer, localPoint: CGPoint)
+    func endedPanGestureRecognizer()
+    
+    func recallSwipeSelectAction()
+}
+
+public extension PhotoPickerListSwipeSelect {
+    
+    func addSwipeSelectGestureRecognizer(target: Any?, action: Selector?) {
+        swipeSelectPanGR = UIPanGestureRecognizer(
+            target: target,
+            action: action
+        )
+        addGestureRecognizer(swipeSelectPanGR!)
     }
+    
     func beganPanGestureRecognizer(
         panGR: UIPanGestureRecognizer,
         localPoint: CGPoint
     ) {
         if let indexPath = collectionView.indexPathForItem(at: localPoint),
-           let photoAsset = getCell(for: indexPath.item)?.photoAsset,
-           let pickerController = pickerController {
-            if !pickerController.canSelectAsset(for: photoAsset, showHUD: false) && !photoAsset.isSelected {
+           let photoAsset = getCell(for: indexPath.item)?.photoAsset {
+            if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: false) && !photoAsset.isSelected {
                 return
             }
             swipeSelectedIndexArray = []
@@ -58,7 +77,7 @@ extension PhotoPickerViewController {
                let swipeSelectState = swipeSelectState,
                var indexArray = swipeSelectedIndexArray {
                 if swipeSelectState == .select {
-                    if let lastPhotoAsset = pickerController?.selectedAssetArray.last,
+                    if let lastPhotoAsset = pickerController.selectedAssetArray.last,
                        let cellIndexPath = getIndexPath(for: lastPhotoAsset) {
                         if lastIndex < beganIndex && cellIndexPath.item < lastIndex {
                             for index in cellIndexPath.item...lastIndex where indexArray.contains(index) {
@@ -87,7 +106,7 @@ extension PhotoPickerViewController {
                         }
                     }
                 }else {
-                    let photoAsset = pickerController?.selectedAssetArray.first
+                    let photoAsset = pickerController.selectedAssetArray.first
                     if let lastPhotoAsset = photoAsset,
                        let cellIndexPath = getIndexPath(for: lastPhotoAsset) {
                         if lastIndex > cellIndexPath.item {
@@ -133,8 +152,8 @@ extension PhotoPickerViewController {
                 }
                 updateCellSelectedTitle()
             }else {
-                if let photoAsset = getCell(for: lastIndex)?.photoAsset, let pickerController = pickerController {
-                    if !pickerController.canSelectAsset(for: photoAsset, showHUD: false) && !photoAsset.isSelected {
+                if let photoAsset = getCell(for: lastIndex)?.photoAsset {
+                    if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: false) && !photoAsset.isSelected {
                         return
                     }
                     swipeSelectedIndexArray = []
@@ -150,6 +169,8 @@ extension PhotoPickerViewController {
                let swipeSelectState = swipeSelectState,
                let indexArray = swipeSelectedIndexArray,
                let point = swipeSelectLastLocalPoint {
+                let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout
+                let itemHieght = flowLayout?.itemSize.height ?? 50
                 let largeHeight = collectionView.contentSize.height > collectionView.height
                 var exceedBottom: Bool
                 let offsety = collectionView.contentOffset.y
@@ -160,14 +181,13 @@ extension PhotoPickerViewController {
                 if offsety > maxOffsetY {
                     let exceedOffset_1 =
                         collectionView.height -
-                        collectionView.contentInset.bottom - 1 -
-                        collectionViewLayout.itemSize.height
-                    let exceedOffset_2 = collectionView.contentSize.height - 1 - collectionViewLayout.itemSize.height
+                        collectionView.contentInset.bottom - 1 - itemHieght
+                    let exceedOffset_2 = collectionView.contentSize.height - 1 - itemHieght
                     exceedBottom = largeHeight ? point.y > exceedOffset_1 : localPoint.y > exceedOffset_2
                 }else {
                     exceedBottom = largeHeight ?
                         false :
-                        localPoint.y > collectionView.contentSize.height - 1 - collectionViewLayout.itemSize.height
+                        localPoint.y > collectionView.contentSize.height - 1 - itemHieght
                 }
                 let inScope = point.x >= 0 && point.x <= collectionView.width
                 if exceedBottom && inScope {
@@ -193,41 +213,19 @@ extension PhotoPickerViewController {
             }
         }
     }
-    @objc func panGestureRecognizer(panGR: UIPanGestureRecognizer) {
-        if titleView.isSelected {
-            return
-        }
-        let localPoint = panGR.location(in: collectionView)
-        swipeSelectLastLocalPoint = panGR.location(in: view)
-        switch panGR.state {
-        case .began:
-            beganPanGestureRecognizer(
-                panGR: panGR,
-                localPoint: localPoint
-            )
-        case .changed:
-            changedPanGestureRecognizer(
-                panGR: panGR,
-                localPoint: localPoint
-            )
-        case .ended, .cancelled, .failed:
-            clearSwipeSelectData()
-        default:
-            break
-        }
-    }
-    private func clearSwipeSelectData() {
+    
+    func endedPanGestureRecognizer() {
         swipeSelectAutoScrollTimer?.cancel()
         swipeSelectAutoScrollTimer = nil
         swipeSelectBeganIndexPath = nil
         swipeSelectState = nil
         swipeSelectedIndexArray = nil
     }
-    private func panGRChangedUpdateState(index: Int, state: SwipeSelectState) {
+    private func panGRChangedUpdateState(index: Int, state: PhotoPickerListSwipeSelectState) {
         if index >= assets.count && !needOffset {
             return
         }
-        let photoAsset = getPhotoAsset(for: index)
+        let photoAsset = getAsset(for: index)
         if swipeSelectState == .select {
             if let array = swipeSelectedIndexArray,
                !photoAsset.isSelected,
@@ -243,10 +241,6 @@ extension PhotoPickerViewController {
         updateCellSelectedState(for: index, isSelected: state == .select)
     }
     private func swipeSelectAutoScroll() {
-//        guard let pickerController = pickerController,
-//              !pickerController.config.allowSyncICloudWhenSelectPhoto else {
-//            return
-//        }
         if !config.swipeSelectAllowAutoScroll {
             return
         }
@@ -268,13 +262,13 @@ extension PhotoPickerViewController {
             let topRect = CGRect(
                 x: 0,
                 y: 0,
-                width: view.width,
+                width: width,
                 height: config.autoSwipeTopAreaHeight + collectionView.contentInset.top
             )
             let bottomRect = CGRect(
                 x: 0,
                 y: collectionView.height - collectionView.contentInset.bottom - config.autoSwipeBottomAreaHeight,
-                width: view.width,
+                width: width,
                 height: config.autoSwipeBottomAreaHeight + collectionView.contentInset.bottom
             )
             let margin: CGFloat = 140 * config.swipeSelectScrollSpeed
@@ -299,7 +293,7 @@ extension PhotoPickerViewController {
                     self.collectionView.contentOffset = CGPoint(x: self.collectionView.contentOffset.x, y: offsety)
                 }
             }
-            panGestureRecognizer(panGR: swipeSelectPanGR!)
+            recallSwipeSelectAction()
         }
     }
     
@@ -307,18 +301,14 @@ extension PhotoPickerViewController {
         if item >= assets.count && !needOffset {
             return
         }
-        guard let pickerController = pickerController else {
-            return
-        }
         var showHUD = false
-        let photoAsset = getPhotoAsset(for: item)
+        let photoAsset = getAsset(for: item)
         let cell = getCell(for: item)
         if photoAsset.isSelected != isSelected {
             if isSelected {
                 func addAsset(showTip: Bool) {
-//                    resetICloud(for: photoAsset)
-                    if pickerController.canSelectAsset(for: photoAsset, showHUD: showTip) {
-                        pickerController.addedPhotoAsset(photoAsset: photoAsset)
+                    if pickerController.pickerData.canSelect(photoAsset, isShowHUD: showTip) {
+                        pickerController.pickerData.append(photoAsset)
                         if let cell = cell {
                             cell.updateSelectedState(
                                 isSelected: isSelected,
@@ -350,25 +340,24 @@ extension PhotoPickerViewController {
                     })
                     if inICloud {
                         swipeSelectPanGR?.isEnabled = false
-                        clearSwipeSelectData()
+                        endedPanGestureRecognizer()
                         swipeSelectPanGR?.isEnabled = true
                     }else {
                         addAsset(showTip: false)
                     }
                 }
             }else {
-                pickerController.removePhotoAsset(photoAsset: photoAsset)
+                pickerController.pickerData.remove(photoAsset)
                 if let cell = cell {
                     cell.updateSelectedState(isSelected: isSelected, animated: false)
                 }
             }
         }
-        photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
-        requestSelectedAssetFileSize()
-        if pickerController.selectArrayIsFull() && showHUD {
+        delegate?.photoList(selectedAssetDidChanged: self)
+        if pickerController.pickerData.isFull && showHUD {
             swipeSelectPanGR?.isEnabled = false
             ProgressHUD.showWarning(
-                addedTo: navigationController?.view,
+                addedTo: pickerController.view,
                 text: String(
                     format: "已达到最大选择数".localized,
                     arguments: [pickerController.config.maximumSelectedPhotoCount]
@@ -376,7 +365,7 @@ extension PhotoPickerViewController {
                 animated: true,
                 delayHide: 1.5
             )
-            clearSwipeSelectData()
+            endedPanGestureRecognizer()
             swipeSelectPanGR?.isEnabled = true
         }
     }

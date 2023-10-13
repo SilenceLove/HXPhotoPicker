@@ -20,21 +20,31 @@ public extension PhotoAsset {
                     completion?(nil)
                     return
                 }
-                AssetManager.saveSystemAlbum(
+                AssetManager.save(
                     type: .livePhoto(imageURL: imageURL, videoURL: videoURL),
                     customAlbumName: albumName
                 ) {
-                    completion?($0)
+                    switch $0 {
+                    case .success(let phAsset):
+                        completion?(phAsset)
+                    case .failure:
+                        completion?(nil)
+                    }
                 }
             }
             return
         }
-        func save(_ type: AssetManager.SaveType) {
-            AssetManager.saveSystemAlbum(
+        func save(_ type: AssetManager.PhotoSaveType) {
+            AssetManager.save(
                 type: type,
                 customAlbumName: albumName
             ) {
-                completion?($0)
+                switch $0 {
+                case .success(let phAsset):
+                    completion?(phAsset)
+                case .failure:
+                    completion?(nil)
+                }
             }
         }
         getAssetURL { result in
@@ -78,7 +88,7 @@ public extension PhotoAsset {
         }
     }
 }
-extension PhotoAsset {
+public extension PhotoAsset {
     
     var inICloud: Bool {
         guard let phAsset = phAsset,

@@ -8,17 +8,14 @@
 
 import UIKit
 
-class EmptyView: UIView {
+public class PhotoPickerEmptyView: UIView {
     private var titleLb: UILabel!
     private var subTitleLb: UILabel!
     
-    var config: EmptyViewConfiguration? {
-        didSet {
-            configColor()
-        }
-    }
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    let config: EmptyViewConfiguration
+    init(config: EmptyViewConfiguration) {
+        self.config = config
+        super.init(frame: .zero)
         
         titleLb = UILabel()
         titleLb.text = "没有照片".localized
@@ -33,14 +30,16 @@ class EmptyView: UIView {
         subTitleLb.textAlignment = .center
         subTitleLb.font = UIFont.mediumPingFang(ofSize: 16)
         addSubview(subTitleLb)
+        
+        configColor()
     }
     
     private func configColor() {
-        titleLb.textColor = PhotoManager.isDark ? config?.titleDarkColor : config?.titleColor
-        subTitleLb.textColor = PhotoManager.isDark ? config?.subTitleDarkColor : config?.subTitleColor
+        titleLb.textColor = PhotoManager.isDark ? config.titleDarkColor : config.titleColor
+        subTitleLb.textColor = PhotoManager.isDark ? config.subTitleDarkColor : config.subTitleColor
     }
     
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
         let titleHeight = titleLb.text?.height(ofFont: titleLb.font, maxWidth: width - 20) ?? 0
         titleLb.frame = CGRect(x: 10, y: 0, width: width - 20, height: titleHeight)
@@ -49,7 +48,7 @@ class EmptyView: UIView {
         height = subTitleLb.frame.maxY
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {

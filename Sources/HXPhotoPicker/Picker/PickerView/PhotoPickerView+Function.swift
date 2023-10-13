@@ -76,12 +76,10 @@ extension PhotoPickerView {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
         
-        emptyView = EmptyView(frame: .zero)
-        emptyView.config = config.emptyView
+        emptyView = PhotoPickerEmptyView(config: config.emptyView)
         
-        var deniedConfig = manager.config.notAuthorized
-        deniedConfig.isHiddenCloseButton = true
-        deniedView = DeniedAuthorizationView(config: deniedConfig)
+        manager.config.notAuthorized.isHiddenCloseButton = true
+        deniedView = DeniedAuthorizationView(config: manager.config)
         
         panGR = UIPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerClick(pan:)))
         if scrollDirection == .horizontal {

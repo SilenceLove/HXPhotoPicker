@@ -16,8 +16,8 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
             return
         }
         var needReload = false
-        if assetCollectionsArray.isEmpty {
-            if let collection = cameraAssetCollection {
+        if fetchData.assetCollections.isEmpty {
+            if let collection = fetchData.cameraAssetCollection {
                 needReload = resultHasChanges(
                     for: changeInstance,
                     assetCollection: collection
@@ -26,7 +26,7 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
                 needReload = true
             }
         }else {
-            let collectionArray = assetCollectionsArray
+            let collectionArray = fetchData.assetCollections
             for assetCollection in collectionArray {
                 let hasChanges = resultHasChanges(
                     for: changeInstance,
@@ -39,12 +39,12 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
         }
         if needReload {
             DispatchQueue.main.async {
-                if self.cameraAssetCollection?.result == nil {
-                    self.fetchCameraAssetCollection()
+                if self.fetchData.cameraAssetCollection?.result == nil {
+                    self.fetchData.fetchCameraAssetCollection()
                 }else {
                     self.reloadData(assetCollection: nil)
                 }
-                self.fetchAssetCollections()
+                self.fetchData.fetchAssetCollections()
             }
         }
     }
@@ -53,7 +53,7 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
         assetCollection: PhotoAssetCollection
     ) -> Bool {
         if assetCollection.result == nil {
-            if assetCollection == self.cameraAssetCollection {
+            if assetCollection == self.fetchData.cameraAssetCollection {
                 return true
             }
             return false
@@ -64,7 +64,7 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
         if let changeResult = changeResult, !changeResult.hasIncrementalChanges {
             let result = changeResult.fetchResultAfterChanges
             assetCollection.changeResult(for: result)
-            if assetCollection == self.cameraAssetCollection && result.count == 0 {
+            if assetCollection == self.fetchData.cameraAssetCollection && result.count == 0 {
                 assetCollection.change(
                     albumName: self.config.albumList.emptyAlbumName.localized,
                     coverImage: self.config.albumList.emptyCoverImageName.image

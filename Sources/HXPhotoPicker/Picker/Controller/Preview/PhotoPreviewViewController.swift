@@ -9,16 +9,16 @@
 import UIKit
 import Photos
 
-public class PhotoPreviewViewController: BaseViewController {
+public class PhotoPreviewViewController: BaseViewController, PhotoPickerControllerFectch {
     
     weak var delegate: PhotoPreviewViewControllerDelegate?
+    let pickerConfig: PickerConfiguration
     public let config: PreviewViewConfiguration
     /// 当前预览的位置索引
     public var currentPreviewIndex: Int = 0
     /// 预览的资源数组
     public var previewAssets: [PhotoAsset] = []
-    /// 是否是外部预览
-    public var isExternalPreview: Bool = false
+    public var previewType: PhotoPreviewType = .none
     public var collectionView: UICollectionView!
     
     private var collectionViewLayout: UICollectionViewFlowLayout!
@@ -26,20 +26,16 @@ public class PhotoPreviewViewController: BaseViewController {
     var cellForIndex: PhotoBrowser.CellReloadContext?
     var assetForIndex: PhotoBrowser.RequiredAsset?
     
-    var photoToolbar: PhotoToolBarProtocol!
+    var photoToolbar: PhotoToolBar!
     var selectBoxControl: SelectBoxView!
     var interactiveTransition: PickerInteractiveTransition?
     weak var beforeNavDelegate: UINavigationControllerDelegate?
-    
+    weak var tmpPickerController: PhotoPickerController?
     var isPreviewSelect: Bool = false
-    var isExternalPickerPreview: Bool = false
     var orientationDidChange: Bool = false
     var statusBarShouldBeHidden: Bool = false
-    var videoLoadSingleCell = false
     var viewDidAppear: Bool = false
     var firstLayoutSubviews: Bool = true
-    var isMultipleSelect: Bool = false
-    var allowLoadPhotoLibrary: Bool = true
     var requestPreviewTimer: Timer?
     
     var assetCount: Int {
@@ -59,8 +55,9 @@ public class PhotoPreviewViewController: BaseViewController {
         return assetForIndex?(index)
     }
     
-    init(config: PreviewViewConfiguration) {
-        self.config = config
+    init(config: PickerConfiguration) {
+        self.config = config.previewView
+        self.pickerConfig = config
         super.init(nibName: nil, bundle: nil)
     }
     required init?(coder: NSCoder) {
@@ -98,16 +95,11 @@ public class PhotoPreviewViewController: BaseViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         title = ""
-        isMultipleSelect = pickerController?.config.selectMode == .multiple
-        if let isLoadPhotoLibrary = pickerController?.config.allowLoadPhotoLibrary {
-            allowLoadPhotoLibrary = isLoadPhotoLibrary
-        }else {
-            allowLoadPhotoLibrary = true
-        }
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
         view.clipsToBounds = true
         initView()
+        tmpPickerController = pickerController
     }
     public override func deviceOrientationWillChanged(notify: Notification) {
         orientationDidChange = true
@@ -126,7 +118,7 @@ public class PhotoPreviewViewController: BaseViewController {
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        pickerController?.viewControllersWillAppear(self)
+        pickerController.viewControllersWillAppear(self)
     }
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -145,12 +137,17 @@ public class PhotoPreviewViewController: BaseViewController {
                 }
             }
         }
-        pickerController?.viewControllersDidAppear(self)
-        guard let picker = pickerController else {
-            return
+        pickerController.viewControllersDidAppear(self)
+        
+        let isFullscreen = pickerController.modalPresentationStyle == .fullScreen || (splitViewController?.modalPresentationStyle == .fullScreen)
+        let isMacApp: Bool
+        if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+            isMacApp = true
+        }else {
+            isMacApp = false
         }
-        if (picker.modalPresentationStyle == .fullScreen && interactiveTransition == nil) ||
-            (!UIDevice.isPortrait && !UIDevice.isPad) && !isExternalPreview {
+        if ((isFullscreen && interactiveTransition == nil) ||
+            (!UIDevice.isPortrait && !UIDevice.isPad) || isMacApp) && previewType != .browser {
             interactiveTransition = PickerInteractiveTransition(
                 panGestureRecognizerFor: self,
                 type: .pop
@@ -159,27 +156,24 @@ public class PhotoPreviewViewController: BaseViewController {
     }
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        pickerController?.viewControllersWillDisappear(self)
+        pickerController.viewControllersWillDisappear(self)
     }
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        pickerController?.viewControllersDidDisappear(self)
+        tmpPickerController?.viewControllersDidDisappear(self)
     }
     public override var prefersStatusBarHidden: Bool {
-        return statusBarShouldBeHidden
+        statusBarShouldBeHidden
     }
     
     public override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
-        return .fade
+        .fade
     }
     public override var preferredStatusBarStyle: UIStatusBarStyle {
         if PhotoManager.isDark {
             return .lightContent
         }
-        if let statusBarStyle = pickerController?.config.statusBarStyle {
-            return statusBarStyle
-        }
-        return .default
+        return pickerController.config.statusBarStyle
     }
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -195,9 +189,6 @@ public class PhotoPreviewViewController: BaseViewController {
 extension PhotoPreviewViewController {
      
     private func initView() {
-        guard let pickerController = pickerController else {
-            return
-        }
         collectionViewLayout = UICollectionViewFlowLayout()
         collectionViewLayout.scrollDirection = .horizontal
         collectionViewLayout.minimumLineSpacing = 0
@@ -213,32 +204,27 @@ extension PhotoPreviewViewController {
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         } else {
-            // Fallback on earlier versions
-            self.automaticallyAdjustsScrollViewInsets = false
+            automaticallyAdjustsScrollViewInsets = false
         }
-        collectionView.register(
-            PreviewPhotoViewCell.self,
-            forCellWithReuseIdentifier: NSStringFromClass(PreviewPhotoViewCell.self)
-        )
-        collectionView.register(
-            PreviewLivePhotoViewCell.self,
-            forCellWithReuseIdentifier: NSStringFromClass(PreviewLivePhotoViewCell.self)
-        )
+        collectionView.register(PreviewPhotoViewCell.self)
+        collectionView.register(PreviewLivePhotoViewCell.self)
         if let customVideoCell = config.customVideoCellClass {
             collectionView.register(
                 customVideoCell,
-                forCellWithReuseIdentifier: NSStringFromClass(PreviewVideoViewCell.self)
+                forCellWithReuseIdentifier: PreviewVideoViewCell.className
             )
         }else {
             collectionView.register(
                 PreviewVideoViewCell.self,
-                forCellWithReuseIdentifier: NSStringFromClass(PreviewVideoViewCell.self)
+                forCellWithReuseIdentifier: PreviewVideoViewCell.className
             )
         }
         view.addSubview(collectionView)
         
-        photoToolbar = config.photoToolbar.init()
-        photoToolbar.initViews(pickerController.config, type: isExternalPreview ? .browser : .preview)
+        photoToolbar = config.photoToolbar.init(
+            pickerConfig,
+            type: previewType != .browser ? .preview : .browser
+        )
         photoToolbar.selectedAssetHandler = { [weak self] in
             guard let self = self else { return }
             if self.previewAssets.contains($0) {
@@ -250,15 +236,15 @@ extension PhotoPreviewViewController {
         photoToolbar.moveAssetHandler = { [weak self] in
             guard let self = self else { return }
             self.delegate?.previewViewController(self, moveItem: $0, toIndex: $1)
-            guard let pickerController = self.pickerController else { return }
-            pickerController.movePhotoAsset(fromIndex: $0, toIndex: $1)
+            let pickerController = self.pickerController
+            pickerController.pickerData.move(fromIndex: $0, toIndex: $1)
             if self.isPreviewSelect {
                 let fromAsset = previewAssets[$0]
                 self.previewAssets.remove(at: $0)
                 self.previewAssets.insert(fromAsset, at: $1)
                 self.getCell(for: self.currentPreviewIndex)?.cancelRequest()
                 self.collectionView.reloadData()
-                self.setupRequestPreviewTimer()
+                self.startRequestPreviewTimer()
             }
             self.photoToolbar.updateSelectedAssets(pickerController.selectedAssetArray)
             if let asset = self.photoAsset(for: self.currentPreviewIndex) {
@@ -279,18 +265,17 @@ extension PhotoPreviewViewController {
         #endif
         photoToolbar.originalHandler = { [weak self] in
             guard let self = self else { return }
-            self.pickerController?.isOriginal = $0
-            self.pickerController?.originalButtonCallback()
+            self.pickerController.isOriginal = $0
             if $0 {
                 self.requestSelectedAssetFileSize()
             }else {
-                self.pickerController?.cancelRequestAssetFileSize(isPreview: true)
+                self.pickerController.pickerData.cancelRequestAssetFileSize(isPreview: true)
             }
             self.delegate?.previewViewController(
                 self,
                 didOriginalButton: $0
             )
-            self.pickerController?.originalButtonCallback()
+            self.pickerController.originalButtonCallback()
         }
         photoToolbar.finishHandler = { [weak self] in
             self?.didFinishClick()
@@ -298,7 +283,7 @@ extension PhotoPreviewViewController {
         
         if config.isShowBottomView {
             view.addSubview(photoToolbar)
-            if !isExternalPreview {
+            if previewType != .browser {
                 photoToolbar.updateOriginalState(pickerController.isOriginal)
                 photoToolbar.requestOriginalAssetBtyes()
                 let selectedAssetArray = pickerController.selectedAssetArray
@@ -318,22 +303,24 @@ extension PhotoPreviewViewController {
         selectBoxControl.backgroundColor = .clear
         selectBoxControl.addTarget(self, action: #selector(didSelectBoxControlClick), for: UIControl.Event.touchUpInside)
         
-        if (isExternalPreview || isExternalPickerPreview) && pickerController.modalPresentationStyle != .custom {
+        if previewType != .none && pickerController.modalPresentationStyle != .custom {
             configColor()
         }
-        if isMultipleSelect || isExternalPreview {
-            videoLoadSingleCell = pickerController.singleVideo
-            if !isExternalPreview {
-                if isExternalPickerPreview {
+        if pickerConfig.isMultipleSelect || previewType != .browser {
+            if previewType != .browser {
+                if previewType == .picker {
+                    let imageName = pickerController.config.photoList.previewStyle == .present ? "hx_picker_photolist_back" : "hx_picker_photolist_cancel"
                     let cancelItem = UIBarButtonItem(
-                        image: "hx_picker_photolist_cancel".image,
+                        image: imageName.image,
                         style: .done,
                         target: self,
                         action: #selector(didCancelItemClick)
                     )
                     navigationItem.leftBarButtonItem = cancelItem
                 }
-                navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: selectBoxControl)
+                if pickerConfig.isMultipleSelect {
+                    navigationItem.rightBarButtonItem = UIBarButtonItem(customView: selectBoxControl)
+                }
             }else {
                 var cancelItem: UIBarButtonItem
                 if config.cancelType == .image {
@@ -373,8 +360,8 @@ extension PhotoPreviewViewController {
                         }
                         #endif
                     }
-                    if !isExternalPreview {
-                        if photoAsset.mediaType == .video && videoLoadSingleCell {
+                    if previewType != .browser {
+                        if photoAsset.mediaType == .video && pickerConfig.isSingleVideo {
                             selectBoxControl.isHidden = true
                         } else {
                             updateSelectBox(photoAsset.isSelected, photoAsset: photoAsset)
@@ -387,8 +374,8 @@ extension PhotoPreviewViewController {
                     )
                 }
             }
-        }else if !isMultipleSelect {
-            if isExternalPickerPreview {
+        }else if !pickerConfig.isMultipleSelect {
+            if previewType == .picker {
                 let cancelItem = UIBarButtonItem(
                     image: "hx_picker_photolist_cancel".image,
                     style: .done,
@@ -478,7 +465,7 @@ extension PhotoPreviewViewController {
             at: .centeredHorizontally,
             animated: false
         )
-        setupRequestPreviewTimer()
+        startRequestPreviewTimer()
     }
     func setCurrentCellImage(image: UIImage?) {
         guard let image = image,
@@ -508,7 +495,7 @@ extension PhotoPreviewViewController {
                 animated: false
             )
             scrollViewDidScroll(collectionView)
-            setupRequestPreviewTimer()
+            startRequestPreviewTimer()
         }else {
             collectionView.insertItems(
                 at: [
@@ -544,7 +531,7 @@ extension PhotoPreviewViewController {
                 animated: false
             )
             scrollViewDidScroll(collectionView)
-            setupRequestPreviewTimer()
+            startRequestPreviewTimer()
         }else {
             collectionView.insertItems(
                 at: [
@@ -558,7 +545,7 @@ extension PhotoPreviewViewController {
         
     }
     func deleteItems(at items: [Int]) {
-        if assetCount == 0 || !isExternalPreview || items.isEmpty {
+        if assetCount == 0 || previewType != .browser || items.isEmpty {
             return
         }
         var indexPaths: [IndexPath] = []
@@ -567,10 +554,11 @@ extension PhotoPreviewViewController {
             guard let photoAsset = photoAsset(for: item) else {
                 continue
             }
-            if let shouldDelete = pickerController?.previewShouldDeleteAsset(
+            let shouldDelete = pickerController.previewShouldDeleteAsset(
                 photoAsset: photoAsset,
                 index: item
-            ), !shouldDelete {
+            )
+            if !shouldDelete {
                 continue
             }
             #if HXPICKER_ENABLE_EDITOR
@@ -589,16 +577,14 @@ extension PhotoPreviewViewController {
         if config.isShowBottomView {
             photoToolbar.removeSelectedAssets(photoAssets)
         }
-        if let pickerController = pickerController {
-            pickerController.pickerDelegate?.pickerController(
-                pickerController,
-                previewDidDeleteAssets: photoAssets,
-                at: items
-            )
-        }
+        pickerController.pickerDelegate?.pickerController(
+            pickerController,
+            previewDidDeleteAssets: photoAssets,
+            at: items
+        )
         if assetCount > 0 {
             scrollViewDidScroll(collectionView)
-            setupRequestPreviewTimer()
+            startRequestPreviewTimer()
         }else {
             didCancelItemClick()
         }
@@ -612,12 +598,11 @@ extension PhotoPreviewViewController {
 //        collectionView.reloadItems(at: [IndexPath.init(item: index, section: 0)])
     }
     func addedCameraPhotoAsset(_ photoAsset: PhotoAsset) {
-        guard let picker = pickerController else { return }
         if config.isShowBottomView {
-            photoToolbar.updateSelectedAssets(picker.selectedAssetArray)
+            photoToolbar.updateSelectedAssets(pickerController.selectedAssetArray)
             configBottomViewFrame()
             photoToolbar.layoutSubviews()
-            photoToolbar.selectedAssetDidChanged(picker.selectedAssetArray)
+            photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
         }
         getCell(for: currentPreviewIndex)?.cancelRequest()
         previewAssets.insert(
@@ -641,11 +626,11 @@ extension PhotoPreviewViewController {
             animated: false
         )
         scrollViewDidScroll(collectionView)
-        setupRequestPreviewTimer()
+        startRequestPreviewTimer()
     }
     
     @objc func didCancelItemClick() {
-        pickerController?.cancelCallback()
+        pickerController.cancelCallback()
         dismiss(animated: true, completion: nil)
     }
 }

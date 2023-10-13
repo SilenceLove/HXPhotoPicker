@@ -11,19 +11,18 @@ import UIKit
 
 extension PhotoPreviewViewController: EditorViewControllerDelegate {
     public func editorViewController(_ editorViewController: EditorViewController, didFinish asset: EditorAsset) {
-        guard let picker = pickerController else { return }
         guard let photoAsset = asset.type.photoAsset else {
             return
         }
-        PhotoManager.shared.appearanceStyle = picker.config.appearanceStyle
+        PhotoManager.shared.appearanceStyle = pickerConfig.appearanceStyle
         if let result = asset.result {
             photoAsset.editedResult = result
-            if isExternalPreview {
+            if previewType == .browser {
                 replacePhotoAsset(at: currentPreviewIndex, with: photoAsset)
             }else {
-                if (videoLoadSingleCell && photoAsset.mediaType == .video) || !isMultipleSelect {
-                    if picker.canSelectAsset(for: photoAsset, showHUD: true) {
-                        if isExternalPickerPreview {
+                if (pickerConfig.isSingleVideo && photoAsset.mediaType == .video) || !pickerConfig.isMultipleSelect {
+                    if pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
+                        if previewType == .picker {
                             delegate?.previewViewController(
                                 self,
                                 didSelectBox: photoAsset,
@@ -31,8 +30,8 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
                                 updateCell: false
                             )
                         }
-                        delegate?.previewViewController(didFinishButton: self)
-                        picker.singleFinishCallback(for: photoAsset)
+                        delegate?.previewViewController(didFinishButton: self, photoAssets: [photoAsset])
+                        pickerController.singleFinishCallback(for: photoAsset)
                     }
                     return
                 }
@@ -41,16 +40,16 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
                     didSelectBoxControlClick()
                 }
             }
-            picker.didEditAsset(photoAsset: photoAsset, atIndex: currentPreviewIndex)
+            pickerController.didEditAsset(photoAsset: photoAsset, atIndex: currentPreviewIndex)
         }else {
             let beforeHasEdit = photoAsset.editedResult != nil
             photoAsset.editedResult = nil
             if beforeHasEdit {
-                picker.didEditAsset(photoAsset: photoAsset, atIndex: currentPreviewIndex)
+                pickerController.didEditAsset(photoAsset: photoAsset, atIndex: currentPreviewIndex)
             }
-            if (videoLoadSingleCell && photoAsset.mediaType == .video) || !isMultipleSelect {
-                if picker.canSelectAsset(for: photoAsset, showHUD: true) {
-                    if isExternalPickerPreview {
+            if (pickerConfig.isSingleVideo && photoAsset.mediaType == .video) || !pickerConfig.isMultipleSelect {
+                if pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
+                    if previewType == .picker {
                         delegate?.previewViewController(
                             self,
                             didSelectBox: photoAsset,
@@ -58,8 +57,8 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
                             updateCell: false
                         )
                     }
-                    delegate?.previewViewController(didFinishButton: self)
-                    picker.singleFinishCallback(for: photoAsset)
+                    delegate?.previewViewController(didFinishButton: self, photoAssets: [photoAsset])
+                    pickerController.singleFinishCallback(for: photoAsset)
                 }
                 return
             }
@@ -74,16 +73,14 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
     }
     
     public func editorViewController(didCancel editorViewController: EditorViewController) {
-        guard let picker = pickerController else { return }
-        PhotoManager.shared.appearanceStyle = picker.config.appearanceStyle
+        PhotoManager.shared.appearanceStyle = pickerConfig.appearanceStyle
     }
     
     public func editorViewController(
         _ editorViewController: EditorViewController,
         loadTitleChartlet response: @escaping EditorTitleChartletResponse
     ) {
-        guard let pickerController = pickerController,
-              let pickerDelegate = pickerController.pickerDelegate else {
+        guard let pickerDelegate = pickerController.pickerDelegate else {
             #if canImport(Kingfisher)
             let titles = PhotoTools.defaultTitleChartlet()
             response(titles)
@@ -105,8 +102,7 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
         titleIndex: Int,
         loadChartletList response: @escaping EditorChartletListResponse
     ) {
-        guard let pickerController = pickerController,
-              let pickerDelegate = pickerController.pickerDelegate else {
+        guard let pickerDelegate = pickerController.pickerDelegate else {
             #if canImport(Kingfisher)
             let chartletList = PhotoTools.defaultNetworkChartlet()
             response(titleIndex, chartletList)
@@ -125,8 +121,7 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
     }
     
     public func editorViewController(shouldClickMusicTool editorViewController: EditorViewController) -> Bool {
-        if let pickerController = pickerController,
-           let shouldClick = pickerController.pickerDelegate?.pickerController(
+        if let shouldClick = pickerController.pickerDelegate?.pickerController(
             pickerController,
             videoEditorShouldClickMusicTool: editorViewController
            ) {
@@ -139,8 +134,7 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
         _ editorViewController: EditorViewController,
         loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void
     ) -> Bool {
-        guard let pickerController = pickerController,
-              let pickerDelegate = pickerController.pickerDelegate else {
+        guard let pickerDelegate = pickerController.pickerDelegate else {
             completionHandler(PhotoTools.defaultMusicInfos())
             return false
         }
@@ -156,8 +150,7 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
         didSearchMusic text: String?,
         completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void
     ) {
-        guard let pickerController = pickerController,
-              let pickerDelegate = pickerController.pickerDelegate else {
+        guard let pickerDelegate = pickerController.pickerDelegate else {
             completionHandler([], false)
             return
         }
@@ -174,8 +167,7 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
         loadMoreMusic text: String?,
         completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void
     ) {
-        guard let pickerController = pickerController,
-              let pickerDelegate = pickerController.pickerDelegate else {
+        guard let pickerDelegate = pickerController.pickerDelegate else {
             completionHandler([], false)
             return
         }

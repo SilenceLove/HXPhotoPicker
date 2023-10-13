@@ -8,18 +8,11 @@
 import UIKit
 
 // MARK: AlbumViewDelegate
-extension PhotoPickerViewController: AlbumViewDelegate {
+extension PhotoPickerViewController: PhotoAlbumListDelegate {
     
     func initAlbumView() {
-        guard let picker = pickerController else {
-            return
-        }
-        titleLabel = UILabel()
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        titleLabel.textAlignment = .center
-        
-        titleView = AlbumTitleView.init(config: config.titleView)
-        titleView.addTarget(self, action: #selector(didTitleViewClick(control:)), for: .touchUpInside)
+        titleView = config.navigationTitle.init(config: pickerConfig, isSplit: pickerController.splitType.isSplit)
+        titleView.addTarget(self, action: #selector(didTitleViewClick))
         
         albumBackgroudView = UIView()
         albumBackgroudView.isHidden = true
@@ -31,22 +24,26 @@ extension PhotoPickerViewController: AlbumViewDelegate {
             )
         )
         
-        albumView = AlbumView(config: pickerController!.config.albumList)
+        albumView = pickerConfig.albumList.albumList.init(
+            config: pickerConfig,
+            isSplit: pickerController.splitType.isSplit
+        )
         albumView.delegate = self
-        if picker.config.albumShowMode == .popup {
+        if pickerConfig.albumShowMode == .popup {
             view.addSubview(albumBackgroudView)
             view.addSubview(albumView)
         }
     }
     
-    @objc func didTitleViewClick(control: AlbumTitleView) {
-        control.isSelected = !control.isSelected
-        if control.isSelected {
+    @objc
+    func didTitleViewClick() {
+        titleView.isSelected = !titleView.isSelected
+        if titleView.isSelected {
             // 展开
-            if albumView.assetCollectionsArray.isEmpty {
+            if albumView.assetCollections.isEmpty {
 //                ProgressHUD.showLoading(addedTo: view, animated: true)
 //                ProgressHUD.hide(forView: weakSelf?.navigationController?.view, animated: true)
-                control.isSelected = false
+                titleView.isSelected = false
                 return
             }
             openAlbumView()
@@ -62,23 +59,23 @@ extension PhotoPickerViewController: AlbumViewDelegate {
     }
     
     func openAlbumView() {
-        collectionView.scrollsToTop = false
+        listView.collectionView.scrollsToTop = false
+        listView.isUserInteractionEnabled = false
         albumBackgroudView.alpha = 0
         albumBackgroudView.isHidden = false
-        albumView.scrollToMiddle()
+        albumView.scrollSelectToMiddle()
         UIView.animate(withDuration: 0.25) {
             self.albumBackgroudView.alpha = 1
             self.updateAlbumViewFrame()
-            self.titleView.arrowView.transform = .init(rotationAngle: .pi)
         }
     }
     
     func closeAlbumView() {
-        collectionView.scrollsToTop = true
+        listView.collectionView.scrollsToTop = true
+        listView.isUserInteractionEnabled = true
         UIView.animate(withDuration: 0.25) {
             self.albumBackgroudView.alpha = 0
             self.updateAlbumViewFrame()
-            self.titleView.arrowView.transform = .init(rotationAngle: .pi * 2)
         } completion: { _ in
             if self.albumBackgroudView.alpha == 0 {
                 self.albumBackgroudView.isHidden = true
@@ -105,10 +102,9 @@ extension PhotoPickerViewController: AlbumViewDelegate {
     }
     
     func getAlbumViewHeight() -> CGFloat {
-        guard let picker = pickerController else { return 0}
-        var albumViewHeight = CGFloat(albumView.assetCollectionsArray.count) * albumView.config.cellHeight
+        var albumViewHeight = CGFloat(albumView.assetCollections.count) * pickerConfig.albumList.cellHeight
         if AssetManager.authorizationStatusIsLimited() &&
-            picker.config.allowLoadPhotoLibrary {
+            pickerConfig.allowLoadPhotoLibrary {
             albumViewHeight += 40
         }
         if albumViewHeight > view.height * 0.75 {
@@ -117,22 +113,22 @@ extension PhotoPickerViewController: AlbumViewDelegate {
         return albumViewHeight
     }
     
-    func albumView(
-        _ albumView: AlbumView,
-        didSelectRowAt assetCollection: PhotoAssetCollection
+    public func albumList(
+        _ albumList: PhotoAlbumList,
+        didSelectAt index: Int,
+        with assetCollection: PhotoAssetCollection
     ) {
         didAlbumBackgroudViewClick()
         if self.assetCollection == assetCollection {
             return
         }
         titleView.title = assetCollection.albumName
-        assetCollection.isSelected = true
-        self.assetCollection.isSelected = false
         self.assetCollection = assetCollection
         ProgressHUD.showLoading(
             addedTo: navigationController?.view,
             animated: true
         )
         fetchPhotoAssets()
+        albumList.reloadData()
     }
 }

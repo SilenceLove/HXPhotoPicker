@@ -37,14 +37,18 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
     
     open override func requestThumbnailImage(targetWidth: CGFloat) {
         if didLoadCompletion {
-            selectControl.isHidden = false
+            if !inICloud {
+                selectControl.isHidden = false
+            }
         }
         super.requestThumbnailImage(targetWidth: targetWidth)
     }
     open override func requestThumbnailCompletion(_ image: UIImage?) {
         super.requestThumbnailCompletion(image)
         if !didLoadCompletion {
-            selectControl.isHidden = false
+            if !inICloud {
+                selectControl.isHidden = false
+            }
             didLoadCompletion = true
         }
     }

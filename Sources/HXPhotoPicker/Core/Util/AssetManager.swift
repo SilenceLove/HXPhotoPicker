@@ -8,17 +8,16 @@
 
 import UIKit
 import Photos
-
 public struct AssetManager {
     
-    public enum SaveType {
+    public enum PhotoSaveType {
         case image(UIImage)
         case imageURL(URL)
         case videoURL(URL)
         case livePhoto(imageURL: URL, videoURL: URL)
     }
-    
-    public enum SaveError: Error {
+
+    public enum PhotoSaveError: Error {
         case notDetermined
         case phAssetIsNull
     }
@@ -29,40 +28,11 @@ public struct AssetManager {
     ///   - customAlbumName: 需要保存到自定义相册的名称，默认BundleName
     ///   - creationDate: 创建时间，默认当前时间
     ///   - location: 位置信息
-    ///   - completion: PHAsset为空则保存失败
-    public static func saveSystemAlbum(
-        type: SaveType,
-        customAlbumName: String? = nil,
-        creationDate: Date = Date(),
-        location: CLLocation? = nil,
-        completion: @escaping (PHAsset?) -> Void
-    ) {
-        saveSystemAlbum(
-            type: type,
-            customAlbumName: customAlbumName,
-            creationDate: creationDate,
-            location: location
-        ) {
-            switch $0 {
-            case .success(let phAsset):
-                completion(phAsset)
-            case .failure:
-                completion(nil)
-            }
-        }
-    }
-    
-    /// 保存资源到系统相册
-    /// - Parameters:
-    ///   - type: 保存类型
-    ///   - customAlbumName: 需要保存到自定义相册的名称，默认BundleName
-    ///   - creationDate: 创建时间，默认当前时间
-    ///   - location: 位置信息
     ///   - completion: 保存之后的结果
-    public static func saveSystemAlbum(
-        type: SaveType,
+    public static func save(
+        type: PhotoSaveType,
         customAlbumName: String? = nil,
-        creationDate: Date = Date(),
+        creationDate: Date = .init(),
         location: CLLocation? = nil,
         completion: @escaping (Result<PHAsset, Error>) -> Void
     ) {
@@ -72,10 +42,10 @@ public struct AssetManager {
         }else {
             albumName = displayName()
         }
-        requestAuthorization {
+        AssetManager.requestAuthorization {
             switch $0 {
             case .denied, .notDetermined, .restricted:
-                completion(.failure(SaveError.notDetermined))
+                completion(.failure(PhotoSaveError.notDetermined))
                 return
             default:
                 break
@@ -108,8 +78,8 @@ public struct AssetManager {
                         placeholder = creationRequest?.placeholderForCreatedAsset
                     }
                     if let placeholder = placeholder,
-                       let phAsset = self.fetchAsset(
-                        withLocalIdentifier: placeholder.localIdentifier
+                       let phAsset = AssetManager.fetchAsset(
+                        with: placeholder.localIdentifier
                        ) {
                         DispatchQueue.main.async {
                             completion(.success(phAsset))
@@ -119,7 +89,7 @@ public struct AssetManager {
                         }
                     }else {
                         DispatchQueue.main.async {
-                            completion(.failure(SaveError.phAssetIsNull))
+                            completion(.failure(PhotoSaveError.phAssetIsNull))
                         }
                     }
                 } catch {
@@ -129,6 +99,40 @@ public struct AssetManager {
                 }
             }
         }
+    }
+    
+    public static func createAssetCollection(for collectionName: String) -> PHAssetCollection? {
+        let collections = PHAssetCollection.fetchAssetCollections(
+            with: .album,
+            subtype: .albumRegular,
+            options: nil
+        )
+        var assetCollection: PHAssetCollection?
+        collections.enumerateObjects { (collection, _, stop) in
+            if collection.localizedTitle == collectionName {
+                assetCollection = collection
+                stop.pointee = true
+            }
+        }
+        if assetCollection == nil {
+            do {
+                var createCollectionID: String?
+                try PHPhotoLibrary.shared().performChangesAndWait {
+                    createCollectionID = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(
+                        withTitle: collectionName
+                    ).placeholderForCreatedAssetCollection.localIdentifier
+                }
+                if let createCollectionID = createCollectionID {
+                    assetCollection = PHAssetCollection.fetchAssetCollections(
+                        withLocalIdentifiers: [createCollectionID],
+                        options: nil
+                    ).firstObject
+                }
+            }catch {
+                
+            }
+        }
+        return assetCollection
     }
     
     private static func displayName() -> String {
@@ -145,17 +149,16 @@ public struct AssetManager {
         for asset: PHAsset,
         albumName: String
     ) {
-        if let assetCollection = createAssetCollection(for: albumName) {
-            try? PHPhotoLibrary.shared().performChangesAndWait {
-                PHAssetCollectionChangeRequest(
-                    for: assetCollection
-                )?.insertAssets(
-                    [asset] as NSFastEnumeration,
-                    at: IndexSet.init(integer: 0)
-                )
-            }
+        guard let assetCollection = createAssetCollection(for: albumName) else {
+            return
+        }
+        try? PHPhotoLibrary.shared().performChangesAndWait {
+            PHAssetCollectionChangeRequest(
+                for: assetCollection
+            )?.insertAssets(
+                [asset] as NSFastEnumeration,
+                at: IndexSet.init(integer: 0)
+            )
         }
     }
-    
-    private init() { }
 }
