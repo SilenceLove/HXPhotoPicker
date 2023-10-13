@@ -1,11 +1,25 @@
 # Release Notes
 
+## 4.0.8
+
+### Added
+
+- Picker
+  - Support `UISplitViewController`, used by `iPad` by default
+  - The photo album list supports customization and implements the protocol `PhotoAlbumList`
+  - The photo list title bar supports customization and implements the protocol `PhotoPickerTitle`
+  - The photo list view supports customization and implements the protocol `PhotoPickerList`
+
+### Resolved
+
+- Fixed some minor issues
+
 ## 4.0.7
 
 ### Added
 
 - Picker
-  - The bottom view of the photo list and preview interface supports customization. You only need to implement the methods in the `PhotoToolBarProtocol` protocol and assign it to the `photoToolbar` of the configuration class.
+  - The bottom view of the photo list and preview interface supports customization. You only need to implement the methods in the `PhotoToolBar` protocol and assign it to the `photoToolbar` of the configuration class.
 - Editor
   - The drawing function `iOS 13.0` and above is replaced by `PencilKit`
 

@@ -102,7 +102,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.0.7"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.0.8"))
 ]
 ```
 
@@ -298,6 +298,7 @@ photoAsset.getURL(compression: compression) { result in
 
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v4.0.8](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#408) | 2023-10-13 | 15.0.0 | 5.9.0 | 12.0+ |
 | [v4.0.7](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#407) | 2023-09-23 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.6](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#406) | 2023-09-09 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.5](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#405) | 2023-08-12 | 14.3.0 | 5.7.0 | 12.0+ |

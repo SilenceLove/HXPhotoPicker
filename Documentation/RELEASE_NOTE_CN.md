@@ -1,11 +1,25 @@
 # 更新日志
 
+## 4.0.8
+
+### 新增
+
+- Picker
+  - 支持`UISplitViewController`，`iPad`默认使用
+  - 相册列表支持自定义，实现协议`PhotoAlbumList`
+  - 照片列表标题栏支持自定义，实现协议`PhotoPickerTitle`
+  - 照片列表视图支持自定义，实现协议`PhotoPickerList`
+
+### 修复
+
+- 解决了一些小问题
+
 ## 4.0.7
 
 ### 新增
 
 - Picker
-  - 照片列表、预览界面的底部视图支持自定义，只需实现`PhotoToolBarProtocol`协议里的方法然后赋值给配置类的`photoToolbar`即可
+  - 照片列表、预览界面的底部视图支持自定义，只需实现`PhotoToolBar`协议里的方法然后赋值给配置类的`photoToolbar`即可
 - Editor
   - 绘画功能`iOS 13.0`以上更换为`PencilKit`
 
