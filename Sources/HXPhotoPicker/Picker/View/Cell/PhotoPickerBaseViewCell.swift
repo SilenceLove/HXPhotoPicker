@@ -13,11 +13,11 @@ import Kingfisher
 #endif
 
 public protocol PhotoPickerViewCellDelegate: AnyObject {
-    func cell(_ cell: PhotoPickerBaseViewCell, didSelectControl isSelected: Bool)
+    func pickerCell(_ cell: PhotoPickerBaseViewCell, didSelectControl isSelected: Bool)
 }
 
 public extension PhotoPickerViewCellDelegate {
-    func cell(_ cell: PhotoPickerBaseViewCell, didSelectControl isSelected: Bool) { }
+    func pickerCell(_ cell: PhotoPickerBaseViewCell, didSelectControl isSelected: Bool) { }
 }
 
 open class PhotoPickerBaseViewCell: UICollectionViewCell {
@@ -178,7 +178,6 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     public override init(frame: CGRect) {
         super.init(frame: frame)
         initView()
-//        addLoadModeObserver()
     }
     
     open override func layoutSubviews() {

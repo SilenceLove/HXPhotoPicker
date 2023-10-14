@@ -540,12 +540,7 @@ extension PhotoToolBarView {
                 previewBtn.isEnabled = true
             }
             finishBtn.setTitle(
-                "完成".localized + " (" +
-                    String(
-                    format: "%d",
-                    arguments: [count]
-                    )
-                    + ")",
+                "完成".localized + " (\(count))",
                 for: .normal
             )
         }else {

@@ -95,7 +95,7 @@ extension PhotoPickerView: PhotoPreviewViewControllerDelegate {
         updateCell: Bool
     ) {
         if let cell = getCell(for: photoAsset) {
-            self.cell(cell, didSelectControl: !isSelected)
+            self.pickerCell(cell, didSelectControl: !isSelected)
         }else {
             if isSelected {
                 manager.addedPhotoAsset(photoAsset: photoAsset)

@@ -40,7 +40,7 @@ class PhotoLoadingView: UIView {
         loadingView.stopAnimating()
     }
     
-    public override func layoutSubviews() {
+    override func layoutSubviews() {
         super.layoutSubviews()
         loadingView.center = .init(x: width / 2, y: height / 2)
     }

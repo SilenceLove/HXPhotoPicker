@@ -39,8 +39,6 @@ open class PhotoPickerListView:
             didFetchAsset = true
             photoCount = assetResult.photoCount
             videoCount = assetResult.videoCount
-            allPhotoCount = assetResult.photoCount
-            allVideoCount = assetResult.videoCount
             allAssets = assetResult.assets
             assets = assetResult.assets
             updateEmptyView()
@@ -73,8 +71,6 @@ open class PhotoPickerListView:
     var collectionViewLayout: UICollectionViewFlowLayout!
     
     var allAssets: [PhotoAsset] = []
-    var allPhotoCount: Int = 0
-    var allVideoCount: Int = 0
     
     var scrollToTop = false
     var targetOffsetY: CGFloat = 0
@@ -103,13 +99,15 @@ open class PhotoPickerListView:
         registerClass()
         addSubview(collectionView)
         if pickerConfig.isMultipleSelect, config.allowSwipeToSelect {
-            addSwipeSelectGestureRecognizer(target: self, action: #selector(panGestureRecognizer(panGR:)))
+            let panGR = UIPanGestureRecognizer(target: self, action: #selector(panGestureRecognizer(panGR:)))
+            addGestureRecognizer(panGR)
             switch pickerConfig.pickerPresentStyle {
             case .none:
                 break
             default:
-                swipeSelectPanGR?.delegate = self
+                panGR.delegate = self
             }
+            swipeSelectPanGR = panGR
         }
         emptyView = PhotoPickerEmptyView(config: config.emptyView)
     }
@@ -136,7 +134,7 @@ open class PhotoPickerListView:
     }
     
     public func selectCell(_ viewCell: PhotoPickerBaseViewCell, isSelected: Bool) {
-        cell(viewCell, didSelectControl: !isSelected)
+        pickerCell(viewCell, didSelectControl: !isSelected)
     }
     
     public func addedAsset(for asset: PhotoAsset) {
@@ -184,8 +182,8 @@ open class PhotoPickerListView:
     func filterPhotoAssets() {
         if filterOptions == .any {
             assets = allAssets
-            photoCount = allPhotoCount
-            videoCount = allVideoCount
+            photoCount = assetResult.photoCount
+            videoCount = assetResult.videoCount
             collectionView.reloadData()
             scrollTo(nil)
             updateEmptyView()
@@ -320,8 +318,8 @@ extension PhotoPickerListView: UICollectionViewDelegate {
         let photoAsset = getAsset(for: indexPath.item)
         if !photoAsset.isSelected &&
             config.cell.isShowDisableMask &&
-            pickerController.config.maximumSelectedVideoFileSize == 0 &&
-            pickerController.config.maximumSelectedPhotoFileSize == 0 {
+            pickerConfig.maximumSelectedVideoFileSize == 0 &&
+            pickerConfig.maximumSelectedPhotoFileSize == 0 {
             myCell.canSelect = pickerController.pickerData.canSelect(
                 photoAsset,
                 isShowHUD: false
@@ -493,7 +491,7 @@ extension PhotoPickerListView: UICollectionViewDelegate {
                           let cell = self.getCell(for: indexPath.item) else {
                         return
                     }
-                    self.cell(cell, didSelectControl: photoAsset.isSelected)
+                    self.pickerCell(cell, didSelectControl: photoAsset.isSelected)
                 }
                 menus.append(select)
             }
@@ -650,7 +648,7 @@ extension PhotoPickerListView: UICollectionViewDelegateFlowLayout {
 
 extension PhotoPickerListView: PhotoPickerViewCellDelegate {
     
-    public func cell(
+    public func pickerCell(
         _ cell: PhotoPickerBaseViewCell,
         didSelectControl isSelected: Bool
     ) {

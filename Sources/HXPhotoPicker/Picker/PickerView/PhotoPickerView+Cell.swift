@@ -9,7 +9,7 @@ import UIKit
 
 extension PhotoPickerView: PhotoPickerViewCellDelegate {
     
-    public func cell(
+    public func pickerCell(
         _ cell: PhotoPickerBaseViewCell,
         didSelectControl isSelected: Bool
     ) {

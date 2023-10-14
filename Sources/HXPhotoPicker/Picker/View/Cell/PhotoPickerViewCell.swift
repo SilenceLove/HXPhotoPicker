@@ -111,7 +111,7 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
     
     /// 触发选中回调
     open func selectedAction(_ isSelected: Bool) {
-        delegate?.cell(self, didSelectControl: isSelected)
+        delegate?.pickerCell(self, didSelectControl: isSelected)
     }
     
     /// 设置禁用遮罩

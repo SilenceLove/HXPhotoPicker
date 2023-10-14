@@ -28,7 +28,6 @@ public protocol PhotoPickerListSwipeSelect:
     var swipeSelectPanGR: UIPanGestureRecognizer?  { get set }
     var swipeSelectLastLocalPoint: CGPoint?  { get set }
     
-    func addSwipeSelectGestureRecognizer(target: Any?, action: Selector?)
     func beganPanGestureRecognizer(panGR: UIPanGestureRecognizer, localPoint: CGPoint)
     func changedPanGestureRecognizer(panGR: UIPanGestureRecognizer, localPoint: CGPoint)
     func endedPanGestureRecognizer()
@@ -37,14 +36,6 @@ public protocol PhotoPickerListSwipeSelect:
 }
 
 public extension PhotoPickerListSwipeSelect {
-    
-    func addSwipeSelectGestureRecognizer(target: Any?, action: Selector?) {
-        swipeSelectPanGR = UIPanGestureRecognizer(
-            target: target,
-            action: action
-        )
-        addGestureRecognizer(swipeSelectPanGR!)
-    }
     
     func beganPanGestureRecognizer(
         panGR: UIPanGestureRecognizer,

@@ -9,9 +9,7 @@
 import UIKit
 import Photos
 
-public struct DefaultPhotoFetchAssetCollection: PhotoFetchAssetCollection {
-    
-}
+public struct DefaultPhotoFetchAssetCollection: PhotoFetchAssetCollection { }
 
 public protocol PhotoFetchAssetCollection {
     

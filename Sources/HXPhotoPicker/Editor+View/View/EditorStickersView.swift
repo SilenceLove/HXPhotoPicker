@@ -165,20 +165,18 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
     
     func getStickerItem() -> Item? {
         var datas: [Item.Info] = []
-        for subView in subviews {
-            if let itemView = subView as? EditorStickersItemView {
-                let centerScale = CGPoint(x: itemView.centerX / width, y: itemView.centerY / height)
-                let itemData = Item.Info(
-                    item: itemView.item,
-                    pinchScale: itemView.pinchScale,
-                    rotation: itemView.radian,
-                    centerScale: centerScale,
-                    mirrorScale: itemView.mirrorScale,
-                    editMirrorScale: itemView.editMirrorScale,
-                    initialMirrorScale: itemView.initialMirrorScale
-                )
-                datas.append(itemData)
-            }
+        for case let itemView as EditorStickersItemView in subviews {
+            let centerScale = CGPoint(x: itemView.centerX / width, y: itemView.centerY / height)
+            let itemData = Item.Info(
+                item: itemView.item,
+                pinchScale: itemView.pinchScale,
+                rotation: itemView.radian,
+                centerScale: centerScale,
+                mirrorScale: itemView.mirrorScale,
+                editMirrorScale: itemView.editMirrorScale,
+                initialMirrorScale: itemView.initialMirrorScale
+            )
+            datas.append(itemData)
         }
         let stickerData = Item(
             items: datas,
@@ -226,58 +224,56 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
         CATransaction.setDisableActions(true)
         delegate?.stickerView(rotateVideo: self)
         var infos: [Info] = []
-        for subView in subviews {
-            if let itemView = subView as? EditorStickersItemView {
-                let image: UIImage?
-                if let imageData = itemView.item.imageData {
-                    #if canImport(Kingfisher)
-                    image = DefaultImageProcessor.default.process(
-                        item: .data(imageData),
-                        options: .init([])
-                    )!
-                    #else
-                    image = UIImage(data: imageData)
-                    #endif
-                }else {
-                    image = itemView.item.image
-                }
-                
-                var audioInfo: AudioInfo?
-                if let audio = itemView.item.audio {
-                    audioInfo = .init(
-                        fontSizeScale: 25.0 / width,
-                        animationSizeScale: CGSize(
-                            width: 20 / width,
-                            height: 15 / height
-                        ),
-                        audio: audio
-                    )
-                }
-                let infoScale = itemView.pinchScale
-                itemView.videoReset(false)
-                let frameScale: Info.FrameScale = .init(
-                    center: .init(
-                        x: itemView.centerX / width,
-                        y: itemView.centerY / height
-                    ),
-                    size: .init(
-                        width: itemView.width / width,
-                        height: itemView.height / height
-                    )
-                )
-                itemView.videoReset(true)
-                let info = Info(
-                    image: image,
-                    isText: itemView.item.isText,
-                    frameScale: frameScale,
-                    angel: itemView.radian.angle,
-                    mirrorScale: itemView.mirrorScale,
-                    scale: infoScale,
-                    viewSize: size,
-                    audio: audioInfo
-                )
-                infos.append(info)
+        for case let itemView as EditorStickersItemView in subviews {
+            let image: UIImage?
+            if let imageData = itemView.item.imageData {
+                #if canImport(Kingfisher)
+                image = DefaultImageProcessor.default.process(
+                    item: .data(imageData),
+                    options: .init([])
+                )!
+                #else
+                image = UIImage(data: imageData)
+                #endif
+            }else {
+                image = itemView.item.image
             }
+            
+            var audioInfo: AudioInfo?
+            if let audio = itemView.item.audio {
+                audioInfo = .init(
+                    fontSizeScale: 25.0 / width,
+                    animationSizeScale: CGSize(
+                        width: 20 / width,
+                        height: 15 / height
+                    ),
+                    audio: audio
+                )
+            }
+            let infoScale = itemView.pinchScale
+            itemView.videoReset(false)
+            let frameScale: Info.FrameScale = .init(
+                center: .init(
+                    x: itemView.centerX / width,
+                    y: itemView.centerY / height
+                ),
+                size: .init(
+                    width: itemView.width / width,
+                    height: itemView.height / height
+                )
+            )
+            itemView.videoReset(true)
+            let info = Info(
+                image: image,
+                isText: itemView.item.isText,
+                frameScale: frameScale,
+                angel: itemView.radian.angle,
+                mirrorScale: itemView.mirrorScale,
+                scale: infoScale,
+                viewSize: size,
+                audio: audioInfo
+            )
+            infos.append(info)
         }
         delegate?.stickerView(resetVideoRotate: self)
         CATransaction.commit()

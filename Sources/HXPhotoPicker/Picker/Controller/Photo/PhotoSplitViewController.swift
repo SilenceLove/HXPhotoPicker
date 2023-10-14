@@ -50,20 +50,16 @@ open class PhotoSplitViewController: UISplitViewController, UISplitViewControlle
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        if !UIDevice.isPad, !UIDevice.isPortrait, !isCollapsed {
-            if modalPresentationStyle == .fullScreen {
-                switch displayMode {
-                case .oneBesideSecondary:
-                    if  supportedInterfaceOrientations == .portrait ||
-                        supportedInterfaceOrientations == .portraitUpsideDown {
-                        isSplitShowColumn = false
-                    }else {
-                        isSplitShowColumn = true
-                    }
-                default:
+        if !UIDevice.isPad, !UIDevice.isPortrait, !isCollapsed, modalPresentationStyle == .fullScreen {
+            switch displayMode {
+            case .oneBesideSecondary:
+                if  supportedInterfaceOrientations == .portrait ||
+                    supportedInterfaceOrientations == .portraitUpsideDown {
                     isSplitShowColumn = false
+                }else {
+                    isSplitShowColumn = true
                 }
-            }else {
+            default:
                 isSplitShowColumn = false
             }
         }else {

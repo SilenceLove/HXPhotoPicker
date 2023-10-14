@@ -191,7 +191,7 @@ public extension EditorView {
     /// Video automatically loops
     /// 视频自动循环播放
     var isVideoPlayToEndTimeAutoPlay: Bool {
-        get { adjusterView.isVideoPlayToEndTimeAutoPlay}
+        get { adjusterView.isVideoPlayToEndTimeAutoPlay }
         set { adjusterView.isVideoPlayToEndTimeAutoPlay = newValue }
     }
     
