@@ -72,7 +72,7 @@ extension EditorView: EditorAdjusterViewDelegate {
         editDelegate?.editorView(self, videoDidPauseAt: time)
     }
     func editorAdjusterView(videoReadyForDisplay editorAdjusterView: EditorAdjusterView) {
-        if reloadContent {
+        if reloadContent || layoutContent {
             layoutContent = true
             reloadContent = false
             layoutSubviews()
