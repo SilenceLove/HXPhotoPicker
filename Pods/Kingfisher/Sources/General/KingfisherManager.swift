@@ -26,6 +26,11 @@
 
 
 import Foundation
+#if os(macOS)
+import AppKit
+#else
+import UIKit
+#endif
 
 /// The downloading progress block type.
 /// The parameter value is the `receivedSize` of current response.
@@ -562,7 +567,7 @@ public class KingfisherManager {
                     if image.kf.imageFrameCount != nil && image.kf.imageFrameCount != 1, let data = image.kf.animatedImageData {
                         // Always recreate animated image representation since it is possible to be loaded in different options.
                         // https://github.com/onevcat/Kingfisher/issues/1923
-                        image = KingfisherWrapper.animatedImage(data: data, options: options.imageCreatingOptions) ?? .init()
+                        image = options.processor.process(item: .data(data), options: options) ?? .init()
                     }
                     if let modifier = options.imageModifier {
                         image = modifier.modify(image)

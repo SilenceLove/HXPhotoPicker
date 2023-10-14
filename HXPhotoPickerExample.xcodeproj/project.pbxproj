@@ -51,6 +51,8 @@
 		D34417CC2AD3DF7400ABFC68 /* AlbumViewBaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34417CB2AD3DF7400ABFC68 /* AlbumViewBaseCell.swift */; };
 		D34417CE2AD3E6FF00ABFC68 /* Core+UICollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34417CD2AD3E6FF00ABFC68 /* Core+UICollectionView.swift */; };
 		D34417D12AD3F39100ABFC68 /* PhotoPickerNavigationTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34417D02AD3F39100ABFC68 /* PhotoPickerNavigationTitle.swift */; };
+		D3513E142ADA2E8100A3930C /* PhotoAssetFetchPhotos.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3513E132ADA2E8100A3930C /* PhotoAssetFetchPhotos.swift */; };
+		D3513E172ADA316300A3930C /* PhotoAssetEquatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3513E162ADA316300A3930C /* PhotoAssetEquatable.swift */; };
 		D35962952A3EC175009CCD94 /* SwiftPickerResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D35962902A3EC175009CCD94 /* SwiftPickerResult.swift */; };
 		D35962972A3EC175009CCD94 /* SwiftAssetURLResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D35962912A3EC175009CCD94 /* SwiftAssetURLResult.swift */; };
 		D35962992A3EC175009CCD94 /* SwiftPickerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D35962922A3EC175009CCD94 /* SwiftPickerConfiguration.swift */; };
@@ -231,7 +233,6 @@
 		D360E7872A6B726500740B6B /* PhotoAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36878F82A399B8C00E70910 /* PhotoAsset.swift */; };
 		D360E7882A6B726500740B6B /* PhotoAsset+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36878F52A399B8C00E70910 /* PhotoAsset+Codable.swift */; };
 		D360E7892A6B726500740B6B /* PhotoAsset+Editor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36878F32A399B8C00E70910 /* PhotoAsset+Editor.swift */; };
-		D360E78A2A6B726500740B6B /* PhotoAsset+Equal.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36878F62A399B8C00E70910 /* PhotoAsset+Equal.swift */; };
 		D360E78B2A6B726500740B6B /* PhotoAsset+FileSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36878F12A399B8C00E70910 /* PhotoAsset+FileSize.swift */; };
 		D360E78C2A6B726500740B6B /* PhotoAsset+Local.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36878EC2A399B8C00E70910 /* PhotoAsset+Local.swift */; };
 		D360E78D2A6B726500740B6B /* PhotoAsset+Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36878F02A399B8C00E70910 /* PhotoAsset+Network.swift */; };
@@ -520,6 +521,8 @@
 		D34417CB2AD3DF7400ABFC68 /* AlbumViewBaseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumViewBaseCell.swift; sourceTree = "<group>"; };
 		D34417CD2AD3E6FF00ABFC68 /* Core+UICollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Core+UICollectionView.swift"; sourceTree = "<group>"; };
 		D34417D02AD3F39100ABFC68 /* PhotoPickerNavigationTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerNavigationTitle.swift; sourceTree = "<group>"; };
+		D3513E132ADA2E8100A3930C /* PhotoAssetFetchPhotos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAssetFetchPhotos.swift; sourceTree = "<group>"; };
+		D3513E162ADA316300A3930C /* PhotoAssetEquatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAssetEquatable.swift; sourceTree = "<group>"; };
 		D35962892A3EBC7E009CCD94 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
 		D35962902A3EC175009CCD94 /* SwiftPickerResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPickerResult.swift; sourceTree = "<group>"; };
 		D35962912A3EC175009CCD94 /* SwiftAssetURLResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftAssetURLResult.swift; sourceTree = "<group>"; };
@@ -702,7 +705,6 @@
 		D36878F32A399B8C00E70910 /* PhotoAsset+Editor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhotoAsset+Editor.swift"; sourceTree = "<group>"; };
 		D36878F42A399B8C00E70910 /* PhotoAsset+URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhotoAsset+URL.swift"; sourceTree = "<group>"; };
 		D36878F52A399B8C00E70910 /* PhotoAsset+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhotoAsset+Codable.swift"; sourceTree = "<group>"; };
-		D36878F62A399B8C00E70910 /* PhotoAsset+Equal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhotoAsset+Equal.swift"; sourceTree = "<group>"; };
 		D36878F72A399B8C00E70910 /* LocalAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAsset.swift; sourceTree = "<group>"; };
 		D36878F82A399B8C00E70910 /* PhotoAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAsset.swift; sourceTree = "<group>"; };
 		D36878F92A399B8C00E70910 /* PhotoAsset+Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhotoAsset+Request.swift"; sourceTree = "<group>"; };
@@ -1092,6 +1094,15 @@
 			path = PhotoList;
 			sourceTree = "<group>";
 		};
+		D3513E152ADA314D00A3930C /* PhotoAsset */ = {
+			isa = PBXGroup;
+			children = (
+				D3513E132ADA2E8100A3930C /* PhotoAssetFetchPhotos.swift */,
+				D3513E162ADA316300A3930C /* PhotoAssetEquatable.swift */,
+			);
+			path = PhotoAsset;
+			sourceTree = "<group>";
+		};
 		D359628F2A3EC175009CCD94 /* SwiftPhotoPicker */ = {
 			isa = PBXGroup;
 			children = (
@@ -1435,7 +1446,6 @@
 				D36878F82A399B8C00E70910 /* PhotoAsset.swift */,
 				D36878F52A399B8C00E70910 /* PhotoAsset+Codable.swift */,
 				D36878F32A399B8C00E70910 /* PhotoAsset+Editor.swift */,
-				D36878F62A399B8C00E70910 /* PhotoAsset+Equal.swift */,
 				D36878F12A399B8C00E70910 /* PhotoAsset+FileSize.swift */,
 				D36878EC2A399B8C00E70910 /* PhotoAsset+Local.swift */,
 				D36878F02A399B8C00E70910 /* PhotoAsset+Network.swift */,
@@ -1945,6 +1955,7 @@
 			children = (
 				D3ACE5942AC121A400C84604 /* Fetch */,
 				D3ACE5932AC11E2200C84604 /* UI */,
+				D3513E152ADA314D00A3930C /* PhotoAsset */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -2023,7 +2034,7 @@
 				7B7E3E731E4AACD1002234EE /* Frameworks */,
 				7B7E3E741E4AACD1002234EE /* Resources */,
 				D360E6F62A6B712400740B6B /* Embed Frameworks */,
-				D6AAEBD51302C749213D8FA3 /* [CP] Embed Pods Frameworks */,
+				2EB45C2A7482CDA274307ECF /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2060,7 +2071,7 @@
 				D361BB162AAAD3E500A4D4F7 /* Sources */,
 				D361BB172AAAD3E500A4D4F7 /* Frameworks */,
 				D361BB182AAAD3E500A4D4F7 /* Resources */,
-				C763E322097253645BBA8707 /* [CP] Embed Pods Frameworks */,
+				D0765AB2E5B172F3DB99B857 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2203,6 +2214,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		2EB45C2A7482CDA274307ECF /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HXPhotoPickerExample/Pods-HXPhotoPickerExample-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		434547430CF3E6D5B728C923 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2225,7 +2251,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C763E322097253645BBA8707 /* [CP] Embed Pods Frameworks */ = {
+		D0765AB2E5B172F3DB99B857 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2238,21 +2264,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiftUIExample/Pods-SwiftUIExample-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D6AAEBD51302C749213D8FA3 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HXPhotoPickerExample/Pods-HXPhotoPickerExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F823D40FB983AA2E37ACC9C4 /* [CP] Check Pods Manifest.lock */ = {
@@ -2462,6 +2473,7 @@
 				D360E7742A6B726500740B6B /* PhotoPreviewSelectedView.swift in Sources */,
 				D360E7752A6B726500740B6B /* PhotoPreviewVideoView.swift in Sources */,
 				D360E93F2A6BBC5700740B6B /* EditorViewController+Action.swift in Sources */,
+				D3513E172ADA316300A3930C /* PhotoAssetEquatable.swift in Sources */,
 				D360E7762A6B726500740B6B /* PhotoThumbnailView.swift in Sources */,
 				D360E7772A6B726500740B6B /* AlbumViewCell.swift in Sources */,
 				D360E7782A6B726500740B6B /* PhotoLoadingView.swift in Sources */,
@@ -2484,7 +2496,6 @@
 				D360E7882A6B726500740B6B /* PhotoAsset+Codable.swift in Sources */,
 				D360E7892A6B726500740B6B /* PhotoAsset+Editor.swift in Sources */,
 				D3ACE59F2AC1769B00C84604 /* PhotoFetchAsset.swift in Sources */,
-				D360E78A2A6B726500740B6B /* PhotoAsset+Equal.swift in Sources */,
 				D32647C72AD63E1000AD6E79 /* PhotoPickerListCondition.swift in Sources */,
 				D360E78B2A6B726500740B6B /* PhotoAsset+FileSize.swift in Sources */,
 				D360E78C2A6B726500740B6B /* PhotoAsset+Local.swift in Sources */,
@@ -2522,6 +2533,7 @@
 				D360E7A92A6B726500740B6B /* EditorViewController+Mosaic.swift in Sources */,
 				D34417C32AD3965300ABFC68 /* PhotoAlbumList.swift in Sources */,
 				D360E7AA2A6B726500740B6B /* EditorViewController+Music.swift in Sources */,
+				D3513E142ADA2E8100A3930C /* PhotoAssetFetchPhotos.swift in Sources */,
 				D360E7AB2A6B726500740B6B /* EditorViewController+Ratio.swift in Sources */,
 				D360E7AC2A6B726500740B6B /* EditorViewController+Text.swift in Sources */,
 				D360E7AD2A6B726500740B6B /* EditorViewController+ToolsView.swift in Sources */,
