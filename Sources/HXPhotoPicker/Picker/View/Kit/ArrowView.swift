@@ -12,6 +12,12 @@ class ArrowView: UIView {
     private var backgroundLayer: CAShapeLayer!
     private var arrowLayer: CAShapeLayer!
     
+    var isHighlighted: Bool = false {
+        didSet {
+            configColor()
+        }
+    }
+    
     init(frame: CGRect, config: ArrowViewConfiguration) {
         self.config = config
         super.init(frame: frame)
@@ -52,12 +58,14 @@ class ArrowView: UIView {
     }
     
     private func configColor() {
-        backgroundLayer.fillColor = PhotoManager.isDark ?
-            config.backgroudDarkColor.cgColor :
-            config.backgroundColor.cgColor
+        let bgColor = PhotoManager.isDark ? config.backgroudDarkColor : config.backgroundColor
+        let arrowColor = PhotoManager.isDark ? config.arrowDarkColor : config.arrowColor
+        backgroundLayer.fillColor = isHighlighted ?
+        bgColor.withAlphaComponent(0.4).cgColor :
+        bgColor.cgColor
         arrowLayer.strokeColor = PhotoManager.isDark ?
-            config.arrowDarkColor.cgColor :
-            config.arrowColor.cgColor
+        arrowColor.withAlphaComponent(0.4).cgColor :
+        arrowColor.cgColor
     }
     
     override func layoutSubviews() {

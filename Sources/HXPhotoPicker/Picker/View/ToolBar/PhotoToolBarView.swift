@@ -26,12 +26,13 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     private var selectedView: PhotoPreviewSelectedView!
     private var contentView: UIView!
     private var previewBtn: UIButton!
-    private var originalView: UIView!
+    private var originalView: UIControl!
     private var originalBox: SelectBoxView!
     private var originalTitleLb: UILabel!
     private var originalLoadingView: UIActivityIndicatorView!
     private var finishBtn: UIButton!
     private var isOriginalLoading: Bool = false
+    private var originalobserve: NSKeyValueObservation?
     
     private var isShowPrompt: Bool {
         type == .picker &&
@@ -112,7 +113,7 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
         }
         
         if type != .browser {
-            originalView = UIView()
+            originalView = UIControl()
             originalView.isHidden = viewConfig.isHiddenOriginalButton
             contentView.addSubview(originalView)
             
@@ -130,14 +131,21 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
             }
             originalBox = SelectBoxView(boxConfig, frame: CGRect(x: 0, y: 0, width: 17, height: 17))
             originalBox.backgroundColor = .clear
+            originalBox.isUserInteractionEnabled = false
             originalView.addSubview(originalBox)
             
             originalLoadingView = UIActivityIndicatorView(style: .white)
             originalLoadingView.hidesWhenStopped = true
             originalView.addSubview(originalLoadingView)
             
-            let tap = UITapGestureRecognizer(target: self, action: #selector(didOriginalButtonClick))
-            originalView.addGestureRecognizer(tap)
+            originalView.addTarget(self, action: #selector(didOriginalButtonClick), for: .touchUpInside)
+            originalobserve = originalView.observe(\.isHighlighted, options: [.new, .old]) { [weak self] control, value in
+                guard let self = self else { return }
+                self.originalBox.isHighlighted = control.isHighlighted
+                let config = self.type == .picker ? self.pickerConfig.photoList.bottomView : self.pickerConfig.previewView.bottomView
+                let textColor = PhotoManager.isDark ? config.originalButtonTitleDarkColor : config.originalButtonTitleColor
+                self.originalTitleLb.textColor = control.isHighlighted ? textColor.withAlphaComponent(0.4) : textColor
+            }
             
             finishBtn = UIButton(type: .custom)
             finishBtn.setTitle("完成".localized, for: .normal)
@@ -382,6 +390,10 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    deinit {
+        originalobserve = nil
+    }
 }
 
 extension PhotoToolBarView {
@@ -393,39 +405,46 @@ extension PhotoToolBarView {
         barTintColor = isDark ? config.barTintDarkColor : config.barTintColor
         barStyle = isDark ? config.barDarkStyle : config.barStyle
         if type == .picker {
+            let previewTitleColor = config.previewButtonTitleColor
+            let previewTitleDarkColor = config.previewButtonTitleDarkColor
             previewBtn.setTitleColor(
-                isDark ?
-                    config.previewButtonTitleDarkColor :
-                    config.previewButtonTitleColor,
+                isDark ? previewTitleDarkColor : previewTitleColor,
                 for: .normal
+            )
+            previewBtn.setTitleColor(
+                isDark ? previewTitleDarkColor.withAlphaComponent(0.4) : previewTitleColor.withAlphaComponent(0.4),
+                for: .highlighted
             )
             if isDark {
                 if config.previewButtonDisableTitleDarkColor != nil {
                     previewBtn.setTitleColor(config.previewButtonDisableTitleDarkColor, for: .disabled)
                 }else {
-                    previewBtn.setTitleColor(config.previewButtonTitleDarkColor.withAlphaComponent(0.6), for: .disabled)
+                    previewBtn.setTitleColor(previewTitleDarkColor.withAlphaComponent(0.6), for: .disabled)
                 }
             }else {
                 if config.previewButtonDisableTitleColor != nil {
                     previewBtn.setTitleColor(config.previewButtonDisableTitleColor, for: .disabled)
                 }else {
-                    previewBtn.setTitleColor(config.previewButtonTitleColor.withAlphaComponent(0.6), for: .disabled)
+                    previewBtn.setTitleColor(previewTitleColor.withAlphaComponent(0.6), for: .disabled)
                 }
             }
         }else if type == .preview {
             #if HXPICKER_ENABLE_EDITOR
-            editBtn.setTitleColor(isDark ? config.editButtonTitleDarkColor : config.editButtonTitleColor, for: .normal)
+            let editTitleColor = config.editButtonTitleColor
+            let editTitleDarkColor = config.editButtonTitleDarkColor
+            editBtn.setTitleColor(isDark ? editTitleDarkColor : editTitleColor, for: .normal)
+            editBtn.setTitleColor(isDark ? editTitleDarkColor.withAlphaComponent(0.4) : editTitleColor.withAlphaComponent(0.4), for: .highlighted)
             if isDark {
                 if config.editButtonDisableTitleDarkColor != nil {
                     editBtn.setTitleColor(config.editButtonDisableTitleDarkColor, for: .disabled)
                 }else {
-                    editBtn.setTitleColor(config.editButtonTitleDarkColor.withAlphaComponent(0.6), for: .disabled)
+                    editBtn.setTitleColor(editTitleDarkColor.withAlphaComponent(0.6), for: .disabled)
                 }
             }else {
                 if config.editButtonDisableTitleColor != nil {
                     editBtn.setTitleColor(config.editButtonDisableTitleColor, for: .disabled)
                 }else {
-                    editBtn.setTitleColor(config.editButtonTitleColor.withAlphaComponent(0.6), for: .disabled)
+                    editBtn.setTitleColor(editTitleColor.withAlphaComponent(0.6), for: .disabled)
                 }
             }
             #endif

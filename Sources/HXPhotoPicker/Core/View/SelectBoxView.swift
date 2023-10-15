@@ -32,6 +32,14 @@ public final class SelectBoxView: UIControl {
             updateLayers()
         }
     }
+    public override var isHighlighted: Bool {
+        didSet {
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            updateLayers()
+            CATransaction.commit()
+        }
+    }
     
     var textSize: CGSize = CGSize.zero
     
@@ -79,18 +87,35 @@ public final class SelectBoxView: UIControl {
     private func drawBackgroundLayer() {
         backgroundLayer.path = backgroundPath()
         if isSelected {
-            backgroundLayer.fillColor = PhotoManager.isDark ?
-                config.selectedBackgroudDarkColor.cgColor :
-                config.selectedBackgroundColor.cgColor
+            let selectedBackgroundColor = config.selectedBackgroundColor
+            let selectedBackgroudDarkColor = config.selectedBackgroudDarkColor
+            if isHighlighted {
+                backgroundLayer.fillColor = PhotoManager.isDark ?
+                selectedBackgroudDarkColor.withAlphaComponent(0.4).cgColor :
+                selectedBackgroundColor.withAlphaComponent(0.4).cgColor
+            }else {
+                backgroundLayer.fillColor = PhotoManager.isDark ?
+                selectedBackgroudDarkColor.cgColor :
+                selectedBackgroundColor.cgColor
+            }
             backgroundLayer.lineWidth = 0
         }else {
             backgroundLayer.lineWidth = config.borderWidth
-            backgroundLayer.fillColor = PhotoManager.isDark ?
-                config.darkBackgroundColor.cgColor :
-                config.backgroundColor.cgColor
-            backgroundLayer.strokeColor = PhotoManager.isDark ?
-                config.borderDarkColor.cgColor :
-                config.borderColor.cgColor
+            let backgroundColor = config.backgroundColor
+            let darkBackgroundColor = config.darkBackgroundColor
+            let borderColor = config.borderColor
+            let borderDarkColor = config.borderDarkColor
+            if isHighlighted {
+                backgroundLayer.fillColor = PhotoManager.isDark ?
+                darkBackgroundColor.withAlphaComponent(0.4).cgColor :
+                backgroundColor.withAlphaComponent(0.4).cgColor
+                backgroundLayer.strokeColor = PhotoManager.isDark ?
+                borderDarkColor.withAlphaComponent(0.4).cgColor :
+                borderColor.withAlphaComponent(0.4).cgColor
+            }else {
+                backgroundLayer.fillColor = PhotoManager.isDark ? darkBackgroundColor.cgColor : backgroundColor.cgColor
+                backgroundLayer.strokeColor = PhotoManager.isDark ? borderDarkColor.cgColor : borderColor.cgColor
+            }
         }
     }
     private func drawTextLayer() {
@@ -120,11 +145,8 @@ public final class SelectBoxView: UIControl {
         )
         textLayer.font = CGFont(font.fontName as CFString)
         textLayer.fontSize = config.titleFontSize
-        if PhotoManager.isDark {
-            textLayer.foregroundColor = config.titleDarkColor.cgColor
-        }else {
-            textLayer.foregroundColor = config.titleColor.cgColor
-        }
+        let color = PhotoManager.isDark ? config.titleDarkColor : config.titleColor
+        textLayer.foregroundColor = isHighlighted ? color.withAlphaComponent(0.4).cgColor : color.cgColor
     }
     
     private func tickPath() -> CGPath {
@@ -142,11 +164,8 @@ public final class SelectBoxView: UIControl {
         tickLayer.isHidden = !isSelected
         tickLayer.path = tickPath()
         tickLayer.lineWidth = config.tickWidth
-        if PhotoManager.isDark {
-            tickLayer.strokeColor = config.tickDarkColor.cgColor
-        }else {
-            tickLayer.strokeColor = config.tickColor.cgColor
-        }
+        let color = PhotoManager.isDark ? config.tickDarkColor : config.tickColor
+        tickLayer.strokeColor = isHighlighted ? color.withAlphaComponent(0.4).cgColor : color.cgColor
         tickLayer.fillColor = UIColor.clear.cgColor
     }
     

@@ -44,6 +44,14 @@ public class AlbumTitleView: UIControl, PhotoPickerNavigationTitle {
         }
     }
     
+    public override var isHighlighted: Bool {
+        didSet {
+            titleLb.textColor =  isHighlighted ? titleColor?.withAlphaComponent(0.4) : titleColor
+            arrowView.isHighlighted = isHighlighted
+            configColor()
+        }
+    }
+    
     public override var intrinsicContentSize: CGSize {
         contentSize
     }
@@ -159,7 +167,8 @@ public class AlbumTitleView: UIControl, PhotoPickerNavigationTitle {
     func configColor() {
         if isPopupAlbum {
             let config = config.photoList.titleView
-            contentView.backgroundColor = PhotoManager.isDark ? config.backgroudDarkColor : config.backgroundColor
+            let color = PhotoManager.isDark ? config.backgroudDarkColor : config.backgroundColor
+            contentView.backgroundColor = isHighlighted ? color?.withAlphaComponent(0.4) : color
         }
     }
 
