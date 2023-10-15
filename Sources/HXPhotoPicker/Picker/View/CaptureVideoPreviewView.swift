@@ -55,9 +55,9 @@ class CaptureVideoPreviewView: UIView, AVCaptureVideoDataOutputSampleBufferDeleg
         }
         sessionCompletion = true
         DispatchQueue.global().async {
-            let session = AVCaptureSession.init()
+            let session = AVCaptureSession()
             if let videoDevice = AVCaptureDevice.default(for: .video),
-               let videoInput = try? AVCaptureDeviceInput.init(device: videoDevice) {
+               let videoInput = try? AVCaptureDeviceInput(device: videoDevice) {
                 session.beginConfiguration()
                 if session.canAddInput(videoInput) {
                     session.addInput(videoInput)
@@ -147,6 +147,24 @@ class CaptureVideoPreviewView: UIView, AVCaptureVideoDataOutputSampleBufferDeleg
         super.layoutSubviews()
         imageMaskView.frame = bounds
         shadeView.frame = bounds
+        
+        if let connection = previewLayer?.connection {
+            let videoOrientation: AVCaptureVideoOrientation
+            let interfaceOrientation = UIApplication.shared.statusBarOrientation
+            switch interfaceOrientation {
+            case .portrait:
+                videoOrientation = .portrait
+            case .portraitUpsideDown:
+                videoOrientation = .portraitUpsideDown
+            case .landscapeLeft:
+                videoOrientation = .landscapeLeft
+            case .landscapeRight:
+                videoOrientation = .landscapeRight
+            default:
+                videoOrientation = .portrait
+            }
+            connection.videoOrientation = videoOrientation
+        }
     }
     
     required init?(coder: NSCoder) {

@@ -458,6 +458,13 @@ extension PhotoPickerListView: UICollectionViewDelegate {
                 return vc
             }else if isCameraCell {
                 let vc = PhotoPeekViewController(isCamera: true)
+                if UIDevice.isPortrait {
+                    let width = UIScreen.main.bounds.width
+                    vc.preferredContentSize = .init(width: width, height: width / 9 * 16)
+                }else {
+                    let height = UIScreen.main.bounds.height
+                    vc.preferredContentSize = .init(width: height / 9 * 16, height: height)
+                }
                 return vc
             }
             return nil
