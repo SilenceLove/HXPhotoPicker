@@ -178,11 +178,20 @@ final class ProgressHUD: UIView {
             return
         }
         if animated {
-            UIView.animate(withDuration: 0.25) {
+            backgroundView.transform = .init(scaleX: 0.75, y: 0.75)
+            UIView.animate(
+                withDuration: 0.25,
+                delay: 0,
+                usingSpringWithDamping: 0.6,
+                initialSpringVelocity: 0,
+                options: [.layoutSubviews]
+            ) {
                 self.backgroundView.alpha = 1
+                self.backgroundView.transform = .identity
             }
         }else {
-            self.backgroundView.alpha = 1
+            backgroundView.alpha = 1
+            backgroundView.transform = .identity
         }
     }
     
@@ -214,8 +223,9 @@ final class ProgressHUD: UIView {
     
     private func hideViews(animated: Bool) {
         if animated {
-            UIView.animate(withDuration: 0.25) {
+            UIView.animate(withDuration: 0.2) {
                 self.backgroundView.alpha = 0
+                self.backgroundView.transform = .init(scaleX: 0.8, y: 0.8)
             } completion: { _ in
                 self.stopAnimating()
                 self.removeFromSuperview()
