@@ -82,8 +82,8 @@ class EditorCanvasView: UIView {
             drawingCurrentHistory = []
             currentIndex = -1
         }else {
-            if currentIndex < drawingCurrentHistory.count - 1 {
-                drawingCurrentHistory.removeSubrange(currentIndex..<drawingCurrentHistory.count)
+            if currentIndex + 1 < drawingCurrentHistory.count {
+                drawingCurrentHistory.removeSubrange(currentIndex+1..<drawingCurrentHistory.count)
             }
         }
         quitDrawing()
@@ -175,7 +175,13 @@ class EditorCanvasView: UIView {
         for history in drawingCurrentHistory {
             historyDatas.append(history.dataRepresentation())
         }
-        return .init(data: historyDatas[currentIndex], historyDatas: historyDatas, index: currentIndex, size: size)
+        let data: Data
+        if currentIndex < historyDatas.count, currentIndex >= 0 {
+            data = historyDatas[currentIndex]
+        }else {
+            data = .init()
+        }
+        return .init(data: data, historyDatas: historyDatas, index: currentIndex, size: size)
     }
     
     var historyData: EditorCanvasData? {
@@ -186,7 +192,13 @@ class EditorCanvasView: UIView {
         for history in drawingHistory {
             historyDatas.append(history.dataRepresentation())
         }
-        return .init(data: historyDatas[index], historyDatas: historyDatas, index: index, size: size)
+        let data: Data
+        if currentIndex < historyDatas.count, currentIndex >= 0 {
+            data = historyDatas[index]
+        }else {
+            data = .init()
+        }
+        return .init(data: data, historyDatas: historyDatas, index: index, size: size)
     }
     
     func setCurrentData(_ data: EditorCanvasData?, viewSize: CGSize) {
@@ -202,7 +214,9 @@ class EditorCanvasView: UIView {
                         canvasView.drawing = draws[data.index]
                     }
                 }else {
-                    canvasView.drawing = try PKDrawing(data: data.data)
+                    if !data.data.isEmpty {
+                        canvasView.drawing = try PKDrawing(data: data.data)
+                    }
                 }
             }
             drawingCurrentHistory = draws
@@ -226,7 +240,9 @@ class EditorCanvasView: UIView {
                         canvasView.drawing = draws[data.index]
                     }
                 }else {
-                    canvasView.drawing = try PKDrawing(data: data.data)
+                    if !data.data.isEmpty {
+                        canvasView.drawing = try PKDrawing(data: data.data)
+                    }
                 }
             }
             drawingHistory = draws
