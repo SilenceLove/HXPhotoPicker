@@ -68,13 +68,13 @@ open class AlbumViewCell: AlbumViewBaseCell {
     /// 获取相册封面图片，重写此方法修改封面图片
     open func requestCoverImage() {
         cancelRequest()
-        requestID = assetCollection?.requestCoverImage(completion: { [weak self] (image, assetCollection, info) in
+        requestID = assetCollection?.requestCoverImage(completion: { [weak self] in
             guard let self = self else { return }
-            if let info = info, info.isCancel { return }
-            if let image = image,
-               assetCollection == self.assetCollection {
+            if let info = $2, info.isCancel { return }
+            if let image = $0,
+               $1 == self.assetCollection {
                 self.albumCoverView.image = image
-                if !AssetManager.assetIsDegraded(for: info) {
+                if !AssetManager.assetIsDegraded(for: $2) {
                     self.requestID = nil
                 }
             }

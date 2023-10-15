@@ -172,20 +172,13 @@ open class AlbumListView: UIView, PhotoAlbumList, UITableViewDataSource, UITable
             let config = config.albumList
             let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: AlbumSectionHeaderView.className) as! AlbumSectionHeaderView
             view.titleColor = config.limitedStatusPromptColor
-            view.titleColor = config.limitedStatusPromptDarkColor
+            view.titleDarkColor = config.limitedStatusPromptDarkColor
             view.bgColor = config.cellBackgroundColor
             view.bgDarkColor = config.cellBackgroundDarkColor
             view.updateColor()
             return view
         }
         return nil
-    }
-    
-    public func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let myCell = cell as? AlbumViewCell else {
-            return
-        }
-        myCell.cancelRequest()
     }
     
     open override func layoutSubviews() {
