@@ -161,10 +161,14 @@ open class CameraViewController: BaseViewController {
         }
     }
     open override func deviceOrientationWillChanged(notify: Notification) {
+        guard let previewView = previewView else { return }
         didLayoutPreview = false
+        previewView.resetMask(nil)
     }
     open override func deviceOrientationDidChanged(notify: Notification) {
+        guard let previewView = previewView else { return }
         previewView.resetOrientation()
+        previewView.removeMask(true)
     }
     
     open override func viewDidLayoutSubviews() {
@@ -191,10 +195,12 @@ open class CameraViewController: BaseViewController {
         super.viewDidAppear(animated)
         if requestCameraSuccess {
             if config.cameraType == .normal {
-                if !sessionCommitConfiguration {
-                    cameraManager.session.commitConfiguration()
+                cameraManager.sessionQueue.async {
+                    if !self.sessionCommitConfiguration {
+                        self.cameraManager.session.commitConfiguration()
+                    }
+                    self.cameraManager.startRunning(applyQueue: false)
                 }
-                cameraManager.startRunning()
             }
         }
     }
@@ -356,7 +362,7 @@ extension CameraViewController {
             view.addSubview(previewView)
         }
         view.addSubview(bottomView)
-        DispatchQueue.global().async {
+        cameraManager.sessionQueue.async {
             do {
                 self.sessionCommitConfiguration = false
                 self.cameraManager.session.beginConfiguration()
@@ -391,11 +397,14 @@ extension CameraViewController {
                 }
             }
         }
+//        DispatchQueue.global().async {
+//        }
     }
     
     func addAudioInput() {
         AVCaptureDevice.requestAccess(for: .audio) { isGranted in
-            DispatchQueue.global().async {
+            self.cameraManager.sessionQueue.async {
+//            DispatchQueue.global().async {
                 if isGranted {
                     do {
                         try self.cameraManager.addAudioInput()
@@ -438,7 +447,7 @@ extension CameraViewController {
         cameraManager.session.commitConfiguration()
         sessionCommitConfiguration = true
         if config.cameraType == .normal {
-            cameraManager.startRunning()
+            cameraManager.startRunning(applyQueue: false)
         }
         requestCameraSuccess = true
         DispatchQueue.main.async {

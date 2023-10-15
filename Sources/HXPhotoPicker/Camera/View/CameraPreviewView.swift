@@ -165,7 +165,6 @@ class CameraPreviewView: UIView {
         delegate?.previewView(self, tappedToFocusAt: captureDevicePoint(for: point))
     }
     func resetOrientation() {
-        
         guard let capture = cameraManager.videoOutput.connection(with: .video),
               capture.isVideoOrientationSupported else { return }
         let videoOrientation: AVCaptureVideoOrientation
@@ -197,8 +196,10 @@ class CameraPreviewView: UIView {
     }
     
     func resetMask(_ image: UIImage?) {
-        metalView.pixelBuffer = nil
-        imageMaskView.image = image
+        if let image = image {
+            metalView.pixelBuffer = nil
+            imageMaskView.image = image
+        }
         imageMaskView.alpha = 1
         addSubview(imageMaskView)
         shadeView.viewWithTag(1)?.alpha = 1

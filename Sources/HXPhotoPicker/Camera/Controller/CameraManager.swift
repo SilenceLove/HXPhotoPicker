@@ -169,21 +169,29 @@ class CameraManager: NSObject {
         session.removeOutput(photoOutput)
     }
     
-    func startRunning() {
+    func startRunning(applyQueue: Bool = true) {
         if session.isRunning {
             return
         }
-        sessionQueue.async {
-            self.session.startRunning()
+        if applyQueue {
+            sessionQueue.async {
+                self.session.startRunning()
+            }
+        }else {
+            session.startRunning()
         }
     }
     
-    func stopRunning() {
+    func stopRunning(applyQueue: Bool = true) {
         if !session.isRunning {
             return
         }
-        sessionQueue.async {
-            self.session.stopRunning()
+        if applyQueue {
+            sessionQueue.async {
+                self.session.stopRunning()
+            }
+        }else {
+            session.stopRunning()
         }
     }
     
