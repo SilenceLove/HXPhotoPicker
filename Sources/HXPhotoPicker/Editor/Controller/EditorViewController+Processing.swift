@@ -496,23 +496,12 @@ extension EditorViewController {
 extension EditorViewController {
     func startPlayVideo() {
         if videoControlView.startDuration == videoControlView.currentDuration {
-            videoPlayTimer = Timer.scheduledTimer(
-                withTimeInterval: videoControlView.middleDuration,
-                repeats: true,
-                block: { [weak self] in
-                    guard let self = self else {
-                        return
-                    }
-                    if self.videoPlayTimer == nil || $0 != self.videoPlayTimer {
-                        $0.invalidate()
-                        return
-                    }
-                    self.editorView.seekVideo(to: self.videoControlView.startTime)
-                }
-            )
+            startPlayVideoTimer()
         }else {
+            let timeInterval = videoControlView.endDuration - videoControlView.currentDuration
+            if timeInterval.isNaN { return }
             videoPlayTimer = Timer.scheduledTimer(
-                withTimeInterval: videoControlView.endDuration - videoControlView.currentDuration,
+                withTimeInterval: timeInterval,
                 repeats: false,
                 block: { [weak self] in
                     guard let self = self else {
@@ -523,23 +512,29 @@ extension EditorViewController {
                         return
                     }
                     self.editorView.seekVideo(to: self.videoControlView.startTime)
-                    self.videoPlayTimer = Timer.scheduledTimer(
-                        withTimeInterval: self.videoControlView.middleDuration,
-                        repeats: true,
-                        block: { [weak self] in
-                            guard let self = self else {
-                                return
-                            }
-                            if self.videoPlayTimer == nil || $0 != self.videoPlayTimer {
-                                $0.invalidate()
-                                return
-                            }
-                            self.editorView.seekVideo(to: self.videoControlView.startTime)
-                        }
-                    )
+                    self.startPlayVideoTimer()
                 }
             )
         }
+    }
+    
+    private func startPlayVideoTimer() {
+        let timeInterval = videoControlView.middleDuration
+        if timeInterval.isNaN { return }
+        videoPlayTimer = Timer.scheduledTimer(
+            withTimeInterval: timeInterval,
+            repeats: true,
+            block: { [weak self] in
+                guard let self = self else {
+                    return
+                }
+                if self.videoPlayTimer == nil || $0 != self.videoPlayTimer {
+                    $0.invalidate()
+                    return
+                }
+                self.editorView.seekVideo(to: self.videoControlView.startTime)
+            }
+        )
     }
     
     func stopPlayVideo() {

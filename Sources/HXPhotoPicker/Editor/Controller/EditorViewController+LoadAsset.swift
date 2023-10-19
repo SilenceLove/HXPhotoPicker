@@ -982,7 +982,7 @@ extension EditorViewController {
     
     func loadCompletion() {
         isLoadCompletion = true
-        if !isLoadVideoControl {
+        if !isLoadVideoControl && !firstAppear {
             loadVideoControl()
         }
         if editorView.type == .image {

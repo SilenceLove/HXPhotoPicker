@@ -727,6 +727,7 @@ open class EditorViewController: BaseViewController {
         updateVolumeViewFrame()
         updateFilterParameterViewFrame()
         if firstAppear {
+            firstAppear = false
             loadVideoControl()
             if isLoadCompletion {
                 selectedDefaultTool()
@@ -734,7 +735,6 @@ open class EditorViewController: BaseViewController {
             loadCorpSizeData()
             editorView.layoutSubviews()
             checkLastResultState()
-            firstAppear = false
         }
         updateVideoControlInfo()
         if orientationDidChange {
