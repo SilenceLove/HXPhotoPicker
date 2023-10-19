@@ -108,16 +108,16 @@ open class PhotoBrowser: PhotoPickerController {
         assets: [PhotoAsset] = [],
         transitionalImage: UIImage? = nil
     ) {
-        let _config = PhotoBrowser.getConfig(config)
-        hideSourceView = _config.browserConfig.hideSourceView
+        let previewConfig = PhotoBrowser.transformConfig(config)
+        hideSourceView = config.hideSourceView
         self.transitionalImage = transitionalImage
         super.init(
-            preview: _config.previewConfig,
+            preview: previewConfig,
             previewAssets: assets,
             currentIndex: pageIndex,
-            modalPresentationStyle: _config.browserConfig.modalPresentationStyle
+            modalPresentationStyle: config.modalPresentationStyle
         )
-        isShowDelete = _config.browserConfig.showDelete
+        isShowDelete = config.showDelete
         pickerDelegate = self
     }
     
@@ -272,9 +272,7 @@ open class PhotoBrowser: PhotoPickerController {
         rightItemHandler?(self)
     }
     
-    private static func getConfig(
-        _ config: Configuration?
-    ) -> (previewConfig: PickerConfiguration, browserConfig: Configuration) {
+    private static func transformConfig(_ config: Configuration) -> PickerConfiguration {
         var previewConfig = PickerConfiguration()
         previewConfig.prefersStatusBarHidden = true
         previewConfig.statusBarStyle = .lightContent
@@ -289,23 +287,19 @@ open class PhotoBrowser: PhotoPickerController {
         pConfig.livePhotoMark.imageColor = "#ffffff".color
         pConfig.livePhotoMark.textColor = "#ffffff".color
         
-        let browserConfig: Configuration
-        if let config = config {
-            browserConfig = config
-        }else {
-            browserConfig = .init()
-        }
-        pConfig.loadNetworkVideoMode = browserConfig.loadNetworkVideoMode
-        pConfig.customVideoCellClass = browserConfig.customVideoCellClass
-        pConfig.backgroundColor = browserConfig.backgroundColor
-        pConfig.livePhotoPlayType = browserConfig.livePhotoPlayType
-        pConfig.videoPlayType = browserConfig.videoPlayType
+        
+        pConfig.loadNetworkVideoMode = config.loadNetworkVideoMode
+        pConfig.customVideoCellClass = config.customVideoCellClass
+        pConfig.backgroundColor = config.backgroundColor
+        pConfig.livePhotoPlayType = config.livePhotoPlayType
+        pConfig.videoPlayType = config.videoPlayType
         
         previewConfig.previewView = pConfig
-        previewConfig.navigationTintColor = browserConfig.tintColor
-        previewConfig.modalPresentationStyle = browserConfig.modalPresentationStyle
+        previewConfig.languageType = config.languageType
+        previewConfig.navigationTintColor = config.tintColor
+        previewConfig.modalPresentationStyle = config.modalPresentationStyle
         
-        return (previewConfig, browserConfig)
+        return previewConfig
     }
     
     let hideSourceView: Bool
@@ -467,6 +461,15 @@ extension PhotoBrowser {
     public typealias ViewLifeCycleHandler = (PhotoBrowser) -> Void
     
     public struct Configuration {
+        
+        /// If the built-in language is not enough, you can add a custom language text
+        /// PhotoManager.shared.customLanguages - custom language array
+        /// PhotoManager.shared.fixedCustomLanguage - If there are multiple custom languages, one can be fixed to display
+        /// 如果自带的语言不够，可以添加自定义的语言文字
+        /// PhotoManager.shared.customLanguages - 自定义语言数组
+        /// PhotoManager.shared.fixedCustomLanguage - 如果有多种自定义语言，可以固定显示某一种
+        public var languageType: LanguageType = .system
+        
         /// 导航栏 删除、取消 按钮颜色
         public var tintColor: UIColor = .white
         /// 网络视频加载方式
