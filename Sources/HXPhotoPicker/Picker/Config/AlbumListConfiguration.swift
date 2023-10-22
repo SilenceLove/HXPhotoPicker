@@ -13,6 +13,10 @@ public struct AlbumListConfiguration {
     
     public var albumList: PhotoAlbumList.Type = AlbumListView.self
     
+    public var leftNavigationItems: [PhotoNavigationItem.Type] = []
+    
+    public var rightNavigationItems: [PhotoNavigationItem.Type] = [PhotoTextCancelItemView.self]
+    
     /// Prompt color under Accessibility
     /// 可访问权限下的提示语颜色
     public var limitedStatusPromptColor: UIColor = "#999999".hx.color
@@ -20,14 +24,6 @@ public struct AlbumListConfiguration {
     /// Hint color for dark style accessibility
     /// 暗黑风格可访问权限下的提示语颜色
     public var limitedStatusPromptDarkColor: UIColor = "#999999".hx.color
-    
-    /// Album name when there are no resources in the album
-    /// 当相册里没有资源时的相册名称
-    public var emptyAlbumName: String = "所有照片"
-    
-    /// The name of the cover image when there are no assets in the album
-    /// 当相册里没有资源时的封面图片名
-    public var emptyCoverImageName: String = "hx_picker_album_empty"
     
     /// list background color
     /// 列表背景颜色
@@ -102,7 +98,7 @@ public struct AlbumListConfiguration {
     
     /// Divider color
     /// 分隔线颜色
-    public var separatorLineColor: UIColor = "#eeeeee".hx.color
+    public var separatorLineColor: UIColor = "#e1e1e1".hx.color
     
     /// Divider color in dark style
     /// 暗黑风格下分隔线颜色
@@ -118,6 +114,6 @@ public struct AlbumListConfiguration {
     
     public init() {
         albumNameFont = .mediumPingFang(ofSize: 15)
-        photoCountFont = .mediumPingFang(ofSize: 12)
+        photoCountFont = .systemFont(ofSize: 13, weight: .medium)
     }
 }

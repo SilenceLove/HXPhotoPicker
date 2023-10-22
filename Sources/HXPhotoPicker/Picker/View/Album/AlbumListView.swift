@@ -48,21 +48,11 @@ open class AlbumListView: UIView, PhotoAlbumList, UITableViewDataSource, UITable
     public var selectedAssetCollection: PhotoAssetCollection? {
         willSet {
             selectedAssetCollection?.isSelected = false
-            if let collection = selectedAssetCollection,
-               let index = assetCollections.firstIndex(of: collection) {
-                let cell = tableView.cellForRow(at: .init(row: index, section: 0)) as? AlbumViewBaseCell
-                cell?.updateSelectedStatus(false)
-            }
+            updateCellSelected(for: selectedAssetCollection, isSelected: false)
         }
         didSet {
             selectedAssetCollection?.isSelected = true
-            guard let collection = selectedAssetCollection,
-                  let index = assetCollections.firstIndex(of: collection) else {
-                return
-            }
-            if let cell = tableView.cellForRow(at: .init(row: index, section: 0)) as? AlbumViewBaseCell {
-                cell.updateSelectedStatus(true)
-            }
+            updateCellSelected(for: selectedAssetCollection, isSelected: true)
         }
     }
     
@@ -96,6 +86,14 @@ open class AlbumListView: UIView, PhotoAlbumList, UITableViewDataSource, UITable
             tableView.sectionHeaderTopPadding = 0
         }
         addSubview(tableView)
+    }
+    
+    func updateCellSelected(for collection: PhotoAssetCollection?, isSelected: Bool) {
+        if let collection = collection,
+           let index = assetCollections.firstIndex(of: collection) {
+            let cell = tableView.cellForRow(at: .init(row: index, section: 0)) as? AlbumViewBaseCell
+            cell?.updateSelectedStatus(isSelected)
+        }
     }
     
     public func configColor() {

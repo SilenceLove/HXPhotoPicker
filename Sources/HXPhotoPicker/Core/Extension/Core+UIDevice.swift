@@ -94,11 +94,11 @@ extension UIDevice {
     class var screenSize: CGSize {
         if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
             if !Thread.isMainThread {
-                return UIScreen.main.bounds.size
+                return UIScreen._size
             }
-            return UIApplication._keyWindow?.size ?? UIScreen.main.bounds.size
+            return UIApplication._keyWindow?.size ?? UIScreen._size
         }
-        return UIScreen.main.bounds.size
+        return UIScreen._size
     }
     class var isAllIPhoneX: Bool {
         let safeArea = safeAreaInsets

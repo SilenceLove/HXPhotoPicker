@@ -42,13 +42,13 @@ final class ProgressCircleView: UIView {
     
     private func initViews() {
         circleLayer = CAShapeLayer()
-        circleLayer.contentsScale = UIScreen.main.scale
+        circleLayer.contentsScale = UIScreen._scale
         circleLayer.lineWidth = lineWidth
         circleLayer.fillColor = UIColor.clear.cgColor
         circleLayer.strokeColor = UIColor.white.cgColor
         
         borderLayer = CAShapeLayer()
-        borderLayer.contentsScale = UIScreen.main.scale
+        borderLayer.contentsScale = UIScreen._scale
         borderLayer.lineWidth = 1
         borderLayer.fillColor = UIColor.clear.cgColor
         borderLayer.strokeColor = UIColor.white.cgColor

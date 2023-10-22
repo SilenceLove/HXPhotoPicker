@@ -188,7 +188,7 @@ class EditorMusicListViewController: BaseViewController {
         collectionView.register(EditorMusicViewCell.self, forCellWithReuseIdentifier: "EditorMusicViewCellID")
         
         noMoreLine = CAShapeLayer()
-        noMoreLine.contentsScale = UIScreen.main.scale
+        noMoreLine.contentsScale = UIScreen._scale
         noMoreLine.fillColor = UIColor.white.withAlphaComponent(0.5).cgColor
         noMoreLine.strokeColor = UIColor.white.withAlphaComponent(0.5).cgColor
         noMoreLine.lineCap = .round

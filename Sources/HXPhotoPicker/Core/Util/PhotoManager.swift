@@ -40,6 +40,8 @@ public final class PhotoManager: NSObject {
         return false
     }
     
+    public var isDebugLogsEnabled: Bool = false
+    
     /// 当前语言文件，每次创建PhotoPickerController判断是否需要重新创建
     var languageBundle: Bundle?
     /// 当前语言类型，每次创建PhotoPickerController时赋值

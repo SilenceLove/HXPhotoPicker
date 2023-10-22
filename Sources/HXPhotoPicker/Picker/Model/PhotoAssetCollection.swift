@@ -29,13 +29,13 @@ open class PhotoAssetCollection: Equatable {
     /// 是否选中
     public var isSelected: Bool = false
     
-    /// 是否是相机胶卷
+    /// 是否是相机胶卷/最近添加
     public var isCameraRoll: Bool = false
     
     /// 真实的封面图片，如果不为nil就是封面
-    var realCoverImage: UIImage?
+    public var realCoverImage: UIImage?
     
-    private var coverImage: UIImage?
+    var coverImage: UIImage?
     
     public init(
         collection: PHAssetCollection?,
@@ -72,14 +72,14 @@ open class PhotoAssetCollection: Equatable {
             if UIDevice.isPad {
                 targetWidth = 300
             }else {
-                targetWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+                targetWidth = min(UIScreen._width, UIScreen._height)
             }
             let asset = result.object(at: result.count - 1)
             return AssetManager.requestThumbnailImage(
                 for: asset,
                 targetWidth: targetWidth
-            ) { (image, info) in
-                completion?(image, self, info)
+            ) {
+                completion?($0, self, $1)
             }
         }
         completion?(coverImage, self, nil)
@@ -113,7 +113,7 @@ open class PhotoAssetCollection: Equatable {
     }
 }
 
-extension PhotoAssetCollection {
+public extension PhotoAssetCollection {
      
     func fetchResult() {
         guard let collection = collection  else {
@@ -124,7 +124,7 @@ extension PhotoAssetCollection {
         count = result?.count ?? 0
     }
     
-    func changeResult(for result: PHFetchResult<PHAsset>) {
+    func updateResult(for result: PHFetchResult<PHAsset>) {
         self.result = result
         count = result.count
         if let collection = collection {
@@ -132,7 +132,7 @@ extension PhotoAssetCollection {
         }
     }
     
-    func change(albumName: String?, coverImage: UIImage?) {
+    func update(albumName: String?, coverImage: UIImage?) {
         self.albumName = albumName
         self.coverImage = coverImage
     }

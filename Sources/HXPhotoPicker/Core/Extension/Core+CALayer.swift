@@ -10,7 +10,7 @@ import UIKit
 extension CALayer {
     func convertedToImage(
         size: CGSize = .zero,
-        scale: CGFloat = UIScreen.main.scale
+        scale: CGFloat = UIScreen._scale
     ) -> UIImage? {
         var toSize: CGSize
         if size.equalTo(.zero) {

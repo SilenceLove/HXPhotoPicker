@@ -89,7 +89,14 @@ extension CIImage {
     
     /// 生成马赛克图片
     func applyMosaic(level: CGFloat) -> CIImage? {
-        let screenScale = level / max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+        var screenScale: CGFloat = 0
+        if !Thread.isMainThread {
+            DispatchQueue.main.sync {
+                screenScale = level / max(UIScreen._width, UIScreen._height)
+            }
+        }else {
+            screenScale = level / max(UIScreen._width, UIScreen._height)
+        }
         let scale = extent.width * screenScale
         return applyingFilter("CIPixellate", parameters: [kCIInputScaleKey: scale])
     }

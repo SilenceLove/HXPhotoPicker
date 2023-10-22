@@ -232,7 +232,7 @@ public extension PhotoFetchAssetCollection {
         if let fetchResult = PhotoManager.shared.cameraAlbumResult,
            let options = PhotoManager.shared.cameraAlbumResultOptions,
            (options == selectOptions || (options.isPhoto && options.isVideo)) {
-            assetCollection.changeResult(for: fetchResult)
+            assetCollection.updateResult(for: fetchResult)
         }else {
             assetCollection.fetchResult()
             if PhotoManager.shared.isCacheCameraAlbum {

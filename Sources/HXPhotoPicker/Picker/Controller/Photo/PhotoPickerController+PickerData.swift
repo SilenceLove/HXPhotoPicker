@@ -38,4 +38,53 @@ extension PhotoPickerController: PhotoFetchDataDelegate {
     public func fetchData(_ fetchData: PhotoFetchData, didFetchAssets asset: PHAsset) -> Bool {
         pickerDelegate?.pickerController(self, didFetchAssets: asset) ?? true
     }
+    
+    public func fetchData(fetchCameraAssetCollectionCompletion fetchData: PhotoFetchData) {
+        ProgressHUD.hide(forView: view)
+        switch config.albumShowMode {
+        case .normal:
+            photoAlbumViewController?.selectedAssetCollection = fetchData.cameraAssetCollection
+            
+            let vc = PhotoPickerViewController(config: config)
+            vc.assetCollection = fetchData.cameraAssetCollection
+            vc.showLoading = false
+            pushViewController(vc, animated: false)
+        default:
+            pickerViewController?.updateAssetCollection(fetchData.cameraAssetCollection, isShow: false)
+        }
+        if let splitViewController = splitViewController as? PhotoSplitViewController,
+           let collection = fetchData.cameraAssetCollection {
+            let photoPickerController: PhotoPickerController?
+            if #available(iOS 14.0, *) {
+                photoPickerController = splitViewController.viewController(for: .primary) as? PhotoPickerController
+            } else {
+                photoPickerController = splitViewController.viewControllers.first as? PhotoPickerController
+            }
+            splitViewController.cameraAssetCollection = collection
+            photoPickerController?.albumViewController?.reloadTableView(assetCollections: [collection])
+        }
+    }
+    
+    public func fetchData(fetchAssetCollectionsCompletion fetchData: PhotoFetchData) {
+        isFetchAssetCollection = false
+        ProgressHUD.hide(forView: view)
+        switch config.albumShowMode {
+        case .normal:
+            ProgressHUD.hide(forView: photoAlbumViewController?.view)
+            photoAlbumViewController?.assetCollections = fetchData.assetCollections
+            photoAlbumViewController?.reloadData()
+        default:
+            pickerViewController?.updateAssetCollections(fetchData.assetCollections)
+        }
+        if let splitViewController = splitViewController as? PhotoSplitViewController {
+            let photoPickerController: PhotoPickerController?
+            if #available(iOS 14.0, *) {
+                photoPickerController = splitViewController.viewController(for: .primary) as? PhotoPickerController
+            } else {
+                photoPickerController = splitViewController.viewControllers.first as? PhotoPickerController
+            }
+            splitViewController.assetCollections = fetchData.assetCollections
+            photoPickerController?.albumViewController?.reloadTableView(assetCollections: fetchData.assetCollections)
+        }
+    }
 }

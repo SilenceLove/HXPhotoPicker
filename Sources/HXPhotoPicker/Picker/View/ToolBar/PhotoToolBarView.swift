@@ -10,13 +10,36 @@ import UIKit
 
 public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     
-    public var previewHandler: (() -> Void)?
-    public var originalHandler: ((Bool) -> Void)?
-    public var selectedAssetHandler: ((PhotoAsset) -> Void)?
-    public var moveAssetHandler: ((Int, Int) -> Void)?
-    public var finishHandler: (() -> Void)?
+    public weak var toolbarDelegate: PhotoToolBarDelegate?
+    
+    public var toolbarHeight: CGFloat {
+        if type == .browser {
+            return 70 + UIDevice.bottomMargin
+        }
+        if pickerConfig.selectMode == .single, isShowPrompt {
+            return 0
+        }
+        return 50 + UIDevice.bottomMargin
+    }
+    
+    public var viewHeight: CGFloat {
+        if pickerConfig.selectMode == .single, isShowPrompt, type != .browser {
+            return 55 + UIDevice.bottomMargin
+        }
+        var viewHeight: CGFloat = toolbarHeight
+        if type == .picker {
+            if isShowPrompt {
+                viewHeight += 70
+            }
+        }else if type == .preview {
+            if isShowSelectedView, selectedView.assetCount > 0 {
+                viewHeight += 70
+            }
+        }
+        return viewHeight
+    }
+     
     #if HXPICKER_ENABLE_EDITOR
-    public var editHandler: (() -> Void)?
     private var editBtn: UIButton!
     #endif
     
@@ -156,7 +179,7 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
             finishBtn.addTarget(self, action: #selector(didFinishButtonClick), for: .touchUpInside)
             contentView.addSubview(finishBtn)
         }
-        
+        layoutSubviews()
         configColor()
     }
     
@@ -177,34 +200,6 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
         selectedView.delegate = self
         addSubview(selectedView)
     }
-    
-    public func toolbarHeight() -> CGFloat {
-        if type == .browser {
-            return 70 + UIDevice.bottomMargin
-        }
-        if pickerConfig.selectMode == .single, isShowPrompt {
-            return 0
-        }
-        return 50 + UIDevice.bottomMargin
-    }
-    
-    public func viewHeight() -> CGFloat {
-        if pickerConfig.selectMode == .single, isShowPrompt, type != .browser {
-            return 55 + UIDevice.bottomMargin
-        }
-        var viewHeight: CGFloat = toolbarHeight()
-        if type == .picker {
-            if isShowPrompt {
-                viewHeight += 70
-            }
-        }else if type == .preview {
-            if isShowSelectedView, selectedView.assetCount > 0 {
-                viewHeight += 70
-            }
-        }
-        return viewHeight
-    }
-    
     public func updateOriginalState(_ isSelected: Bool) {
         originalBox.isSelected = isSelected
     }
@@ -217,7 +212,7 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
         if isCanLoadOriginal {
             startOriginalLoading()
         }
-        originalHandler?(true)
+        toolbarDelegate?.photoToolbar(self, didOriginalClick: true)
     }
     
     public func originalAssetBytes(_ bytes: Int, bytesString: String) {
@@ -272,13 +267,13 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     
     @objc
     private func didPreviewButtonClick() {
-        previewHandler?()
+        toolbarDelegate?.photoToolbar(didPreviewClick: self)
     }
     
     #if HXPICKER_ENABLE_EDITOR
     @objc
     private func didEditBtnButtonClick() {
-        editHandler?()
+        toolbarDelegate?.photoToolbar(didEditClick: self)
     }
     #endif
     
@@ -299,7 +294,7 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
         }else {
             stopOriginalLoading(bytes: 0, bytesString: "")
         }
-        originalHandler?(isSelected)
+        toolbarDelegate?.photoToolbar(self, didOriginalClick: isSelected)
     }
     
     private func startOriginalLoading() {
@@ -322,7 +317,7 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     
     @objc
     private func didFinishButtonClick() {
-        finishHandler?()
+        toolbarDelegate?.photoToolbar(didFinishClick: self)
     }
     
     public var leftMargin: CGFloat {
@@ -604,13 +599,13 @@ extension PhotoToolBarView: PhotoPreviewSelectedViewDelegate {
         _ selectedView: PhotoPreviewSelectedView,
         didSelectItemAt photoAsset: PhotoAsset
     ) {
-        selectedAssetHandler?(photoAsset)
+        toolbarDelegate?.photoToolbar(self, didSelectedAsset: photoAsset)
     }
     
     func selectedView(
         _ selectedView: PhotoPreviewSelectedView,
         moveItemAt fromIndex: Int, toIndex: Int
     ) {
-        moveAssetHandler?(fromIndex, toIndex)
+        toolbarDelegate?.photoToolbar(self, didMoveAsset: fromIndex, with: toIndex)
     }
 }

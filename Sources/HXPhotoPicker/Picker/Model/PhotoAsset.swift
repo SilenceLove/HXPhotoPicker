@@ -16,7 +16,7 @@ public typealias PhotoAssetICloudHandler = (PhotoAsset, PHImageRequestID) -> Voi
 public typealias PhotoAssetProgressHandler = (PhotoAsset, Double) -> Void
 public typealias PhotoAssetFailureHandler = (PhotoAsset, [AnyHashable: Any]?, AssetError) -> Void
 
-open class PhotoAsset: Equatable {
+open class PhotoAsset: Equatable, PhotoAssetEquatable {
     
     /// 系统相册里的资源
     public var phAsset: PHAsset? { didSet { setMediaType() } }

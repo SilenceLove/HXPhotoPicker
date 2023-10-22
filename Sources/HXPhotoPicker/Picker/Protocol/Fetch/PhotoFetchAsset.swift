@@ -41,6 +41,10 @@ public extension PhotoFetchAsset {
             selectedPhotoAssets = result.photoAssets
         }
         var selectedAsset: PhotoAsset?
+        var normalAssets: [PhotoAsset] = []
+        var gifAssets: [PhotoAsset] = []
+        var livePhotoAssets: [PhotoAsset] = []
+        var videoAssets: [PhotoAsset] = []
         var photoCount = 0
         var videoCount = 0
         assetCollection.enumerateAssets { photoAsset, index, stop in
@@ -80,37 +84,101 @@ public extension PhotoFetchAsset {
                 selectedAsset = selectPhotoAsset
             }
             photoAssets.append(asset)
+            if config.isFetchDeatilsAsset {
+                if asset.mediaSubType.isNormalPhoto {
+                    normalAssets.append(asset)
+                }
+                if asset.mediaSubType.isLivePhoto {
+                    livePhotoAssets.append(asset)
+                }
+                if asset.mediaSubType.isGif {
+                    gifAssets.append(asset)
+                }
+                if asset.mediaType == .video {
+                    videoAssets.append(asset)
+                }
+            }
         }
-        if config.photoList.isShowAssetNumber {
-            localAssets.forEach {
-                if $0.mediaType == .photo {
+        for asset in localAssets.reversed() {
+            photoAssets.append(asset)
+            if config.isFetchDeatilsAsset {
+                if asset.mediaSubType.isNormalPhoto {
+                    normalAssets.append(asset)
+                }
+                if asset.mediaSubType.isLivePhoto {
+                    livePhotoAssets.append(asset)
+                }
+                if asset.mediaSubType.isGif {
+                    gifAssets.append(asset)
+                }
+                if asset.mediaType == .video {
+                    videoAssets.append(asset)
+                }
+            }
+            if config.photoList.isShowAssetNumber {
+                if asset.mediaType == .photo {
                     photoCount += 1
                 }else {
                     videoCount += 1
                 }
             }
         }
-        photoAssets.append(contentsOf: localAssets.reversed())
         if config.photoList.sort == .desc {
             photoAssets.reverse()
+            if config.isFetchDeatilsAsset {
+                normalAssets.reverse()
+                livePhotoAssets.reverse()
+                gifAssets.reverse()
+                videoAssets.reverse()
+            }
         }
-        return .init(assets: photoAssets, selectedAsset: selectedAsset, photoCount: photoCount, videoCount: videoCount)
+        return .init(
+            assets: photoAssets,
+            selectedAsset: selectedAsset,
+            normalAssets: normalAssets,
+            gifAssets: gifAssets,
+            livePhotoAssets: livePhotoAssets,
+            videoAssets: videoAssets,
+            photoCount: photoCount,
+            videoCount: videoCount
+        )
     }
 }
 
 public struct PhotoFetchAssetResult {
     /// 相册里的`PhotoAsst`对象
-    let assets: [PhotoAsset]
+    public let assets: [PhotoAsset]
     /// 相册列表滚动到指定的 `PhotoAsset`
-    let selectedAsset: PhotoAsset?
-    /// 相册里的照片数量
-    let photoCount: Int
-    /// 相册里的视频数量
-    let videoCount: Int
+    public let selectedAsset: PhotoAsset?
     
-    public init(assets: [PhotoAsset] = [], selectedAsset: PhotoAsset? = nil, photoCount: Int = 0, videoCount: Int = 0) {
+    /// 普通照片 Asset
+    public let normalAssets: [PhotoAsset]
+    /// GIF Asset
+    public let gifAssets: [PhotoAsset]
+    /// LivePhoto Asset
+    public let livePhotoAssets: [PhotoAsset]
+    /// 视频 Asset
+    public let videoAssets: [PhotoAsset]
+    
+    public let photoCount: Int
+    public let videoCount: Int
+    
+    public init(
+        assets: [PhotoAsset] = [],
+        selectedAsset: PhotoAsset? = nil,
+        normalAssets: [PhotoAsset] = [],
+        gifAssets: [PhotoAsset] = [],
+        livePhotoAssets: [PhotoAsset] = [],
+        videoAssets: [PhotoAsset] = [],
+        photoCount: Int = 0,
+        videoCount: Int = 0
+    ) {
         self.assets = assets
         self.selectedAsset = selectedAsset
+        self.normalAssets = normalAssets
+        self.gifAssets = gifAssets
+        self.livePhotoAssets = livePhotoAssets
+        self.videoAssets = videoAssets
         self.photoCount = photoCount
         self.videoCount = videoCount
     }

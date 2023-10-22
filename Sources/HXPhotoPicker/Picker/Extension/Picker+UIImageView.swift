@@ -79,7 +79,7 @@ extension UIImageView {
                     .onlyLoadFirstFrame,
                     .processor(processor),
                     .cacheOriginalImage,
-                    .scaleFactor(UIScreen.main.scale)
+                    .scaleFactor(UIScreen._scale)
                 ]
                 if imageAsset.isFade {
                     options += [.transition(.fade(0.2))]

@@ -84,7 +84,7 @@ class EditorChartletPreviewView: UIView {
         bgLayer = CAShapeLayer()
         bgLayer.fillColor = UIColor.white.cgColor
         bgLayer.strokeColor = UIColor.white.cgColor
-        bgLayer.contentsScale = UIScreen.main.scale
+        bgLayer.contentsScale = UIScreen._scale
         bgLayer.path = bgLayerPath()
         
         layer.addSublayer(bgLayer)

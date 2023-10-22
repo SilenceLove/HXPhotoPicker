@@ -37,6 +37,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
                 listView.reloadCell(for: photoAsset)
             }
             photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+            finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
             requestSelectedAssetFileSize()
         }else {
             let beforeHasEdit = photoAsset.editedResult != nil
@@ -58,6 +59,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
                     listView.updateCellSelectedTitle()
                 }
                 photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+                finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
                 requestSelectedAssetFileSize()
             }
             if listView.filterOptions.contains(.edited) {

@@ -319,9 +319,22 @@ extension PhotoTools {
         config.albumList.separatorLineColor = "#434344".color.withAlphaComponent(0.6)
         config.albumList.tickColor = wxColor
         
+        config.albumController.backgroundColor = "#2E2F30".color
+        config.albumController.cellBackgroundColor = "#2E2F30".color
+        config.albumController.cellSelectedColor = UIColor.init(red: 0.125, green: 0.125, blue: 0.125, alpha: 1)
+        config.albumController.albumNameColor = .white
+        config.albumController.photoCountColor = .white
+        config.albumController.headerTitleColor = .white
+        config.albumController.headerButtonTitleColor = wxColor
+        config.albumController.mediaTitleColor = wxColor
+        config.albumController.mediaCountColor = .white
+        config.albumController.separatorLineColor = "#434344".color.withAlphaComponent(0.6)
+        config.albumController.imageColor = wxColor
+        config.albumController.arrowColor = .white
+        
         config.photoList.backgroundColor = "#2E2F30".color
-        config.photoList.cancelPosition = .left
-        config.photoList.cancelType = .image
+        config.photoList.leftNavigationItems = [PhotoImageCancelItemView.self]
+        config.photoList.rightNavigationItems = [PhotoPickerFilterItemView.self]
         
         config.photoList.titleView.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
         config.photoList.titleView.arrow.backgroundColor = "#B2B2B2".color

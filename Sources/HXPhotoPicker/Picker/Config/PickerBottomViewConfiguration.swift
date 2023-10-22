@@ -143,7 +143,7 @@ public struct PickerBottomViewConfiguration {
     
     /// The color of the prompt icon in the dark style
     /// 暗黑风格下提示图标颜色
-    public var promptIconDarkColor: UIColor = .white
+    public var promptIconDarkColor: UIColor = .systemBlue
     
     /// prompt color
     /// 提示语颜色
@@ -159,7 +159,7 @@ public struct PickerBottomViewConfiguration {
     
     /// The color of the prompt arrow in the dark style
     /// 暗黑风格下提示语箭头颜色
-    public var promptArrowDarkColor: UIColor = .white
+    public var promptArrowDarkColor: UIColor = .systemBlue
     
     /// Show selected resources
     /// 显示已选资源

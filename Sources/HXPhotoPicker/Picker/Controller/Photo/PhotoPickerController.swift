@@ -9,12 +9,11 @@
 import UIKit
 import Photos
 
-extension PhotoPickerController {
+open class PhotoPickerController: UINavigationController {
+    
     public typealias FinishHandler = (PickerResult, PhotoPickerController) -> Void
     public typealias CancelHandler = (PhotoPickerController) -> Void
-}
-
-open class PhotoPickerController: UINavigationController {
+    
     public weak var pickerDelegate: PhotoPickerControllerDelegate?
     
     public var finishHandler: FinishHandler?
@@ -72,13 +71,21 @@ open class PhotoPickerController: UINavigationController {
     /// 可以在传入 selectedAssetArray 之后重新加载数据将重新设置的被选择的 PhotoAsset 选中
     /// - Parameter assetCollection: 切换显示其他资源集合
     public func reloadData(assetCollection: PhotoAssetCollection?) {
-        pickerViewController?.changedAssetCollection(collection: assetCollection)
+        pickerViewController?.updateAssetCollection(assetCollection)
         reloadAlbumData()
     }
     
     /// 刷新相册数据，只对单独控制器展示的有效
     public func reloadAlbumData() {
-        albumViewController?.listView.reloadData()
+        if splitType.isSplit {
+            albumViewController?.listView.reloadData()
+        }else {
+            if config.albumShowMode.isPopView {
+                pickerViewController?.reloadAlbumData()
+            }else {
+                photoAlbumViewController?.reloadData()
+            }
+        }
     }
     
     /// 使用其他相机拍摄完之后调用此方法添加
@@ -131,12 +138,20 @@ open class PhotoPickerController: UINavigationController {
         getCurrentPreviewImageView()
     }
     
-    /// 相册列表控制器
+    /// UISplitViewController 中的相册列表控制器
     public var albumViewController: AlbumViewController? {
         getViewController(
             for: AlbumViewController.self
         ) as? AlbumViewController
     }
+    
+    public var photoAlbumViewController: PhotoAlbumController? {
+        for case let vc as PhotoAlbumController in viewControllers {
+            return vc
+        }
+        return nil
+    }
+    
     /// 照片选择控制器
     public var pickerViewController: PhotoPickerViewController? {
         getViewController(
@@ -186,9 +201,12 @@ open class PhotoPickerController: UINavigationController {
         modalPresentationStyle = config.modalPresentationStyle
         pickerDelegate = delegate
         var photoVC: UIViewController
-        if config.albumShowMode == .normal {
-            photoVC = AlbumViewController(config: config.albumList)
-        }else {
+        switch config.albumShowMode {
+        case .normal:
+            let vc = config.albumController.albumController.init(config: config)
+            vc.delegate = self
+            photoVC = vc
+        default:
             photoVC = PhotoPickerViewController(config: config)
         }
         self.viewControllers = [photoVC]
@@ -246,18 +264,6 @@ open class PhotoPickerController: UINavigationController {
         }
     }
     
-    let splitType: SplitContentType
-    
-    enum SplitContentType {
-        case none
-        case album
-        case picker
-        
-        var isSplit: Bool {
-            self != .none
-        }
-    }
-    
     public init(
         splitPicker config: PickerConfiguration,
         delegate: PhotoPickerControllerDelegate? = nil
@@ -299,7 +305,7 @@ open class PhotoPickerController: UINavigationController {
         super.init(nibName: nil, bundle: nil)
         fetchData.delegate = self
         modalPresentationStyle = config.modalPresentationStyle
-        let vc = AlbumViewController(config: config.albumList)
+        let vc = AlbumViewController(config: config)
         self.viewControllers = [vc]
     }
     
@@ -312,6 +318,7 @@ open class PhotoPickerController: UINavigationController {
         super.init(nibName: nil, bundle: nil)
     }
     
+    let splitType: SplitContentType
     let fetchData: PhotoFetchData
     let pickerData: PhotoPickerData
     var deniedView: PhotoDeniedAuthorization!
@@ -319,8 +326,9 @@ open class PhotoPickerController: UINavigationController {
     var interactiveTransition: PickerInteractiveTransition?
     var dismissInteractiveTransition: PickerControllerInteractiveTransition?
     var isDismissed: Bool = false
-    var pickerTask: Any?
+    private var pickerTask: Any?
     private var isFirstAuthorization: Bool = false
+    var isFetchAssetCollection: Bool = false
     
     public override var modalPresentationStyle: UIModalPresentationStyle {
         didSet {
@@ -333,6 +341,7 @@ open class PhotoPickerController: UINavigationController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        delegate = self
         PhotoManager.shared.indicatorType = config.indicatorType
         PhotoManager.shared.loadNetworkVideoMode = config.previewView.loadNetworkVideoMode
         PhotoManager.shared.thumbnailLoadMode = .complete
@@ -346,7 +355,7 @@ open class PhotoPickerController: UINavigationController {
         if previewType == .none {
             requestAuthorization()
             if modalPresentationStyle == .fullScreen &&
-                config.albumShowMode == .popup &&
+                config.albumShowMode.isPop &&
                 config.allowCustomTransitionAnimation {
                 modalPresentationCapturesStatusBarAppearance = true
                 switch config.pickerPresentStyle {
@@ -500,6 +509,16 @@ open class PhotoPickerController: UINavigationController {
         PhotoManager.shared.firstLoadAssets = false
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
+    
+    enum SplitContentType {
+        case none
+        case album
+        case picker
+        
+        var isSplit: Bool {
+            self != .none
+        }
+    }
 }
 
 // MARK: Private function
@@ -520,8 +539,8 @@ extension PhotoPickerController {
             configBackgroundColor()
         }
         let isDark = PhotoManager.isDark
-        let titleTextAttributes = [
-            NSAttributedString.Key.foregroundColor:
+        let titleTextAttributes: [NSAttributedString.Key : Any] = [
+            .foregroundColor:
                 isDark ? config.navigationTitleDarkColor : config.navigationTitleColor
         ]
         navigationBar.titleTextAttributes = titleTextAttributes
@@ -564,6 +583,9 @@ extension PhotoPickerController {
                 ProgressHUD.showLoading(addedTo: view, afterDelay: 0.15, animated: true)
             }
             fetchData.fetchCameraAssetCollection()
+            if config.albumShowMode.isPop {
+                fetchData.fetchAssetCollections()
+            }
         }else if status.rawValue >= 1 {
             // 无权限
             if splitType.isSplit {
@@ -574,9 +596,9 @@ extension PhotoPickerController {
         }else {
             // 用户还没做出选择，请求权限
             isFirstAuthorization = true
-            AssetManager.requestAuthorization { (status) in
+            AssetManager.requestAuthorization { _ in
                 self.requestAuthorization()
-                self.albumViewController?.updatePrompt()
+                self.albumViewController?.reloadData()
                 self.pickerViewController?.reloadAlbumData()
                 PhotoManager.shared.registerPhotoChangeObserver()
             }
@@ -609,6 +631,37 @@ extension PhotoPickerController {
         if !isDismissed {
             cancelHandler?(self)
         }
+    }
+}
+
+extension PhotoPickerController: UINavigationControllerDelegate, PhotoAlbumControllerDelegate {
+    public func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+        if viewController is PhotoAlbumController {
+            if fetchData.assetCollections.isEmpty, !isFetchAssetCollection {
+                isFetchAssetCollection = true
+                ProgressHUD.showLoading(addedTo: viewController.view)
+                fetchData.fetchAssetCollections()
+            }
+        }
+    }
+    
+    public func albumController(_ albumController: PhotoAlbumController, didSelectedWith assetCollection: PhotoAssetCollection) {
+        let vc = PhotoPickerViewController(config: config)
+        vc.assetCollection = assetCollection
+        vc.showLoading = true
+        pushViewController(vc, animated: true)
+    }
+    public func albumController(willAppear viewController: PhotoAlbumController) {
+        viewControllersWillAppear(viewController)
+    }
+    public func albumController(didAppear viewController: PhotoAlbumController) {
+        viewControllersDidAppear(viewController)
+    }
+    public func albumController(willDisappear viewController: PhotoAlbumController) {
+        viewControllersWillDisappear(viewController)
+    }
+    public func albumController(didDisappear viewController: PhotoAlbumController) {
+        viewControllersDidDisappear(viewController)
     }
 }
 

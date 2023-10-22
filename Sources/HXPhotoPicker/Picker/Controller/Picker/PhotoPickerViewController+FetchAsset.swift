@@ -11,75 +11,16 @@ import UIKit
 extension PhotoPickerViewController {
     
     func fetchData() {
-        if pickerConfig.albumShowMode == .popup || pickerController.splitType.isSplit {
-            fetchAssetCollections()
-            title = ""
-            if let cameraAssetCollection = pickerController.fetchData.cameraAssetCollection {
-                assetCollection = cameraAssetCollection
-                assetCollection.isSelected = true
-                titleView.title = assetCollection.albumName
-                updateCameraAlbumViewController(assetCollection)
+        title = ""
+        if pickerConfig.albumShowMode.isPop || pickerController.splitType.isSplit {
+            if assetCollection != nil {
                 fetchPhotoAssets()
-            }else {
-                pickerController.fetchData.fetchCameraAssetCollectionCompletion = { [weak self] assetCollection in
-                    self?.assetCollection = assetCollection
-                    self?.assetCollection.isSelected = true
-                    self?.titleView.title = self?.assetCollection.albumName
-                    self?.updateCameraAlbumViewController(assetCollection)
-                    self?.fetchPhotoAssets()
-                }
             }
         }else {
-            title = ""
             if showLoading {
                 ProgressHUD.showLoading(addedTo: view, afterDelay: 0.15, animated: true)
             }
             fetchPhotoAssets()
-        }
-    }
-    
-    private func updateCameraAlbumViewController(_ collection: PhotoAssetCollection?) {
-        if let splitViewController = splitViewController as? PhotoSplitViewController,
-           let collection = collection {
-            let photoPickerController: PhotoPickerController?
-            if #available(iOS 14.0, *) {
-                photoPickerController = splitViewController.viewController(for: .primary) as? PhotoPickerController
-            } else {
-                photoPickerController = splitViewController.viewControllers.first as? PhotoPickerController
-            }
-            splitViewController.cameraAssetCollection = collection
-            photoPickerController?.albumViewController?.reloadTableView(assetCollectionsArray: [collection])
-        }
-    }
-    func fetchAssetCollections() {
-        if !pickerController.fetchData.assetCollections.isEmpty {
-            updateAlbumViewController(pickerController.fetchData.assetCollections)
-            albumView.selectedAssetCollection = assetCollection
-            updateAlbumViewFrame()
-        }
-        fetchAssetCollectionsClosure()
-        if !pickerConfig.allowLoadPhotoLibrary {
-            pickerController.fetchData.fetchAssetCollections()
-        }
-    }
-    private func updateAlbumViewController(_ collections: [PhotoAssetCollection]) {
-        albumView.assetCollections = collections
-        if let splitViewController = splitViewController as? PhotoSplitViewController {
-            let photoPickerController: PhotoPickerController?
-            if #available(iOS 14.0, *) {
-                photoPickerController = splitViewController.viewController(for: .primary) as? PhotoPickerController
-            } else {
-                photoPickerController = splitViewController.viewControllers.first as? PhotoPickerController
-            }
-            splitViewController.assetCollections = collections
-            photoPickerController?.albumViewController?.reloadTableView(assetCollectionsArray: collections)
-        }
-    }
-    private func fetchAssetCollectionsClosure() {
-        pickerController.fetchData.fetchAssetCollectionsCompletion = { [weak self] in
-            self?.updateAlbumViewController($0)
-            self?.albumView.selectedAssetCollection = self?.assetCollection
-            self?.updateAlbumViewFrame()
         }
     }
     func fetchPhotoAssets() {
@@ -94,9 +35,7 @@ extension PhotoPickerViewController {
         }
         var addFilter: Bool = true
         if let collection = assetCollection.collection {
-            if collection.isCameraRoll {
-                addFilter = true
-            }else if collection.assetCollectionType == .album {
+            if collection.isCameraRoll || collection.assetCollectionType == .album {
                 addFilter = true
             }else {
                 addFilter = false
@@ -124,6 +63,40 @@ extension PhotoPickerViewController {
             }else {
                 ProgressHUD.hide(forView: self.navigationController?.view, animated: false)
             }
+        }
+    }
+    
+    func updateAssetCollection(_ collection: PhotoAssetCollection?, isShow: Bool = true) {
+        if isShow {
+            ProgressHUD.showLoading(
+                addedTo: navigationController?.view,
+                animated: true
+            )
+        }
+        if let collection = collection {
+            if pickerConfig.albumShowMode.isPop {
+                assetCollection?.isSelected = false
+                collection.isSelected = true
+            }
+            assetCollection = collection
+        }
+        updateTitle()
+        fetchPhotoAssets()
+        reloadAlbumData()
+    }
+    
+    func updateAssetCollections(_ collections: [PhotoAssetCollection]) {
+        if pickerConfig.albumShowMode.isPopView, !pickerController.splitType.isSplit {
+            albumView.selectedAssetCollection = assetCollection
+            albumView.assetCollections = collections
+            updateAlbumViewFrame()
+        }
+    }
+    
+    func reloadAlbumData() {
+        if pickerConfig.albumShowMode.isPopView, !pickerController.splitType.isSplit {
+            albumView.selectedAssetCollection = assetCollection
+            albumView.reloadData()
         }
     }
 }

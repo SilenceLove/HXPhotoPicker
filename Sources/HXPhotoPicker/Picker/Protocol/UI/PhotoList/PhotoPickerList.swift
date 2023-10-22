@@ -8,7 +8,7 @@
 
 import UIKit
 
-public protocol PhotoPickerListDelegate: AnyObject {
+public protocol PhotoPickerListDelegate: PhotoControllerEvent {
     
     /// 点击cell时调用
     func photoList(
@@ -26,6 +26,14 @@ public protocol PhotoPickerListDelegate: AnyObject {
         _ photoList: PhotoPickerList,
         openEditor asset: PhotoAsset,
         with image: UIImage?
+    )
+    
+    /// 打开预览界面
+    func photoList(
+        _ photoList: PhotoPickerList,
+        openPreview assets: [PhotoAsset],
+        with page: Int,
+        animated: Bool
     )
     
     /// 跳转到相机界面
@@ -156,7 +164,7 @@ public extension PhotoPickerList {
     }
     
     func updateCellLoadMode(_ mode: PhotoManager.ThumbnailLoadMode, judgmentIsEqual: Bool = true) { }
-    func cellReloadImage()  { }
+    func cellReloadImage() { }
 }
 
 public protocol PhotoPickerListDelegateProperty {

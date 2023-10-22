@@ -508,7 +508,7 @@ public struct PhotoTools {
         locations: [NSNumber] = [0.1, 0.3, 0.5, 0.7, 0.9]
     ) -> CAGradientLayer {
         let layer = CAGradientLayer()
-        layer.contentsScale = UIScreen.main.scale
+        layer.contentsScale = UIScreen._scale
         layer.colors = colors
         layer.startPoint = startPoint
         layer.endPoint = endPoint

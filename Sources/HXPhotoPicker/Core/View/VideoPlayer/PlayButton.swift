@@ -25,7 +25,7 @@ class PlayButton: UIControl {
         playLayer.strokeColor = UIColor.white.cgColor
         playLayer.lineCap = .round
         playLayer.lineJoin = .round
-        playLayer.contentsScale = UIScreen.main.scale
+        playLayer.contentsScale = UIScreen._scale
         playLayer.shadowColor = UIColor.black.withAlphaComponent(0.3).cgColor
         playLayer.shadowOpacity = 0.3
         layer.addSublayer(playLayer)

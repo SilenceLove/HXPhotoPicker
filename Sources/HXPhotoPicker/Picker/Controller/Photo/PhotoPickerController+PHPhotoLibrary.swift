@@ -63,11 +63,11 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
         )
         if let changeResult = changeResult, !changeResult.hasIncrementalChanges {
             let result = changeResult.fetchResultAfterChanges
-            assetCollection.changeResult(for: result)
+            assetCollection.updateResult(for: result)
             if assetCollection == self.fetchData.cameraAssetCollection && result.count == 0 {
-                assetCollection.change(
-                    albumName: self.config.albumList.emptyAlbumName.localized,
-                    coverImage: self.config.albumList.emptyCoverImageName.image
+                assetCollection.update(
+                    albumName: self.config.emptyAlbumName,
+                    coverImage: self.config.emptyCoverImageName.image
                 )
             }
             return true

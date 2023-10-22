@@ -105,10 +105,7 @@ open class PhotoPreviewContentView: UIView {
             requestNetworkCompletion = true
             requestID = photoAsset.requestThumbnailImage(
                 localType: .original,
-                targetWidth: min(
-                    UIDevice.screenSize.width,
-                    UIDevice.screenSize.height
-                ),
+                targetWidth: AssetManager.thumbnailTargetWidth,
                 completion: { [weak self] (image, asset, info) in
                 guard let self = self else { return }
                 if let info = info, info.isCancel { return }

@@ -212,7 +212,7 @@ public extension PhotoAsset {
         var error: Error = PickerError.imageFetchFaild
         
         let group = DispatchGroup()
-        let queue = DispatchQueue(label: "HXPhotoPicker.request.urls", qos: .userInitiated)
+        let queue = DispatchQueue(label: "HXPhotoPicker.request.assetResults", qos: .userInitiated)
         queue.async(group: group) {
             let semaphore = DispatchSemaphore(value: 0)
             self.getURL(toFile: fileConfig, compression: compression) {
@@ -228,7 +228,7 @@ public extension PhotoAsset {
         }
         queue.async(group: group) {
             let semaphore = DispatchSemaphore(value: 0)
-            self.requestThumbnailImage(targetWidth: 350) { img, _, info in
+            self.requestThumbnailImage(targetWidth: AssetManager.thumbnailTargetWidth) { img, _, info in
                 if AssetManager.assetIsDegraded(for: info) {
                     return
                 }

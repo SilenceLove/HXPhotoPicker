@@ -252,11 +252,12 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
             if photoAsset.isLocalAsset {
                 picker.pickerData.addedLocalCamera(photoAsset)
             }
-            if picker.config.albumShowMode == .popup {
+            if picker.config.albumShowMode.isPopView {
                 self.albumView.reloadData()
             }
             self.listView.addedAsset(for: photoAsset)
             self.photoToolbar.selectedAssetDidChanged(picker.selectedAssetArray)
+            self.finishItem?.selectedAssetDidChanged(picker.selectedAssetArray)
             self.requestSelectedAssetFileSize()
             if picker.config.selectMode == .single && self.config.finishSelectionAfterTakingPhoto {
                 self.quickSelect(photoAsset, isCapture: isCapture)

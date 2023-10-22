@@ -1,15 +1,18 @@
 //
-//  PhotoAsset+Equal.swift
+//  PhotoAssetEquatable.swift
 //  HXPhotoPicker
 //
-//  Created by Slience on 2021/8/25.
+//  Created by Silence on 2023/10/14.
+//  Copyright © 2023 洪欣. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
-public extension PhotoAsset {
-    
-    /// 判断是否是同一个 PhotoAsset 对象
+public protocol PhotoAssetEquatable: PhotoAsset {
+    func isEqual(_ photoAsset: PhotoAsset?) -> Bool
+}
+
+public extension PhotoAssetEquatable {
     func isEqual(_ photoAsset: PhotoAsset?) -> Bool {
         guard let photoAsset = photoAsset else {
             return false

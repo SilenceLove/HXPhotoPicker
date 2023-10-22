@@ -42,7 +42,7 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         navigationController?.delegate = vc
         navigationController?.pushViewController(vc, animated: animated)
         if !animated {
-            vc.configColor()
+            vc.updateColors()
         }
     }
     
@@ -84,6 +84,7 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         }
         listView.updateCellSelectedTitle()
         photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+        finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
         requestSelectedAssetFileSize()
     }
     
@@ -96,6 +97,7 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         }
         if photoAsset.isSelected {
             photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+            finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
             requestSelectedAssetFileSize()
         }
     }
@@ -138,6 +140,7 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
     ) {
         listView.reloadCell(for: photoAsset)
         photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+        finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
         requestSelectedAssetFileSize()
         if listView.filterOptions.contains(.edited) {
             listView.reloadData()

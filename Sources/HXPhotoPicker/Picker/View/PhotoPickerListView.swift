@@ -93,6 +93,7 @@ open class PhotoPickerListView:
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.delaysContentTouches = false
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
@@ -459,10 +460,10 @@ extension PhotoPickerListView: UICollectionViewDelegate {
             }else if isCameraCell {
                 let vc = PhotoPeekViewController(isCamera: true)
                 if UIDevice.isPortrait {
-                    let width = UIScreen.main.bounds.width
+                    let width = UIScreen._width
                     vc.preferredContentSize = .init(width: width, height: width / 9 * 16)
                 }else {
-                    let height = UIScreen.main.bounds.height
+                    let height = UIScreen._height
                     vc.preferredContentSize = .init(width: height / 9 * 16, height: height)
                 }
                 return vc

@@ -15,7 +15,7 @@ class TickView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         tickLayer = CAShapeLayer.init()
-        tickLayer.contentsScale = UIScreen.main.scale
+        tickLayer.contentsScale = UIScreen._scale
         let tickPath = UIBezierPath.init()
         tickPath.move(to: CGPoint(x: scale(8), y: height * 0.5 + scale(1)))
         tickPath.addLine(to: CGPoint(x: width * 0.5 - scale(2), y: height - scale(8)))

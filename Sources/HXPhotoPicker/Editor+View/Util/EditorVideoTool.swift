@@ -348,7 +348,7 @@ fileprivate extension EditorVideoTool {
                 let drawLayer = CALayer()
                 drawLayer.contents = image.cgImage
                 drawLayer.frame = bounds
-                drawLayer.contentsScale = UIScreen.main.scale
+                drawLayer.contentsScale = UIScreen._scale
                 bgLayer.addSublayer(drawLayer)
             }
         }
@@ -356,7 +356,7 @@ fileprivate extension EditorVideoTool {
             let drawLayer = CALayer()
             drawLayer.contents = image.cgImage
             drawLayer.frame = bounds
-            drawLayer.contentsScale = UIScreen.main.scale
+            drawLayer.contentsScale = UIScreen._scale
             bgLayer.addSublayer(drawLayer)
         }
         for info in stickers {
@@ -382,9 +382,9 @@ fileprivate extension EditorVideoTool {
             let mirrorTransform = CATransform3DMakeScale(info.mirrorScale.x, info.mirrorScale.y, 1)
             let rotateTransform = CATransform3DMakeRotation(info.angel.radians, 0, 0, 1)
             let contentLayer = CALayer()
-            contentLayer.contentsScale = UIScreen.main.scale
+            contentLayer.contentsScale = UIScreen._scale
             let mirrorLayer = CALayer()
-            mirrorLayer.contentsScale = UIScreen.main.scale
+            mirrorLayer.contentsScale = UIScreen._scale
             contentLayer.addSublayer(mirrorLayer)
             if let audioInfo = info.audio,
                let audioContent = audioInfo.audio.contentsHandler?(audioInfo.audio),
@@ -761,7 +761,7 @@ fileprivate extension EditorVideoTool {
         videoDuration: TimeInterval
     ) -> CALayer {
         let animationLayer = CALayer()
-        animationLayer.contentsScale = UIScreen.main.scale
+        animationLayer.contentsScale = UIScreen._scale
         animationLayer.contents = image.cgImage
         guard let gifResult = image.animateCGImageFrame() else {
             return animationLayer

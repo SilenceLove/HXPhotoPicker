@@ -158,7 +158,7 @@ class EditorMaskView: UIView {
             }
             addSubview(visualEffectView)
             maskLayer = CAShapeLayer()
-            maskLayer.contentsScale = UIScreen.main.scale
+            maskLayer.contentsScale = UIScreen._scale
             layer.mask = maskLayer
             addSubview(blackMaskView)
         case .customMask:
@@ -172,14 +172,14 @@ class EditorMaskView: UIView {
         dotsLayer.strokeColor = UIColor.white.cgColor
         dotsLayer.fillColor = UIColor.clear.cgColor
         dotsLayer.lineWidth = 3.5
-        dotsLayer.contentsScale = UIScreen.main.scale
+        dotsLayer.contentsScale = UIScreen._scale
         
         frameLayer = CAShapeLayer()
         frameLayer.strokeColor = UIColor.white.cgColor
         frameLayer.fillColor = UIColor.clear.cgColor
         frameLayer.lineWidth = 1.2
         frameLayer.shadowOffset = CGSize(width: -1, height: 1)
-        frameLayer.contentsScale = UIScreen.main.scale
+        frameLayer.contentsScale = UIScreen._scale
         frameLayer.shouldRasterize = true
         frameLayer.rasterizationScale = layer.contentsScale
         frameLayer.shadowOpacity = 0.5
@@ -197,7 +197,7 @@ class EditorMaskView: UIView {
         gridlinesLayer.fillColor = UIColor.clear.cgColor
         gridlinesLayer.lineWidth = 0.5
         gridlinesLayer.shadowOffset = CGSize(width: -1, height: 1)
-        gridlinesLayer.contentsScale = UIScreen.main.scale
+        gridlinesLayer.contentsScale = UIScreen._scale
         gridlinesLayer.shouldRasterize = true
         gridlinesLayer.rasterizationScale = layer.contentsScale
         gridlinesLayer.shadowOpacity = 0.5
@@ -224,7 +224,7 @@ class EditorMaskView: UIView {
         gridGraylinesLayer.strokeColor = UIColor.gray.withAlphaComponent(0.75).cgColor
         gridGraylinesLayer.fillColor = UIColor.clear.cgColor
         gridGraylinesLayer.lineWidth = 0.5
-        gridGraylinesLayer.contentsScale = UIScreen.main.scale
+        gridGraylinesLayer.contentsScale = UIScreen._scale
         gridGraylinesLayer.shouldRasterize = true
         gridGraylinesLayer.rasterizationScale = layer.contentsScale
         

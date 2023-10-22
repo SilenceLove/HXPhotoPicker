@@ -140,7 +140,7 @@ class EditorStickersItemView: EditorStickersItemBaseView {
         externalBorder.shadowOpacity = 0.3
         externalBorder.shadowOffset = CGSize(width: 0, height: 0)
         externalBorder.shadowRadius = 1
-        externalBorder.contentsScale = UIScreen.main.scale
+        externalBorder.contentsScale = UIScreen._scale
         
         deleteBtn = UIButton(type: .custom)
         deleteBtn.setBackgroundImage("hx_editor_view_sticker_item_delete".image, for: .normal)

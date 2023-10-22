@@ -198,7 +198,6 @@ extension PhotoPickerController {
         )
     }
     
-    
     func updateAlbums(coverImage: UIImage?, count: Int) {
         fetchData.updateAlbums(coverImage: coverImage, count: count)
         reloadAlbumData()

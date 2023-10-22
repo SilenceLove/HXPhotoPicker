@@ -46,9 +46,11 @@ public class AlbumTitleView: UIControl, PhotoPickerNavigationTitle {
     
     public override var isHighlighted: Bool {
         didSet {
-            titleLb.textColor =  isHighlighted ? titleColor?.withAlphaComponent(0.4) : titleColor
-            arrowView.isHighlighted = isHighlighted
-            configColor()
+            if isPopupAlbum {
+                titleLb.textColor =  isHighlighted ? titleColor?.withAlphaComponent(0.4) : titleColor
+                arrowView.isHighlighted = isHighlighted
+                configColor()
+            }
         }
     }
     
@@ -69,7 +71,7 @@ public class AlbumTitleView: UIControl, PhotoPickerNavigationTitle {
     var arrowView: ArrowView!
     var contentView: UIView!
     var titleLb: UILabel!
-    var isPopupAlbum: Bool { config.albumShowMode == .popup && !isSplit }
+    var isPopupAlbum: Bool { config.albumShowMode.isPop && !isSplit }
     
     var contentSize: CGSize {
         let maxWidth: CGFloat

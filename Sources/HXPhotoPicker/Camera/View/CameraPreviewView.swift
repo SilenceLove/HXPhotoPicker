@@ -280,7 +280,7 @@ class CameraFocusView: UIView {
         rectLayer.lineCap = .round
         rectLayer.strokeColor = color.cgColor
         rectLayer.fillColor = UIColor.clear.cgColor
-        rectLayer.contentsScale = UIScreen.main.scale
+        rectLayer.contentsScale = UIScreen._scale
         let rectPath = UIBezierPath(rect: bounds)
         rectLayer.path = rectPath.cgPath
         layer.addSublayer(rectLayer)

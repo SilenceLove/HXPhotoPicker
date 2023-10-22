@@ -45,7 +45,7 @@ class ProgressIndefiniteView: UIView {
         
         circleLayer = CAShapeLayer()
         circleLayer.frame = bounds
-        circleLayer.contentsScale = UIScreen.main.scale
+        circleLayer.contentsScale = UIScreen._scale
         circleLayer.strokeColor = UIColor.white.cgColor
         circleLayer.fillColor = UIColor.clear.cgColor
         circleLayer.lineCap = .round
@@ -61,7 +61,7 @@ class ProgressIndefiniteView: UIView {
         circleLayer.path = path.cgPath
         
         maskLayer = CALayer()
-        maskLayer.contentsScale = UIScreen.main.scale
+        maskLayer.contentsScale = UIScreen._scale
         maskLayer.frame = bounds
         let topLayer: CAGradientLayer = .init()
         topLayer.frame = CGRect(x: width * 0.5, y: 0, width: width * 0.5, height: height)

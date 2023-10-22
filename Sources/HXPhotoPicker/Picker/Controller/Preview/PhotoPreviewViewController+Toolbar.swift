@@ -7,7 +7,88 @@
 
 import UIKit
 
-extension PhotoPreviewViewController {
+extension PhotoPreviewViewController: PhotoToolBarDelegate {
+    
+    func initToolbar() {
+        if !isShowToolbar {
+            photoToolbar = PhotoToolBarEmptyView(pickerConfig, type: .preview)
+            return
+        }
+        photoToolbar = config.photoToolbar.init(
+            pickerConfig,
+            type: previewType != .browser ? .preview : .browser
+        )
+        photoToolbar.toolbarDelegate = self
+        
+        if config.isShowBottomView {
+            view.addSubview(photoToolbar)
+            if previewType != .browser {
+                photoToolbar.updateOriginalState(pickerController.isOriginal)
+                photoToolbar.requestOriginalAssetBtyes()
+                let selectedAssetArray = pickerController.selectedAssetArray
+                photoToolbar.updateSelectedAssets(selectedAssetArray)
+                photoToolbar.selectedAssetDidChanged(selectedAssetArray)
+            }else {
+                photoToolbar.updateSelectedAssets(previewAssets)
+            }
+        }
+    }
+    
+    public func photoToolbar(_ toolbar: PhotoToolBar, didOriginalClick isSelected: Bool) {
+        pickerController.isOriginal = isSelected
+        if isSelected {
+            requestSelectedAssetFileSize()
+        }else {
+            pickerController.pickerData.cancelRequestAssetFileSize(isPreview: true)
+        }
+        delegate?.previewViewController(
+            self,
+            didOriginalButton: isSelected
+        )
+        pickerController.originalButtonCallback()
+    }
+    
+    #if HXPICKER_ENABLE_EDITOR
+    public func photoToolbar(didEditClick toolbar: PhotoToolBar) {
+        guard let photoAsset = photoAsset(for: currentPreviewIndex) else {
+            return
+        }
+        openEditor(photoAsset)
+    }
+    #endif
+    
+    public func photoToolbar(didFinishClick toolbar: PhotoToolBar) {
+        didFinishClick()
+    }
+    
+    public func photoToolbar(_ toolbar: PhotoToolBar, didSelectedAsset asset: PhotoAsset) {
+        if previewAssets.contains(asset) {
+            scrollToPhotoAsset(asset)
+        }else {
+            photoToolbar.selectedViewScrollTo(nil, animated: true)
+        }
+    }
+    
+    public func photoToolbar(_ toolbar: PhotoToolBar, didMoveAsset fromIndex: Int, with toIndex: Int) {
+        delegate?.previewViewController(self, moveItem: fromIndex, toIndex: toIndex)
+        pickerController.pickerData.move(fromIndex: fromIndex, toIndex: toIndex)
+        if isPreviewSelect {
+            let fromAsset = previewAssets[fromIndex]
+            previewAssets.remove(at: fromIndex)
+            previewAssets.insert(fromAsset, at: toIndex)
+            getCell(for: currentPreviewIndex)?.cancelRequest()
+            collectionView.reloadData()
+            startRequestPreviewTimer()
+        }
+        photoToolbar.updateSelectedAssets(pickerController.selectedAssetArray)
+        if let asset = photoAsset(for: currentPreviewIndex) {
+            updateSelectBox(asset.isSelected, photoAsset: asset)
+            DispatchQueue.main.async {
+                self.photoToolbar.selectedViewScrollTo(asset, animated: true)
+            }
+        }
+        delegate?.previewViewController(movePhotoAsset: self)
+    }
     
     func openEditor(_ photoAsset: PhotoAsset) {
         let shouldEditAsset = pickerController.shouldEditAsset(

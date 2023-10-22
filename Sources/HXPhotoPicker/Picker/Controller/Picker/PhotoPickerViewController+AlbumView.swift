@@ -16,20 +16,20 @@ extension PhotoPickerViewController: PhotoAlbumListDelegate {
         
         albumBackgroudView = UIView()
         albumBackgroudView.isHidden = true
-        albumBackgroudView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
-        albumBackgroudView.addGestureRecognizer(
-            UITapGestureRecognizer(
-                target: self,
-                action: #selector(didAlbumBackgroudViewClick)
-            )
-        )
         
         albumView = pickerConfig.albumList.albumList.init(
             config: pickerConfig,
             isSplit: pickerController.splitType.isSplit
         )
-        albumView.delegate = self
-        if pickerConfig.albumShowMode == .popup {
+        if pickerConfig.albumShowMode.isPopView {
+            albumBackgroudView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+            albumBackgroudView.addGestureRecognizer(
+                UITapGestureRecognizer(
+                    target: self,
+                    action: #selector(didAlbumBackgroudViewClick)
+                )
+            )
+            albumView.delegate = self
             view.addSubview(albumBackgroudView)
             view.addSubview(albumView)
         }
@@ -37,6 +37,23 @@ extension PhotoPickerViewController: PhotoAlbumListDelegate {
     
     @objc
     func didTitleViewClick() {
+        switch pickerConfig.albumShowMode {
+        case .present(let style):
+            let assetCollections = pickerController.fetchData.assetCollections
+            if assetCollections.isEmpty {
+                return
+            }
+            let vc = pickerConfig.albumController.albumController.init(config: pickerConfig)
+            vc.delegate = self
+            vc.assetCollections = assetCollections
+            vc.selectedAssetCollection = assetCollection
+            let nav = UINavigationController(rootViewController: vc)
+            nav.modalPresentationStyle = style
+            present(nav, animated: true)
+            return
+        default:
+            break
+        }
         titleView.isSelected = !titleView.isSelected
         if titleView.isSelected {
             // 展开
@@ -130,5 +147,33 @@ extension PhotoPickerViewController: PhotoAlbumListDelegate {
         )
         fetchPhotoAssets()
         albumList.reloadData()
+    }
+}
+
+extension PhotoPickerViewController: PhotoAlbumControllerDelegate {
+    public func albumController(_ albumController: PhotoAlbumController, didSelectedWith assetCollection: PhotoAssetCollection) {
+        albumController.dismiss(animated: true)
+        if self.assetCollection == assetCollection {
+            return
+        }
+        titleView.title = assetCollection.albumName
+        self.assetCollection = assetCollection
+        ProgressHUD.showLoading(
+            addedTo: navigationController?.view,
+            animated: true
+        )
+        fetchPhotoAssets()
+    }
+    public func albumController(willAppear viewController: PhotoAlbumController) {
+        pickerController.viewControllersWillAppear(viewController)
+    }
+    public func albumController(didAppear viewController: PhotoAlbumController) {
+        pickerController.viewControllersDidAppear(viewController)
+    }
+    public func albumController(willDisappear viewController: PhotoAlbumController) {
+        pickerController.viewControllersWillDisappear(viewController)
+    }
+    public func albumController(didDisappear viewController: PhotoAlbumController) {
+        pickerController.viewControllersDidDisappear(viewController)
     }
 }

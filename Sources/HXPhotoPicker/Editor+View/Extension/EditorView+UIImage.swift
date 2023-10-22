@@ -73,7 +73,7 @@ extension UIImage {
     
     func convertBlackImage() -> UIImage? {
         let rect = CGRect(origin: .zero, size: size)
-        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
+        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen._scale)
         UIColor.black.setFill()
         UIRectFill(rect)
         draw(in: rect, blendMode: .destinationOut, alpha: 1)

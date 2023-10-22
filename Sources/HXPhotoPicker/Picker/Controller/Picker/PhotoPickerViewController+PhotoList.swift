@@ -9,6 +9,7 @@ import UIKit
 
 
 extension PhotoPickerViewController: PhotoPickerListDelegate {
+    
     public func photoList(_ photoList: PhotoPickerList, didSelectCell asset: PhotoAsset, at index: Int, animated: Bool) {
         if !pickerController.shouldClickCell(photoAsset: asset, index: index) {
             return
@@ -34,12 +35,17 @@ extension PhotoPickerViewController: PhotoPickerListDelegate {
     
     public func photoList(selectedAssetDidChanged photoList: UIView) {
         photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+        finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
         requestSelectedAssetFileSize()
     }
     
     public func photoList(_ photoList: PhotoPickerList, openEditor asset: PhotoAsset, with image: UIImage?) {
         asset.playerTime = 0
         openEditor(asset, image: image)
+    }
+    
+    public func photoList(_ photoList: PhotoPickerList, openPreview assets: [PhotoAsset], with page: Int, animated: Bool) {
+        pushPreviewViewController(previewAssets: assets, currentPreviewIndex: page, animated: animated)
     }
     
     public func photoList(presentCamera photoList: PhotoPickerList) {

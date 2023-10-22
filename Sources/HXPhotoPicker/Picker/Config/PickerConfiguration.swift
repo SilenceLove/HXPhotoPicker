@@ -8,13 +8,15 @@
 
 import UIKit
 
-public struct PickerConfiguration: IndicatorTypeConfig {
+public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     
     /// 获取 AssetCollection
     public var fetchAssetCollection: PhotoFetchAssetCollection.Type = DefaultPhotoFetchAssetCollection.self
     
     /// 获取 Asset
     public var fetchAsset: PhotoFetchAsset.Type = DefaultPhotoFetchAsset.self
+    
+    public var isFetchDeatilsAsset: Bool = false
     
     /// 获取数据
     public var fetchdata: PhotoFetchData.Type = PhotoFetchData.self
@@ -206,9 +208,20 @@ public struct PickerConfiguration: IndicatorTypeConfig {
     /// 暗黑风格下TintColor
     public var navigationDarkTintColor: UIColor?
     
+    /// 相册控制器配置
+    public var albumController: PhotoAlbumControllerConfiguration = .init()
+    
     /// Album list configuration
-    /// 相册列表配置
+    /// albumShowMode = .popup 时 相册列表配置
     public var albumList: AlbumListConfiguration = .init()
+    
+    /// Album name when there are no resources in the album
+    /// 当相册里没有资源时的相册名称
+    public var emptyAlbumName: String = "所有照片".hx.localized
+    
+    /// The name of the cover image when there are no assets in the album
+    /// 当相册里没有资源时的封面图片名
+    public var emptyCoverImageName: String = "hx_picker_album_empty"
     
     /// Photo list configuration
     /// 照片列表配置
@@ -242,5 +255,17 @@ public struct PickerConfiguration: IndicatorTypeConfig {
     
     public static var `default`: PickerConfiguration {
         PhotoTools.getWXPickerConfig()
+    }
+    
+    public static var system: PickerConfiguration {
+        var config = PickerConfiguration()
+        if #available(iOS 13.0, *) {
+            config.albumShowMode = .present(.automatic)
+        } else {
+            config.albumShowMode = .present(.fullScreen)
+        }
+        config.photoList.leftNavigationItems = [PhotoTextCancelItemView.self]
+        config.photoList.rightNavigationItems = [PhotoPickerFinishItemView.self, PhotoPickerFilterItemView.self]
+        return config
     }
 }

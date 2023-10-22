@@ -124,7 +124,7 @@ public extension EditorConfiguration {
         
         /// Control brushes, textures... clarity after export
         /// 控制画笔、贴图...导出之后清晰程度
-        public var scale: CGFloat = UIScreen.main.scale
+        public var scale: CGFloat = UIScreen._scale
         
         /// The specified tool is selected by default
         /// 默认选中指定工具

@@ -90,7 +90,7 @@ extension UIImage {
         for color: UIColor?,
         havingSize: CGSize,
         radius: CGFloat = 0,
-        scale: CGFloat = UIScreen.main.scale
+        scale: CGFloat = UIScreen._scale
     ) -> UIImage? {
         if let color = color {
             let rect: CGRect
@@ -258,7 +258,7 @@ extension UIImage {
         }
         return self
     }
-    func merge(_ image: UIImage, origin: CGPoint, scale: CGFloat = UIScreen.main.scale) -> UIImage? {
+    func merge(_ image: UIImage, origin: CGPoint, scale: CGFloat = UIScreen._scale) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(size, false, scale)
         draw(in: CGRect(origin: .zero, size: size))
         image.draw(in: CGRect(origin: origin, size: size))
@@ -266,7 +266,7 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return mergeImage
     }
-    func merge(images: [UIImage], scale: CGFloat = UIScreen.main.scale) -> UIImage? {
+    func merge(images: [UIImage], scale: CGFloat = UIScreen._scale) -> UIImage? {
         if images.isEmpty {
             return self
         }
@@ -280,7 +280,7 @@ extension UIImage {
         return mergeImage
     }
     
-    static func merge(images: [UIImage], scale: CGFloat = UIScreen.main.scale) -> UIImage? {
+    static func merge(images: [UIImage], scale: CGFloat = UIScreen._scale) -> UIImage? {
         if images.isEmpty {
             return nil
         }
@@ -298,7 +298,7 @@ extension UIImage {
     static func gradualShadowImage(_ havingSize: CGSize) -> UIImage? {
         let layer = PhotoTools.getGradientShadowLayer(true)
         layer.frame = CGRect(origin: .zero, size: havingSize)
-        UIGraphicsBeginImageContextWithOptions(havingSize, false, UIScreen.main.scale)
+        UIGraphicsBeginImageContextWithOptions(havingSize, false, UIScreen._scale)
         guard let context = UIGraphicsGetCurrentContext() else {
             return nil
         }

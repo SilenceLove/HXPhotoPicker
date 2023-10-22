@@ -19,6 +19,9 @@ public protocol PhotoFetchDataDelegate: AnyObject {
         _ fetchData: PhotoFetchData,
         didFetchAssets asset: PHAsset
     ) -> Bool
+    
+    func fetchData(fetchCameraAssetCollectionCompletion fetchData: PhotoFetchData)
+    func fetchData(fetchAssetCollectionsCompletion fetchData: PhotoFetchData)
 }
 
 open class PhotoFetchData {
@@ -27,8 +30,6 @@ open class PhotoFetchData {
     
     public var assetCollections: [PhotoAssetCollection] = []
     public var cameraAssetCollection: PhotoAssetCollection?
-    public var fetchAssetCollectionsCompletion: (([PhotoAssetCollection]) -> Void)?
-    public var fetchCameraAssetCollectionCompletion: ((PhotoAssetCollection?) -> Void)?
     
     
     public let config: PickerConfiguration
@@ -75,18 +76,19 @@ open class PhotoFetchData {
             let cameraAssetCollection: PhotoAssetCollection
             if let assetCollection = assetCollection {
                 cameraAssetCollection = assetCollection
+                if assetCollection.count == 0 {
+                    assetCollection.coverImage = self.config.emptyCoverImageName.image
+                }
             }else {
                 cameraAssetCollection = PhotoAssetCollection(
-                    albumName: self.config.albumList.emptyAlbumName.localized,
-                    coverImage: self.config.albumList.emptyCoverImageName.image
+                    albumName: self.config.emptyAlbumName,
+                    coverImage: self.config.emptyCoverImageName.image
                 )
             }
+            cameraAssetCollection.isSelected = true
             self.cameraAssetCollection = cameraAssetCollection
-            if self.config.albumShowMode == .popup {
-                self.fetchAssetCollections()
-            }
             DispatchQueue.main.async {
-                self.fetchCameraAssetCollectionCompletion?(cameraAssetCollection)
+                self.delegate?.fetchData(fetchCameraAssetCollectionCompletion: self)
             }
         }
     }
@@ -142,6 +144,7 @@ open class PhotoFetchData {
                 if let cameraAssetCollection = self.cameraAssetCollection {
                     collection = cameraAssetCollection
                 }else {
+                    collection.isSelected = true
                     self.cameraAssetCollection = collection
                 }
                 collection.count += localCount
@@ -160,7 +163,7 @@ open class PhotoFetchData {
                 }
             }
             DispatchQueue.main.async {
-                self.fetchAssetCollectionsCompletion?(self.assetCollections)
+                self.delegate?.fetchData(fetchAssetCollectionsCompletion: self)
             }
         }
         assetCollectionsQueue.addOperation(operation)

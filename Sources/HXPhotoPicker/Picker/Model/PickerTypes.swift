@@ -224,11 +224,31 @@ public extension PhotoAsset {
     }
 }
 
-public enum AlbumShowMode: Int {
+public enum AlbumShowMode {
     /// 正常展示
-    case normal = 0
-    /// 弹出展示
-    case popup = 1
+    case normal
+    /// 弹出 View
+    case popup
+    /// 弹出 控制器
+    case present(UIModalPresentationStyle)
+    
+    public var isPop: Bool {
+        switch self {
+        case .popup, .present:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    public var isPopView: Bool {
+        switch self {
+        case .popup:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 public extension PhotoPickerViewController {

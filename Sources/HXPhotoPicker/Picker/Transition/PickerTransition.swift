@@ -75,7 +75,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             transitionContext.completeTransition(true)
             return
         }
-
+        previewVC.isTransitioning = true
         let backgroundColor = PhotoManager.isDark ?
             previewVC.config.backgroundDarkColor :
             previewVC.config.backgroundColor
@@ -244,8 +244,8 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         
         let previewMaskY: CGFloat
         let previewMaskHeight: CGFloat
-        let previewToolbarHeight = previewVC.photoToolbar.toolbarHeight()
-        let previewViewHeight = previewVC.photoToolbar.viewHeight()
+        let previewToolbarHeight = previewVC.photoToolbar.toolbarHeight
+        let previewViewHeight = previewVC.photoToolbar.viewHeight
         if type == .push {
             previewMaskY = previewViewHeight - previewToolbarHeight
             previewMaskHeight = previewToolbarHeight
@@ -264,8 +264,8 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         
         let pickerMaskY: CGFloat
         let pickerMaskHeight: CGFloat
-        let pickerToolbarHeight = pickerVC?.photoToolbar.toolbarHeight() ?? 0
-        let pickerViewHeight = pickerVC?.photoToolbar.viewHeight() ?? 0
+        let pickerToolbarHeight = pickerVC?.photoToolbar.toolbarHeight ?? 0
+        let pickerViewHeight = pickerVC?.photoToolbar.viewHeight ?? 0
         if type == .push {
             pickerMaskY = 0
             pickerMaskHeight = pickerViewHeight
@@ -340,6 +340,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         } completion: { _ in
             pickerVC?.photoToolbar.mask = nil
             previewVC.photoToolbar.mask = nil
+            previewVC.isTransitioning = false
             if self.type == .push {
                 if let requestID = self.requestID {
                     PHImageManager.default().cancelImageRequest(requestID)
@@ -348,7 +349,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 fromView?.isHidden = false
                 previewVC.setCurrentCellImage(image: self.pushImageView.image)
                 previewVC.collectionView.isHidden = false
-                previewVC.configColor()
+                previewVC.updateColors()
                 self.pushImageView.removeFromSuperview()
                 contentView.removeFromSuperview()
                 transitionContext.completeTransition(true)
@@ -397,6 +398,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         var previewView: UIView?
         var toRect: CGRect = .zero
         let previewViewController = pickerController.previewViewController
+        previewViewController?.isTransitioning = true
         if type == .present {
             contentView.frame = toVC.view.bounds
             containerView.addSubview(contentView)
@@ -620,6 +622,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 .pickerController(pickerController, animateTransition: self.type)
         } completion: { _ in
             previewView?.isHidden = false
+            previewViewController?.isTransitioning = false
             if self.type == .present {
                 if let requestID = self.requestID {
                     PHImageManager.default().cancelImageRequest(requestID)
@@ -632,7 +635,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 previewViewController?.view.backgroundColor = backgroundColor.withAlphaComponent(1)
                 previewViewController?.setCurrentCellImage(image: self.pushImageView.image)
                 previewViewController?.collectionView.isHidden = false
-                previewViewController?.configColor()
+                previewViewController?.updateColors()
                 pickerController.configBackgroundColor()
                 self.pushImageView.removeFromSuperview()
                 contentView.removeFromSuperview()

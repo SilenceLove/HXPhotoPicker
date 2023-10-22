@@ -20,7 +20,7 @@ class EditorAdjusterView: UIView {
     var contentInsets: UIEdgeInsets = .zero
     var setContentInsets: (() -> UIEdgeInsets)?
     var maximumZoomScale: CGFloat = 20
-    var exportScale: CGFloat = UIScreen.main.scale {
+    var exportScale: CGFloat = UIScreen._scale {
         didSet {
             if #available(iOS 13.0, *), let canvasView = contentView.canvasView as? EditorCanvasView {
                 canvasView.exportScale = exportScale

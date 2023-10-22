@@ -321,7 +321,7 @@ extension CameraViewController {
             do {
                 try cameraManager.switchCameras()
             } catch {
-                print(error)
+                HXLog("相机前后摄像头切换失败: \(error)")
                 switchCameraFailed()
             }
             delegate?.cameraViewController(

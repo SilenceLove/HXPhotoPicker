@@ -96,7 +96,7 @@ class PreviewMetalView: MTKView {
         if CGRect(origin: .zero, size: CGSize(width: textureWidth, height: textureHeight)).contains(transformPoint) {
             result = transformPoint
         } else {
-            print("Invalid point \(point) result point \(transformPoint)")
+            HXLog("Invalid point \(point) result point \(transformPoint)")
         }
         
         return result
@@ -112,7 +112,7 @@ class PreviewMetalView: MTKView {
         if internalBounds.contains(transformPoint) {
             result = transformPoint
         } else {
-            print("Invalid point \(point) result point \(transformPoint)")
+            HXLog("Invalid point \(point) result point \(transformPoint)")
         }
         
         return result
@@ -346,7 +346,7 @@ class PreviewMetalView: MTKView {
             &cvTextureOut
         )
         guard let cvTexture = cvTextureOut, let texture = CVMetalTextureGetTexture(cvTexture) else {
-            print("Failed to create preview texture")
+            HXLog("Failed to create preview texture")
             CVMetalTextureCacheFlush(textureCache, 0)
             return
         }
@@ -366,13 +366,13 @@ class PreviewMetalView: MTKView {
         
         // Set up command buffer and encoder
         guard let commandQueue = commandQueue else {
-            print("Failed to create Metal command queue")
+            HXLog("Failed to create Metal command queue")
             CVMetalTextureCacheFlush(textureCache, 0)
             return
         }
         
         guard let commandBuffer = commandQueue.makeCommandBuffer() else {
-            print("Failed to create Metal command buffer")
+            HXLog("Failed to create Metal command buffer")
             CVMetalTextureCacheFlush(textureCache, 0)
             return
         }
@@ -380,7 +380,7 @@ class PreviewMetalView: MTKView {
         guard let commandEncoder = commandBuffer.makeRenderCommandEncoder(
             descriptor: currentRenderPassDescriptor
         ) else {
-            print("Failed to create Metal command encoder")
+            HXLog("Failed to create Metal command encoder")
             CVMetalTextureCacheFlush(textureCache, 0)
             return
         }

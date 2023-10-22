@@ -12,6 +12,13 @@ public typealias ImageResultHandler = (UIImage?, [AnyHashable: Any]?) -> Void
 
 public extension AssetManager {
     
+    static var thumbnailTargetWidth: CGFloat {
+        min(
+            UIDevice.screenSize.width,
+            UIDevice.screenSize.height
+        )
+    }
+    
     /// 请求获取缩略图
     /// - Parameters:
     ///   - asset: 资源对象

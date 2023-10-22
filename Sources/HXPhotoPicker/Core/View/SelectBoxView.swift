@@ -59,16 +59,16 @@ public final class SelectBoxView: UIControl {
     
     private func initViews() {
         backgroundLayer = CAShapeLayer()
-        backgroundLayer.contentsScale = UIScreen.main.scale
+        backgroundLayer.contentsScale = UIScreen._scale
         
         textLayer = CATextLayer()
-        textLayer.contentsScale = UIScreen.main.scale
+        textLayer.contentsScale = UIScreen._scale
         textLayer.alignmentMode = .center
         textLayer.isWrapped = true
         
         tickLayer = CAShapeLayer()
         tickLayer.lineJoin = .round
-        tickLayer.contentsScale = UIScreen.main.scale
+        tickLayer.contentsScale = UIScreen._scale
     }
     
     

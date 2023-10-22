@@ -43,17 +43,17 @@ extension PhotoTools {
         let ciContext = CIContext()
         let renderedCIImage = CIImage(cvImageBuffer: pixelBuffer)
         guard let renderedCGImage = ciContext.createCGImage(renderedCIImage, from: renderedCIImage.extent) else {
-            print("Failed to create CGImage")
+            HXLog("Failed to create CGImage")
             return nil
         }
         
         guard let data = CFDataCreateMutable(kCFAllocatorDefault, 0) else {
-            print("Create CFData error!")
+            HXLog("Create CFData error!")
             return nil
         }
         
         guard let cgImageDestination = CGImageDestinationCreateWithData(data, kUTTypeJPEG, 1, nil) else {
-            print("Create CGImageDestination error!")
+            HXLog("Create CGImageDestination error!")
             return nil
         }
         
@@ -61,7 +61,7 @@ extension PhotoTools {
         if CGImageDestinationFinalize(cgImageDestination) {
             return data as Data
         }
-        print("Finalizing CGImageDestination error!")
+        HXLog("Finalizing CGImageDestination error!")
         return nil
     }
 }

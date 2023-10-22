@@ -31,7 +31,7 @@ class EditorBrushSizeView: UIView {
     
     private func initViews() {
         sizeLayer = CAShapeLayer()
-        sizeLayer.contentsScale = UIScreen.main.scale
+        sizeLayer.contentsScale = UIScreen._scale
         sizeLayer.shadowColor = UIColor.black.cgColor
         sizeLayer.shadowOpacity = 0.4
         sizeLayer.shadowOffset = CGSize(width: 0, height: 0)

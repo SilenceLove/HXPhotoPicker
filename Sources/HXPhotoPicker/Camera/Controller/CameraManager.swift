@@ -350,7 +350,7 @@ extension CameraManager {
                 camera.videoZoomFactor = zoom
                 camera.unlockForConfiguration()
             } catch {
-                print(error)
+                HXLog("相机缩放失败: \(error)")
             }
         }
     }

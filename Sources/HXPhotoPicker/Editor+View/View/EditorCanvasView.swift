@@ -44,7 +44,7 @@ class EditorCanvasView: UIView {
             }
         }
     }
-    var exportScale: CGFloat = UIScreen.main.scale
+    var exportScale: CGFloat = UIScreen._scale
     
     override init(frame: CGRect) {
         super.init(frame: frame)

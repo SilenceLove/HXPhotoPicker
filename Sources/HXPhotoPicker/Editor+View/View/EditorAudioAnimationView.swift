@@ -25,10 +25,10 @@ public class EditorAudioAnimationLayer: CALayer {
     ) {
         self.scale = scale
         super.init()
-        contentsScale = UIScreen.main.scale
+        contentsScale = UIScreen._scale
         for _ in 0..<12 {
             let shapeLayer = CAShapeLayer()
-            shapeLayer.contentsScale = UIScreen.main.scale
+            shapeLayer.contentsScale = UIScreen._scale
             shapeLayer.fillColor = UIColor.clear.cgColor
             shapeLayer.strokeColor = hexColor.color.cgColor
             shapeLayer.lineWidth = 1 * scale

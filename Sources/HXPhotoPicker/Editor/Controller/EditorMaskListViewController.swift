@@ -158,7 +158,7 @@ extension EditorMaskListViewController: UICollectionViewDataSource, UICollection
                     .paragraphStyle: paragraphStyle
                 ]
                 let rect = text.boundingRect(ofAttributes: attDic, size: .init(width: 9999, height: 9999))
-                UIGraphicsBeginImageContextWithOptions(rect.size, false, UIScreen.main.scale)
+                UIGraphicsBeginImageContextWithOptions(rect.size, false, UIScreen._scale)
                 let string = text as NSString
                 string.draw(in: rect, withAttributes: attDic)
                 let image = UIGraphicsGetImageFromCurrentImageContext()

@@ -43,7 +43,7 @@ extension PhotoTools {
                 }
                 try data.write(to: cameraPreviewImageURL())
             } catch {
-                print("saveError:\n", error)
+                HXLog("相机预览画面 image 保存失败: \(error)")
             }
         }
     }
@@ -57,7 +57,7 @@ extension PhotoTools {
             let data = try Data(contentsOf: cacheURL)
             return UIImage(data: data)
         } catch {
-            print("getError:\n", error)
+            HXLog("相机预览画面 image 获取失败: \(error)")
         }
         return nil
     }

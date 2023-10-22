@@ -211,8 +211,8 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     }
                     if let previewToolbar = previewViewController.photoToolbar,
                        let photoToolbar = toVC?.photoToolbar {
-                        let previewToolbarHeight = previewToolbar.toolbarHeight()
-                        let previewViewHeight = previewToolbar.viewHeight()
+                        let previewToolbarHeight = previewToolbar.toolbarHeight
+                        let previewViewHeight = previewToolbar.viewHeight
                         let previewTopHeight = (previewViewHeight - previewToolbarHeight)
                         let previewMaskY = previewTopHeight * (1 - maskScale)
                         let previewMaskWidth = previewToolbar.width
@@ -223,8 +223,8 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                             width: previewMaskWidth,
                             height: previewMaskHeight
                         )
-                        let pickerToolbarHeight = photoToolbar.toolbarHeight()
-                        let pickerViewHeight = photoToolbar.viewHeight()
+                        let pickerToolbarHeight = photoToolbar.toolbarHeight
+                        let pickerViewHeight = photoToolbar.viewHeight
                         let pickerTopHeight = pickerViewHeight - pickerToolbarHeight
                         let pickerMaskY = pickerTopHeight * maskScale
                         let pickerMaskWidth = photoToolbar.width
@@ -300,8 +300,8 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                             )
                         }
                         if let toolbar = toVC?.photoToolbar, toolbar.mask != nil {
-                            let viewheight = toolbar.viewHeight()
-                            let maskHeight = toolbar.toolbarHeight()
+                            let viewheight = toolbar.viewHeight
+                            let maskHeight = toolbar.toolbarHeight
                             toolbar.mask?.frame = CGRect(x: 0, y: viewheight - maskHeight, width: maskWidth, height: maskHeight)
                         }
                     }else {
@@ -395,8 +395,8 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                         let maskWidth = previewViewController.photoToolbar.width
                         if let toolbar = previewViewController.photoToolbar,
                            toolbar.mask != nil {
-                            let viewHeight = toolbar.viewHeight()
-                            let toolbarHeight = toolbar.toolbarHeight()
+                            let viewHeight = toolbar.viewHeight
+                            let toolbarHeight = toolbar.toolbarHeight
                             let maskY = viewHeight - toolbarHeight
                             let maskHeight = toolbarHeight
                             toolbar.mask?.frame = CGRect(
@@ -407,7 +407,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                             )
                         }
                         if let toolbar = toVC?.photoToolbar, toolbar.mask != nil {
-                            let maskHeight = toolbar.viewHeight()
+                            let maskHeight = toolbar.viewHeight
                             toolbar.mask?.frame = CGRect(x: 0, y: 0, width: maskWidth, height: maskHeight)
                         }
                     }else {
@@ -577,14 +577,14 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 x: 0,
                 y: 0,
                 width: previewViewController.view.width,
-                height: previewViewController.photoToolbar.viewHeight()
+                height: previewViewController.photoToolbar.viewHeight
             )
         )
         previewMaskView.backgroundColor = .white
         previewViewController.photoToolbar.mask = previewMaskView
         
-        let pickerToolbarHeight = pickerViewController.photoToolbar.toolbarHeight()
-        let pickerViewHeight = pickerViewController.photoToolbar.viewHeight()
+        let pickerToolbarHeight = pickerViewController.photoToolbar.toolbarHeight
+        let pickerViewHeight = pickerViewController.photoToolbar.viewHeight
         let pickerMaskView = UIView(
             frame: CGRect(
                 x: 0,

@@ -143,8 +143,8 @@ extension PickerManager {
                 collection = assetCollection
             }else {
                 collection = PhotoAssetCollection(
-                    albumName: config.albumList.emptyAlbumName.localized,
-                    coverImage: config.albumList.emptyCoverImageName.image
+                    albumName: config.emptyAlbumName,
+                    coverImage: config.emptyCoverImageName.image
                 )
                 cameraAssetCollection = collection
             }
@@ -163,8 +163,8 @@ extension PickerManager {
                 assetCollection = collection
             }else {
                 assetCollection = PhotoAssetCollection(
-                    albumName: self.config.albumList.emptyAlbumName.localized,
-                    coverImage: self.config.albumList.emptyCoverImageName.image
+                    albumName: self.config.emptyAlbumName,
+                    coverImage: self.config.emptyCoverImageName.image
                 )
             }
             self.cameraAssetCollection = assetCollection
@@ -627,7 +627,7 @@ extension PickerManager: PHPhotoLibraryChangeObserver {
         if changeResult != nil {
             if !changeResult!.hasIncrementalChanges {
                 let result = changeResult!.fetchResultAfterChanges
-                assetCollection.changeResult(for: result)
+                assetCollection.updateResult(for: result)
                 return true
             }
         }

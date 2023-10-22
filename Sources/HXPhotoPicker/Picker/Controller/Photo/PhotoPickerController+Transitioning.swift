@@ -19,7 +19,7 @@ extension PhotoPickerController: UIViewControllerTransitioningDelegate {
             return nil
         }
         if modalPresentationStyle == .fullScreen &&
-            config.albumShowMode == .popup {
+            config.albumShowMode.isPop {
             switch config.pickerPresentStyle {
             case .push:
                 return PickerControllerTransition(type: .push)
@@ -37,7 +37,7 @@ extension PhotoPickerController: UIViewControllerTransitioningDelegate {
             return nil
         }
         if modalPresentationStyle == .fullScreen &&
-            config.albumShowMode == .popup {
+            config.albumShowMode.isPop {
             switch config.pickerPresentStyle {
             case .push:
                 return PickerControllerTransition(type: .pop)

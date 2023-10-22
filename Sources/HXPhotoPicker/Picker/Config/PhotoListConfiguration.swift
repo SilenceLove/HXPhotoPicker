@@ -13,6 +13,10 @@ public struct PhotoListConfiguration {
     
     public var listView: PhotoPickerList.Type = PhotoPickerListView.self
     
+    public var leftNavigationItems: [PhotoNavigationItem.Type] = []
+    
+    public var rightNavigationItems: [PhotoNavigationItem.Type] = [PhotoTextCancelItemView.self, PhotoPickerFilterItemView.self]
+    
     public var navigationTitle: PhotoPickerNavigationTitle.Type = AlbumTitleView.self
     
     /// Album title view configuration
@@ -31,16 +35,12 @@ public struct PhotoListConfiguration {
     
     /// Background color in dark style
     /// 暗黑风格下背景颜色
-    public var backgroundDarkColor: UIColor = "#2E2F30".hx.color
+    public var backgroundDarkColor: UIColor = .black
     
-    /// Cancel button configuration is only valid when albumShowMode = .popup
-    /// Cancel button type
-    /// 取消按钮的配置只有当 albumShowMode = .popup 时有效
-    /// 取消按钮类型
+    @available(*, deprecated, message: "Use the registration APIs declared in the PhotoNavigationItem protocol")
     public var cancelType: PhotoPickerViewController.CancelType = .text
     
-    /// Cancel button position
-    /// 取消按钮位置
+    @available(*, deprecated, message: "Use the registration APIs declared in the PhotoNavigationItem protocol")
     public var cancelPosition: PhotoPickerViewController.CancelPosition = .right
     
     /// Cancel button image name

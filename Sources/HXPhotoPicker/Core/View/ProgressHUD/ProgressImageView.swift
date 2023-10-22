@@ -17,11 +17,11 @@ final class ProgressImageView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         circleLayer = CAShapeLayer()
-        circleLayer.contentsScale = UIScreen.main.scale
+        circleLayer.contentsScale = UIScreen._scale
         lineLayer = CAShapeLayer()
-        lineLayer.contentsScale = UIScreen.main.scale
+        lineLayer.contentsScale = UIScreen._scale
         pointLayer = CAShapeLayer()
-        pointLayer.contentsScale = UIScreen.main.scale
+        pointLayer.contentsScale = UIScreen._scale
         layer.addSublayer(circleLayer)
         layer.addSublayer(lineLayer)
         layer.addSublayer(pointLayer)
@@ -32,7 +32,7 @@ final class ProgressImageView: UIView {
     init(tickFrame: CGRect) {
         super.init(frame: tickFrame)
         tickLayer = CAShapeLayer()
-        tickLayer.contentsScale = UIScreen.main.scale
+        tickLayer.contentsScale = UIScreen._scale
         layer.addSublayer(tickLayer)
         drawTickLayer()
     }

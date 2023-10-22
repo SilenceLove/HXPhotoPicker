@@ -22,7 +22,7 @@ public class PhotoPickerLimitCell: UICollectionViewCell {
         super.init(frame: frame)
         
         lineLayer = CAShapeLayer()
-        lineLayer.contentsScale = UIScreen.main.scale
+        lineLayer.contentsScale = UIScreen._scale
         lineLayer.fillColor = UIColor.clear.cgColor
         lineLayer.lineCap = .round
         contentView.layer.addSublayer(lineLayer)

@@ -17,7 +17,7 @@ class EditorStickersContentView: UIView {
         layer.shadowOpacity = 0.4
         layer.shadowOffset = CGSize(width: 0, height: 1)
         layer.shouldRasterize = true
-        layer.rasterizationScale = UIScreen.main.scale
+        layer.rasterizationScale = UIScreen._scale
     }
     func update(item: EditorStickerItem) {
         self.item = item
@@ -108,7 +108,7 @@ class EditorStickersContentAudioView: EditorStickersContentView {
         textLayer.fontSize = fontSize
         textLayer.foregroundColor = UIColor.white.cgColor
         textLayer.truncationMode = .end
-        textLayer.contentsScale = UIScreen.main.scale
+        textLayer.contentsScale = UIScreen._scale
         textLayer.alignmentMode = .left
         textLayer.isWrapped = true
         

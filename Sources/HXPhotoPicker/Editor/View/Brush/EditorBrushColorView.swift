@@ -338,7 +338,7 @@ class EditorBrushColorViewCell: UICollectionViewCell {
         imageView.isHidden = true
         
         let bgLayer = CAShapeLayer()
-        bgLayer.contentsScale = UIScreen.main.scale
+        bgLayer.contentsScale = UIScreen._scale
         bgLayer.frame = CGRect(x: 0, y: 0, width: 22, height: 22)
         bgLayer.fillColor = UIColor.white.cgColor
         let bgPath = UIBezierPath(
@@ -349,7 +349,7 @@ class EditorBrushColorViewCell: UICollectionViewCell {
         imageView.layer.addSublayer(bgLayer)
 
         let maskLayer = CAShapeLayer()
-        maskLayer.contentsScale = UIScreen.main.scale
+        maskLayer.contentsScale = UIScreen._scale
         maskLayer.frame = CGRect(x: 0, y: 0, width: 22, height: 22)
         let maskPath = UIBezierPath(rect: bgLayer.bounds)
         maskPath.append(

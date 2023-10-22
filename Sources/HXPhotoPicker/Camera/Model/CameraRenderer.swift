@@ -90,7 +90,7 @@ class CameraRenderer {
             var pbuf: CVPixelBuffer?
             CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, outputPixelBufferPool, &pbuf)
             guard let outputPixelBuffer = pbuf else {
-                print("Allocation failure")
+                HXLog("Allocation failure")
                 return nil
             }
             

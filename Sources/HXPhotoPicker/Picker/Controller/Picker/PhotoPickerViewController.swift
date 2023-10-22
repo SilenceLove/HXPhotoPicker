@@ -11,40 +11,47 @@ import MobileCoreServices
 import AVFoundation
 import Photos
 
-public class PhotoPickerViewController: BaseViewController, PhotoPickerControllerFectch {
-    let pickerConfig: PickerConfiguration
+public class PhotoPickerViewController: PhotoBaseViewController {
     let config: PhotoListConfiguration
-    init(config: PickerConfiguration) {
+    override init(config: PickerConfiguration) {
         self.config = config.photoList
-        self.pickerConfig = config
-        super.init(nibName: nil, bundle: nil)
+        super.init(config: config)
     }
+    
     var assetCollection: PhotoAssetCollection!
     var titleView: PhotoPickerNavigationTitle!
     var listView: PhotoPickerList!
     var albumBackgroudView: UIView!
     var albumView: PhotoAlbumList!
     var photoToolbar: PhotoToolBar!
+    var isShowToolbar: Bool = false
     
     var showLoading: Bool = false
     
     var orientationDidChange: Bool = false
     var beforeOrientationIndexPath: IndexPath?
-    
-    var allowShowPrompt: Bool {
-        config.bottomView.isShowPrompt &&
-        AssetManager.authorizationStatusIsLimited() &&
-        pickerConfig.allowLoadPhotoLibrary
-    }
-    
-    weak var tmpPickerController: PhotoPickerController?
+    weak var finishItem: PhotoNavigationItem?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        isShowToolbar = config.photoToolbar.isShow(pickerConfig, type: .picker)
         initView()
-        configColor()
+        updateColors()
         fetchData()
-        tmpPickerController = pickerController
+    }
+    
+    override func updateColors() {
+        let isDark = PhotoManager.isDark
+        view.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
+        if let listView = listView {
+            listView.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
+        }
+        let titleColor = isDark ?
+            pickerConfig.navigationTitleDarkColor :
+            pickerConfig.navigationTitleColor
+        if let titleView = titleView {
+            titleView.titleColor = titleColor
+        }
     }
     
     public override func deviceOrientationWillChanged(notify: Notification) {
@@ -132,32 +139,41 @@ public class PhotoPickerViewController: BaseViewController, PhotoPickerControlle
                 }
             }
         }
-        if pickerConfig.albumShowMode == .popup {
+        if pickerConfig.albumShowMode.isPop {
             albumBackgroudView.frame = view.bounds
             updateAlbumViewFrame()
             if orientationDidChange {
                 titleView.updateFrame()
             }
         }
-        var promptHeight: CGFloat = UIDevice.bottomMargin
         if pickerConfig.isMultipleSelect {
-            let bottomHeight: CGFloat = photoToolbar.viewHeight()
-            photoToolbar.frame = .init(x: 0, y: view.height - bottomHeight, width: view.width, height: bottomHeight)
+            let bottomInset: CGFloat
+            let bottomIndicatorInset: CGFloat
+            if isShowToolbar {
+                let viewHeight = photoToolbar.viewHeight
+                photoToolbar.frame = .init(x: 0, y: view.height - viewHeight, width: view.width, height: viewHeight)
+                bottomInset = photoToolbar.height + 0.5
+                bottomIndicatorInset = viewHeight - UIDevice.bottomMargin
+            }else {
+                bottomInset = UIDevice.bottomMargin
+                bottomIndicatorInset = UIDevice.bottomMargin
+            }
             listView.contentInset = UIEdgeInsets(
                 top: collectionTop,
                 left: 0,
-                bottom: photoToolbar.height + 0.5,
+                bottom: bottomInset,
                 right: 0
             )
             listView.scrollIndicatorInsets = UIEdgeInsets(
                 top: 0,
                 left: 0,
-                bottom: bottomHeight - UIDevice.bottomMargin,
+                bottom: bottomIndicatorInset,
                 right: 0
             )
         }else {
-            if allowShowPrompt {
-                promptHeight = photoToolbar.viewHeight()
+            var promptHeight: CGFloat = UIDevice.bottomMargin
+            if isShowToolbar {
+                promptHeight = photoToolbar.viewHeight
                 photoToolbar.frame = .init(x: 0, y: view.height - promptHeight, width: view.width, height: promptHeight)
             }
             listView.contentInset = UIEdgeInsets(
@@ -184,34 +200,7 @@ public class PhotoPickerViewController: BaseViewController, PhotoPickerControlle
             isFirstLayout = false
         }
     }
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        pickerController.viewControllersWillAppear(self)
-    }
-    public override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        pickerController.viewControllersDidAppear(self)
-    }
-    public override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        pickerController.viewControllersWillDisappear(self)
-    }
-    public override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        tmpPickerController?.viewControllersDidDisappear(self)
-    }
-    public override var prefersStatusBarHidden: Bool {
-        return false
-    }
     
-    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if #available(iOS 13.0, *) {
-            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-                configColor()
-            }
-        }
-    }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -240,162 +229,60 @@ extension PhotoPickerViewController {
     }
     
     func initNavItems(_ addFilter: Bool = true) {
-        navigationItem.leftBarButtonItem = nil
-        navigationItem.leftBarButtonItems = []
-        navigationItem.rightBarButtonItem = nil
-        navigationItem.rightBarButtonItems = []
-        
-        let filterImageName: String
-        if listView.filterOptions == .any {
-            filterImageName = "hx_picker_photolist_nav_filter_normal"
-        }else {
-            filterImageName = "hx_picker_photolist_nav_filter_selected"
-        }
-        let filterItem = UIBarButtonItem(
-            image: filterImageName.image,
-            style: .done,
-            target: self,
-            action: #selector(didFilterItemClick)
-        )
-        if pickerConfig.albumShowMode == .popup {
-            let cancelItem: UIBarButtonItem
-            if config.cancelType == .text {
-                cancelItem = UIBarButtonItem(
-                    title: "取消".localized,
-                    style: .done,
-                    target: self,
-                    action: #selector(didCancelItemClick)
-                )
-            }else {
-                cancelItem = UIBarButtonItem(
-                    image: UIImage.image(
-                        for: PhotoManager.isDark ?
-                            config.cancelDarkImageName :
-                            config.cancelImageName
-                    ),
-                    style: .done,
-                    target: self,
-                    action: #selector(didCancelItemClick)
-                )
-            }
-            if config.cancelPosition == .left {
-                if let splitViewController = splitViewController as? PhotoSplitViewController {
-                    if UIDevice.isPad {
-                        if #unavailable(iOS 14.0) {
-                            navigationItem.leftBarButtonItems = [splitViewController.displayModeButtonItem, cancelItem]
-                        }else {
-                            navigationItem.leftBarButtonItem = cancelItem
-                        }
-                        if config.isShowFilterItem, addFilter {
-                            navigationItem.rightBarButtonItem = filterItem
-                        }
-                    }else {
-                        if UIDevice.isPortrait {
-                            if config.isShowFilterItem, addFilter {
-                                navigationItem.rightBarButtonItems = [cancelItem, filterItem]
-                            }else {
-                                navigationItem.rightBarButtonItem = cancelItem
-                            }
-                        }else {
-                            if splitViewController.isSplitShowColumn {
-                                if config.isShowFilterItem, addFilter {
-                                    navigationItem.rightBarButtonItem = filterItem
-                                }
-                            }else {
-                                navigationItem.leftBarButtonItem = cancelItem
-                            }
-                        }
-                    }
-                }else {
-                    navigationItem.leftBarButtonItem = cancelItem
-                    if config.isShowFilterItem, addFilter {
-                        navigationItem.rightBarButtonItem = filterItem
-                    }
-                }
-            }else {
-                if let splitViewController = splitViewController as? PhotoSplitViewController, #unavailable(iOS 14.0) {
-                    navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
-                }
-                if config.isShowFilterItem, addFilter {
-                    if #available(iOS 14.5, *), let splitViewController = splitViewController as? PhotoSplitViewController, !UIDevice.isPad, splitViewController.isSplitShowColumn {
-                        navigationItem.rightBarButtonItems = [filterItem]
-                    }else {
-                        navigationItem.rightBarButtonItems = [cancelItem, filterItem]
-                    }
-                }else {
-                    if #available(iOS 14.5, *), let splitViewController = splitViewController as? PhotoSplitViewController, !UIDevice.isPad, splitViewController.isSplitShowColumn {
-                        navigationItem.rightBarButtonItem = nil
-                    }else {
-                        navigationItem.rightBarButtonItem = cancelItem
-                    }
+        let items = config.leftNavigationItems + config.rightNavigationItems
+        var leftItems: [UIBarButtonItem] = []
+        var rightItems: [UIBarButtonItem] = []
+        for (index, item) in items.enumerated() {
+            let isLeft = index < config.leftNavigationItems.count
+            let view = item.init(config: pickerConfig)
+            view.itemDelegate = self
+            if view.itemType == .cancel {
+                if let splitViewController = splitViewController as? PhotoSplitViewController,
+                   splitViewController.isSplitShowColumn,
+                   !UIDevice.isPad,
+                   !UIDevice.isPortrait {
+                    continue
                 }
             }
-        }else {
-            let cancelItem = UIBarButtonItem(
-                title: "取消".localized,
-                style: .done,
-                target: self,
-                action: #selector(didCancelItemClick)
-            )
-            if config.isShowFilterItem, addFilter {
-                navigationItem.rightBarButtonItems = [cancelItem, filterItem]
+            if view.itemType == .filter {
+                if !addFilter || !config.isShowFilterItem {
+                    continue
+                }
+                if !isLeft, config.rightNavigationItems.count > 1, view.size.width < 25 {
+                    view.width += 10
+                }
+                view.isSelected = listView.filterOptions != .any
+            }
+            if view.itemType == .finish {
+                finishItem = view
+                if pickerConfig.isMultipleSelect {
+                    view.selectedAssetDidChanged(pickerController.selectedAssetArray)
+                }
+            }
+            if isLeft {
+                leftItems.append(.init(customView: view))
             }else {
-                navigationItem.rightBarButtonItem = cancelItem
+                rightItems.append(.init(customView: view))
             }
         }
-    }
-    private func configColor() {
-        let isDark = PhotoManager.isDark
-        view.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
-        if let listView = listView {
-            listView.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
+        navigationItem.leftItemsSupplementBackButton = true
+        if pickerConfig.albumShowMode.isPopView {
+            if let splitViewController = splitViewController as? PhotoSplitViewController,
+               UIDevice.isPad {
+                if #unavailable(iOS 14.0) {
+                    leftItems.insert(splitViewController.displayModeButtonItem, at: 0)
+                }
+            }
         }
-        let titleColor = isDark ?
-            pickerConfig.navigationTitleDarkColor :
-            pickerConfig.navigationTitleColor
-        if let titleView = titleView {
-            titleView.titleColor = titleColor
-        }
-    }
-    func updateTitle() {
-        guard let titleView = titleView else { return }
-        titleView.title = assetCollection?.albumName
-    }
-    func scrollToAppropriatePlace(photoAsset: PhotoAsset?) {
-        if isFirstLayout {
-            appropriatePlaceAsset = photoAsset
-            return
-        }
-        listView.scrollTo(photoAsset)
+        navigationItem.leftBarButtonItems = leftItems
+        navigationItem.rightBarButtonItems = rightItems
     }
     
-    func changedAssetCollection(collection: PhotoAssetCollection?) {
-        ProgressHUD.showLoading(
-            addedTo: navigationController?.view,
-            animated: true
-        )
-        if let collection = collection {
-            if pickerConfig.albumShowMode == .popup {
-                assetCollection.isSelected = false
-                collection.isSelected = true
-            }
-            assetCollection = collection
-        }
-        updateTitle()
-        fetchPhotoAssets()
-        reloadAlbumData()
-    }
-    func reloadAlbumData() {
-        if pickerConfig.albumShowMode == .popup {
-            albumView.reloadData()
-        }
-    }
-    
-    @objc func didCancelItemClick() {
+    @objc 
+    func didCancelItemClick() {
         pickerController.cancelCallback()
     }
     
-    @objc
     func didFilterItemClick() {
         let vc: PhotoPickerFilterViewController
         if #available(iOS 13.0, *) {
@@ -423,5 +310,34 @@ extension PhotoPickerViewController {
         }
         let nav = UINavigationController(rootViewController: vc)
         present(nav, animated: true)
+    }
+    
+    func updateTitle() {
+        guard let titleView = titleView else { return }
+        titleView.title = assetCollection?.albumName
+    }
+    
+    func scrollToAppropriatePlace(photoAsset: PhotoAsset?) {
+        if isFirstLayout {
+            appropriatePlaceAsset = photoAsset
+            return
+        }
+        listView.scrollTo(photoAsset)
+    }
+}
+
+extension PhotoPickerViewController: PhotoNavigationItemDelegate {
+    
+    public func photoItem(presentFilterAssets photoItem: PhotoNavigationItem) {
+        didFilterItemClick()
+    }
+}
+
+extension PhotoPickerViewController: PhotoControllerEvent {
+    public func photoControllerDidFinish() {
+        pickerController.finishCallback()
+    }
+    public func photoControllerDidCancel() {
+        pickerController.cancelCallback()
     }
 }

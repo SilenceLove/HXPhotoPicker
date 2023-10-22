@@ -28,9 +28,9 @@ class ArrowView: UIView {
     
     private func initViews() {
         arrowLayer = CAShapeLayer()
-        arrowLayer.contentsScale = UIScreen.main.scale
+        arrowLayer.contentsScale = UIScreen._scale
         backgroundLayer = CAShapeLayer()
-        backgroundLayer.contentsScale = UIScreen.main.scale
+        backgroundLayer.contentsScale = UIScreen._scale
     }
     
     private func drawContent() {

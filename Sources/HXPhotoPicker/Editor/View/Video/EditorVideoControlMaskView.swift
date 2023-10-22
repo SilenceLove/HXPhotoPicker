@@ -63,7 +63,7 @@ class EditorVideoControlMaskView: UIView {
     
     private func initViews() {
         maskLayer = CAShapeLayer()
-        maskLayer.contentsScale = UIScreen.main.scale
+        maskLayer.contentsScale = UIScreen._scale
         mask_View = UIView()
         mask_View.backgroundColor = .black.withAlphaComponent(0.5)
         mask_View.layer.mask = maskLayer

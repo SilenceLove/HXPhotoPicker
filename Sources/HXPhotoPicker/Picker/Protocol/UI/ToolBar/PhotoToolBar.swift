@@ -9,7 +9,6 @@
 import UIKit
 
 public enum PhotoToolBarType {
-    
     /// 照片列表
     case picker
     
@@ -20,33 +19,49 @@ public enum PhotoToolBarType {
     case browser
 }
 
+public protocol PhotoToolBarDelegate: AnyObject {
+    func photoToolbar(didPreviewClick toolbar: PhotoToolBar)
+    func photoToolbar(_ toolbar: PhotoToolBar, didOriginalClick isSelected: Bool)
+    
+    #if HXPICKER_ENABLE_EDITOR
+    func photoToolbar(didEditClick toolbar: PhotoToolBar)
+    #endif
+    
+    func photoToolbar(didFinishClick toolbar: PhotoToolBar)
+    
+    func photoToolbar(_ toolbar: PhotoToolBar, didSelectedAsset asset: PhotoAsset)
+    func photoToolbar(_ toolbar: PhotoToolBar, didMoveAsset fromIndex: Int, with toIndex: Int)
+}
+
+public extension PhotoToolBarDelegate {
+    func photoToolbar(didPreviewClick toolbar: PhotoToolBar) { }
+    #if HXPICKER_ENABLE_EDITOR
+    func photoToolbar(didEditClick toolbar: PhotoToolBar) { }
+    #endif
+    func photoToolbar(_ toolbar: PhotoToolBar, didSelectedAsset asset: PhotoAsset) { }
+    func photoToolbar(_ toolbar: PhotoToolBar, didMoveAsset fromIndex: Int, with toIndex: Int) { }
+}
+
 /// 具体实现可参考`PhotoToolbarView`
-public protocol PhotoToolBar: UIView {
+public protocol PhotoToolBar: UIView, PhotoPickerDataStatus {
+    
+    /// 是否显示toolbar
+    static func isShow(_ config: PickerConfiguration,  type: PhotoToolBarType) -> Bool
+    
+    var toolbarDelegate: PhotoToolBarDelegate? { get set }
+    
+    /// toolbar（预览、原图、完成按钮这一栏）的高度
+    var toolbarHeight: CGFloat { get }
+    
+    /// 视图整体高度
+    var viewHeight: CGFloat { get }
     
     init(_ config: PickerConfiguration, type: PhotoToolBarType)
     
-    /// toolbar（预览、原图、完成按钮这一栏）的高度
-    func toolbarHeight() -> CGFloat
-    
-    /// 视图整体高度
-    func viewHeight() -> CGFloat
-    
-    /// 预览事件
-    var previewHandler: (() -> Void)? { get set }
-    
-    /// 原图事件
-    var originalHandler: ((Bool) -> Void)? { get set }
-    
     #if HXPICKER_ENABLE_EDITOR
-    /// 编辑事件
-    var editHandler: (() -> Void)? { get set }
-    
     /// 更新编辑按钮的状态
     func updateEditState(_ isEnabled: Bool)
     #endif
-    
-    /// 完成事件
-    var finishHandler: (() -> Void)? { get set }
     
     /// 更新原图选中状态
     func updateOriginalState(_ isSelected: Bool)
@@ -59,22 +74,13 @@ public protocol PhotoToolBar: UIView {
     /// if 是否显示loading {
     ///     startOriginalLoading()
     /// }
-    /// originalHandler?(true)
+    /// toolbarDelegate?.photoToolbar(self, didOriginalClick: true)
     /// /// 然后在 originalAssetBytes(_ bytes: Int, bytesString: String) 的回调里更新原图按钮
     /// ```
     func requestOriginalAssetBtyes()
     
     /// 请求原图大小的结果回调
     func originalAssetBytes(_ bytes: Int, bytesString: String)
-    
-    /// 选中的资源发生改变，主要用于更新 预览/完成按钮的数量/状态
-    func selectedAssetDidChanged(_ photoAssets: [PhotoAsset])
-    
-    /// 选中照片的预览视图选中Asset
-    var selectedAssetHandler: ((PhotoAsset) -> Void)? { get set }
-    
-    /// 选中照片的预览视图移动Asset (fromIndex, toIndex)
-    var moveAssetHandler: ((Int, Int) -> Void)? { get set }
     
     /// 选中照片的预览视图添加 `PhotoAsset` 对象
     func insertSelectedAsset(_ photoAsset: PhotoAsset)
@@ -97,17 +103,18 @@ public protocol PhotoToolBar: UIView {
 
 public extension PhotoToolBar {
     
-    var previewHandler: (() -> Void)? { get { nil } set { } }
-    
-    var originalHandler: ((Bool) -> Void)? { get { nil } set { } }
+    static func isShow(_ config: PickerConfiguration,  type: PhotoToolBarType) -> Bool {
+        if type == .picker, config.selectMode == .single {
+            return config.photoList.bottomView.isShowPrompt &&
+                   config.allowLoadPhotoLibrary &&
+                   AssetManager.authorizationStatusIsLimited()
+        }
+        return true
+    }
     
     #if HXPICKER_ENABLE_EDITOR
-    var editHandler: (() -> Void)? { get { nil } set { } }
-    
     func updateEditState(_ isEnabled: Bool) { }
     #endif
-    
-    var finishHandler: (() -> Void)? { get { nil } set { } }
     
     func updateOriginalState(_ isSelected: Bool) { }
     
@@ -116,10 +123,6 @@ public extension PhotoToolBar {
     func originalAssetBytes(_ bytes: Int, bytesString: String) { }
     
     func selectedAssetDidChanged(_ photoAssets: [PhotoAsset]) { }
-    
-    var selectedAssetHandler: ((PhotoAsset) -> Void)? { get { nil } set { } }
-    
-    var moveAssetHandler: ((Int, Int) -> Void)? { get { nil } set { } }
     
     func insertSelectedAsset(_ photoAsset: PhotoAsset) { }
     

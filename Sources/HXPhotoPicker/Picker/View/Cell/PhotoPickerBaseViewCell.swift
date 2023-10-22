@@ -206,7 +206,7 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     }
 }
 
-extension PhotoPickerBaseViewCell {
+public extension PhotoPickerBaseViewCell {
     func reload() {
         self.photoView.reloadImage()
         if !self.requestICloudCompletion && !self.iCloundLoading {

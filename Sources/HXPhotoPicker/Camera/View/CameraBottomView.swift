@@ -72,7 +72,7 @@ class CameraBottomView: UIView {
         addSubview(backButton)
         
         takeMaskLayer = CAShapeLayer()
-        takeMaskLayer.contentsScale = UIScreen.main.scale
+        takeMaskLayer.contentsScale = UIScreen._scale
         takeMaskLayer.fillColor = UIColor.clear.cgColor
         takeMaskLayer.lineWidth = 5
         takeMaskLayer.strokeColor = color.cgColor

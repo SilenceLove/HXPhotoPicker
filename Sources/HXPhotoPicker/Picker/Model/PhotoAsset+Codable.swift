@@ -114,7 +114,7 @@ extension PhotoAsset {
             }
             #endif
         } catch {
-            print(error)
+            HXLog("PhotoAsset 解码失败: \(error)")
         }
         return photoAsset
     }
