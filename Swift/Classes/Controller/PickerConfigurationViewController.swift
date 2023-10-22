@@ -409,11 +409,22 @@ extension PickerConfigurationViewController {
     }
     func albumShowModeAction(_ indexPath: IndexPath) {
         let alert = UIAlertController.init(title: "albumShowMode", message: nil, preferredStyle: .alert)
-        let titles = ["normal", "popup"]
+        let titles = ["normal", "popup", "present"]
         for title in titles {
             alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { [weak self] (action) in
                 guard let self = self else { return }
-                self.config.albumShowMode = AlbumShowMode.init(rawValue: titles.firstIndex(of: action.title!)!)!
+                let index = titles.firstIndex(of: action.title!)!
+                if index == 0 {
+                    self.config.albumShowMode = .normal
+                }else if index == 1 {
+                    self.config.albumShowMode = .popup
+                }else {
+                    if #available(iOS 13.0, *) {
+                        self.config.albumShowMode = .present(.automatic)
+                    } else {
+                        self.config.albumShowMode = .present(.fullScreen)
+                    }
+                }
                 self.tableView.reloadRows(at: [indexPath], with: .fade)
             }))
         }
@@ -968,6 +979,8 @@ extension AlbumShowMode {
             return "单独控制器"
         case .popup:
             return "弹窗"
+        case .present:
+            return "弹窗控制器"
         }
     }
 }

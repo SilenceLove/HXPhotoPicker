@@ -42,8 +42,7 @@ class SwiftPhotoPicker: NSObject {
         pickerConfig.selectOptions = config.selectOptions.toSwift
         pickerConfig.selectMode = config.selectMode.toSwift
         pickerConfig.allowSelectedTogether = config.allowSelectedTogether
-        pickerConfig.allowSyncICloudWhenSelectPhoto = config.allowSyncICloudWhenSelectPhoto
-        pickerConfig.albumShowMode = config.albumShowMode.toSwift
+        pickerConfig.allowSyncICloudWhenSelectPhoto = config.allowSyncICloudWhenSelectPhoto 
         let controller = PhotoPickerController(config: pickerConfig) {
             finish?(.init(photoAssets: $0.photoAssets, isOriginal: $0.isOriginal), $1)
         } cancel: {

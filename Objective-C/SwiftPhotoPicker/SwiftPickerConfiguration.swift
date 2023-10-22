@@ -28,9 +28,6 @@ class SwiftPickerConfiguration: NSObject {
    var allowSyncICloudWhenSelectPhoto: Bool = true
    
    @objc
-   var albumShowMode: SwiftAlbumShowMode = .normal
-   
-   @objc
    enum SelectOptions: Int {
        case photo
        case photo_gif
@@ -71,21 +68,6 @@ class SwiftPickerConfiguration: NSObject {
            }
        }
    }
-   
-   @objc
-   enum SwiftAlbumShowMode: Int {
-       case normal
-       case popup
-       
-       var toSwift: AlbumShowMode {
-           switch self {
-           case .normal:
-               return .normal
-           case .popup:
-               return .popup
-           }
-       }
-   }
     
     var toHX: PickerConfiguration {
         var config = PickerConfiguration()
@@ -94,7 +76,6 @@ class SwiftPickerConfiguration: NSObject {
         config.selectMode = selectMode.toSwift
         config.allowSelectedTogether = allowSelectedTogether
         config.allowSyncICloudWhenSelectPhoto = allowSyncICloudWhenSelectPhoto
-        config.albumShowMode = albumShowMode.toSwift
         return config
     }
 }
