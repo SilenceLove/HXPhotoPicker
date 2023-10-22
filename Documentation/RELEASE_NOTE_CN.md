@@ -1,5 +1,29 @@
 # 更新日志
 
+## 4.0.9
+
+### 新增
+
+- Picker
+  - 新增相册列表展现方式 `present(UIModalPresentationStyle)`
+  - 相册列表UI修改，支持自定义，实现协议`PhotoAlbumController`
+  - 相册列表、照片列表导航栏按钮支持自定义，实现协议`PhotoNavigationItem`
+  - `PhotoBrowser`新增语言配置[[584]](https://github.com/SilenceLove/HXPhotoPicker/issues/584)
+  - 按钮添加高亮状态
+  
+### 修复
+
+- Picker
+  - 低版本系统点击`PhotoToolbar`没反应 [[587]](https://github.com/SilenceLove/HXPhotoPicker/issues/587)
+- Editor
+    - 编辑视频崩溃 [[580]](https://github.com/SilenceLove/HXPhotoPicker/issues/580)
+    - 绘画时旋转可能会崩溃
+- 以及修复了一些小问题
+
+### 优化
+
+- 优化了一些代码
+
 ## 4.0.8
 
 ### 新增

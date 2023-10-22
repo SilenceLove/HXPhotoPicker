@@ -1,5 +1,29 @@
 # Release Notes
 
+## 4.0.9
+
+### Added
+
+- Picker
+  - Added new album list presentation method `present(UIModalPresentationStyle)`
+  - Album list UI modification, support customization, implement protocol `PhotoAlbumController`
+  - The album list and photo list navigation bar buttons support customization and implement the protocol `PhotoNavigationItem`
+  - `PhotoBrowser` adds new language configuration [[584]](https://github.com/SilenceLove/HXPhotoPicker/issues/584)
+  - Add highlight state to button
+  
+### Resolved
+
+- Picker
+  - There is no response when clicking `PhotoToolbar` on low-version systems [[587]](https://github.com/SilenceLove/HXPhotoPicker/issues/587)
+- Editor
+    - Edit video crash [[580]](https://github.com/SilenceLove/HXPhotoPicker/issues/580)
+    - Rotation may crash while painting
+- and fixed some minor issues
+
+### Optimizer
+
+- Optimized some code
+
 ## 4.0.8
 
 ### Added
