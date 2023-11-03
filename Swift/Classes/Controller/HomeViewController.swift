@@ -89,6 +89,12 @@ class HomeViewController: UITableViewController {
                     present(vc, animated: true, completion: nil)
                 }
                 return
+            }else if rowType == .redBook {
+                let pickerController = PhotoPickerController(config: .redBook)
+                pickerController.autoDismiss = false
+                pickerController.pickerDelegate = self
+                present(pickerController, animated: true, completion: nil)
+                return
             }
         }
 //        present(rowType.controller, animated: true)
@@ -181,6 +187,7 @@ extension HomeViewController {
         case preselectAsset
         case collectionView
         case customCell
+        case redBook
         case weChat
         case weChatMoment
         case photoBrowser
@@ -197,6 +204,8 @@ extension HomeViewController {
                 return "Picker+UICollectionView"
             case .customCell:
                 return "Picker+CustomCell"
+            case .redBook:
+                return "RedBook"
             case .weChat:
                 return "WeChat"
             case .weChatMoment:
@@ -236,6 +245,8 @@ extension HomeViewController {
                 let pickerController: PhotoPickerController = PhotoPickerController(config: config)
                 pickerController.autoDismiss = false
                 return pickerController
+            case .redBook:
+                return .init()
             case .weChat:
                 return WeChatViewController()
             case .weChatMoment:

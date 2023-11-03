@@ -25,10 +25,13 @@ extension UIImage {
         if __CGSizeEqualToSize(self.size, size) {
             return self
         }
-        UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
-        self.draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = scale
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        let image = renderer.image { context in
+            draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        }
         return image
     }
     
@@ -40,13 +43,11 @@ extension UIImage {
             }else {
                 rect = CGRect(x: 0, y: 0, width: havingSize.width, height: havingSize.height)
             }
-            UIGraphicsBeginImageContext(rect.size)
-            let context = UIGraphicsGetCurrentContext()
-            context?.setFillColor(color.cgColor)
-            context?.fill(rect)
-        
-            let image = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
+            let renderer = UIGraphicsImageRenderer(size: rect.size)
+            let image = renderer.image { context in
+                context.cgContext.setFillColor(color.cgColor)
+                context.cgContext.fill(rect)
+            }
             return image
         }
         return nil
@@ -59,10 +60,13 @@ extension UIImage {
         return repaintImage()
     }
     func repaintImage() -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = scale
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        let image = renderer.image { context in
+            draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        }
         return image
     }
     
@@ -80,10 +84,13 @@ extension UIImage {
         layer.locations = [0.1, 0.3, 0.5, 0.7, 0.9]
         layer.borderWidth = 0.0
         layer.frame = CGRect(origin: .zero, size: havingSize)
-        UIGraphicsBeginImageContextWithOptions(havingSize, false, UIScreen.main.scale)
-        layer.render(in: UIGraphicsGetCurrentContext()!)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = UIScreen.main.scale
+        let renderer = UIGraphicsImageRenderer(size: havingSize, format: format)
+        let image = renderer.image { context in
+            layer.render(in: context.cgContext)
+        }
         return image
     }
 }

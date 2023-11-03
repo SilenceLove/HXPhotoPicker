@@ -116,6 +116,8 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     tableView.delegate = self;
     tableView.rowHeight = 70;
     [self.view addSubview:tableView];
+    
+    [self tableView:tableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
 }
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 2;
