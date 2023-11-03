@@ -29,12 +29,15 @@ public class PhotoPickerViewController: PhotoBaseViewController {
     var showLoading: Bool = false
     
     var orientationDidChange: Bool = false
-    var beforeOrientationIndexPath: IndexPath?
     weak var finishItem: PhotoNavigationItem?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        isShowToolbar = config.photoToolbar.isShow(pickerConfig, type: .picker)
+        if let photoToolbar = config.photoToolbar {
+            isShowToolbar = photoToolbar.isShow(pickerConfig, type: .picker)
+        }else {
+            isShowToolbar = false
+        }
         initView()
         updateColors()
         fetchData()
@@ -44,7 +47,7 @@ public class PhotoPickerViewController: PhotoBaseViewController {
         let isDark = PhotoManager.isDark
         view.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
         if let listView = listView {
-            listView.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
+            listView.view.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
         }
         let titleColor = isDark ?
             pickerConfig.navigationTitleDarkColor :
@@ -56,25 +59,6 @@ public class PhotoPickerViewController: PhotoBaseViewController {
     
     public override func deviceOrientationWillChanged(notify: Notification) {
         orientationDidChange = true
-        let items = listView.collectionView.indexPathsForVisibleItems.sorted { $0.item < $1.item }
-        if !items.isEmpty {
-            if items.last?.item == listView.numberOfItems - 1 {
-                beforeOrientationIndexPath = items.last
-                return
-            }
-            if items.first?.item == 0 {
-                beforeOrientationIndexPath = items.first
-                return
-            }
-            let startItem = items.first?.item ?? 0
-            let endItem = items.last?.item ?? 0
-            if let beforeItem = beforeOrientationIndexPath?.item,
-               beforeItem >= startItem, beforeItem <= endItem {
-                return
-            }
-            let middleIndex = min(items.count - 1, max(0, items.count / 2))
-            beforeOrientationIndexPath = items[middleIndex]
-        }
     }
     
     public override func deviceOrientationDidChanged(notify: Notification) {
@@ -107,7 +91,7 @@ public class PhotoPickerViewController: PhotoBaseViewController {
             margin = UIDevice.leftMargin
             collectionWidth = view.width - 2 * margin
         }
-        listView.frame = CGRect(x: margin, y: 0, width: collectionWidth, height: view.height)
+        listView.view.frame = CGRect(x: margin, y: 0, width: collectionWidth, height: view.height)
         var collectionTop: CGFloat = UIDevice.navigationBarHeight
         if let nav = navigationController {
             if nav.modalPresentationStyle == .fullScreen && UIDevice.isPortrait {
@@ -184,14 +168,6 @@ public class PhotoPickerViewController: PhotoBaseViewController {
             )
         }
         if orientationDidChange {
-            listView.reloadData()
-            if navigationController?.topViewController == self {
-                DispatchQueue.main.async {
-                    if let indexPath = self.beforeOrientationIndexPath {
-                        self.listView.scrollTo(at: indexPath, at: .centeredVertically, animated: false)
-                    }
-                }
-            }
             orientationDidChange = false
         }
         if isFirstLayout {
@@ -204,6 +180,10 @@ public class PhotoPickerViewController: PhotoBaseViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    deinit {
+        HXLog("PickerViewController deinited 👍")
+    }
 }
 
 extension PhotoPickerViewController {
@@ -214,10 +194,7 @@ extension PhotoPickerViewController {
         if #unavailable(iOS 11.0) {
             automaticallyAdjustsScrollViewInsets = false
         }
-        listView = config.listView.init(config: pickerConfig)
-        listView.delegate = self
-        view.addSubview(listView)
-        
+        initListView()
         initToolbar()
         initAlbumView()
         initTitleView()
@@ -245,7 +222,7 @@ extension PhotoPickerViewController {
                 }
             }
             if view.itemType == .filter {
-                if !addFilter || !config.isShowFilterItem {
+                if !addFilter {
                     continue
                 }
                 if !isLeft, config.rightNavigationItems.count > 1, view.size.width < 25 {

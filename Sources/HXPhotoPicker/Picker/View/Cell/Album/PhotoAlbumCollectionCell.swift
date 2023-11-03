@@ -46,6 +46,7 @@ public class PhotoAlbumCollectionCell: UITableViewCell, UICollectionViewDataSour
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.showsVerticalScrollIndicator = false
+        collectionView.delaysContentTouches = false
         collectionView.register(PhotoAlbumCollectionViewCell.self)
         contentView.addSubview(collectionView)
         
@@ -65,6 +66,7 @@ public class PhotoAlbumCollectionCell: UITableViewCell, UICollectionViewDataSour
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
         delegate?.collectionCell(didSelected: assetCollections[indexPath.item])
     }
     

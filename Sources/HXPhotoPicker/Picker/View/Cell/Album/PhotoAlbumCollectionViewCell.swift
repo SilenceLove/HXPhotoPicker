@@ -33,8 +33,26 @@ public class PhotoAlbumCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    public override var isSelected: Bool {
+        didSet {
+            if isSelected {
+                selectedBgView.alpha = 1
+                selectedBgView.isHidden = false
+            }else {
+                UIView.animate(withDuration: 0.2) {
+                    self.selectedBgView.alpha = 0
+                } completion: {
+                    if $0 {
+                        self.selectedBgView.isHidden = true
+                    }
+                }
+            }
+        }
+    }
+    
     public override var isHighlighted: Bool {
         didSet {
+            selectedBgView.alpha = isHighlighted ? 1 : 0
             selectedBgView.isHidden = !isHighlighted
         }
     }

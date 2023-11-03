@@ -48,7 +48,10 @@ class EditorVideoPlayerView: VideoPlayerView {
         player.currentTime()
     }
     var duration: CMTime {
-        avAsset?.duration ?? .zero
+        guard let duration = avAsset?.duration else {
+            return .zero
+        }
+        return duration
     }
     var startTime: CMTime? {
         didSet {

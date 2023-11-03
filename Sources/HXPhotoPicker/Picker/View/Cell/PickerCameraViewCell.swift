@@ -15,7 +15,7 @@ public class PickerCameraViewCell: UICollectionViewCell {
     private var captureView: CaptureVideoPreviewView!
     private var imageView: UIImageView!
     
-    var config: PhotoListConfiguration.CameraCell? {
+    var config: PhotoListConfiguration.CameraCell = .init() {
         didSet {
             configProperty()
         }
@@ -38,23 +38,25 @@ public class PickerCameraViewCell: UICollectionViewCell {
         }
         let isCache = PhotoManager.shared.cameraPreviewImage != nil
         if (captureView.previewLayer?.session != nil || isCache) && canPreview() {
-            imageView.image = UIImage.image(for: config?.cameraDarkImageName)
+            imageView.image = UIImage.image(for: config.cameraDarkImageName)
         }else {
             imageView.image = UIImage.image(
                 for: PhotoManager.isDark ?
-                    config?.cameraDarkImageName :
-                    config?.cameraImageName
+                    config.cameraDarkImageName :
+                    config.cameraImageName
             )
         }
-        backgroundColor = PhotoManager.isDark ? config?.backgroundDarkColor : config?.backgroundColor
-        imageView.size = imageView.image?.size ?? .zero
-        if let allowPreview = config?.allowPreview, allowPreview {
+        backgroundColor = PhotoManager.isDark ? config.backgroundDarkColor : config.backgroundColor
+        if let imageSize = imageView.image?.size {
+            imageView.size = imageSize
+        }
+        if config.allowPreview {
             requestCameraAccess()
         }else {
             imageView.image = UIImage.image(
                 for: PhotoManager.isDark ?
-                    config?.cameraDarkImageName :
-                    config?.cameraImageName
+                    config.cameraDarkImageName :
+                    config.cameraImageName
             )
             captureView.isHidden = true
         }
@@ -88,7 +90,7 @@ public class PickerCameraViewCell: UICollectionViewCell {
         captureView.startSession { [weak self] isFinished in
             if isFinished {
                 self?.imageView.image = UIImage.image(
-                    for: self?.config?.cameraDarkImageName
+                    for: self?.config.cameraDarkImageName
                 )
             }
         }

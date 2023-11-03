@@ -10,6 +10,9 @@ import UIKit
 
 extension UIDevice {
     class var isPortrait: Bool {
+        if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+            return true
+        }
         if isPad {
             return true
         }
@@ -89,14 +92,19 @@ extension UIDevice {
         return safeAreaInsets.bottom
     }
     class var isPad: Bool {
-        current.userInterfaceIdiom == .pad
+        if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+            return true
+        }
+        return current.userInterfaceIdiom == .pad
     }
     class var screenSize: CGSize {
         if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
             if !Thread.isMainThread {
                 return UIScreen._size
             }
-            return UIApplication._keyWindow?.size ?? UIScreen._size
+            if let size = UIApplication._keyWindow?.size {
+                return size
+            }
         }
         return UIScreen._size
     }

@@ -45,7 +45,9 @@ extension CIImage {
             if editFator.saturation != 1 {
                 brightnessContrastFilter.setValue(editFator.saturation, forKey: kCIInputSaturationKey)
             }
-            inputImage = brightnessContrastFilter.outputImage ?? inputImage
+            if let image = brightnessContrastFilter.outputImage {
+                inputImage = image
+            }
         }
         
         if editFator.exposure != 0 {
@@ -53,7 +55,9 @@ extension CIImage {
             exposureFilter.setDefaults()
             exposureFilter.setValue(inputImage, forKey: kCIInputImageKey)
             exposureFilter.setValue(editFator.exposure, forKey: kCIInputEVKey)
-            inputImage = exposureFilter.outputImage ?? inputImage
+            if let image = exposureFilter.outputImage {
+                inputImage = image
+            }
         }
         
         if editFator.vignette != 0 {
@@ -66,7 +70,9 @@ extension CIImage {
                 forKey: kCIInputRadiusKey
             )
             vignetteFilter.setValue(editFator.vignette, forKey: kCIInputIntensityKey)
-            inputImage = vignetteFilter.outputImage ?? inputImage
+            if let image = vignetteFilter.outputImage {
+                inputImage = image
+            }
         }
         
         if editFator.sharpen != 0 {
@@ -74,7 +80,9 @@ extension CIImage {
             sharpFilter.setDefaults()
             sharpFilter.setValue(inputImage, forKey: kCIInputImageKey)
             sharpFilter.setValue(editFator.sharpen, forKey: kCIInputSharpnessKey)
-            inputImage = sharpFilter.outputImage ?? inputImage
+            if let image = sharpFilter.outputImage {
+                inputImage = image
+            }
         }
         
 //        if editFator.warmth != 0 {
@@ -89,7 +97,7 @@ extension CIImage {
     
     /// 生成马赛克图片
     func applyMosaic(level: CGFloat) -> CIImage? {
-        var screenScale: CGFloat = 0
+        var screenScale: CGFloat = 1
         if !Thread.isMainThread {
             DispatchQueue.main.sync {
                 screenScale = level / max(UIScreen._width, UIScreen._height)

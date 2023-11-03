@@ -125,6 +125,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             
             previewVC.collectionView.isHidden = true
             previewVC.photoToolbar.alpha = 0
+            previewVC.navBgView?.alpha = 0
             previewVC.view.backgroundColor = backgroundColor.withAlphaComponent(0)
         }else if type == .pop {
             containerView.addSubview(toVC.view)
@@ -210,13 +211,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             }else {
                 imageSize = .zero
             }
-            let isiOSAppOnMac: Bool
-            if #available(iOS 14.0, *) {
-                isiOSAppOnMac = ProcessInfo.processInfo.isiOSAppOnMac
-            } else {
-                isiOSAppOnMac = false
-            }
-            if UIDevice.isPad && photoAsset?.mediaType == .video && !isiOSAppOnMac {
+            if UIDevice.isPad {
                 rect = PhotoTools.transformImageSize(
                     imageSize,
                     toViewSize: toVC.view.size,
@@ -246,36 +241,50 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         let previewMaskHeight: CGFloat
         let previewToolbarHeight = previewVC.photoToolbar.toolbarHeight
         let previewViewHeight = previewVC.photoToolbar.viewHeight
-        if type == .push {
-            previewMaskY = previewViewHeight - previewToolbarHeight
-            previewMaskHeight = previewToolbarHeight
-        }else {
-            previewMaskY = 0
-            previewMaskHeight = previewViewHeight
-        }
-        let previewMaskView = UIView(
-            frame: CGRect(
-                x: 0, y: previewMaskY,
-                width: contentView.width, height: previewMaskHeight
-            )
-        )
-        previewMaskView.backgroundColor = .white
-        previewVC.photoToolbar.mask = previewMaskView
         
         let pickerMaskY: CGFloat
         let pickerMaskHeight: CGFloat
-        let pickerToolbarHeight = pickerVC?.photoToolbar.toolbarHeight ?? 0
-        let pickerViewHeight = pickerVC?.photoToolbar.viewHeight ?? 0
-        if type == .push {
-            pickerMaskY = 0
-            pickerMaskHeight = pickerViewHeight
+        let pickerToolbarHeight: CGFloat
+        if let height = pickerVC?.photoToolbar.toolbarHeight {
+            pickerToolbarHeight = height
         }else {
-            pickerMaskY = pickerViewHeight - pickerToolbarHeight
-            pickerMaskHeight = pickerToolbarHeight
+            pickerToolbarHeight = 0
         }
-        let pickerMaskView = UIView(frame: CGRect(x: 0, y: pickerMaskY, width: contentView.width, height: pickerMaskHeight))
-        pickerMaskView.backgroundColor = .white
-        pickerVC?.photoToolbar.mask = pickerMaskView
+        let pickerViewHeight: CGFloat
+        if let height = pickerVC?.photoToolbar.viewHeight {
+            pickerViewHeight = height
+        }else {
+            pickerViewHeight = 0
+        }
+        
+        if previewViewHeight != pickerViewHeight {
+            if type == .push {
+                previewMaskY = previewViewHeight - previewToolbarHeight
+                previewMaskHeight = previewToolbarHeight
+            }else {
+                previewMaskY = 0
+                previewMaskHeight = previewViewHeight
+            }
+            let previewMaskView = UIView(
+                frame: CGRect(
+                    x: 0, y: previewMaskY,
+                    width: contentView.width, height: previewMaskHeight
+                )
+            )
+            previewMaskView.backgroundColor = .white
+            previewVC.photoToolbar.mask = previewMaskView
+            
+            if type == .push {
+                pickerMaskY = 0
+                pickerMaskHeight = pickerViewHeight
+            }else {
+                pickerMaskY = pickerViewHeight - pickerToolbarHeight
+                pickerMaskHeight = pickerToolbarHeight
+            }
+            let pickerMaskView = UIView(frame: CGRect(x: 0, y: pickerMaskY, width: contentView.width, height: pickerMaskHeight))
+            pickerMaskView.backgroundColor = .white
+            pickerVC?.photoToolbar.mask = pickerMaskView
+        }
         
         let duration = transitionDuration(using: transitionContext)
         UIView.animate(withDuration: duration - 0.15) {
@@ -286,33 +295,47 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             }
         }
         if type == .push {
-            UIView.animate(withDuration: duration - 0.2, delay: 0, options: [.curveEaseIn]) {
-                previewVC.photoToolbar.mask?.frame = CGRect(
-                    x: 0, y: 0,
-                    width: contentView.width, height: previewViewHeight
-                )
-                pickerVC?.photoToolbar.mask?.frame = CGRect(
-                    x: 0, y: pickerViewHeight - pickerToolbarHeight,
-                    width: contentView.width, height: pickerToolbarHeight
-                )
+            let alphaDuration: TimeInterval
+            if previewVC.photoToolbar.mask != nil {
+                alphaDuration = 0.15
+                UIView.animate(withDuration: duration - 0.2, delay: 0, options: [.curveEaseIn]) {
+                    previewVC.photoToolbar.mask?.frame = CGRect(
+                        x: 0, y: 0,
+                        width: contentView.width, height: previewViewHeight
+                    )
+                    pickerVC?.photoToolbar.mask?.frame = CGRect(
+                        x: 0, y: pickerViewHeight - pickerToolbarHeight,
+                        width: contentView.width, height: pickerToolbarHeight
+                    )
+                }
+            }else {
+                alphaDuration = duration
             }
-            let alphaDuration: TimeInterval = 0.15
             UIView.animate(withDuration: alphaDuration) {
                 previewVC.photoToolbar.alpha = 1
+                previewVC.navBgView?.alpha = 1
             }
         }else if type == .pop {
-            UIView.animate(withDuration: duration - 0.2, delay: 0, options: [.curveLinear]) {
-                previewVC.photoToolbar.mask?.frame = CGRect(
-                    x: 0, y: previewViewHeight - previewToolbarHeight,
-                    width: contentView.width, height: previewToolbarHeight
-                )
-                pickerVC?.photoToolbar.mask?.frame = CGRect(
-                    x: 0, y: 0,
-                    width: contentView.width, height: pickerViewHeight
-                )
-            }
-            UIView.animate(withDuration: duration - 0.15, delay: 0.125, options: []) {
-                previewVC.photoToolbar.alpha = 0
+            if previewVC.photoToolbar.mask != nil {
+                UIView.animate(withDuration: duration - 0.2, delay: 0, options: [.curveLinear]) {
+                    previewVC.photoToolbar.mask?.frame = CGRect(
+                        x: 0, y: previewViewHeight - previewToolbarHeight,
+                        width: contentView.width, height: previewToolbarHeight
+                    )
+                    pickerVC?.photoToolbar.mask?.frame = CGRect(
+                        x: 0, y: 0,
+                        width: contentView.width, height: pickerViewHeight
+                    )
+                }
+                UIView.animate(withDuration: duration - 0.15, delay: 0.125, options: []) {
+                    previewVC.photoToolbar.alpha = 0
+                    previewVC.navBgView?.alpha = 0
+                }
+            }else {
+                UIView.animate(withDuration: duration) {
+                    previewVC.photoToolbar.alpha = 0
+                    previewVC.navBgView?.alpha = 0
+                }
             }
         }
         
@@ -408,6 +431,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             pickerController.view.backgroundColor = nil
             pickerController.navigationBar.alpha = 0
             previewViewController?.photoToolbar.alpha = 0
+            previewViewController?.navBgView?.alpha = 0
             previewViewController?.collectionView.isHidden = true
             fromView = pushImageView
             let currentPreviewIndex: Int
@@ -505,7 +529,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     }
                 }
                 #endif
-                if UIDevice.isPad && photoAsset.mediaType == .video {
+                if UIDevice.isPad {
                     toRect = PhotoTools.transformImageSize(
                         photoAsset.imageSize,
                         toViewSize: toVC.view.size,
@@ -581,9 +605,11 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         UIView.animate(withDuration: colorDuration, delay: colorDelay, options: [ .curveLinear]) {
             if self.type == .present {
                 previewViewController?.photoToolbar.alpha = 1
+                previewViewController?.navBgView?.alpha = 1
                 contentView.backgroundColor = backgroundColor.withAlphaComponent(1)
             }else if self.type == .dismiss {
                 previewViewController?.photoToolbar.alpha = 0
+                previewViewController?.navBgView?.alpha = 0
                 contentView.backgroundColor = backgroundColor.withAlphaComponent(0)
             }
         }

@@ -11,7 +11,7 @@ import UIKit
 // MARK: Photo list configuration class / 照片列表配置类
 public struct PhotoListConfiguration {
     
-    public var listView: PhotoPickerList.Type = PhotoPickerListView.self
+    public var listView: PhotoPickerList.Type = PhotoPickerListViewController.self
     
     public var leftNavigationItems: [PhotoNavigationItem.Type] = []
     
@@ -102,7 +102,7 @@ public struct PhotoListConfiguration {
     public var cell: PhotoListCellConfiguration = .init()
     
     /// 自定义底部工具栏视图
-    public var photoToolbar: PhotoToolBar.Type = PhotoToolBarView.self
+    public var photoToolbar: PhotoToolBar.Type? = PhotoToolBarView.self
     
     /// Bottom view related configuration
     /// 默认的底部视图相关配置
@@ -148,7 +148,7 @@ public struct PhotoListConfiguration {
     /// 底部显示 照片/视频 数量
     public var isShowAssetNumber: Bool = true
     
-    /// 导航栏显示筛选按钮
+    @available(*, deprecated, message: "Use the registration APIs declared in the PhotoNavigationItem protocol")
     public var isShowFilterItem: Bool = true
     
     public var assetNumber: AssetNumber = .init()
@@ -158,7 +158,7 @@ public struct PhotoListConfiguration {
     public var emptyView: EmptyViewConfiguration = .init()
     
     /// 预览样式
-    public var previewStyle: PhotoPickerPreviewStyle = .push
+    public var previewStyle: PhotoPickerPreviewJumpStyle = .push
     
     public init() {
         #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)

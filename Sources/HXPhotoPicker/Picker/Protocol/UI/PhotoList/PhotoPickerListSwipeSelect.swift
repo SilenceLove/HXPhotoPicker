@@ -14,10 +14,10 @@ public enum PhotoPickerListSwipeSelectState {
 }
 
 public protocol PhotoPickerListSwipeSelect:
-    UIView,
+    UIViewController,
     PhotoPickerListDelegateProperty,
     PhotoPickerListCollectionView,
-    PhotoPickerControllerViewFectch,
+    PhotoPickerControllerFectch,
     PhotoPickerListFectchCell,
     PhotoPickerListFetchAssets
 {
@@ -161,7 +161,12 @@ public extension PhotoPickerListSwipeSelect {
                let indexArray = swipeSelectedIndexArray,
                let point = swipeSelectLastLocalPoint {
                 let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout
-                let itemHieght = flowLayout?.itemSize.height ?? 50
+                let itemHieght: CGFloat
+                if let height = flowLayout?.itemSize.height {
+                    itemHieght = height
+                } else {
+                    itemHieght = 50
+                }
                 let largeHeight = collectionView.contentSize.height > collectionView.height
                 var exceedBottom: Bool
                 let offsety = collectionView.contentOffset.y
@@ -253,13 +258,13 @@ public extension PhotoPickerListSwipeSelect {
             let topRect = CGRect(
                 x: 0,
                 y: 0,
-                width: width,
+                width: view.width,
                 height: config.autoSwipeTopAreaHeight + collectionView.contentInset.top
             )
             let bottomRect = CGRect(
                 x: 0,
                 y: collectionView.height - collectionView.contentInset.bottom - config.autoSwipeBottomAreaHeight,
-                width: width,
+                width: view.width,
                 height: config.autoSwipeBottomAreaHeight + collectionView.contentInset.bottom
             )
             let margin: CGFloat = 140 * config.swipeSelectScrollSpeed
@@ -344,11 +349,11 @@ public extension PhotoPickerListSwipeSelect {
                 }
             }
         }
-        delegate?.photoList(selectedAssetDidChanged: self)
+        delegate?.photoList(selectedAssetDidChanged: self as! PhotoPickerList)
         if pickerController.pickerData.isFull && showHUD {
             swipeSelectPanGR?.isEnabled = false
             ProgressHUD.showWarning(
-                addedTo: pickerController.view,
+                addedTo: navigationController?.view,
                 text: String(
                     format: "已达到最大选择数".localized,
                     arguments: [pickerController.config.maximumSelectedPhotoCount]

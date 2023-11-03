@@ -14,7 +14,10 @@ extension PhotoPickerViewController: PhotoToolBarDelegate {
             photoToolbar = PhotoToolBarEmptyView(pickerConfig, type: .picker)
             return
         }
-        photoToolbar = config.photoToolbar.init(pickerConfig, type: .picker)
+        guard let toolbar = config.photoToolbar else {
+            return
+        }
+        photoToolbar = toolbar.init(pickerConfig, type: .picker)
         photoToolbar.toolbarDelegate = self
         photoToolbar.updateOriginalState(pickerController.isOriginal)
         view.addSubview(photoToolbar)

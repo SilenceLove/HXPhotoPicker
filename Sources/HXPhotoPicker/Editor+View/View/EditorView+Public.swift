@@ -53,7 +53,7 @@ public extension EditorView {
         if let image = image, let lastImage = self.image {
             let scale = CGFloat(Int(image.width / image.height * 1000)) / 1000
             let lastScale = CGFloat(Int(lastImage.width / lastImage.height * 1000)) / 1000
-            updateScale = scale != lastScale
+            updateScale = abs(lastScale - scale) > 0.002
         }
         if updateScale {
             resetState()

@@ -204,3 +204,13 @@ extension PhotoPickerController {
     }
     
 }
+
+extension PhotoPickerController: PhotoControllerEvent {
+    public func photoControllerDidCancel() {
+        cancelCallback()
+    }
+    
+    public func photoControllerDidFinish() {
+        finishCallback()
+    }
+}

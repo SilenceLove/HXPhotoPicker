@@ -26,8 +26,10 @@ public class PhotoImageCancelItemView: UIView, PhotoNavigationItem {
         button.setImage(imageName.image, for: .normal)
         button.addTarget(self, action: #selector(didCancelClick), for: .touchUpInside)
         addSubview(button)
-        button.size = button.currentImage?.size ?? .zero
-        size = button.size
+        if let btnSize = button.currentImage?.size {
+            button.size = btnSize
+            size = button.size
+        }
         setColor()
     }
     

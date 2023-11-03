@@ -31,7 +31,7 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
     
     weak var delegate: PhotoPreviewViewCellDelegate?
     
-    var scrollContentView: PhotoPreviewContentView!
+    var scrollContentView: PhotoPreviewContentViewProtocol!
     var scrollView: UIScrollView!
     
     var statusBarShouldBeHidden = false
@@ -79,12 +79,16 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
             return
         }
         if scrollContentView.width != width {
-            setupPortraitContentSize()
+            if UIDevice.isPad  {
+                setupLandscapeContentSize()
+            }else {
+                setupPortraitContentSize()
+            }
         }
     }
     func setupScrollViewContentSize() {
         scrollView.zoomScale = 1
-        if UIDevice.isPortrait {
+        if UIDevice.isPortrait && !UIDevice.isPad {
             setupPortraitContentSize()
         }else {
             setupLandscapeContentSize()

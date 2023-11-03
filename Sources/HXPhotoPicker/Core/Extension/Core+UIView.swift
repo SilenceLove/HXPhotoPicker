@@ -86,10 +86,13 @@ extension UIView: HXPickerCompatible {
             size = rect.size
             origin = CGPoint(x: -rect.minX, y: -rect.minY)
         }
-        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen._scale)
-        drawHierarchy(in: CGRect(origin: origin, size: bounds.size), afterScreenUpdates: true)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = UIScreen._scale
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        let image = renderer.image { context in
+            drawHierarchy(in: CGRect(origin: origin, size: bounds.size), afterScreenUpdates: true)
+        }
         return image
     }
     

@@ -72,7 +72,7 @@ public enum PickerPresentStyle {
     }
 }
 
-public enum PhotoPickerPreviewStyle {
+public enum PhotoPickerPreviewJumpStyle {
     case push
     case present
 }

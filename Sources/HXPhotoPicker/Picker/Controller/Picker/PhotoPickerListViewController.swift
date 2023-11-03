@@ -1,5 +1,5 @@
 //
-//  PhotoPickerListView.swift
+//  PhotoPickerListViewController.swift
 //  HXPhotoPicker
 //
 //  Created by Silence on 2023/10/11.
@@ -9,8 +9,8 @@
 import UIKit
 import Photos
 
-open class PhotoPickerListView:
-    UIView,
+open class PhotoPickerListViewController:
+    BaseViewController,
     PhotoPickerList,
     PhotopickerListRegisterClass,
     PhotoPickerListFectchCell,
@@ -47,6 +47,7 @@ open class PhotoPickerListView:
     
     public var assets: [PhotoAsset] = [] {
         didSet {
+            guard let collectionView = collectionView else { return }
             collectionView.reloadData()
         }
     }
@@ -78,10 +79,17 @@ open class PhotoPickerListView:
     var scrollEndReload: Bool = false
     var scrollReachDistance = false
     
+    var orientationDidChange: Bool = false
+    var beforeOrientationIndexPath: IndexPath?
+    
     public required init(config: PickerConfiguration) {
         self.config = config.photoList
         self.pickerConfig = config
-        super.init(frame: .zero)
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    open override func viewDidLoad() {
+        super.viewDidLoad()
         initViews()
     }
     
@@ -89,19 +97,23 @@ open class PhotoPickerListView:
         collectionViewLayout = UICollectionViewFlowLayout()
         collectionViewLayout.minimumLineSpacing = config.spacing
         collectionViewLayout.minimumInteritemSpacing = config.spacing
-        collectionView = UICollectionView(frame: bounds, collectionViewLayout: collectionViewLayout)
+        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: collectionViewLayout)
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.delaysContentTouches = false
+        if !config.allowSwipeToSelect {
+            collectionView.delaysContentTouches = false
+        }
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
+        }else {
+            automaticallyAdjustsScrollViewInsets = false
         }
         registerClass()
-        addSubview(collectionView)
+        view.addSubview(collectionView)
         if pickerConfig.isMultipleSelect, config.allowSwipeToSelect {
             let panGR = UIPanGestureRecognizer(target: self, action: #selector(panGestureRecognizer(panGR:)))
-            addGestureRecognizer(panGR)
+            view.addGestureRecognizer(panGR)
             switch pickerConfig.pickerPresentStyle {
             case .none:
                 break
@@ -116,7 +128,7 @@ open class PhotoPickerListView:
     @objc
     func panGestureRecognizer(panGR: UIPanGestureRecognizer) {
         let localPoint = panGR.location(in: collectionView)
-        swipeSelectLastLocalPoint = panGR.location(in: self)
+        swipeSelectLastLocalPoint = panGR.location(in: view)
         switch panGR.state {
         case .began:
             beganPanGestureRecognizer(panGR: panGR, localPoint: localPoint)
@@ -134,8 +146,16 @@ open class PhotoPickerListView:
         panGestureRecognizer(panGR: panGR)
     }
     
-    public func selectCell(_ viewCell: PhotoPickerBaseViewCell, isSelected: Bool) {
-        pickerCell(viewCell, didSelectControl: !isSelected)
+    public func selectCell(for asset: PhotoAsset, isSelected: Bool) {
+        guard let cell = getCell(for: asset) else {
+            if isSelected {
+                pickerController.pickerData.append(asset)
+            }else {
+                pickerController.pickerData.remove(asset)
+            }
+            return
+        }
+        pickerCell(cell, didSelectControl: !isSelected)
     }
     
     public func addedAsset(for asset: PhotoAsset) {
@@ -240,21 +260,58 @@ open class PhotoPickerListView:
     }
     
     func updateEmptyView() {
+        guard let emptyView = emptyView else {
+            return
+        }
         if assets.isEmpty {
-            addSubview(emptyView)
+            view.addSubview(emptyView)
         }else {
             emptyView.removeFromSuperview()
         }
     }
     
-    open override func layoutSubviews() {
-        super.layoutSubviews()
+    
+    public override func deviceOrientationWillChanged(notify: Notification) {
+        orientationDidChange = true
+        let items = collectionView.indexPathsForVisibleItems.sorted { $0.item < $1.item }
+        if !items.isEmpty {
+            if items.last?.item == numberOfItems - 1 {
+                beforeOrientationIndexPath = items.last
+                return
+            }
+            if items.first?.item == 0 {
+                beforeOrientationIndexPath = items.first
+                return
+            }
+            let startItem: Int
+            if let item = items.first?.item {
+                startItem = item
+            }else {
+                startItem = 0
+            }
+            let endItem: Int
+            if let item = items.last?.item {
+                endItem = item
+            }else {
+                endItem = 0
+            }
+            if let beforeItem = beforeOrientationIndexPath?.item,
+               beforeItem >= startItem, beforeItem <= endItem {
+                return
+            }
+            let middleIndex = min(items.count - 1, max(0, items.count / 2))
+            beforeOrientationIndexPath = items[middleIndex]
+        }
+    }
+    
+    open override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
         let space = config.spacing
         let count: CGFloat
         if  UIDevice.isPortrait {
             count = CGFloat(config.rowNumber)
         }else {
-            if let splitViewController = viewController?.splitViewController as? PhotoSplitViewController, !UIDevice.isPad {
+            if let splitViewController = splitViewController as? PhotoSplitViewController, !UIDevice.isPad {
                 if splitViewController.isSplitShowColumn {
                     count = CGFloat(config.spltRowNumber)
                 }else {
@@ -269,23 +326,39 @@ open class PhotoPickerListView:
                 count = CGFloat(config.landscapeRowNumber)
             }
         }
-        let itemWidth = (width - space * (count - CGFloat(1))) / count
+        let itemWidth = (view.width - space * (count - CGFloat(1))) / count
         collectionViewLayout.itemSize = .init(width: itemWidth, height: itemWidth)
-        collectionView.frame = bounds
+        collectionView.frame = view.bounds
         
-        emptyView.width = width
+        emptyView.width = view.width
         emptyView.center = CGPoint(
-            x: width * 0.5,
-            y: (height - contentInset.top - contentInset.bottom) * 0.5
+            x: view.width * 0.5,
+            y: (view.height - contentInset.top - contentInset.bottom) * 0.5
         )
+        
+        if orientationDidChange {
+            reloadData()
+            if navigationController?.topViewController is PhotoPickerViewController {
+                DispatchQueue.main.async {
+                    if let indexPath = self.beforeOrientationIndexPath {
+                        self.scrollTo(at: indexPath, at: .centeredVertically, animated: false)
+                    }
+                }
+            }
+            orientationDidChange = false
+        }
     }
     
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    deinit {
+        HXLog("PickerListController deinited 👍")
+    }
 }
 
-extension PhotoPickerListView: UICollectionViewDataSource {
+extension PhotoPickerListViewController: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         numberOfItems
     }
@@ -306,7 +379,7 @@ extension PhotoPickerListView: UICollectionViewDataSource {
     }
 }
 
-extension PhotoPickerListView: UICollectionViewDelegate {
+extension PhotoPickerListViewController: UICollectionViewDelegate {
     public func collectionView(
         _ collectionView: UICollectionView,
         willDisplay cell: UICollectionViewCell,
@@ -354,11 +427,9 @@ extension PhotoPickerListView: UICollectionViewDelegate {
     }
     
     func didSelectItem(indexPath: IndexPath, animated: Bool) {
-        if pickerController.topViewController != viewController {
-            return
-        }
         collectionView.deselectItem(at: indexPath, animated: false)
-        guard let cell = collectionView.cellForItem(at: indexPath) else {
+        guard navigationController?.topViewController is PhotoPickerViewController,
+              let cell = collectionView.cellForItem(at: indexPath) else {
             return
         }
         #if !targetEnvironment(macCatalyst)
@@ -426,7 +497,7 @@ extension PhotoPickerListView: UICollectionViewDelegate {
         #else
         isCameraCell = false
         #endif
-        let viewSize = size
+        let viewSize = view.size
         return .init(
             identifier: indexPath as NSCopying
         ) {
@@ -641,20 +712,20 @@ extension PhotoPickerListView: UICollectionViewDelegate {
     }
 }
 
-extension PhotoPickerListView: UICollectionViewDelegateFlowLayout {
+extension PhotoPickerListViewController: UICollectionViewDelegateFlowLayout {
     public func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         referenceSizeForFooterInSection section: Int
     ) -> CGSize {
         if config.isShowAssetNumber && (photoCount > 0 || videoCount > 0) {
-            return CGSize(width: width, height: filterOptions == .any ? 50 : 70)
+            return CGSize(width: view.width, height: filterOptions == .any ? 50 : 70)
         }
         return .zero
     }
 }
 
-extension PhotoPickerListView: PhotoPickerViewCellDelegate {
+extension PhotoPickerListViewController: PhotoPickerViewCellDelegate {
     
     public func pickerCell(
         _ cell: PhotoPickerBaseViewCell,
@@ -663,7 +734,7 @@ extension PhotoPickerListView: PhotoPickerViewCellDelegate {
         if isSelected {
             // 取消选中
             let photoAsset = cell.photoAsset!
-            pickerController.pickerData.remove(photoAsset)
+            let isSuccess = pickerController.pickerData.remove(photoAsset)
             #if HXPICKER_ENABLE_EDITOR
             if photoAsset.videoEditedResult != nil, pickerConfig.isDeselectVideoRemoveEdited {
                 photoAsset.editedResult = nil
@@ -682,6 +753,9 @@ extension PhotoPickerListView: PhotoPickerViewCellDelegate {
             )
             #endif
             updateCellSelectedTitle()
+            if isSuccess {
+                delegate?.photoList(self, didDeselectedAsset: photoAsset)
+            }
         }else {
             // 选中
             #if HXPICKER_ENABLE_EDITOR
@@ -699,12 +773,13 @@ extension PhotoPickerListView: PhotoPickerViewCellDelegate {
             #endif
             func addAsset() {
                 if pickerController.pickerData.append(cell.photoAsset) {
-                    cell.updateSelectedState(
-                        isSelected: true,
-                        animated: true
-                    )
-                    updateCellSelectedTitle()
+                    delegate?.photoList(self, didSelectedAsset: cell.photoAsset)
                 }
+                cell.updateSelectedState(
+                    isSelected: true,
+                    animated: true
+                )
+                updateCellSelectedTitle()
             }
             let inICloud: Bool
             if let pickerCell = cell as? PhotoPickerViewCell {
@@ -727,7 +802,7 @@ extension PhotoPickerListView: PhotoPickerViewCellDelegate {
     
 }
 
-extension PhotoPickerListView: PhotoPeekViewControllerDelegate {
+extension PhotoPickerListViewController: PhotoPeekViewControllerDelegate {
     public func photoPeekViewController(
         requestSucceed photoPeekViewController: PhotoPeekViewController
     ) {
@@ -738,12 +813,12 @@ extension PhotoPickerListView: PhotoPeekViewControllerDelegate {
     }
 }
 
-extension PhotoPickerListView: UIGestureRecognizerDelegate {
-    public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+extension PhotoPickerListViewController: UIGestureRecognizerDelegate {
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer != swipeSelectPanGR {
             return true
         }
-        let point = gestureRecognizer.location(in: self)
+        let point = gestureRecognizer.location(in: view)
         return point.x > pickerConfig.photoList.swipeSelectIgnoreLeftArea
     }
 }

@@ -24,11 +24,11 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     
     public weak var delegate: PhotoPickerViewCellDelegate?
     
-    public var config: PhotoListCellConfiguration? {
+    public var config: PhotoListCellConfiguration = .init() {
         didSet {
-            photoView.targetWidth = config?.targetWidth ?? 250
+            photoView.targetWidth = config.targetWidth
             #if canImport(Kingfisher)
-            photoView.kf_indicatorColor = config?.kf_indicatorColor
+            photoView.kf_indicatorColor = config.kf_indicatorColor
             #endif
             configColor()
         }
@@ -79,16 +79,16 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     }
     /// 配置背景颜色
     open func configColor() {
-        backgroundColor = PhotoManager.isDark ? config?.backgroundDarkColor : config?.backgroundColor
+        backgroundColor = PhotoManager.isDark ? config.backgroundDarkColor : config.backgroundColor
     }
     
     /// 当前选中时显示的标题数字
     open var selectedTitle: String = "0"
     
     /// 获取图片，重写此方法可以修改图片
-    open func requestThumbnailImage() { 
+    open func requestThumbnailImage() {
         requestThumbnailImage(
-            targetWidth: config?.targetWidth ?? 250
+            targetWidth: config.targetWidth
         )
     }
     
@@ -122,8 +122,7 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     
     /// 获取是否在iCloud
     open func requestICloudState() {
-        guard let config = config,
-              config.isShowICloudMark else {
+        guard config.isShowICloudMark else {
             return
         }
         cancelICloudRequest()

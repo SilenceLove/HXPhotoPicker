@@ -12,7 +12,7 @@ public class PhotoPickerLimitCell: UICollectionViewCell {
     private var lineLayer: CAShapeLayer!
     private var titleLb: UILabel!
     
-    var config: PhotoListConfiguration.LimitCell? {
+    var config: PhotoListConfiguration.LimitCell = .init() {
         didSet {
             setConfig()
         }
@@ -44,9 +44,6 @@ public class PhotoPickerLimitCell: UICollectionViewCell {
     }
     
     func setConfig() {
-        guard let config = config else {
-            return
-        }
         titleLb.text = config.title?.localized
         let isDark = PhotoManager.isDark
         backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
@@ -59,9 +56,9 @@ public class PhotoPickerLimitCell: UICollectionViewCell {
     func setLineLayerPath() {
         let path = UIBezierPath()
         let centerX = width * 0.5
-        let margin: CGFloat = config?.title?.localized == nil ? 0 : 20
+        let margin: CGFloat = config.title?.localized == nil ? 0 : 20
         let centerY = (height - margin) * 0.5
-        let linelength = (config?.lineLength ?? 30) * 0.5
+        let linelength = config.lineLength * 0.5
         path.move(to: CGPoint(x: centerX - linelength, y: centerY))
         path.addLine(to: CGPoint(x: centerX + linelength, y: centerY))
         

@@ -91,7 +91,8 @@ final class ProgressHUD: UIView {
         backgroundView.alpha = 0
         backgroundView.addSubview(blurEffectView)
         
-        if indicatorType == .circle {
+        switch indicatorType {
+        case .circle:
             let indicatorView: ProgressIndefiniteView = .init(
                 frame: CGRect(
                     origin: .zero,
@@ -100,7 +101,16 @@ final class ProgressHUD: UIView {
             )
             indicatorView.startAnimating()
             self.indicatorView = indicatorView
-        }else {
+        case .circleJoin:
+            let indicatorView: ProgressCricleJoinView = .init(
+                frame: CGRect(
+                    origin: .zero,
+                    size: CGSize(width: 32, height: 32)
+                )
+            )
+            indicatorView.startAnimating()
+            self.indicatorView = indicatorView
+        case .system:
             let indicatorView: UIActivityIndicatorView = .init(style: .whiteLarge)
             indicatorView.hidesWhenStopped = true
             indicatorView.startAnimating()
@@ -454,12 +464,17 @@ final class ProgressHUD: UIView {
             indefiniteView.startAnimating()
         }else if let indefiniteView = indicatorView as? UIActivityIndicatorView {
             indefiniteView.startAnimating()
+        }else if let indefiniteView = indicatorView as? ProgressCricleJoinView {
+            indefiniteView.startAnimating()
         }
+        
     }
     private func stopAnimating() {
         if let indefiniteView = indicatorView as? ProgressIndefiniteView {
             indefiniteView.stopAnimating()
         }else if let indefiniteView = indicatorView as? UIActivityIndicatorView {
+            indefiniteView.stopAnimating()
+        }else if let indefiniteView = indicatorView as? ProgressCricleJoinView {
             indefiniteView.stopAnimating()
         }
     }

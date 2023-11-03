@@ -13,7 +13,7 @@ public protocol PhotoPickerListFectchCell:
     PhotoPickerListConfig,
     PhotoPickerListAssets,
     PhotoPickerListCondition,
-    PhotoPickerControllerViewFectch
+    PhotoPickerControllerFectch
 {
     
     var limitAddCell: PhotoPickerLimitCell { get }
@@ -26,8 +26,9 @@ public protocol PhotoPickerListFectchCell:
     func getCell(for asset: PhotoAsset) -> PhotoPickerBaseViewCell?
     func getIndexPath(for asset: PhotoAsset) -> IndexPath?
     func updateCellSelectedTitle()
+    func updateCell(for asset: PhotoAsset)
     func resetICloud(for asset: PhotoAsset)
-    func selectCell(_ viewCell: PhotoPickerBaseViewCell, isSelected: Bool)
+    func selectCell(for asset: PhotoAsset, isSelected: Bool)
 }
 
 public extension PhotoPickerListFectchCell {
@@ -180,6 +181,12 @@ public extension PhotoPickerListFectchCell {
                 animated: false
             )
         }
+    }
+    
+    func updateCell(for asset: PhotoAsset) {
+        let cell = getCell(for: asset)
+        cell?.isRequestDirectly = true
+        cell?.photoAsset = asset
     }
     
     func resetICloud(for asset: PhotoAsset) {

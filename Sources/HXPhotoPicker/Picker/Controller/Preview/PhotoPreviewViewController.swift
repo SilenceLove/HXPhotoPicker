@@ -58,9 +58,32 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
         self.config = config.previewView
         super.init(config: config)
     }
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    
+    var navBgView: UIToolbar?
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        if let photoToolbar = config.photoToolbar {
+            isShowToolbar = photoToolbar.isShow(pickerConfig, type: previewType != .browser ? .preview : .browser)
+        }else {
+            isShowToolbar = false
+        }
+        title = ""
+        extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = .all
+        view.clipsToBounds = true
+        initView()
     }
+    
+    override func updateColors() {
+        if isTransitioning {
+            return
+        }
+        view.backgroundColor = PhotoManager.isDark ?
+            config.backgroundDarkColor :
+            config.backgroundColor
+    }
+    
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let margin: CGFloat = 20
@@ -88,24 +111,14 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
             }
             firstLayoutSubviews = false
         }
-    }
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        isShowToolbar = config.photoToolbar.isShow(pickerConfig, type: previewType != .browser ? .preview : .browser)
-        title = ""
-        extendedLayoutIncludesOpaqueBars = true
-        edgesForExtendedLayout = .all
-        view.clipsToBounds = true
-        initView()
-    }
-    override func updateColors() {
-        if isTransitioning {
-            return
+        
+        let navHeight: CGFloat
+        if let navH = navigationController?.navigationBar.frame.maxY {
+            navHeight = navH
+        }else {
+            navHeight = 0
         }
-        view.backgroundColor = PhotoManager.isDark ?
-            config.backgroundDarkColor :
-            config.backgroundColor
+        navBgView?.frame = .init(x: 0, y: 0, width: view.width, height: navHeight)
     }
     
     public override func deviceOrientationWillChanged(notify: Notification) {
@@ -170,6 +183,13 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
             return .lightContent
         }
         return pickerController.config.statusBarStyle
+    }
+    
+    deinit {
+        HXLog("PhotoPreviewViewController deinited 👍")
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -319,6 +339,12 @@ extension PhotoPreviewViewController {
                     )
                 }
             }
+        }
+        if !pickerConfig.adaptiveBarAppearance, previewType != .browser {
+            let navBgView = UIToolbar()
+            navBgView.barStyle = pickerConfig.navigationBarStyle
+            view.addSubview(navBgView)
+            self.navBgView = navBgView
         }
     }
     func configBottomViewFrame() {

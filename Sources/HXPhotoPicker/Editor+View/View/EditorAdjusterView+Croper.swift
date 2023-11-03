@@ -11,7 +11,10 @@ extension EditorAdjusterView {
     
     var isCropRund: Bool {
         if state == .normal {
-            return oldAdjustedFactor?.isRoundMask ?? false
+            if let isRoundMask = oldAdjustedFactor?.isRoundMask {
+                return isRoundMask
+            }
+            return false
         } else {
             return isRoundMask
         }
@@ -174,8 +177,8 @@ extension EditorAdjusterView {
         let overlayImage = getOverlayImage(inputImage.size, cropFactor: cropFactor)
         var exportScale = exportScale
         let maxSize = max(inputImage.size.width, inputImage.size.height)
-        if maxSize * exportScale > 5000 {
-            exportScale = 5000 / maxSize
+        if maxSize > 10000 {
+            exportScale = 10000 / maxSize
         }
         if exportScale != inputImage.scale && overlayImage != nil {
             let scale = exportScale / inputImage.scale
@@ -376,6 +379,8 @@ extension EditorAdjusterView {
             return 10000000 / dataCount
         }else if dataCount > 10000000 {
             return 6000000 / dataCount
+        }else if dataCount > 6000000 {
+            return 4500000 / dataCount
         }else if dataCount > 3000000 {
             return 3000000 / dataCount
         }

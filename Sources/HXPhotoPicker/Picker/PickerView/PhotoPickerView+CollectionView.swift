@@ -117,7 +117,7 @@ extension PhotoPickerView: UICollectionViewDelegate {
         resetScrollCell(indexPath)
         scrollIndexPath = indexPath
         cell.photoAsset.isScrolling = true
-        let rightMargin = cell.config?.selectBoxRightMargin ?? 5
+        let rightMargin = cell.config.selectBoxRightMargin
         var m = offsetX - cell.x - cell.selectControl.width - rightMargin
         if m < 0 {
             m = 0

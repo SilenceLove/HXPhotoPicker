@@ -61,7 +61,7 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        scrollContentView = PhotoPreviewContentView(type: .livePhoto)
+        scrollContentView = PhotoPreviewContentLivePhotoView()
         scrollContentView.delegate = self
         initView()
         
@@ -82,7 +82,9 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         liveMarkView.layer.masksToBounds = true
         let imageView = UIImageView(image: "hx_picker_livePhoto".image?.withRenderingMode(.alwaysTemplate))
         imageView.tintColor = "#666666".color
-        imageView.size = imageView.image?.size ?? .zero
+        if let imageSize = imageView.image?.size {
+            imageView.size = imageSize
+        }
         imageView.centerY = liveMarkView.height * 0.5
         imageView.x = 5
         liveMarkView.contentView.addSubview(imageView)
@@ -108,17 +110,17 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         fatalError("init(coder:) has not been implemented")
     }
     
-    func contentView(requestSucceed contentView: PhotoPreviewContentView) {
+    func contentView(requestSucceed contentView: PhotoPreviewContentViewProtocol) {
         delegate?.cell(requestSucceed: self)
     }
-    func contentView(requestFailed contentView: PhotoPreviewContentView) {
+    func contentView(requestFailed contentView: PhotoPreviewContentViewProtocol) {
         delegate?.cell(requestFailed: self)
     }
     
-    func contentView(livePhotoWillBeginPlayback contentView: PhotoPreviewContentView) {
+    func contentView(livePhotoWillBeginPlayback contentView: PhotoPreviewContentViewProtocol) {
         hideMark()
     }
-    func contentView(livePhotoDidEndPlayback contentView: PhotoPreviewContentView) {
+    func contentView(livePhotoDidEndPlayback contentView: PhotoPreviewContentViewProtocol) {
         showMark()
     }
     
@@ -134,7 +136,7 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         if !liveMarkConfig.allowShow {
             return
         }
-        if scrollContentView.livePhotoIsAnimating ||
+        if scrollContentView.isLivePhotoAnimating ||
             scrollContentView.isBacking ||
             statusBarShouldBeHidden { return }
         if let superView = superview, !(superView is UICollectionView) {

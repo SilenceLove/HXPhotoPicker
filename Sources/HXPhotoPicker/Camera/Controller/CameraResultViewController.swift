@@ -126,9 +126,12 @@ class CameraResultViewController: UIViewController {
         }else {
             playerView.frame = rect
         }
-        var doneWidth = (doneButton.currentTitle?.width(
-                            ofFont: doneButton.titleLabel!.font,
-                            maxHeight: 33) ?? 0) + 20
+        var doneWidth: CGFloat = 0
+        if let doneTitleWidth = doneButton.currentTitle?.width(ofFont: doneButton.titleLabel!.font, maxHeight: 33) {
+            doneWidth = doneTitleWidth + 20
+        }else {
+            doneWidth = 20
+        }
         if doneWidth < 60 {
             doneWidth = 60
         }

@@ -86,7 +86,9 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         contentView.layer.addSublayer(disableMaskLayer)
         
         iCloudMarkView = UIImageView(image: "hx_picker_photo_icloud_mark".image)
-        iCloudMarkView.size = iCloudMarkView.image?.size ?? .zero
+        if let imageSize = iCloudMarkView.image?.size {
+            iCloudMarkView.size = imageSize
+        }
         iCloudMarkView.isHidden = true
         contentView.addSubview(iCloudMarkView)
         
@@ -218,11 +220,15 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
             CATransaction.commit()
         }
         assetTypeLb.frame = CGRect(x: 0, y: height - 19, width: width - 5, height: 18)
-        assetTypeIcon.size = assetTypeIcon.image?.size ?? .zero
+        if let imageSize = assetTypeIcon.image?.size {
+            assetTypeIcon.size = imageSize
+        }
         assetTypeIcon.x = 5
         assetTypeIcon.y = height - assetTypeIcon.height - 5
         assetTypeLb.centerY = assetTypeIcon.centerY
-        assetEditMarkIcon.size = assetEditMarkIcon.image?.size ?? .zero
+        if let imageSize = assetEditMarkIcon.image?.size {
+            assetEditMarkIcon.size = imageSize
+        }
         assetEditMarkIcon.x = 5
         assetEditMarkIcon.y = height - assetEditMarkIcon.height - 5
         

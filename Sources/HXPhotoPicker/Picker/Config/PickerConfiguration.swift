@@ -208,6 +208,11 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     /// 暗黑风格下TintColor
     public var navigationDarkTintColor: UIColor?
     
+    public var navigationBackgroundColor: UIColor?
+    public var navigationBackgroundDarkColor: UIColor?
+    public var navigationBackgroundImage: UIImage?
+    public var navigationBackgroundDarkImage: UIImage?
+    
     /// 相册控制器配置
     public var albumController: PhotoAlbumControllerConfiguration = .init()
     
@@ -257,15 +262,7 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
         PhotoTools.getWXPickerConfig()
     }
     
-    public static var system: PickerConfiguration {
-        var config = PickerConfiguration()
-        if #available(iOS 13.0, *) {
-            config.albumShowMode = .present(.automatic)
-        } else {
-            config.albumShowMode = .present(.fullScreen)
-        }
-        config.photoList.leftNavigationItems = [PhotoTextCancelItemView.self]
-        config.photoList.rightNavigationItems = [PhotoPickerFinishItemView.self, PhotoPickerFilterItemView.self]
-        return config
+    public static var redBook: PickerConfiguration {
+        PhotoTools.redBookConfig
     }
 }

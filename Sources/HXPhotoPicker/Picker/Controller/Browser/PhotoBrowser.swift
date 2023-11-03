@@ -59,7 +59,7 @@ open class PhotoBrowser: PhotoPickerController {
     public var pageIndicatorType: PageIndicatorType = .bottom
     
     /// 页面指示器，nil则不显示
-    public var pageIndicator: PhotoBrowserPageIndicator?
+    public var pageIndicator: PhotoBrowserPageIndicator? = PhotoBrowserPageControlIndicator(frame: .init(x: 0, y: 0, width: 0, height: 30))
     
     /// 获取页数
     /// 动态设置数据时必须实现（assets.isEmpty）
@@ -374,12 +374,9 @@ open class PhotoBrowser: PhotoPickerController {
     }
     
     private func initViews() {
-        
-        let indicator = PhotoBrowserPageControlIndicator(frame: .init(x: 0, y: 0, width: 0, height: 30))
-        indicator.pageControlChanged = { [weak self] index in
+        pageIndicator?.pageControlChanged = { [weak self] index in
             self?.pageIndex = index
         }
-        pageIndicator = indicator
         
         let navHeight = navigationBar.height
         gradualShadowImageView = UIImageView(
@@ -675,6 +672,8 @@ extension PhotoBrowser: PhotoPickerControllerDelegate {
 
 public protocol PhotoBrowserPageIndicator: UIView {
     
+    var pageControlChanged: ((Int) -> Void)? { get set }
+    
     /// 刷新指示器
     /// - Parameters:
     ///   - numberOfPages: 页面总数
@@ -685,6 +684,10 @@ public protocol PhotoBrowserPageIndicator: UIView {
     /// - Parameter pageIndex: 当前显示的页面下标
     func didChanged(pageIndex: Int)
     
+}
+
+public extension PhotoBrowserPageIndicator {
+    var pageControlChanged: ((Int) -> Void)? { get { nil } set { } }
 }
 
 open class PhotoBrowserDefaultPageIndicator: UIView, PhotoBrowserPageIndicator {

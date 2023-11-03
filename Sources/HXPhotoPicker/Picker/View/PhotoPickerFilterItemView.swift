@@ -31,8 +31,10 @@ public class PhotoPickerFilterItemView: UIView, PhotoNavigationItem {
         button.setImage("hx_picker_photolist_nav_filter_selected".image?.withRenderingMode(.alwaysTemplate), for: .selected)
         button.addTarget(self, action: #selector(didFilterClick), for: .touchUpInside)
         addSubview(button)
-        button.size = button.currentImage?.size ?? .zero
-        size = button.size
+        if let btnSize = button.currentImage?.size {
+            button.size = btnSize
+            size = button.size
+        }
         setColor()
     }
     

@@ -203,8 +203,10 @@ extension EditorView {
         adjusterView = EditorAdjusterView(maskColor: maskColor)
         adjusterView.delegate = self
         adjusterView.setContentInsets = { [weak self] in
-            guard let self = self else { return .zero }
-            return self.editContentInset?(self) ?? .zero
+            guard let self = self, let insets = self.editContentInset?(self) else {
+                return .zero
+            }
+            return insets
         }
         addSubview(adjusterView)
     }

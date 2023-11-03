@@ -106,7 +106,6 @@ public struct PhotoAlbumControllerConfiguration {
     /// 暗黑风格下分隔线颜色
     public var separatorLineDarkColor: UIColor = "#434344".hx.color.withAlphaComponent(0.6)
     
-    ///
     /// 媒体类型图标的颜色
     public var imageColor: UIColor = .systemBlue
     

@@ -65,7 +65,7 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
         forItemAt indexPath: IndexPath
     ) {
         let myCell = cell as! PhotoPreviewViewCell
-        myCell.scrollContentView.startAnimatedImage()
+        myCell.scrollContentView.startAnimated()
         if myCell.photoAsset.mediaType == .video {
             myCell.scrollView.zoomScale = 1
         }
@@ -177,6 +177,7 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
             if config.isShowBottomView {
                 photoToolbar.isHidden = false
             }
+            navBgView?.isHidden = false
             if currentCell?.photoAsset.mediaType == .video && config.singleClickCellAutoPlayVideo {
                 currentCell?.scrollContentView.videoView.stopPlay()
             }
@@ -196,8 +197,18 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
         if config.isShowBottomView {
             UIView.animate(withDuration: 0.25) {
                 self.photoToolbar.alpha = self.statusBarShouldBeHidden ? 0 : 1
-            } completion: { _ in
-                self.photoToolbar.isHidden = self.statusBarShouldBeHidden
+            } completion: {
+                if $0 {
+                    self.photoToolbar.isHidden = self.statusBarShouldBeHidden
+                }
+            }
+        }
+
+        UIView.animate(withDuration: 0.25) {
+            self.navBgView?.alpha = self.statusBarShouldBeHidden ? 0 : 1
+        } completion: {
+            if $0 {
+                self.navBgView?.isHidden = self.statusBarShouldBeHidden
             }
         }
         pickerController.pickerDelegate?.pickerController(

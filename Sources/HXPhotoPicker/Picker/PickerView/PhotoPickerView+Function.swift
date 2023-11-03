@@ -208,7 +208,9 @@ extension PhotoPickerView {
     func scrollToAppropriatePlace(photoAsset: PhotoAsset?) {
         var item = config.sort == .asc ? assets.count - 1 : 0
         if let photoAsset = photoAsset {
-            item = assets.firstIndex(of: photoAsset) ?? item
+            if let index = assets.firstIndex(of: photoAsset) {
+                item = index
+            }
             if needOffset {
                 item += offsetIndex
             }

@@ -41,6 +41,7 @@ public class PhotoMyAlbumViewController: UIViewController, UICollectionViewDataS
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.showsVerticalScrollIndicator = false
+        collectionView.delaysContentTouches = false
         collectionView.register(PhotoAlbumCollectionViewCell.self)
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
@@ -61,6 +62,7 @@ public class PhotoMyAlbumViewController: UIViewController, UICollectionViewDataS
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
         delegate?.myAlbumViewController(self, didSelectedWith: assetCollections[indexPath.item])
     }
     

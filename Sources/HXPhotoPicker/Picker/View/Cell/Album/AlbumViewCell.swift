@@ -18,7 +18,7 @@ open class AlbumViewCell: AlbumViewBaseCell {
     public var selectedBgView: UIView!
     
     /// 配置
-    public override var config: AlbumListConfiguration! {
+    public override var config: AlbumListConfiguration {
         didSet {
             albumNameLb.font = config.albumNameFont
             photoCountLb.font = config.photoCountFont
@@ -88,16 +88,16 @@ open class AlbumViewCell: AlbumViewBaseCell {
     // 颜色配置，重写此方法修改颜色配置
     open func configColor() {
         let isDark = PhotoManager.isDark
-        albumNameLb.textColor = isDark ? config?.albumNameDarkColor : config?.albumNameColor
-        photoCountLb.textColor = isDark ? config?.photoCountDarkColor : config?.photoCountColor
-        bottomLineView.backgroundColor = isDark ? config?.separatorLineDarkColor : config?.separatorLineColor
-        tickView.tickLayer.strokeColor = isDark ? config?.tickDarkColor.cgColor : config?.tickColor.cgColor
-        backgroundColor = isDark ? config?.cellBackgroundDarkColor : config?.cellBackgroundColor
+        albumNameLb.textColor = isDark ? config.albumNameDarkColor : config.albumNameColor
+        photoCountLb.textColor = isDark ? config.photoCountDarkColor : config.photoCountColor
+        bottomLineView.backgroundColor = isDark ? config.separatorLineDarkColor : config.separatorLineColor
+        tickView.tickLayer.strokeColor = isDark ? config.tickDarkColor.cgColor : config.tickColor.cgColor
+        backgroundColor = isDark ? config.cellBackgroundDarkColor : config.cellBackgroundColor
         if isDark {
-            selectedBgView.backgroundColor = config?.cellSelectedDarkColor
+            selectedBgView.backgroundColor = config.cellSelectedDarkColor
             selectedBackgroundView = selectedBgView
         }else {
-            if let color = config?.cellSelectedColor {
+            if let color = config.cellSelectedColor {
                 selectedBgView.backgroundColor = color
                 selectedBackgroundView = selectedBgView
             }else {
@@ -123,7 +123,7 @@ open class AlbumViewCell: AlbumViewBaseCell {
         albumNameLb.x = albumCoverView.frame.maxX + 10
         albumNameLb.size = CGSize(width: tickView.x - albumNameLb.x - 20, height: 16)
         
-        if let isShowPhotoCount = config?.isShowPhotoCount, isShowPhotoCount {
+        if config.isShowPhotoCount {
             albumNameLb.centerY = height / 2 - albumNameLb.height / 2
             
             photoCountLb.x = albumCoverView.frame.maxX + 10

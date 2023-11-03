@@ -733,45 +733,53 @@ extension EditorViewController {
             switch result {
             case .success(let dataResult):
                 DispatchQueue.global().async {
-                    var image: UIImage?
-                    let dataCount = CGFloat(dataResult.imageData.count)
-                    if dataCount > 3000000 {
-                        if let imageData = PhotoTools.imageCompress(
-                            dataResult.imageData,
-                            compressionQuality: dataCount.editorCompressionQuality,
-                            isHEIC: isHEIC
-                        ) {
-                            image = .init(data: imageData)
+                    func handler(_ result: UIImage? = nil) {
+                        var image = result
+                        if image == nil {
+                            image = UIImage(data: dataResult.imageData)
                         }
-                    }
-                    if image == nil {
-                        image = UIImage(data: dataResult.imageData)
-                    }
-                    guard let image = image?.normalizedImage() else {
+                        guard let image = image?.normalizedImage() else {
+                            DispatchQueue.main.async {
+                                if !self.isTransitionCompletion {
+                                    self.loadAssetStatus = .failure
+                                    return
+                                }
+                                ProgressHUD.hide(forView: self.view, animated: true)
+                                self.loadFailure(message: "图片获取失败!".localized)
+                            }
+                            return
+                        }
                         DispatchQueue.main.async {
                             if !self.isTransitionCompletion {
-                                self.loadAssetStatus = .failure
+                                self.loadAssetStatus = .successful(.image(image))
                                 return
                             }
+                            self.editorView.setImage(image)
+                            self.loadCompletion()
+                            self.loadLastEditedData()
+                            let viewSize = UIDevice.screenSize
+                            DispatchQueue.global().async {
+                                self.loadThumbnailImage(image, viewSize: viewSize)
+                            }
                             ProgressHUD.hide(forView: self.view, animated: true)
-                            self.loadFailure(message: "图片获取失败!".localized)
+                        }
+                    }
+                    let dataCount = CGFloat(dataResult.imageData.count)
+                    if dataCount > 3000000 {
+                        PhotoTools.compressImageData(
+                            dataResult.imageData,
+                            compressionQuality: dataCount.compressionQuality,
+                            queueLabel: "com.hxphotopicker.previewrequest"
+                        ) {
+                            guard let imageData = $0 else {
+                                handler()
+                                return
+                            }
+                            handler(.init(data: imageData))
                         }
                         return
                     }
-                    DispatchQueue.main.async {
-                        if !self.isTransitionCompletion {
-                            self.loadAssetStatus = .successful(.image(image))
-                            return
-                        }
-                        self.editorView.setImage(image)
-                        self.loadCompletion()
-                        self.loadLastEditedData()
-                        let viewSize = UIDevice.screenSize
-                        DispatchQueue.global().async {
-                            self.loadThumbnailImage(image, viewSize: viewSize)
-                        }
-                        ProgressHUD.hide(forView: self.view, animated: true)
-                    }
+                    handler()
                 }
             case .failure(let error):
                 if !self.isTransitionCompletion {

@@ -176,8 +176,8 @@ class PhotoPreviewVideoView: VideoPlayerView {
 //        }
     }
     func loadingSuperview() -> UIView? {
-        if let view = superview as? PhotoPreviewContentView {
-            return view.hudSuperview()
+        if let view = superview as? PhotoPreviewContentViewProtocol {
+            return view.hudSuperview
         }
         return self
     }

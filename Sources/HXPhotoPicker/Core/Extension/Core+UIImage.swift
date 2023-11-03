@@ -66,24 +66,26 @@ extension UIImage {
         }else {
             rect = CGRect(origin: .zero, size: size)
         }
-        UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        self.draw(in: rect)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = scale
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        let image = renderer.image { context in
+            draw(in: rect)
+        }
         return image
     }
     func scaleImage(toScale: CGFloat) -> UIImage? {
         if toScale == 1 {
             return self
         }
-        UIGraphicsBeginImageContextWithOptions(
-            CGSize(width: width * toScale, height: height * toScale),
-            false,
-            self.scale
-        )
-        self.draw(in: CGRect(x: 0, y: 0, width: width * toScale, height: height * toScale))
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = scale
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: width * toScale, height: height * toScale), format: format)
+        let image = renderer.image { context in
+            draw(in: CGRect(x: 0, y: 0, width: width * toScale, height: height * toScale))
+        }
         return image
     }
     static func image(
@@ -99,15 +101,17 @@ extension UIImage {
             }else {
                 rect = CGRect(x: 0, y: 0, width: havingSize.width, height: havingSize.height)
             }
-            UIGraphicsBeginImageContextWithOptions(rect.size, false, scale)
-            let context = UIGraphicsGetCurrentContext()
-            context?.setFillColor(color.cgColor)
-            let path = UIBezierPath(roundedRect: rect, cornerRadius: radius).cgPath
-            context?.addPath(path)
-            context?.fillPath()
-        
-            let image = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
+            let format = UIGraphicsImageRendererFormat()
+            format.opaque = false
+            format.scale = scale
+            let renderer = UIGraphicsImageRenderer(size: rect.size, format: format)
+            let image = renderer.image { context in
+                let cgContext = context.cgContext
+                cgContext.setFillColor(color.cgColor)
+                let path = UIBezierPath(roundedRect: rect, cornerRadius: radius).cgPath
+                cgContext.addPath(path)
+                cgContext.fillPath()
+            }
             return image
         }
         return nil
@@ -120,21 +124,24 @@ extension UIImage {
         return repaintImage()
     }
     func repaintImage() -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = scale
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        let image = renderer.image { context in
+            draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        }
         return image
     }
     func roundCropping() -> UIImage? {
-        UIGraphicsBeginImageContext(size)
-        let width = min(size.width, size.height)
-        let rect = CGRect(x: (size.width - width) * 0.5, y: (size.height - width) * 0.5, width: width, height: width)
-        let path = UIBezierPath(ovalIn: rect)
-        path.addClip()
-        draw(at: .zero)
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let newImage = renderer.image { context in
+            let width = min(size.width, size.height)
+            let rect = CGRect(x: (size.width - width) * 0.5, y: (size.height - width) * 0.5, width: width, height: width)
+            let path = UIBezierPath(ovalIn: rect)
+            path.addClip()
+            draw(at: .zero)
+        }
         return newImage
     }
     func cropImage(toRect cropRect: CGRect, viewWidth: CGFloat, viewHeight: CGFloat) -> UIImage? {
@@ -211,20 +218,20 @@ extension UIImage {
             default:
                 return self
             }
-            UIGraphicsBeginImageContext(bnds.size)
-            let context = UIGraphicsGetCurrentContext()
-            switch orientation {
-            case .left, .leftMirrored, .right, .rightMirrored:
-                context?.scaleBy(x: -1, y: 1)
-                context?.translateBy(x: -rect.height, y: 0)
-            default:
-                context?.scaleBy(x: 1, y: -1)
-                context?.translateBy(x: 0, y: -rect.height)
+            let renderer = UIGraphicsImageRenderer(size: bnds.size)
+            let newImage = renderer.image { context in
+                let cgContext = context.cgContext
+                switch orientation {
+                case .left, .leftMirrored, .right, .rightMirrored:
+                    cgContext.scaleBy(x: -1, y: 1)
+                    cgContext.translateBy(x: -rect.height, y: 0)
+                default:
+                    cgContext.scaleBy(x: 1, y: -1)
+                    cgContext.translateBy(x: 0, y: -rect.height)
+                }
+                cgContext.concatenate(trans)
+                cgContext.draw(cgImage, in: rect)
             }
-            context?.concatenate(trans)
-            context?.draw(cgImage, in: rect)
-            let newImage = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
             return newImage
         }
         return nil
@@ -259,52 +266,72 @@ extension UIImage {
         return self
     }
     func merge(_ image: UIImage, origin: CGPoint, scale: CGFloat = UIScreen._scale) -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        draw(in: CGRect(origin: .zero, size: size))
-        image.draw(in: CGRect(origin: origin, size: size))
-        let mergeImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = scale
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        let mergeImage = renderer.image { context in
+            image.draw(in: CGRect(origin: origin, size: size))
+        }
         return mergeImage
     }
     func merge(images: [UIImage], scale: CGFloat = UIScreen._scale) -> UIImage? {
         if images.isEmpty {
             return self
         }
-        UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        draw(in: CGRect(origin: .zero, size: size))
-        for image in images {
-            image.draw(in: CGRect(origin: .zero, size: size))
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = scale
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        let mergeImage = renderer.image { context in
+            draw(in: CGRect(origin: .zero, size: size))
+            for image in images {
+                image.draw(in: CGRect(origin: .zero, size: size))
+            }
         }
-        let mergeImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
         return mergeImage
     }
     
-    static func merge(images: [UIImage], scale: CGFloat = UIScreen._scale) -> UIImage? {
+    static func merge(images: [UIImage], scale: CGFloat? = nil) -> UIImage? {
         if images.isEmpty {
             return nil
         }
         if images.count == 1 {
             return images.first
         }
-        UIGraphicsBeginImageContextWithOptions(images.first!.size, false, scale)
-        for image in images {
-            image.draw(in: CGRect(origin: .zero, size: image.size))
+        var _scale: CGFloat = 1
+        if let scale = scale {
+            _scale = scale
+        }else {
+            if !Thread.isMainThread {
+                DispatchQueue.main.sync {
+                    _scale = UIScreen._scale
+                }
+            }else {
+                _scale = UIScreen._scale
+            }
         }
-        let mergeImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = _scale
+        let renderer = UIGraphicsImageRenderer(size: images.first!.size, format: format)
+        let mergeImage = renderer.image { context in
+            for image in images {
+                image.draw(in: CGRect(origin: .zero, size: image.size))
+            }
+        }
         return mergeImage
     }
     static func gradualShadowImage(_ havingSize: CGSize) -> UIImage? {
         let layer = PhotoTools.getGradientShadowLayer(true)
         layer.frame = CGRect(origin: .zero, size: havingSize)
-        UIGraphicsBeginImageContextWithOptions(havingSize, false, UIScreen._scale)
-        guard let context = UIGraphicsGetCurrentContext() else {
-            return nil
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = UIScreen._scale
+        let renderer = UIGraphicsImageRenderer(size: havingSize, format: format)
+        let image = renderer.image { context in
+            layer.render(in: context.cgContext)
         }
-        layer.render(in: context)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
         return image
     }
 }

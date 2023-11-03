@@ -137,7 +137,9 @@ public class PhotoPickerBottomNumberView: UICollectionReusableView {
             contentLb.centerY = 25
         }
         filterLb.width = width
-        filterLb.height = filterLb.attributedText?.string.height(ofFont: .systemFont(ofSize: 14), maxWidth: width) ?? 0
+        if let textHeight = filterLb.attributedText?.string.height(ofFont: .systemFont(ofSize: 14), maxWidth: width) {
+            filterLb.height = textHeight
+        }
         filterLb.y = contentLb.frame.maxY
     }
     
@@ -158,8 +160,15 @@ public class PhotoPickerBottomNumberView: UICollectionReusableView {
 
 fileprivate extension String {
     var intervalNumber: String {
+        guard let value = Int(self) else {
+            return self
+        }
+        let number = NSNumber(value: value)
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        return formatter.string(from: NSNumber(value: Int(self) ?? 0)) ?? self
+        guard let string = formatter.string(from: number) else {
+            return self
+        }
+        return string
     }
 }

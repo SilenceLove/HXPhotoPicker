@@ -243,7 +243,9 @@ open class EditorViewController: BaseViewController {
         
         leftRotateButton = ExpandButton(type: .system)
         leftRotateButton.setImage("hx_editor_photo_rotate_left".image, for: .normal)
-        leftRotateButton.size = leftRotateButton.currentImage?.size ?? .zero
+        if let btnSize = leftRotateButton.currentImage?.size {
+            leftRotateButton.size = btnSize
+        }
         leftRotateButton.tintColor = .white
         leftRotateButton.addTarget(self, action: #selector(didLeftRotateButtonClick(button:)), for: .touchUpInside)
         leftRotateButton.alpha = 0
@@ -251,7 +253,9 @@ open class EditorViewController: BaseViewController {
         
         rightRotateButton = ExpandButton(type: .system)
         rightRotateButton.setImage("hx_editor_photo_rotate_right".image, for: .normal)
-        rightRotateButton.size = rightRotateButton.currentImage?.size ?? .zero
+        if let btnSize = rightRotateButton.currentImage?.size {
+            rightRotateButton.size = btnSize
+        }
         rightRotateButton.tintColor = .white
         rightRotateButton.addTarget(self, action: #selector(didRightRotateButtonClick(button:)), for: .touchUpInside)
         rightRotateButton.alpha = 0
@@ -259,7 +263,9 @@ open class EditorViewController: BaseViewController {
         
         mirrorHorizontallyButton = ExpandButton(type: .system)
         mirrorHorizontallyButton.setImage("hx_editor_photo_mirror_horizontally".image, for: .normal)
-        mirrorHorizontallyButton.size = mirrorHorizontallyButton.currentImage?.size ?? .zero
+        if let btnSize = mirrorHorizontallyButton.currentImage?.size {
+            mirrorHorizontallyButton.size = btnSize
+        }
         mirrorHorizontallyButton.tintColor = .white
         mirrorHorizontallyButton.addTarget(self, action: #selector(didMirrorHorizontallyButtonClick(button:)), for: .touchUpInside)
         mirrorHorizontallyButton.alpha = 0
@@ -267,7 +273,9 @@ open class EditorViewController: BaseViewController {
         
         mirrorVerticallyButton = ExpandButton(type: .system)
         mirrorVerticallyButton.setImage("hx_editor_photo_mirror_vertically".image, for: .normal)
-        mirrorVerticallyButton.size = mirrorVerticallyButton.currentImage?.size ?? .zero
+        if let btnSize = mirrorVerticallyButton.currentImage?.size {
+            mirrorVerticallyButton.size = btnSize
+        }
         mirrorVerticallyButton.tintColor = .white
         mirrorVerticallyButton.addTarget(self, action: #selector(didMirrorVerticallyButtonClick(button:)), for: .touchUpInside)
         mirrorVerticallyButton.alpha = 0
@@ -275,7 +283,9 @@ open class EditorViewController: BaseViewController {
         
         changeButton = ExpandButton(type: .custom)
         changeButton.setImage("hx_editor_change_asset".image, for: .normal)
-        changeButton.size = changeButton.currentImage?.size ?? .zero
+        if let btnSize = changeButton.currentImage?.size {
+            changeButton.size = btnSize
+        }
         changeButton.addTarget(self, action: #selector(didChangeButtonClick(button:)), for: .touchUpInside)
         changeButton.layer.shadowColor = UIColor.black.withAlphaComponent(0.5).cgColor
         changeButton.layer.shadowOpacity = 1
@@ -285,7 +295,9 @@ open class EditorViewController: BaseViewController {
         
         maskListButton = ExpandButton(type: .custom)
         maskListButton.setImage("hx_editor_crop_mask_list".image, for: .normal)
-        maskListButton.size = maskListButton.currentImage?.size ?? .zero
+        if let btnSize = maskListButton.currentImage?.size {
+            maskListButton.size = btnSize
+        }
         maskListButton.tintColor = .white
         maskListButton.addTarget(self, action: #selector(didMaskListButtonClick(button:)), for: .touchUpInside)
         maskListButton.alpha = 0
@@ -294,13 +306,17 @@ open class EditorViewController: BaseViewController {
         scaleSwitchLeftBtn = ExpandButton(type: .custom)
         scaleSwitchLeftBtn.setImage("hx_editor_crop_scale_switch_left".image, for: .normal)
         scaleSwitchLeftBtn.setImage("hx_editor_crop_scale_switch_left_selected".image, for: .selected)
-        scaleSwitchLeftBtn.size = scaleSwitchLeftBtn.currentImage?.size ?? .zero
+        if let btnSize = scaleSwitchLeftBtn.currentImage?.size {
+            scaleSwitchLeftBtn.size = btnSize
+        }
         scaleSwitchLeftBtn.addTarget(self, action: #selector(didScaleSwitchLeftBtn(button:)), for: .touchUpInside)
         
         scaleSwitchRightBtn = ExpandButton(type: .custom)
         scaleSwitchRightBtn.setImage("hx_editor_crop_scale_switch_right".image, for: .normal)
         scaleSwitchRightBtn.setImage("hx_editor_crop_scale_switch_right_selected".image, for: .selected)
-        scaleSwitchRightBtn.size = scaleSwitchRightBtn.currentImage?.size ?? .zero
+        if let btnSize = scaleSwitchRightBtn.currentImage?.size {
+            scaleSwitchRightBtn.size = btnSize
+        }
         scaleSwitchRightBtn.addTarget(self, action: #selector(didScaleSwitchRightBtn(button:)), for: .touchUpInside)
         
         scaleSwitchView = UIView()
@@ -346,7 +362,9 @@ open class EditorViewController: BaseViewController {
             
             drawUndoBtn = ExpandButton(type: .custom)
             drawUndoBtn.setImage("hx_editor_canvas_draw_undo".image, for: .normal)
-            drawUndoBtn.size = drawUndoBtn.currentImage?.size ?? .zero
+            if let btnSize = drawUndoBtn.currentImage?.size {
+                drawUndoBtn.size = btnSize
+            }
             drawUndoBtn.isEnabled = false
             drawUndoBtn.alpha = 0
             drawUndoBtn.isHidden = true
@@ -354,7 +372,9 @@ open class EditorViewController: BaseViewController {
             
             drawUndoAllBtn = ExpandButton(type: .custom)
             drawUndoAllBtn.setImage("hx_editor_canvas_draw_undo_all".image, for: .normal)
-            drawUndoAllBtn.size = drawUndoAllBtn.currentImage?.size ?? .zero
+            if let btnSize = drawUndoAllBtn.currentImage?.size {
+                drawUndoAllBtn.size = btnSize
+            }
             drawUndoAllBtn.isEnabled = false
             drawUndoAllBtn.alpha = 0
             drawUndoAllBtn.isHidden = true
@@ -362,7 +382,9 @@ open class EditorViewController: BaseViewController {
             
             drawRedoBtn = ExpandButton(type: .custom)
             drawRedoBtn.setImage("hx_editor_canvas_draw_redo".image, for: .normal)
-            drawRedoBtn.size = drawRedoBtn.currentImage?.size ?? .zero
+            if let btnSize = drawRedoBtn.currentImage?.size {
+                drawRedoBtn.size = btnSize
+            }
             drawRedoBtn.isEnabled = false
             drawRedoBtn.alpha = 0
             drawRedoBtn.isHidden = true

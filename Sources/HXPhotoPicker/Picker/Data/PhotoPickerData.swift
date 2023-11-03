@@ -139,7 +139,7 @@ open class PhotoPickerData {
         }
         if selectedAssets.contains(photoAsset) {
             photoAsset.isSelected = true
-            return true
+            return false
         }
         let canSelect = canSelect(
             photoAsset,

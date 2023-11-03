@@ -26,8 +26,10 @@ public class PhotoTextCancelItemView: UIView, PhotoNavigationItem {
         button.titleLabel?.font = .mediumPingFang(ofSize: 17)
         button.addTarget(self, action: #selector(didCancelClick), for: .touchUpInside)
         addSubview(button)
-        button.size = button.titleLabel?.textSize ?? .zero
-        size = button.size
+        if let textSize = button.titleLabel?.textSize {
+            button.size = textSize
+            size = button.size
+        }
         setColor()
     }
     

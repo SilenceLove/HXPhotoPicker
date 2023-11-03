@@ -116,9 +116,10 @@
 "筛选照片" = "Foto";
 "筛选视频" = "Video";
 "选择相册" = "Pilih album";
-"我的相册" = "album saya";
-"媒体类型" = "tipe media";
+"我的相册" = "Album saya";
+"媒体类型" = "Tipe media";
 "查看全部" = "Lihat semua";
+"全部" = "Semua";
 
 "HXAlbumCameraRoll" = "Semua foto";
 "HXAlbumPanoramas" = "gambar panorama";

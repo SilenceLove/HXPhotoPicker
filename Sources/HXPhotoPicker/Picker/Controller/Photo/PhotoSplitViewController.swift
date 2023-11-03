@@ -170,4 +170,8 @@ open class PhotoSplitViewController: UISplitViewController, UISplitViewControlle
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        HXLog("PhotoSplitViewController deinited 👍")
+    }
+    
 }

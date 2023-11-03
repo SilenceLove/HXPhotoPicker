@@ -23,7 +23,9 @@ class PhotoPermissionPromptView: UIView {
     private func initView() {
         let promptIconImage = UIImage.image(for: "hx_picker_photolist_bottom_prompt")?.withRenderingMode(.alwaysTemplate)
         promptIcon = UIImageView(image: promptIconImage)
-        promptIcon.size = promptIcon.image?.size ?? CGSize.zero
+        if let imageSize = promptIcon.image?.size {
+            promptIcon.size = imageSize
+        }
         addSubview(promptIcon)
         
         promptLb = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 60))
@@ -35,7 +37,9 @@ class PhotoPermissionPromptView: UIView {
         
         let promptArrowImage = UIImage.image(for: "hx_picker_photolist_bottom_prompt_arrow")?.withRenderingMode(.alwaysTemplate)
         promptArrow = UIImageView(image: promptArrowImage)
-        promptArrow.size = promptArrow.image?.size ?? CGSize.zero
+        if let imageSize = promptArrow.image?.size {
+            promptArrow.size = imageSize
+        }
         addSubview(promptArrow)
         
         addGestureRecognizer(

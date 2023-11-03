@@ -21,7 +21,7 @@ public extension PhotoPeekViewControllerDelegate {
 public class PhotoPeekViewController: UIViewController {
     weak var delegate: PhotoPeekViewControllerDelegate?
     
-    private var contentView: PhotoPreviewContentView!
+    private var contentView: PhotoPreviewContentViewProtocol!
     private var progressView: UIView!
     #if !targetEnvironment(macCatalyst)
     private var captureView: CaptureVideoPreviewView!
@@ -44,18 +44,17 @@ public class PhotoPeekViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         if photoAsset != nil {
-            let type: PhotoPreviewContentView.`Type`
             if photoAsset.mediaType == .photo {
                 if photoAsset.mediaSubType == .livePhoto ||
                     photoAsset.mediaSubType == .localLivePhoto {
-                    type = .livePhoto
+                    contentView = PhotoPreviewContentLivePhotoView()
                 }else {
-                    type = .photo
+                    contentView = PhotoPreviewContentPhotoView()
                 }
             }else {
-                type = .video
+                contentView = PhotoPreviewContentVideoView()
+                contentView.videoView.delegate = self
             }
-            contentView = PhotoPreviewContentView(type: type)
             contentView.isPeek = true
             if let photoAsset = photoAsset {
                 contentView.photoAsset = photoAsset
@@ -63,9 +62,6 @@ public class PhotoPeekViewController: UIViewController {
             contentView.livePhotoPlayType = .auto
             contentView.videoPlayType = .auto
             contentView.delegate = self
-            if type == .video {
-                contentView.videoView.delegate = self
-            }
             view.addSubview(contentView)
             
             progressView = UIView()
@@ -124,10 +120,10 @@ public class PhotoPeekViewController: UIViewController {
     }
 }
 extension PhotoPeekViewController: PhotoPreviewContentViewDelete {
-    public func contentView(requestSucceed contentView: PhotoPreviewContentView) {
+    func contentView(requestSucceed contentView: PhotoPreviewContentViewProtocol) {
         delegate?.photoPeekViewController(requestSucceed: self)
     }
-    public func contentView(requestFailed contentView: PhotoPreviewContentView) {
+    func contentView(requestFailed contentView: PhotoPreviewContentViewProtocol) {
         delegate?.photoPeekViewController(requestFailed: self)
     }
 }

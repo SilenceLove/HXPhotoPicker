@@ -165,6 +165,10 @@ open class PhotoPickerController: UINavigationController {
         ) as? PhotoPreviewViewController
     }
     
+    public var dismissPanGestureRecognizer: UIPanGestureRecognizer? {
+        dismissInteractiveTransition?.panGestureRecognizer
+    }
+    
     /// 当前处于的外部预览
     public let previewType: PhotoPreviewType
     
@@ -390,8 +394,8 @@ open class PhotoPickerController: UINavigationController {
     
     private func initViews() {
         configColor()
-        navigationBar.isTranslucent = config.navigationBarIsTranslucent
         deniedView = config.notAuthorizedView.init(config: config)
+        deniedView.pickerDelegate = self
         if let view = splitViewController?.view {
             deniedView.frame = view.bounds
         }else {
@@ -508,6 +512,7 @@ open class PhotoPickerController: UINavigationController {
         PhotoManager.shared.thumbnailLoadMode = .complete
         PhotoManager.shared.firstLoadAssets = false
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
+        HXLog("PhotoPickerController deinited 👍")
     }
     
     enum SplitContentType {
@@ -529,10 +534,8 @@ extension PhotoPickerController {
             config.navigationViewBackgroundColor
     }
     private func configColor() {
-        if config.appearanceStyle == .normal {
-            if #available(iOS 13.0, *) {
-                overrideUserInterfaceStyle = .light
-            }
+        if #available(iOS 13.0, *), config.appearanceStyle == .normal {
+            overrideUserInterfaceStyle = .light
         }
         
         if modalPresentationStyle != .custom {
@@ -548,6 +551,16 @@ extension PhotoPickerController {
         navigationBar.tintColor = tintColor
         let barStyle = isDark ? config.navigationBarDarkStyle : config.navigationBarStyle
         navigationBar.barStyle = barStyle
+        navigationBar.isTranslucent = config.navigationBarIsTranslucent
+        
+        let navigationBackgroundImage = isDark ? config.navigationBackgroundDarkImage : config.navigationBackgroundImage
+        let navigationBackgroundColor = isDark ? config.navigationBackgroundDarkColor : config.navigationBackgroundColor
+        if let image = navigationBackgroundImage {
+            navigationBar.setBackgroundImage(image, for: .default)
+        }
+        if let color = navigationBackgroundColor {
+            navigationBar.backgroundColor = color
+        }
         
         if !config.adaptiveBarAppearance {
             return
@@ -560,6 +573,12 @@ extension PhotoPickerController {
                 appearance.backgroundEffect = UIBlurEffect(style: .extraLight)
             default:
                 appearance.backgroundEffect = UIBlurEffect(style: .dark)
+            }
+            if let image = navigationBackgroundImage {
+                appearance.backgroundImage = image
+            }
+            if let color = navigationBackgroundColor {
+                appearance.backgroundColor = color
             }
             navigationBar.standardAppearance = appearance
             navigationBar.scrollEdgeAppearance = appearance

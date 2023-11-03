@@ -170,6 +170,10 @@ public class PhotoAlbumViewController: UIViewController, PhotoAlbumController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        HXLog("PhotoAlbumViewController deinited 👍")
+    }
+    
     struct AlbumData {
         let title: String
         let assetCollections: [PhotoAssetCollection]

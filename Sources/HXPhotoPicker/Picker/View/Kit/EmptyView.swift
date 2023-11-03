@@ -41,10 +41,12 @@ public class PhotoPickerEmptyView: UIView {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        let titleHeight = titleLb.text?.height(ofFont: titleLb.font, maxWidth: width - 20) ?? 0
-        titleLb.frame = CGRect(x: 10, y: 0, width: width - 20, height: titleHeight)
-        let subTitleHeight = subTitleLb.text?.height(ofFont: subTitleLb.font, maxWidth: width - 20) ?? 0
-        subTitleLb.frame = CGRect(x: 10, y: titleLb.frame.maxY + 3, width: width - 20, height: subTitleHeight)
+        if let titleHeight = titleLb.text?.height(ofFont: titleLb.font, maxWidth: width - 20) {
+            titleLb.frame = CGRect(x: 10, y: 0, width: width - 20, height: titleHeight)
+        }
+        if let subTitleHeight = subTitleLb.text?.height(ofFont: subTitleLb.font, maxWidth: width - 20) {
+            subTitleLb.frame = CGRect(x: 10, y: titleLb.frame.maxY + 3, width: width - 20, height: subTitleHeight)
+        }
         height = subTitleLb.frame.maxY
     }
     

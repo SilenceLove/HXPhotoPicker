@@ -92,6 +92,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 toVC.view.insertSubview(contentView, at: 1)
             }else if let previewVC = toVC as? PhotoPreviewViewController {
                 previewVC.photoToolbar.alpha = 0
+                previewVC.navBgView?.alpha = 0
                 toVC.view.insertSubview(contentView, at: 1)
             }else if toVC is PhotoPickerController || toVC is PhotoSplitViewController {
                 var picker: PhotoPickerController?
@@ -120,6 +121,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     vc.view.insertSubview(contentView, at: 1)
                 }else if let vc = picker?.topViewController as? PhotoPreviewViewController {
                     vc.photoToolbar.alpha = 0
+                    vc.navBgView?.alpha = 0
                     vc.view.insertSubview(contentView, at: 1)
                 }
                 picker?.navigationBar.alpha = 0
@@ -147,10 +149,10 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 if let view = editorVC.delegate?.editorViewController(transitioStartPreviewView: editorVC) {
                     transitionView = view
                     fromRect = view.convert(view.bounds, to: contentView)
-                }else {
-                    fromRect = editorVC.delegate?.editorViewController(
-                        transitioStartPreviewFrame: editorVC
-                    ) ?? .zero
+                }else if let rect = editorVC.delegate?.editorViewController(
+                    transitioStartPreviewFrame: editorVC
+                ) {
+                    fromRect = rect
                 }
                 let image = editorVC.delegate?.editorViewController(transitionPreviewImage: editorVC)
                 previewView.image = image
@@ -217,7 +219,9 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     }
                 }
                 let finalView = editorVC.editorView.finalView
-                fromRect = finalView.superview?.convert(finalView.frame, to: contentView) ?? .zero
+                if let rect = finalView.superview?.convert(finalView.frame, to: contentView) {
+                    fromRect = rect
+                }
                 previewView.frame = fromRect
                 imageView.frame = previewView.bounds
                 previewView.addSubview(imageView)
@@ -225,10 +229,10 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 if let view = editorVC.delegate?.editorViewController(transitioEndPreviewView: editorVC) {
                     transitionView = view
                     toRect = view.convert(view.bounds, to: contentView)
-                }else {
-                    toRect = editorVC.delegate?.editorViewController(
-                        transitioEndPreviewFrame: editorVC
-                    ) ?? .zero
+                }else if let rect = editorVC.delegate?.editorViewController(
+                    transitioEndPreviewFrame: editorVC
+                ) {
+                    toRect = rect
                 }
             }
             editorVC.editorView.isHidden = true
@@ -266,6 +270,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     pickerVC.photoToolbar.alpha = 0
                 }else if let previewVC = fromVC as? PhotoPreviewViewController {
                     previewVC.photoToolbar.alpha = 0
+                    previewVC.navBgView?.alpha = 0
                 }else if fromVC is PhotoPickerController || fromVC is PhotoSplitViewController {
                     var picker: PhotoPickerController?
                     if let pickerController = fromVC as? PhotoPickerController {
@@ -287,6 +292,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                         vc.photoToolbar.alpha = 0
                     }else if let vc = picker?.topViewController as? PhotoPreviewViewController {
                         vc.photoToolbar.alpha = 0
+                        vc.navBgView?.alpha = 0
                     }
                 }
                 #endif
@@ -300,6 +306,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     pickerVC.photoToolbar.alpha = 1
                 }else if let previewVC = toVC as? PhotoPreviewViewController {
                     previewVC.photoToolbar.alpha = 1
+                    previewVC.navBgView?.alpha = 1
                 }else if toVC is PhotoPickerController || toVC is PhotoSplitViewController {
                     var picker: PhotoPickerController?
                     if let pickerController = toVC as? PhotoPickerController {
@@ -322,6 +329,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                         vc.photoToolbar.alpha = 1
                     }else if let vc = picker?.topViewController as? PhotoPreviewViewController {
                         vc.photoToolbar.alpha = 1
+                        vc.navBgView?.alpha = 1
                     }
                     picker?.navigationBar.alpha = 1
                 }
@@ -374,6 +382,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     pickerVC.photoToolbar.alpha = 1
                 }else if let previewVC = fromVC as? PhotoPreviewViewController {
                     previewVC.photoToolbar.alpha = 1
+                    previewVC.navBgView?.alpha = 1
                 }else if fromVC is PhotoPickerController || fromVC is PhotoSplitViewController {
                     var picker: PhotoPickerController?
                     if let pickerController = fromVC as? PhotoPickerController {
@@ -395,6 +404,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                         vc.photoToolbar.alpha = 1
                     }else if let vc = picker?.topViewController as? PhotoPreviewViewController {
                         vc.photoToolbar.alpha = 1
+                        vc.navBgView?.alpha = 1
                     }
                 }
                 #endif

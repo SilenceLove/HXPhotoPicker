@@ -9,6 +9,7 @@
 import UIKit
  
 public class DeniedAuthorizationView: UIView, PhotoDeniedAuthorization {
+    public weak var pickerDelegate: PhotoControllerEvent?
     
     let config: NotAuthorizedConfiguration
     
@@ -101,11 +102,7 @@ public class DeniedAuthorizationView: UIView, PhotoDeniedAuthorization {
     }
     @objc
     private func didCloseClick() {
-        guard let pickerController = viewController as? PhotoPickerController else {
-            viewController?.dismiss(animated: true)
-            return
-        }
-        pickerController.cancelCallback()
+        pickerDelegate?.photoControllerDidCancel()
     }
     @objc
     private func jumpSetting() {

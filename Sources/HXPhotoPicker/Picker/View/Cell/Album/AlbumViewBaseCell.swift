@@ -11,7 +11,7 @@ import UIKit
 open class AlbumViewBaseCell: UITableViewCell {
     open var assetCollection: PhotoAssetCollection!
     
-    open var config: AlbumListConfiguration!
+    open var config: AlbumListConfiguration = .init()
     
     open func updateSelectedStatus(_ isSelected: Bool) { }
 }

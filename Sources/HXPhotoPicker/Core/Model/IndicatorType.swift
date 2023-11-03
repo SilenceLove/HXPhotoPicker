@@ -11,6 +11,9 @@ public enum IndicatorType {
     /// gradient ring
     /// 渐变圆环
     case circle
+    
+    case circleJoin
+    
     /// System chrysanthemum
     /// 系统菊花
     case system

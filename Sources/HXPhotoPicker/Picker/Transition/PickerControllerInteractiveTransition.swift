@@ -12,7 +12,7 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
         case pop
         case dismiss
     }
-    private var panGestureRecognizer: UIPanGestureRecognizer!
+    var panGestureRecognizer: UIPanGestureRecognizer!
     private weak var bgView: UIView?
     private var pickerControllerBackgroundColor: UIColor?
     private var beganPoint: CGPoint = .zero

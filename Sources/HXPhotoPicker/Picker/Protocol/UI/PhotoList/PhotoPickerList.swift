@@ -19,7 +19,7 @@ public protocol PhotoPickerListDelegate: PhotoControllerEvent {
     )
     
     /// 数据发生改变
-    func photoList(selectedAssetDidChanged photoList: UIView)
+    func photoList(selectedAssetDidChanged photoList: PhotoPickerList)
     
     /// 打开编辑器
     func photoList(
@@ -41,10 +41,18 @@ public protocol PhotoPickerListDelegate: PhotoControllerEvent {
     
     /// 跳转到筛选界面
     func photoList(presentFilter photoList: PhotoPickerList)
+    
+    func photoList(_ photoList: PhotoPickerList, didSelectedAsset asset: PhotoAsset)
+    func photoList(_ photoList: PhotoPickerList, didDeselectedAsset asset: PhotoAsset)
+}
+
+public extension PhotoPickerListDelegate {
+    func photoList(_ photoList: PhotoPickerList, didSelectedAsset asset: PhotoAsset) { }
+    func photoList(_ photoList: PhotoPickerList, didDeselectedAsset asset: PhotoAsset) { }
 }
 
 public protocol PhotoPickerList:
-    UIView,
+    UIViewController,
     PhotoPickerListDelegateProperty,
     PhotoPickerListFectchCell,
     PhotoPickerListPickerConfig,
@@ -134,7 +142,7 @@ public extension PhotoPickerList {
         if assets.isEmpty {
             return
         }
-        let rect = cell.photoView.convert(cell.photoView.bounds, to: self)
+        let rect = cell.photoView.convert(cell.photoView.bounds, to: view)
         if rect.minY - collectionView.contentInset.top < 0 {
             if let indexPath = collectionView.indexPath(for: cell) {
                 collectionView.scrollToItem(
@@ -143,7 +151,7 @@ public extension PhotoPickerList {
                     animated: false
                 )
             }
-        }else if rect.maxY > height - collectionView.contentInset.bottom {
+        }else if rect.maxY > view.height - collectionView.contentInset.bottom {
             if let indexPath = collectionView.indexPath(for: cell) {
                 collectionView.scrollToItem(
                     at: indexPath,

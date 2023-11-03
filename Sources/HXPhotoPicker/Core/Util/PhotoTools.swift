@@ -402,31 +402,10 @@ public struct PhotoTools {
                 width: Int(resultImage.width * ratio),
                 height: Int(resultImage.height * ratio)
             )
-            UIGraphicsBeginImageContext(size)
-            resultImage.draw(in: CGRect(origin: .zero, size: size))
-            guard let image = UIGraphicsGetImageFromCurrentImageContext() else {
-                UIGraphicsEndImageContext()
+            guard let image = resultImage.scaleToFillSize(size: size),
+                  let imageData = image.jpegData(compressionQuality: 0.5) else {
                 return data
             }
-            let imageData: Data
-            if isHEIC {
-                if let data = image.jpegData(compressionQuality: 0.5) {
-                    imageData = data
-                }else {
-                    UIGraphicsEndImageContext()
-                    return data
-                }
-            }else {
-                if let data = image.pngData() {
-                    imageData = data
-                }else if let data = image.jpegData(compressionQuality: 1) {
-                    imageData = data
-                }else {
-                    UIGraphicsEndImageContext()
-                    return data
-                }
-            }
-            UIGraphicsEndImageContext()
             resultImage = image
             data = imageData
         }
@@ -436,10 +415,17 @@ public struct PhotoTools {
     static func compressImageData(
         _ imageData: Data,
         compressionQuality: CGFloat?,
-        isHEIC: Bool = false,
         queueLabel: String,
         completion: @escaping (Data?) -> Void
     ) {
+        guard let compressionQuality else {
+            completion(imageData)
+            return
+        }
+        guard let resultImage = UIImage(data: imageData)?.normalizedImage() else {
+            completion(imageData)
+            return
+        }
         let serialQueue = DispatchQueue(
             label: queueLabel,
             qos: .userInitiated,
@@ -447,20 +433,66 @@ public struct PhotoTools {
             autoreleaseFrequency: .workItem,
             target: nil
         )
+        let compression = max(0, min(1, compressionQuality))
+        let maxLength = Int(CGFloat(imageData.count) * compression)
+        let widthHeightRatio = resultImage.width / resultImage.height
+        let data = imageData
+        
         serialQueue.async {
-            autoreleasepool {
-                if let compressionQuality = compressionQuality {
-                    if let data = self.imageCompress(
-                        imageData,
-                        compressionQuality: compressionQuality,
-                        isHEIC: isHEIC
-                    ) {
-                        completion(data)
-                        return
-                    }
-                }
-                completion(imageData)
+            compressImageData(
+                data,
+                resultImage: resultImage,
+                compression: compressionQuality,
+                maxLength: maxLength,
+                widthHeightRatio: widthHeightRatio
+            ) {
+                completion($0)
             }
+        }
+    }
+     
+    private static func compressImageData(
+        _ data: Data,
+        resultImage: UIImage,
+        compression: CGFloat,
+        maxLength: Int,
+        lastDataLength: Int = 0,
+        widthHeightRatio: CGFloat,
+        completionHandler: @escaping (Data) -> Void
+    ) {
+        autoreleasepool {
+            var lastDataLength = lastDataLength
+            let dataCount = data.count
+            lastDataLength = dataCount
+            let maxRatio: CGFloat
+            if widthHeightRatio < 0.2 {
+                maxRatio = 1
+            }else {
+                maxRatio = min(5000 / resultImage.width, 5000 / resultImage.height)
+            }
+            let ratio = min(max(CGFloat(maxLength) / CGFloat(dataCount), compression), maxRatio)
+            let size = CGSize(
+                width: Int(resultImage.width * ratio),
+                height: Int(resultImage.height * ratio)
+            )
+            guard let image = resultImage.scaleToFillSize(size: size),
+                  let imageData = image.jpegData(compressionQuality: 0.5) else {
+                completionHandler(data)
+                return
+            }
+            if data.count > maxLength && data.count != lastDataLength {
+                self.compressImageData(
+                    imageData,
+                    resultImage: image,
+                    compression: compression,
+                    maxLength: maxLength,
+                    lastDataLength: lastDataLength,
+                    widthHeightRatio: widthHeightRatio,
+                    completionHandler: completionHandler
+                )
+                return
+            }
+            completionHandler(imageData)
         }
     }
     

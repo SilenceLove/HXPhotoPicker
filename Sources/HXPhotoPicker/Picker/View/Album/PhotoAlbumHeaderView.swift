@@ -48,9 +48,10 @@ public class PhotoAlbumHeaderView: UITableViewHeaderFooterView {
         titleLb.centerY = contentView.height / 2
         titleLb.size = contentView.size
         
-        let btnWidth = allBtn.titleLabel?.textWidth ?? 0
-        allBtn.size = .init(width: btnWidth, height: contentView.height)
-        allBtn.x = contentView.width - 15 - btnWidth
+        if let btnWidth = allBtn.titleLabel?.textWidth {
+            allBtn.size = .init(width: btnWidth, height: contentView.height)
+            allBtn.x = contentView.width - 15 - btnWidth
+        }
     }
     
     func updateColors() {

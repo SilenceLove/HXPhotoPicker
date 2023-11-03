@@ -217,7 +217,10 @@ extension EditorAdjusterView {
     }
     var currentAngle: CGFloat {
         if state == .normal {
-            return oldAdjustedFactor?.angle ?? 0
+            guard let angle = oldAdjustedFactor?.angle else {
+                return 0
+            }
+            return angle
         }
         return adjustedFactor.angle
     }
@@ -356,7 +359,11 @@ extension EditorAdjusterView {
     }
     
     func setControllContentInsets() {
-        contentInsets = setContentInsets?() ?? .zero
+        if let insets = setContentInsets?() {
+            contentInsets = insets
+        }else {
+            contentInsets = .zero
+        }
     }
     
     func setScrollViewEnabled(_ isEnabled: Bool) {
@@ -395,7 +402,12 @@ extension EditorAdjusterView {
             insets: contentInset
         )
         frameView.frame = containerView.bounds
-        let insets = setContentInsets?() ?? .zero
+        let insets: UIEdgeInsets
+        if let contentInsets = setContentInsets?() {
+            insets = contentInsets
+        }else {
+            insets = .zero
+        }
         let anchorX: CGFloat
         if insets.left == insets.right {
             anchorX = 0.5
@@ -470,10 +482,18 @@ extension EditorAdjusterView {
     ) {
         if animated {
             UIView.animate {
-                self.mirrorView.transform = transform ?? .identity
+                if let transform {
+                    self.mirrorView.transform = transform
+                }else {
+                    self.mirrorView.transform = .identity
+                }
             }
         }else {
-            mirrorView.transform = transform ?? .identity
+            if let transform {
+                mirrorView.transform = transform
+            }else {
+                mirrorView.transform = .identity
+            }
         }
     }
     

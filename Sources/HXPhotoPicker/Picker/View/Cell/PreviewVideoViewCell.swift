@@ -8,7 +8,7 @@
 import UIKit
 import AVFoundation
 
-open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDelete {
+open class PreviewVideoViewCell: PhotoPreviewViewCell {
     
     var playButton: UIButton!
     
@@ -23,7 +23,7 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        scrollContentView = PhotoPreviewContentView.init(type: .video)
+        scrollContentView = PhotoPreviewContentVideoView()
         scrollContentView.delegate = self
         scrollContentView.videoView.delegate = self
         initView()
@@ -43,31 +43,6 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
         }else {
             scrollContentView.videoView.stopPlay()
         }
-    }
-    
-    override func setupScrollViewContentSize() {
-        if UIDevice.isPad {
-            scrollView.zoomScale = 1
-            setupLandscapeContentSize()
-        }else {
-            super.setupScrollViewContentSize()
-        }
-    }
-    
-    public func contentView(requestSucceed contentView: PhotoPreviewContentView) {
-        delegate?.cell(requestSucceed: self)
-    }
-    public func contentView(requestFailed contentView: PhotoPreviewContentView) {
-        delegate?.cell(requestFailed: self)
-    }
-    public func contentView(updateContentSize contentView: PhotoPreviewContentView) {
-        setupScrollViewContentSize()
-    }
-    public func contentView(networkImagedownloadSuccess contentView: PhotoPreviewContentView) {
-        
-    }
-    public func contentView(networkImagedownloadFailed contentView: PhotoPreviewContentView) {
-        
     }
     
     /// 指定视频播放时间
@@ -142,7 +117,25 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+}
+
+extension PreviewVideoViewCell: PhotoPreviewContentViewDelete {
     
+    func contentView(requestSucceed contentView: PhotoPreviewContentViewProtocol) {
+        delegate?.cell(requestSucceed: self)
+    }
+    func contentView(requestFailed contentView: PhotoPreviewContentViewProtocol) {
+        delegate?.cell(requestFailed: self)
+    }
+    func contentView(updateContentSize contentView: PhotoPreviewContentViewProtocol) {
+        setupScrollViewContentSize()
+    }
+    func contentView(networkImagedownloadSuccess contentView: PhotoPreviewContentViewProtocol) {
+        
+    }
+    func contentView(networkImagedownloadFailed contentView: PhotoPreviewContentViewProtocol) {
+        
+    }
 }
 
 extension PreviewVideoViewCell: PhotoPreviewVideoViewDelegate {

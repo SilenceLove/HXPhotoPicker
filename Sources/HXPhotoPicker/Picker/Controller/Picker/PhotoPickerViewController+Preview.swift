@@ -66,20 +66,10 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         updateCell: Bool
     ) {
         if config.previewStyle == .present {
-            if let cell = listView.getCell(for: photoAsset) {
-                listView.selectCell(cell, isSelected: isSelected)
-            }else {
-                if isSelected {
-                    pickerController.pickerData.append(photoAsset)
-                }else {
-                    pickerController.pickerData.remove(photoAsset)
-                }
-            }
+            listView.selectCell(for: photoAsset, isSelected: isSelected)
         }else {
             if !isSelected && updateCell {
-                let cell = listView.getCell(for: photoAsset)
-                cell?.isRequestDirectly = true
-                cell?.photoAsset = photoAsset
+                listView.updateCell(for: photoAsset)
             }
         }
         listView.updateCellSelectedTitle()
@@ -156,11 +146,15 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         if config.previewStyle != .present {
             return editorConfig
         }
-        return pickerController.shouldEditPhotoAsset(
+        let config = pickerController.shouldEditPhotoAsset(
             photoAsset: photoAsset,
             editorConfig: editorConfig,
             atIndex: previewController.currentPreviewIndex
-        ) ?? editorConfig
+        )
+        guard let config = config else {
+            return editorConfig
+        }
+        return config
     }
     
     func previewViewController(
@@ -171,11 +165,15 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         if config.previewStyle != .present {
             return editorConfig
         }
-        return pickerController.shouldEditVideoAsset(
+        let config = pickerController.shouldEditVideoAsset(
             videoAsset: videoAsset,
             editorConfig: editorConfig,
             atIndex: previewController.currentPreviewIndex
-        ) ?? editorConfig
+        )
+        guard let config else {
+            return editorConfig
+        }
+        return config
     }
     #endif
 }

@@ -14,7 +14,10 @@ extension PhotoPreviewViewController: PhotoToolBarDelegate {
             photoToolbar = PhotoToolBarEmptyView(pickerConfig, type: .preview)
             return
         }
-        photoToolbar = config.photoToolbar.init(
+        guard let toolbar = config.photoToolbar else {
+            return
+        }
+        photoToolbar = toolbar.init(
             pickerConfig,
             type: previewType != .browser ? .preview : .browser
         )

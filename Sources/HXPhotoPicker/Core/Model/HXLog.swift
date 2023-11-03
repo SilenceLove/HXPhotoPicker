@@ -13,7 +13,7 @@ internal func HXLog(
     lineNumber: Int = #line,
     functionName: String = #function
 ) {
-    guard PhotoManager.shared.isDebugLogsEnabled else {
+    if !PhotoManager.shared.isDebugLogsEnabled {
         return
     }
     // swiftlint:disable:next line_length

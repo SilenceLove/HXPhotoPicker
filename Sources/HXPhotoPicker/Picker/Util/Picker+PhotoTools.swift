@@ -434,4 +434,79 @@ extension PhotoTools {
         
         return config
     }
+    
+    public static var redBookConfig: PickerConfiguration {
+        var config = getWXPickerConfig()
+        config.modalPresentationStyle = .fullScreen
+        config.appearanceStyle = .normal
+        config.selectOptions = [.photo, .gifPhoto, .livePhoto, .video]
+        config.albumShowMode = .popup
+        config.navigationTitleColor = .white
+        config.navigationTintColor = .white
+        config.statusBarStyle = .lightContent
+        config.navigationBarStyle = .black
+        config.navigationViewBackgroundColor = .black
+        config.maximumSelectedVideoDuration = 0
+        config.maximumSelectedCount = 9
+        config.maximumSelectedVideoCount = 0
+        config.allowSelectedTogether = true
+        config.isFetchDeatilsAsset = true
+        
+        let redColor = "#FE2443".color
+        config.albumList.tickColor = redColor
+        
+        config.albumController.headerButtonTitleColor = redColor
+        config.albumController.mediaTitleColor = redColor
+        config.albumController.imageColor = redColor
+        
+        config.photoList.listView = PhotoPickerPageViewController.self
+        config.photoList.allowSwipeToSelect = false
+        config.photoList.backgroundColor = .black
+        config.photoList.leftNavigationItems = [PhotoImageCancelItemView.self]
+        config.photoList.rightNavigationItems = []
+        config.photoList.sort = .desc
+        config.photoList.allowAddCamera = false
+        config.photoList.allowAddLimit = false
+        
+        config.photoList.titleView.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
+        config.photoList.titleView.arrow.backgroundColor = .clear
+        config.photoList.titleView.arrow.arrowColor = .white
+        
+        config.photoList.cell.customSelectableCellClass = nil
+        config.photoList.cell.selectBox.selectedBackgroundColor = redColor
+        config.photoList.cell.selectBox.titleColor = .white
+        config.photoList.cell.selectBox.style = .number
+        
+        config.photoList.assetNumber.filterContentColor = redColor
+        
+        config.photoList.bottomView.finishButtonBackgroundColor = redColor
+        config.photoList.bottomView.promptIconColor = redColor
+        config.photoList.bottomView.promptArrowColor = redColor
+        
+        config.photoList.bottomView.originalSelectBox.selectedBackgroundColor = redColor
+        
+        config.previewView.selectBox.selectedBackgroundColor = redColor
+        config.previewView.bottomView.originalSelectBox.selectedBackgroundColor = redColor
+        config.previewView.bottomView.finishButtonBackgroundColor = redColor
+        config.previewView.bottomView.selectedViewTickColor = redColor
+        
+        #if HXPICKER_ENABLE_EDITOR
+        config.editor.video.cropTime.maximumTime = 0
+        #endif
+        
+        #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
+        if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+        }else {
+            var cameraConfig = CameraConfiguration()
+            cameraConfig.tintColor = redColor
+            cameraConfig.modalPresentationStyle = .fullScreen
+            config.photoList.cameraType = .custom(cameraConfig)
+        }
+        #endif
+        
+        config.notAuthorized.closeButtonColor = redColor
+        config.notAuthorized.jumpButtonBackgroundColor = redColor
+        return config
+        
+    }
 }

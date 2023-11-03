@@ -56,10 +56,11 @@ public class PhotoAlbumViewCell: UITableViewCell {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        
-        arrowView.size = arrowView.image?.size ?? .zero
-        arrowView.centerY = contentView.height / 2
-        arrowView.x = contentView.width - 15 - arrowView.width
+        if let imageSize = arrowView.image?.size {
+            arrowView.size = imageSize
+            arrowView.centerY = contentView.height / 2
+            arrowView.x = contentView.width - 15 - arrowView.width
+        }
         
         countLb.y = 0
         countLb.height = contentView.height
