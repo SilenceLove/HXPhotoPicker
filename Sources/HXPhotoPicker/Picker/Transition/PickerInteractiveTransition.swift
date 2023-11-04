@@ -212,6 +212,35 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             }
             backgroundView.alpha = alpha
             let toVC = transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
+            if type == .pop {
+                var maskScale = 1 - scale * 2.85
+                if maskScale < 0 {
+                    maskScale = 0
+                }
+                if let previewToolbar = previewViewController.photoToolbar,
+                   let photoToolbar = toVC?.photoToolbar,
+                   previewToolbar.viewHeight != photoToolbar.viewHeight {
+                    let previewViewHeight = previewToolbar.viewHeight
+                    let previewToolbarHeight = previewToolbar.toolbarHeight
+                    let previewTopHeight = (previewViewHeight - previewToolbarHeight)
+                    let previewMaskY = previewTopHeight * (1 - maskScale)
+                    let previewMaskWidth = previewToolbar.width
+                    let previewMaskHeight = previewToolbar.height - previewMaskY
+                    previewToolbar.mask?.frame = CGRect(
+                        x: 0,
+                        y: previewMaskY,
+                        width: previewMaskWidth,
+                        height: previewMaskHeight
+                    )
+                    let pickerToolbarHeight = photoToolbar.toolbarHeight
+                    let pickerViewHeight = photoToolbar.viewHeight
+                    let pickerTopHeight = pickerViewHeight - pickerToolbarHeight
+                    let pickerMaskY = pickerTopHeight * maskScale
+                    let pickerMaskWidth = photoToolbar.width
+                    let pickerMaskHeight = pickerToolbarHeight + pickerTopHeight * (1 - maskScale)
+                    photoToolbar.mask?.frame = CGRect(x: 0, y: pickerMaskY, width: pickerMaskWidth, height: pickerMaskHeight)
+                }
+            }
             if !previewViewController.statusBarShouldBeHidden {
                 var bottomViewAlpha = 1 - scale * 1.5
                 if bottomViewAlpha < 0 {
@@ -219,35 +248,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 }
                 previewViewController.photoToolbar.alpha = bottomViewAlpha
                 previewViewController.navBgView?.alpha = bottomViewAlpha
-                if type == .pop {
-                    var maskScale = 1 - scale * 2.85
-                    if maskScale < 0 {
-                        maskScale = 0
-                    }
-                    if let previewToolbar = previewViewController.photoToolbar,
-                       let photoToolbar = toVC?.photoToolbar,
-                       previewToolbar.viewHeight != photoToolbar.viewHeight {
-                        let previewViewHeight = previewToolbar.viewHeight
-                        let previewToolbarHeight = previewToolbar.toolbarHeight
-                        let previewTopHeight = (previewViewHeight - previewToolbarHeight)
-                        let previewMaskY = previewTopHeight * (1 - maskScale)
-                        let previewMaskWidth = previewToolbar.width
-                        let previewMaskHeight = previewToolbar.height - previewMaskY
-                        previewToolbar.mask?.frame = CGRect(
-                            x: 0,
-                            y: previewMaskY,
-                            width: previewMaskWidth,
-                            height: previewMaskHeight
-                        )
-                        let pickerToolbarHeight = photoToolbar.toolbarHeight
-                        let pickerViewHeight = photoToolbar.viewHeight
-                        let pickerTopHeight = pickerViewHeight - pickerToolbarHeight
-                        let pickerMaskY = pickerTopHeight * maskScale
-                        let pickerMaskWidth = photoToolbar.width
-                        let pickerMaskHeight = pickerToolbarHeight + pickerTopHeight * (1 - maskScale)
-                        photoToolbar.mask?.frame = CGRect(x: 0, y: pickerMaskY, width: pickerMaskWidth, height: pickerMaskHeight)
-                    }
-                }else {
+                if type == .dismiss {
                     previewViewController.navigationController?.navigationBar.alpha = alpha
                     navigationBarAlpha = alpha
                 }
