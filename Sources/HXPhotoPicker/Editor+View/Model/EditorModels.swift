@@ -2,7 +2,7 @@
 //  EditorModels.swift
 //  HXPhotoPicker
 //
-//  Created by 洪欣 on 2023/4/29.
+//  Created by Silence on 2023/4/29.
 //
 
 import UIKit

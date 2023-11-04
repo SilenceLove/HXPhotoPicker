@@ -2,7 +2,7 @@
 //  EditorViewProtocol.swift
 //  HXPhotoPicker
 //
-//  Created by 洪欣 on 2023/5/5.
+//  Created by Silence on 2023/5/5.
 //
 
 import UIKit

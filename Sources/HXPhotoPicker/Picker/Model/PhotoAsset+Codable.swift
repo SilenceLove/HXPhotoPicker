@@ -74,8 +74,12 @@ extension PhotoAsset {
             )
             #endif
         #endif
-        let encoder = JSONEncoder()
-        let data = try? encoder.encode(simplify)
+        var data: Data?
+        do {
+            data = try JSONEncoder().encode(simplify)
+        } catch {
+            HXLog("PhotoAsset 编码失败: \(error)")
+        }
         return data
     }
     

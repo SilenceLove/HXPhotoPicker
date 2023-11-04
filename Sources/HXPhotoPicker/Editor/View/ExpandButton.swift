@@ -3,7 +3,7 @@
 //  HXPhotoPicker
 //
 //  Created by Silence on 2023/10/8.
-//  Copyright © 2023 洪欣. All rights reserved.
+//  Copyright © 2023 Silence. All rights reserved.
 //
 
 import UIKit
