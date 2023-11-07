@@ -34,9 +34,12 @@ extension EditorViewController: EditorToolsViewDelegate {
             presentText()
             return
         case .chartlet:
-            let vc = EditorChartletViewController(config: config, editorType: selectedAsset.contentType)
+            let vc = config.chartlet.listProtcol.init(config: config, editorType: selectedAsset.contentType)
+            if let vc = vc as? EditorChartletViewController {
+                vc.chartletDelegate = self
+            }
+            vc.modalPresentationStyle = config.chartlet.modalPresentationStyle
             vc.delegate = self
-            vc.firstRequest()
             present(vc, animated: true)
             return
         default:

@@ -186,6 +186,15 @@ public extension PickerResult {
         try await objects(compression, toFile: fileConfig)
     }
     
+    /// 获取 AssetResult 对象数组
+    /// - Parameters:
+    ///   - compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    ///   - fileConfig: 指定路径
+    ///   - Returns: AssetResult 对象数组
+    func assetResults(_ compression: PhotoAsset.Compression? = nil, toFile fileConfig: FileConfigHandler? = nil) async throws -> [AssetResult] {
+        try await objects(compression, toFile: fileConfig)
+    }
+    
     /// 获取对应资源
     /// - Parameters:
     ///   - compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩

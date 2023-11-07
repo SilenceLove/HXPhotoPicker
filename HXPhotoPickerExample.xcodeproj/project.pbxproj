@@ -442,6 +442,7 @@
 		D36B1CD62ADF76030024B7E7 /* PhotoAlbumController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36B1CD52ADF76030024B7E7 /* PhotoAlbumController.swift */; };
 		D3837B2E2AA4312400F4D64E /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3837B2D2AA4312400F4D64E /* Extension.swift */; };
 		D3899BAB2AE621AB0052BAC7 /* PhotoPickerPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3899BAA2AE621AB0052BAC7 /* PhotoPickerPageViewController.swift */; };
+		D3914ABD2AF9CC0F007978F0 /* EditorChartletListProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3914ABC2AF9CC0F007978F0 /* EditorChartletListProtocol.swift */; };
 		D39E64202AC577E4003001EF /* PhotoFetchData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39E641F2AC577E4003001EF /* PhotoFetchData.swift */; };
 		D39E64222AC577F6003001EF /* PhotoPickerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39E64212AC577F6003001EF /* PhotoPickerData.swift */; };
 		D39E64242AC57AB2003001EF /* Picker+ConfigExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39E64232AC57AB2003001EF /* Picker+ConfigExtension.swift */; };
@@ -903,6 +904,7 @@
 		D36B1CD52ADF76030024B7E7 /* PhotoAlbumController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAlbumController.swift; sourceTree = "<group>"; };
 		D3837B2D2AA4312400F4D64E /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		D3899BAA2AE621AB0052BAC7 /* PhotoPickerPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerPageViewController.swift; sourceTree = "<group>"; };
+		D3914ABC2AF9CC0F007978F0 /* EditorChartletListProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorChartletListProtocol.swift; sourceTree = "<group>"; };
 		D39E641F2AC577E4003001EF /* PhotoFetchData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoFetchData.swift; sourceTree = "<group>"; };
 		D39E64212AC577F6003001EF /* PhotoPickerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerData.swift; sourceTree = "<group>"; };
 		D39E64232AC57AB2003001EF /* Picker+ConfigExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Picker+ConfigExtension.swift"; sourceTree = "<group>"; };
@@ -1726,6 +1728,7 @@
 				D368798F2A399B8D00E70910 /* EditorAsset.swift */,
 				D36879772A399B8C00E70910 /* EditedResult.swift */,
 				D36879752A399B8C00E70910 /* Config */,
+				D3914ABB2AF9CBCE007978F0 /* Protocol */,
 				D36879782A399B8C00E70910 /* Controller */,
 				D36879912A399B8D00E70910 /* View */,
 				D368798A2A399B8C00E70910 /* Model */,
@@ -1897,6 +1900,14 @@
 				D36879A42A399B8D00E70910 /* EditorChartletViewListCell.swift */,
 			);
 			path = Chartlet;
+			sourceTree = "<group>";
+		};
+		D3914ABB2AF9CBCE007978F0 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				D3914ABC2AF9CC0F007978F0 /* EditorChartletListProtocol.swift */,
+			);
+			path = Protocol;
 			sourceTree = "<group>";
 		};
 		D39E641E2AC577CE003001EF /* Data */ = {
@@ -2169,7 +2180,7 @@
 				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1430;
-				ORGANIZATIONNAME = "洪欣";
+				ORGANIZATIONNAME = Silence;
 				TargetAttributes = {
 					7B7E3E751E4AACD1002234EE = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -2463,6 +2474,7 @@
 				D360E7212A6B726500740B6B /* PhotoTools+File.swift in Sources */,
 				D360E7222A6B726500740B6B /* Core+UILabel.swift in Sources */,
 				D360E7232A6B726500740B6B /* Core+CGFloat.swift in Sources */,
+				D3914ABD2AF9CC0F007978F0 /* EditorChartletListProtocol.swift in Sources */,
 				D34417CC2AD3DF7400ABFC68 /* AlbumViewBaseCell.swift in Sources */,
 				D360E7242A6B726500740B6B /* Core+Bundle.swift in Sources */,
 				D360E7252A6B726500740B6B /* Core+UIFont.swift in Sources */,
@@ -2934,7 +2946,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.0.8;
+				MARKETING_VERSION = 4.1.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -2961,7 +2973,7 @@
 					"-ld64",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xfrontend -debug-time-function-bodies";
-				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example18;
+				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example19;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -3000,7 +3012,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.0.8;
+				MARKETING_VERSION = 4.1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-framework",
@@ -3026,7 +3038,7 @@
 					"-ld64",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xfrontend -debug-time-function-bodies";
-				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example18;
+				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example19;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

@@ -7,6 +7,43 @@
 
 import UIKit
 
+extension EditorViewController: EditorChartletListDelegate {
+    public func chartletList(
+        _ chartletList: EditorChartletListProtocol,
+        didSelectedWith type: EditorChartletType
+    ) {
+        deselectedDrawTool()
+        if let tool = selectedTool,
+           tool.type == .graffiti || tool.type == .mosaic {
+            selectedTool = nil
+            updateBottomMaskLayer()
+        }
+        switch type {
+        case .image(let image):
+            editorView.addSticker(image)
+        case .data(let data):
+            editorView.addSticker(data)
+        }
+        checkSelectedTool()
+        checkFinishButtonState()
+    }
+    func deselectedDrawTool() {
+        if let tool = lastSelectedTool {
+            switch tool.type {
+            case .graffiti, .mosaic:
+                toolsView.deselected()
+                editorView.isMosaicEnabled = false
+                editorView.isDrawEnabled = false
+                hideBrushColorView()
+                hideMosaicToolView()
+                lastSelectedTool = nil
+            default:
+                break
+            }
+        }
+    }
+}
+
 extension EditorViewController: EditorChartletViewControllerDelegate {
     
     func chartletViewController(
@@ -48,41 +85,6 @@ extension EditorViewController: EditorChartletViewControllerDelegate {
             #else
             response(titleIndex, [])
             #endif
-        }
-    }
-    func chartletViewController(
-        _ chartletViewController: EditorChartletViewController,
-        didSelectImage image: UIImage,
-        imageData: Data?
-    ) {
-        deselectedDrawTool()
-        if let tool = selectedTool,
-           tool.type == .graffiti || tool.type == .mosaic {
-            selectedTool = nil
-            updateBottomMaskLayer()
-        }
-        if let imageData = imageData {
-            editorView.addSticker(imageData)
-        }else {
-            editorView.addSticker(image)
-        }
-        checkSelectedTool()
-        checkFinishButtonState()
-    }
-    
-    func deselectedDrawTool() {
-        if let tool = lastSelectedTool {
-            switch tool.type {
-            case .graffiti, .mosaic:
-                toolsView.deselected()
-                editorView.isMosaicEnabled = false
-                editorView.isDrawEnabled = false
-                hideBrushColorView()
-                hideMosaicToolView()
-                lastSelectedTool = nil
-            default:
-                break
-            }
         }
     }
 }

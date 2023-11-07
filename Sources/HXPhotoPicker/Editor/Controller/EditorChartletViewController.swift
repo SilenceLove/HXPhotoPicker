@@ -21,16 +21,11 @@ protocol EditorChartletViewControllerDelegate: AnyObject {
         titleIndex: Int,
         loadChartletList response: @escaping EditorChartletListResponse
     )
-    func chartletViewController(
-        _ chartletViewController: EditorChartletViewController,
-        didSelectImage image: UIImage,
-        imageData: Data?
-    )
 }
 
-class EditorChartletViewController: BaseViewController {
-    
-    weak var delegate: EditorChartletViewControllerDelegate?
+public class EditorChartletViewController: BaseViewController, EditorChartletListProtocol {
+    public weak var delegate: EditorChartletListDelegate?
+    weak var chartletDelegate: EditorChartletViewControllerDelegate?
     private var loadingView: UIActivityIndicatorView!
     private var titleBgView: UIVisualEffectView!
     private var bgView: UIVisualEffectView!
@@ -48,7 +43,7 @@ class EditorChartletViewController: BaseViewController {
     var titles: [EditorChartletTitle] = []
     var selectedTitleIndex: Int = 0
     var configTitles: [EditorChartlet] = []
-    init(
+    public required init(
         config: EditorConfiguration,
         editorType: EditorContentViewType
     ) {
@@ -56,19 +51,20 @@ class EditorChartletViewController: BaseViewController {
         self.config = editorConfig.chartlet
         self.editorType = editorType
         super.init(nibName: nil, bundle: nil)
-        initViews()
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .clear
         setupTitles(config.titles)
+        initViews()
         view.addSubview(bgView)
         view.addSubview(listView)
         view.addSubview(titleBgView)
         view.addSubview(titleView)
         view.addSubview(backButton)
         view.addSubview(loadingView)
+        requestData()
     }
     
     private func initViews() {
@@ -241,11 +237,11 @@ class EditorChartletViewController: BaseViewController {
         }
     }
     var didDeviceOrientation = false
-    override func deviceOrientationWillChanged(notify: Notification) {
+    public override func deviceOrientationWillChanged(notify: Notification) {
         didDeviceOrientation = true
     }
     
-    override func viewDidLayoutSubviews() {
+    public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let viewY: CGFloat
         if modalPresentationStyle == .fullScreen {
@@ -291,7 +287,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
                               UICollectionViewDelegate,
                               UICollectionViewDelegateFlowLayout,
                               EditorChartletViewListCellDelegate {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         #if HXPICKER_ENABLE_PICKER
         if config.allowAddAlbum && !titles.isEmpty {
             if collectionView == listView {
@@ -302,7 +298,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
         return titles.count
     }
     
-    func collectionView(
+    public func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
@@ -327,7 +323,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
         }
     }
     
-    func collectionView(
+    public func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
@@ -338,7 +334,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
             return listView.size
         }
     }
-    func collectionView(
+    public func collectionView(
         _ collectionView: UICollectionView,
         willDisplay cell: UICollectionViewCell,
         forItemAt indexPath: IndexPath
@@ -358,7 +354,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
         let listCell = cell as! EditorChartletViewListCell
         listCell.startLoading()
     }
-    func collectionView(
+    public func collectionView(
         _ collectionView: UICollectionView,
         didEndDisplaying cell: UICollectionViewCell,
         forItemAt indexPath: IndexPath
@@ -369,7 +365,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
         let listCell = cell as! EditorChartletViewListCell
         listCell.stopLoad()
     }
-    func collectionView(
+    public func collectionView(
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
@@ -421,11 +417,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
                                 switch $0 {
                                 case .success(let result):
                                     if let imageData = try? Data(contentsOf: result.url) {
-                                        self.delegate?.chartletViewController(
-                                            self,
-                                            didSelectImage: .init(),
-                                            imageData: imageData
-                                        )
+                                        self.delegate?.chartletList(self, didSelectedWith: .data(imageData))
                                     }
                                 default:
                                     break
@@ -440,7 +432,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
                             photoAsset.getImage(compressionQuality: 0.5) { [weak self] in
                                 guard let self = self else { return }
                                 if let image = $0 {
-                                    self.delegate?.chartletViewController(self, didSelectImage: image, imageData: nil)
+                                    self.delegate?.chartletList(self, didSelectedWith: .image(image))
                                 }
                                 completionCount += 1
                                 if completionCount == pickerResult.photoAssets.count {
@@ -458,7 +450,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
             requestData(index: indexPath.item)
         }
     }
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView != listView {
             return
         }
@@ -483,7 +475,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
         
         selectedTitleIndex = currentIndex
     }
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         if scrollView != listView {
             return
         }
@@ -523,7 +515,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
             }
             return
         }
-        delegate?.chartletViewController(
+        chartletDelegate?.chartletViewController(
             self,
             titleChartlet: configTitles[index],
             titleIndex: index,
@@ -538,7 +530,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
                 cell?.stopLoad()
         })
     }
-    func firstRequest() {
+    func requestData() {
         if titles.isEmpty {
             loadingView.startAnimating()
             if let titleHandler = config.titleHandler {
@@ -546,7 +538,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
                     self?.loadTitlesCompletion(titleChartlets)
                 }
             }else {
-                delegate?.chartletViewController(self, loadTitleChartlet: { [weak self] titleChartlets in
+                chartletDelegate?.chartletViewController(self, loadTitleChartlet: { [weak self] titleChartlets in
                     self?.loadTitlesCompletion(titleChartlets)
                 })
             }
@@ -564,7 +556,11 @@ extension EditorChartletViewController: UICollectionViewDataSource,
         listView.reloadData()
     }
     func listCell(_ cell: EditorChartletViewListCell, didSelectImage image: UIImage, imageData: Data?) {
-        delegate?.chartletViewController(self, didSelectImage: image, imageData: imageData)
+        if let imageData {
+            delegate?.chartletList(self, didSelectedWith: .data(imageData))
+        }else {
+            delegate?.chartletList(self, didSelectedWith: .image(image))
+        }
         didBackButtonClick()
     }
 }

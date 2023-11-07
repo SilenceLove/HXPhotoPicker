@@ -475,6 +475,11 @@ public extension EditorConfiguration {
             /// 滚动停止时
             case scrollStop
         }
+        
+        public var listProtcol: EditorChartletListProtocol.Type = EditorChartletViewController.self
+        
+        public var modalPresentationStyle: UIModalPresentationStyle
+        
         /// 每行显示个数
         public var rowCount: Int = UIDevice.isPad ? 6 : 5
         /// 贴图加载时机
@@ -505,7 +510,13 @@ public extension EditorConfiguration {
         /// }
         public var listHandler: ((Int, @escaping EditorChartletListResponse) -> Void)?
         
-        public init() { }
+        public init() {
+            if #available(iOS 13.0, *) {
+                modalPresentationStyle = .automatic
+            } else {
+                modalPresentationStyle = .fullScreen
+            }
+        }
     }
 
     struct ToolsView {

@@ -54,7 +54,7 @@ public final class PhotoManager: NSObject {
     /// 是否使用了自定义的语言
     var isCustomLanguage: Bool = false
     /// 加载指示器类型
-    var indicatorType: IndicatorType = .circleJoin
+    var indicatorType: IndicatorType = .system
     
     #if HXPICKER_ENABLE_PICKER
     

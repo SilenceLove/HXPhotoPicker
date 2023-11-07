@@ -706,7 +706,7 @@ public extension PhotoPickerController {
         var config = config
         config.isAutoBack = false
         let vc = show(config, selectedAssets: selectedAssets, delegate: delegate, fromVC: fromVC)
-        return try await vc.pickerObject(compression, toFile: fileConfig)
+        return try await vc.pickerAsset(compression, toFile: fileConfig)
     }
     
     static func picker(
@@ -766,7 +766,7 @@ public extension PhotoPickerController {
     ///   - compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
     ///   - fileConfig: 指定获取URL的路径
     /// - Returns: 获取对应的对象数组
-    func pickerObject<T: PhotoAssetObject>(
+    func pickerAsset<T: PhotoAssetObject>(
        _ compression: PhotoAsset.Compression? = nil,
        toFile fileConfig: PickerResult.FileConfigHandler? = nil
     ) async throws -> [T] {
