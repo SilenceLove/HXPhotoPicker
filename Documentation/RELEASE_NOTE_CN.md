@@ -1,4 +1,19 @@
-# 更新日志
+# 更新日志 
+
+## 4.1.0
+
+### 新增
+
+- Editor
+  - 贴纸列表支持自定义，实现协议`EditorChartletListProtocol`
+
+### 修复
+
+- Picker
+  - 多次快速手势返回可能导致界面无响应的问题
+  
+- [[593]](https://github.com/SilenceLove/HXPhotoPicker/issues/593)
+- [[592]](https://github.com/SilenceLove/HXPhotoPicker/issues/592)
 
 ## 4.0.9
 

@@ -102,7 +102,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.0.9"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.1.0"))
 ]
 ```
 
@@ -170,11 +170,13 @@ class ViewController: UIViewController {
         let images: [UIImage] = try await Photo.picker(config)
         let urls: [URL] = try await Photo.picker(config)
         let urlResult: [AssetURLResult] = try await Photo.picker(config)
+        let assetResult: [AssetResult] = try await Photo.picker(config)
         
         let pickerResult = try await Photo.picker(config)
         let images: [UIImage] = try await pickerResult.objects()
         let urls: [URL] = try await pickerResult.objects()
         let urlResults: [AssetURLResult] = try await pickerResult.objects()
+        let assetResults: [AssetResult] = try await pickerResult.objects()
         
         // 方法二：
         let pickerController = PhotoPickerController(picker: config)
@@ -217,6 +219,7 @@ extension ViewController: PhotoPickerControllerDelegate {
         let images: [UIImage] = try await result.objects()
         let urls: [URL] = try await result.objects()
         let urlResults: [AssetURLResult] = try await result.objects()
+        let assetResults: [AssetResult] = try await result.objects()
         
         result.getImage { (image, photoAsset, index) in
             if let image = image {
@@ -296,6 +299,18 @@ photoAsset.getURL(compression: compression) { result in
 
 ## <a id="更新记录"></a> 更新日志
 
+<details open id="最近更新">
+  <summary><strong>最近更新</strong></summary>
+  
+| 版本 | 发布时间 | Xcode | Swift | iOS |
+| ---- | ----  | ---- | ---- | ---- |
+| [v4.1.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#410) | 2023-11-07 | 15.0.0 | 5.9.0 | 12.0+ | 
+
+</details>
+
+<details id="历史记录">
+  <summary><strong>历史记录</strong></summary>
+  
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
 | [v4.0.9](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#409) | 2023-10-22 | 15.0.0 | 5.9.0 | 12.0+ |
@@ -308,7 +323,9 @@ photoAsset.getURL(compression: compression) { result in
 | [v4.0.2](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#402) | 2023-06-24 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.1](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#401) | 2023-06-17 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#400) | 2023-06-15 | 14.3.0 | 5.7.0 | 12.0+ |
-| [v3.0.0](https://github.com/SilenceLove/HXPhotoPickerObjC#-%E6%9B%B4%E6%96%B0%E8%AE%B0%E5%BD%95---update-history) | 2022-09-18 | 14.0.0 | ----- | 8.0+ |
+| [v3.0.0](https://github.com/SilenceLove/HXPhotoPickerObjC#-%E6%9B%B4%E6%96%B0%E8%AE%B0%E5%BD%95---update-history) | 2022-09-18 | 14.0.0 | ----- | 8.0+ | 
+
+</details>
 
 ## <a id="演示效果"></a> 演示效果
 

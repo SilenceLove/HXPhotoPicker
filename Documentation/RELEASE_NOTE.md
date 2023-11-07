@@ -1,5 +1,20 @@
 # Release Notes
 
+## 4.1.0
+
+### Added
+
+- Editor
+  - The sticker list supports customization and implements the protocol `EditorChartletListProtocol`
+
+### Resolved
+
+- Picker
+  - Multiple quick gesture returns may cause the interface to become unresponsive.
+  
+- [[593]](https://github.com/SilenceLove/HXPhotoPicker/issues/593)
+- [[592]](https://github.com/SilenceLove/HXPhotoPicker/issues/592)
+
 ## 4.0.9
 
 ### Added

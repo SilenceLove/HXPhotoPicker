@@ -85,7 +85,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.0.9"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.1.0"))
 ]
 ```
 
@@ -146,11 +146,13 @@ class ViewController: UIViewController {
         let images: [UIImage] = try await Photo.picker(config)
         let urls: [URL] = try await Photo.picker(config)
         let urlResult: [AssetURLResult] = try await Photo.picker(config)
+        let assetResult: [AssetResult] = try await Photo.picker(config)
         
         let pickerResult = try await Photo.picker(config)
         let images: [UIImage] = try await pickerResult.objects()
         let urls: [URL] = try await pickerResult.objects()
         let urlResults: [AssetURLResult] = try await pickerResult.objects()
+        let assetResults: [AssetResult] = try await pickerResult.objects()
         
         // Method 2：
         let pickerController = PhotoPickerController(picker: config)
@@ -191,6 +193,7 @@ extension ViewController: PhotoPickerControllerDelegate {
         let images: [UIImage] = try await result.objects()
         let urls: [URL] = try await result.objects()
         let urlResults: [AssetURLResult] = try await result.objects()
+        let assetResults: [AssetResult] = try await result.objects()
         
         result.getImage { (image, photoAsset, index) in
             if let image = image {
@@ -234,7 +237,8 @@ photoAsset.getImage(compressionQuality: compressionQuality) { image in
 // async/await 
 // compression: if not passed, no compression
 let url: URL = try await photoAsset.object(compression)
-let result: AssetURLResult = try await photoAsset.object(compression)
+let urlResult: AssetURLResult = try await photoAsset.object(compression)
+let assetResult: AssetResult = try await photoAsset.object(compression)
 
 /// compression: Compress parameters, if not passed, no compression
 photoAsset.getURL(compression: compression) { result in
@@ -268,6 +272,18 @@ photoAsset.getURL(compression: compression) { result in
 
 ## Release Notes
 
+<details open id="Latest updates">
+  <summary><strong>Latest updates</strong></summary>
+  
+| Version | Release Date | Xcode | Swift | iOS |
+| ---- | ----  | ---- | ---- | ---- |
+| [v4.1.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#410) | 2023-11-07 | 15.0.0 | 5.9.0 | 12.0+ |
+
+</details>
+
+<details open id="History record">
+  <summary><strong>History record</strong></summary>
+  
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
 | [v4.0.9](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#409) | 2023-10-22 | 15.0.0 | 5.9.0 | 12.0+ |
@@ -280,6 +296,8 @@ photoAsset.getURL(compression: compression) { result in
 | [v4.0.2](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#402) | 2023-06-24 | 14.3.0 | 5.7.0 | 12.0+ | 
 | [v4.0.1](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#401) | 2023-06-17 | 14.3.0 | 5.7.0 | 12.0+ | 
 | [v4.0.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#400) | 2023-06-15 | 14.3.0 | 5.7.0 | 12.0+ | 
+
+</details>
 
 ## Demonstration effect
 
