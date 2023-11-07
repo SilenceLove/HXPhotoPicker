@@ -30,7 +30,7 @@ struct PhotoPickerView: UIViewControllerRepresentable {
         controller.autoDismiss = false
         Task {
             do {
-                let assetResults: [AssetResult] = try await controller.pickerObject()
+                let assetResults: [AssetResult] = try await controller.pickerAsset()
                 photoAssets = controller.selectedAssetArray
                 var assets: [Asset] = []
                 for (index, photoAsset) in photoAssets.enumerated() {
