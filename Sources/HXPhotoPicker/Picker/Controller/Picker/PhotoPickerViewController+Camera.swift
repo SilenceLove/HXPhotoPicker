@@ -237,33 +237,36 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
         isCapture: Bool = false,
         completion: (() -> Void)? = nil
     ) {
-        DispatchQueue.main.async {
-            let picker = self.pickerController
-            ProgressHUD.hide(forView: self.navigationController?.view, animated: true)
-            if self.config.takePictureCompletionToSelected {
-                if picker.pickerData.append(
-                    photoAsset,
-                    isFilterEditor: true
-                ) {
-                    self.listView.updateCellSelectedTitle()
-                }
+        if !Thread.isMainThread {
+            DispatchQueue.main.async {
+                self.addedCameraPhotoAsset(photoAsset, isCapture: isCapture, completion: completion)
             }
-            picker.updateAlbums(coverImage: photoAsset.originalImage, count: 1)
-            if photoAsset.isLocalAsset {
-                picker.pickerData.addedLocalCamera(photoAsset)
-            }
-            if picker.config.albumShowMode.isPopView {
-                self.albumView.reloadData()
-            }
-            self.listView.addedAsset(for: photoAsset)
-            self.photoToolbar.selectedAssetDidChanged(picker.selectedAssetArray)
-            self.finishItem?.selectedAssetDidChanged(picker.selectedAssetArray)
-            self.requestSelectedAssetFileSize()
-            if picker.config.selectMode == .single && self.config.finishSelectionAfterTakingPhoto {
-                self.quickSelect(photoAsset, isCapture: isCapture)
-            }
-            completion?()
+            return
         }
+        ProgressHUD.hide(forView: navigationController?.view, animated: true)
+        if config.takePictureCompletionToSelected {
+            if pickerController.pickerData.append(
+                photoAsset,
+                isFilterEditor: true
+            ) {
+                listView.updateCellSelectedTitle()
+            }
+        }
+        if photoAsset.isLocalAsset {
+            pickerController.pickerData.addedLocalCamera(photoAsset)
+        }
+        pickerController.updateAlbums(coverImage: photoAsset.originalImage, count: 1)
+        listView.addedAsset(for: photoAsset)
+        if pickerController.config.albumShowMode.isPopView {
+            albumView.reloadData()
+        }
+        photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+        finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
+        requestSelectedAssetFileSize()
+        if pickerController.config.selectMode == .single && config.finishSelectionAfterTakingPhoto {
+            quickSelect(photoAsset, isCapture: isCapture)
+        }
+        completion?()
     }
 }
 
@@ -287,6 +290,7 @@ extension PhotoPickerViewController: CameraControllerDelegate {
             addedTo: self.navigationController?.view,
             animated: true
         )
+        let pickerController = pickerController
         DispatchQueue.global().async {
             let saveType: AssetManager.PhotoSaveType
             let photoAsset: PhotoAsset
@@ -300,7 +304,7 @@ extension PhotoPickerViewController: CameraControllerDelegate {
                 photoAsset = .init(localVideoAsset: .init(videoURL: videoURL, duration: videoDuration))
             }
             var canSelect = true
-            if !self.pickerController.pickerData.canSelect(
+            if !pickerController.pickerData.canSelect(
                 photoAsset,
                 isShowHUD: true,
                 isFilterEditor: true
@@ -313,7 +317,7 @@ extension PhotoPickerViewController: CameraControllerDelegate {
                 }
                 canSelect = false
             }
-            if !didDismiss && !self.pickerController.autoDismiss {
+            if !didDismiss && !pickerController.autoDismiss {
                 DispatchQueue.main.async {
                     cameraController.dismiss(animated: true)
                 }

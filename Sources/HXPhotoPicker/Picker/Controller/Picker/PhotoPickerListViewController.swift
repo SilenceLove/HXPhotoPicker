@@ -41,16 +41,14 @@ open class PhotoPickerListViewController:
             videoCount = assetResult.videoCount
             allAssets = assetResult.assets
             assets = assetResult.assets
+            if let collectionView {
+                collectionView.reloadData()
+            }
             updateEmptyView()
         }
     }
     
-    public var assets: [PhotoAsset] = [] {
-        didSet {
-            guard let collectionView = collectionView else { return }
-            collectionView.reloadData()
-        }
-    }
+    public var assets: [PhotoAsset] = []
     public var didFetchAsset: Bool = false
     
     public var swipeSelectBeganIndexPath: IndexPath?
