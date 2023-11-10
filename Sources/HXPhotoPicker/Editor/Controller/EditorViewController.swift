@@ -231,7 +231,7 @@ open class EditorViewController: BaseViewController {
         finishButton.addTarget(self, action: #selector(didFinishButtonClick(button:)), for: .touchUpInside)
         finishButton.isEnabled = !config.isWhetherFinishButtonDisabledInUneditedState
         
-        resetButton = ExpandButton(type: .custom)
+        resetButton = UIButton(type: .custom)
         resetButton.setTitle("还原".localized, for: .normal)
         resetButton.setTitleColor(.white, for: .normal)
         resetButton.setTitleColor(.white.withAlphaComponent(0.5), for: .highlighted)
@@ -655,6 +655,7 @@ open class EditorViewController: BaseViewController {
         }
     }
     
+    var navModalStyle: UIModalPresentationStyle?
     var navFrame: CGRect?
     var firstAppear = true
     var isFullScreen: Bool {
@@ -662,6 +663,9 @@ open class EditorViewController: BaseViewController {
         if let nav = navigationController {
             return nav.modalPresentationStyle == .fullScreen || nav.modalPresentationStyle == .custom || isFull
         }else {
+            if let navModalStyle {
+                return navModalStyle == .fullScreen || navModalStyle == .custom || isFull
+            }
             return modalPresentationStyle == .fullScreen || modalPresentationStyle == .custom || isFull
         }
     }
@@ -927,7 +931,12 @@ open class EditorViewController: BaseViewController {
         filtersView.frame = .init(x: 0, y: toolsView.y - 120, width: view.width, height: 120)
         brushColorView.frame = .init(x: 0, y: toolsView.y - 65, width: view.width, height: 65)
         brushSizeView.x = view.width - 45 - UIDevice.rightMargin
-        mosaicToolView.frame =  .init(x: 0, y: toolsView.y - 65, width: view.width, height: 65)
+        if UIDevice.isPad {
+            mosaicToolView.frame =  .init(x: 0, y: toolsView.y - 65, width: 300, height: 65)
+            mosaicToolView.centerX = view.width / 2
+        }else {
+            mosaicToolView.frame =  .init(x: 0, y: toolsView.y - 65, width: view.width, height: 65)
+        }
         
         if !UIDevice.isPad || config.buttonType == .bottom {
             leftRotateButton.y = rotateScaleView.y - leftRotateButton.height - 10
@@ -1287,6 +1296,7 @@ open class EditorViewController: BaseViewController {
     
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        navModalStyle = navigationController?.modalPresentationStyle
         if let isHidden = navigationController?.navigationBar.isHidden, !isHidden {
             navigationController?.setNavigationBarHidden(true, animated: false)
         }

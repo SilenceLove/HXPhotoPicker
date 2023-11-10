@@ -69,8 +69,10 @@ extension EditorViewController {
                 mosaicToolView.alpha = 0
             case .filterEdit:
                 filterEditView.alpha = 0
+                filterParameterView.alpha = 0
             case .filter:
                 filtersView.alpha = 0
+                filterParameterView.alpha = 0
             case .cropSize:
                 if !config.cropSize.aspectRatios.isEmpty {
                     ratioToolView.alpha = 0
