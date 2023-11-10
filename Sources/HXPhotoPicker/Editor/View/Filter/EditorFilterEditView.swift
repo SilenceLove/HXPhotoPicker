@@ -109,10 +109,10 @@ class EditorFilterEditView: UIView {
                 type: .exposure,
                 parameters: [.init(parameter: .init(defaultValue: 0), sliderType: .center)]
             ),
-//            .init(
-//                type: .warmth,
-//                parameters: [.init(parameter: .init(defaultValue: 0), sliderType: .center)]
-//            ),
+            .init(
+                type: .warmth,
+                parameters: [.init(parameter: .init(defaultValue: 0), sliderType: .center)]
+            ),
             .init(
                 type: .vignette,
                 parameters: [.init(parameter: .init(defaultValue: 0), sliderType: .normal)]

@@ -85,14 +85,18 @@ extension CIImage {
             }
         }
         
-//        if editFator.warmth != 0 {
-//            guard let temperatureAndTintFilter = CIFilter(name: "CITemperatureAndTint") else { return sharpFilter.outputImage }
-//            temperatureAndTintFilter.setValue(sharpFilter.outputImage, forKey: kCIInputImageKey)
-//            temperatureAndTintFilter.setValue(CIVector(x: 2000 + 4500 * CGFloat(editFator.warmth), y: 0), forKey: "inputNeutral")
-//            return temperatureAndTintFilter.outputImage
-//        }else {
-            return inputImage
-//        }
+        if editFator.warmth != 0 {
+            guard let temperatureAndTintFilter = CIFilter(name: "CITemperatureAndTint") else {
+                return inputImage
+            }
+            temperatureAndTintFilter.setValue(inputImage, forKey: kCIInputImageKey)
+            temperatureAndTintFilter.setValue(CIVector(x: 6500 + 3000 * CGFloat(editFator.warmth), y: 0), forKey: "inputNeutral")
+            temperatureAndTintFilter.setValue(CIVector(x: 6500, y: 0), forKey: "inputTargetNeutral")
+            if let image = temperatureAndTintFilter.outputImage {
+                inputImage = image
+            }
+        }
+        return inputImage
     }
     
     /// 生成马赛克图片
