@@ -236,10 +236,10 @@ extension EditorFrameView {
     }
     
     func showLinesShadow() {
-        maskLinesView.showShadow(true)
+        maskLinesView.setShadows(true)
     }
     func hideLinesShadow() {
-        maskLinesView.showShadow(false)
+        maskLinesView.setShadows(false)
     }
     func showGridlinesLayer() {
         maskLinesView.showGridlinesLayer(true, animated: true)

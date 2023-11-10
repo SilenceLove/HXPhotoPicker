@@ -46,7 +46,13 @@ class EditorMaskView: UIView {
         }
     }
     
-    var maskType: EditorView.MaskType = .blurEffect(style: .dark) {
+    var maskType: EditorView.MaskType = {
+        if #available(iOS 13.0, *) {
+            .blurEffect(style: .systemThickMaterialDark)
+        } else {
+            .blurEffect(style: .dark)
+        }
+    }() {
         didSet {
             switch type {
             case .mask:
@@ -178,11 +184,11 @@ class EditorMaskView: UIView {
         frameLayer.strokeColor = UIColor.white.cgColor
         frameLayer.fillColor = UIColor.clear.cgColor
         frameLayer.lineWidth = 1.2
-        frameLayer.shadowOffset = CGSize(width: -1, height: 1)
+//        frameLayer.shadowOffset = CGSize(width: -1, height: 1)
         frameLayer.contentsScale = UIScreen._scale
-        frameLayer.shouldRasterize = true
+//        frameLayer.shouldRasterize = true
         frameLayer.rasterizationScale = layer.contentsScale
-        frameLayer.shadowOpacity = 0.5
+//        frameLayer.shadowOpacity = 0.5
         
         frameView = UIView()
         frameView.isUserInteractionEnabled = false
@@ -196,11 +202,11 @@ class EditorMaskView: UIView {
         gridlinesLayer.strokeColor = UIColor.white.cgColor
         gridlinesLayer.fillColor = UIColor.clear.cgColor
         gridlinesLayer.lineWidth = 0.5
-        gridlinesLayer.shadowOffset = CGSize(width: -1, height: 1)
+//        gridlinesLayer.shadowOffset = CGSize(width: -1, height: 1)
         gridlinesLayer.contentsScale = UIScreen._scale
-        gridlinesLayer.shouldRasterize = true
+//        gridlinesLayer.shouldRasterize = true
         gridlinesLayer.rasterizationScale = layer.contentsScale
-        gridlinesLayer.shadowOpacity = 0.5
+//        gridlinesLayer.shadowOpacity = 0.5
         
         sizeLb = UILabel()
         sizeLb.font = .semiboldPingFang(ofSize: UIDevice.isPad ? 18 : 15)
@@ -211,6 +217,7 @@ class EditorMaskView: UIView {
         sizeLb.layer.shadowColor = UIColor.black.cgColor
         sizeLb.layer.shadowOpacity = 1
         sizeLb.layer.shadowRadius = 8
+        sizeLb.layer.shouldRasterize = true
         sizeLb.layer.shadowOffset = CGSize(width: 0, height: 0)
         sizeLb.adjustsFontSizeToFitWidth = true
         
@@ -225,7 +232,7 @@ class EditorMaskView: UIView {
         gridGraylinesLayer.fillColor = UIColor.clear.cgColor
         gridGraylinesLayer.lineWidth = 0.5
         gridGraylinesLayer.contentsScale = UIScreen._scale
-        gridGraylinesLayer.shouldRasterize = true
+//        gridGraylinesLayer.shouldRasterize = true
         gridGraylinesLayer.rasterizationScale = layer.contentsScale
         
         gridGraylinesView = UIView()
@@ -645,8 +652,16 @@ extension EditorMaskView {
         updateLayers(layersRect, animated)
     }
     
-    func showShadow(_ isShow: Bool) {
-        frameLayer.isHidden = !isShow
+    func setShadows(_ isShow: Bool) {
+        if isShow {
+            sizeLb.layer.shadowOpacity = 1
+//            gridlinesLayer.shadowOpacity = 0.5
+//            frameLayer.shadowOpacity = 0.5
+        }else {
+            sizeLb.layer.shadowOpacity = 0
+//            gridlinesLayer.shadowOpacity = 0
+//            frameLayer.shadowOpacity = 0
+        }
     }
     
     func showGridlinesLayer(_ isShow: Bool, animated: Bool) {
