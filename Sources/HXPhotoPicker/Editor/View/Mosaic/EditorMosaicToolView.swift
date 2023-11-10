@@ -107,6 +107,17 @@ class EditorMosaicToolView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         if UIDevice.isPortrait {
+            if UIDevice.isPad {
+                let buttonWidth = (width - height) * 0.5
+                mosaicButton.frame = CGRect(x: 0, y: 0, width: buttonWidth, height: height)
+                smearButton.frame = CGRect(x: mosaicButton.frame.maxX, y: 0, width: buttonWidth, height: height)
+                undoButton.frame = CGRect(x: width - height, y: 0, width: height, height: height)
+            }else {
+                let buttonWidth = (width - UIDevice.leftMargin - UIDevice.rightMargin - height) * 0.5
+                mosaicButton.frame = CGRect(x: UIDevice.leftMargin, y: 0, width: buttonWidth, height: height)
+                smearButton.frame = CGRect(x: mosaicButton.frame.maxX, y: 0, width: buttonWidth, height: height)
+                undoButton.frame = CGRect(x: width - UIDevice.rightMargin - height, y: 0, width: height, height: height)
+            }
             let buttonWidth = (width - UIDevice.leftMargin - UIDevice.rightMargin - height) * 0.5
             mosaicButton.frame = CGRect(x: UIDevice.leftMargin, y: 0, width: buttonWidth, height: height)
             smearButton.frame = CGRect(x: mosaicButton.frame.maxX, y: 0, width: buttonWidth, height: height)
