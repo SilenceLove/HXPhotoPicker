@@ -1,5 +1,18 @@
 # 更新日志 
 
+## 4.1.1
+
+### 新增
+
+- Editor
+  - 画面调整新增`高光`、`阴影`、`色温`效果
+  
+### 修复
+    
+- [[593]](https://github.com/SilenceLove/HXPhotoPicker/issues/593)
+- [[589]](https://github.com/SilenceLove/HXPhotoPicker/issues/589)
+- 以及一些已知问题
+
 ## 4.1.0
 
 ### 新增

@@ -1,5 +1,18 @@
 # Release Notes
 
+## 4.1.1
+
+### Added
+
+- Editor
+  - Added `Highlight`, `Shadow` and `Color Temperature` effects to the picture adjustment
+  
+### Resolved
+    
+- [[593]](https://github.com/SilenceLove/HXPhotoPicker/issues/593)
+- [[589]](https://github.com/SilenceLove/HXPhotoPicker/issues/589)
+- and some known issues
+
 ## 4.1.0
 
 ### Added
