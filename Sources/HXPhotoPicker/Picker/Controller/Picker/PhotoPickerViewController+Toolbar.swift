@@ -10,6 +10,13 @@ import UIKit
 extension PhotoPickerViewController: PhotoToolBarDelegate {
     
     func initToolbar() {
+        if AssetManager.authorizationStatus() == .notDetermined {
+            photoToolbar = PhotoToolBarEmptyView(pickerConfig, type: .picker)
+            return
+        }
+        if photoToolbar?.superview == view {
+            return
+        }
         if !isShowToolbar {
             photoToolbar = PhotoToolBarEmptyView(pickerConfig, type: .picker)
             return

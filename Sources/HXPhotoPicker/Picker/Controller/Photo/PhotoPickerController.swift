@@ -603,6 +603,7 @@ extension PhotoPickerController {
             }
             fetchData.fetchCameraAssetCollection()
             if config.albumShowMode.isPop {
+                pickerViewController?.initToolbar()
                 fetchData.fetchAssetCollections()
             }
         }else if status.rawValue >= 1 {
