@@ -45,6 +45,11 @@ public protocol PhotoPickerDataDelegate: AnyObject {
         didUnselectAsset photoAsset: PhotoAsset,
         at index: Int
     )
+    
+    func pickerData(
+        _ pickerData: PhotoPickerData,
+        removeSelectedAssetWhenRemovingAssets photoAssets: [PhotoAsset]
+    )
 }
 
 open class PhotoPickerData {

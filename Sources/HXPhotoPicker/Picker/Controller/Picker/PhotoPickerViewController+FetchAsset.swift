@@ -63,6 +63,12 @@ extension PhotoPickerViewController {
             }else {
                 ProgressHUD.hide(forView: self.navigationController?.view, animated: false)
             }
+            if AssetManager.authorizationStatusIsLimited(),
+               self.pickerConfig.isRemoveSelectedAssetWhenRemovingAssets {
+                self.photoToolbar.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
+                self.finishItem?.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
+                self.requestSelectedAssetFileSize()
+            }
         }
     }
     

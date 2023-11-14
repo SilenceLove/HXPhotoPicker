@@ -139,7 +139,9 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                let rect = cell?.scrollContentView.convert(contentBounds, to: containerView) {
                 fromView?.frame = rect
             }
-            contentView.addSubview(fromView!)
+            if let fromView {
+                contentView.addSubview(fromView)
+            }
             previewVC.collectionView.isHidden = true
             previewVC.view.backgroundColor = UIColor.clear
             if let pickerVC = pickerVC, let photoAsset = photoAsset {

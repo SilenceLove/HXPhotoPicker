@@ -47,6 +47,8 @@ public extension PhotoFetchAsset {
         var videoAssets: [PhotoAsset] = []
         var photoCount = 0
         var videoCount = 0
+        var phAssetResult: [PHAsset] = []
+        let isLimited = AssetManager.authorizationStatusIsLimited() && config.isRemoveSelectedAssetWhenRemovingAssets
         assetCollection.enumerateAssets { photoAsset, index, stop in
             guard let phAsset = photoAsset.phAsset else {
                 return
@@ -83,6 +85,9 @@ public extension PhotoFetchAsset {
                 asset = selectPhotoAsset
                 selectedAsset = selectPhotoAsset
             }
+            if isLimited {
+                phAssetResult.append(phAsset)
+            }
             photoAssets.append(asset)
             if config.isFetchDeatilsAsset {
                 if asset.mediaSubType.isNormalPhoto {
@@ -97,6 +102,17 @@ public extension PhotoFetchAsset {
                 if asset.mediaType == .video {
                     videoAssets.append(asset)
                 }
+            }
+        }
+        if isLimited {
+            var removedAssets: [PhotoAsset] = []
+            for (index, selectedPHAsset) in selectedPHAssets.enumerated() where !phAssetResult.contains(selectedPHAsset) {
+                let photoAsset = selectedPhotoAssets[index]
+                pickerData.remove(photoAsset)
+                removedAssets.append(photoAsset)
+            }
+            DispatchQueue.main.async {
+                pickerData.delegate?.pickerData(pickerData, removeSelectedAssetWhenRemovingAssets: removedAssets)
             }
         }
         for asset in localAssets.reversed() {

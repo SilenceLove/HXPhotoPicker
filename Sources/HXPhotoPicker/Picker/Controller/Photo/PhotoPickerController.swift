@@ -603,7 +603,6 @@ extension PhotoPickerController {
             }
             fetchData.fetchCameraAssetCollection()
             if config.albumShowMode.isPop {
-                pickerViewController?.initToolbar()
                 fetchData.fetchAssetCollections()
             }
         }else if status.rawValue >= 1 {
@@ -618,6 +617,9 @@ extension PhotoPickerController {
             isFirstAuthorization = true
             AssetManager.requestAuthorization { _ in
                 self.requestAuthorization()
+                if self.config.albumShowMode.isPop {
+                    self.pickerViewController?.initToolbar()
+                }
                 self.albumViewController?.reloadData()
                 self.pickerViewController?.reloadAlbumData()
                 PhotoManager.shared.registerPhotoChangeObserver()

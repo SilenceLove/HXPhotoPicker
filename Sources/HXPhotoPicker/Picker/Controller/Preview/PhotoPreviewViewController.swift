@@ -572,4 +572,44 @@ extension PhotoPreviewViewController {
         pickerController.cancelCallback()
         dismiss(animated: true, completion: nil)
     }
+    
+    func removeSelectedAssetWhenRemovingAssets(_ assets: [PhotoAsset]) {
+        if assetCount == 0 || assets.isEmpty {
+            return
+        }
+        var indexPaths: [IndexPath] = []
+        for photoAsset in assets {
+            guard let index = previewAssets.firstIndex(of: photoAsset) else {
+                continue
+            }
+            previewAssets.remove(at: index)
+            indexPaths.append(.init(
+                item: index,
+                section: 0
+            ))
+        }
+        collectionView.deleteItems(at: indexPaths)
+        if config.isShowBottomView {
+            photoToolbar.removeSelectedAssets(assets)
+            photoToolbar.requestOriginalAssetBtyes()
+            photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+            if pickerController.selectedAssetArray.isEmpty {
+                UIView.animate(withDuration: 0.25) {
+                    self.configBottomViewFrame()
+                    self.photoToolbar.layoutSubviews()
+                }
+            }
+        }
+        if assetCount > 0 {
+            scrollViewDidScroll(collectionView)
+            startRequestPreviewTimer()
+        }else {
+            if let viewControllers = navigationController?.viewControllers,
+               viewControllers.count > 1 {
+                navigationController?.popViewController(animated: true)
+            }else {
+                dismiss(animated: true, completion: nil)
+            }
+        }
+    }
 }

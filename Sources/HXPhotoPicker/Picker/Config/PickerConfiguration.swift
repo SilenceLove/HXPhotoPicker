@@ -24,6 +24,10 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     /// 选择数据
     public var pickerData: PhotoPickerData.Type = PhotoPickerData.self
     
+    /// 在相册权限受限时，移除授权的照片时是否移除对应选择的数据
+    /// Whether to remove the corresponding selected data when removing authorized assets
+    public var isRemoveSelectedAssetWhenRemovingAssets: Bool = true
+    
     public var modalPresentationStyle: UIModalPresentationStyle
     
     /// Selector display style, effective when albumShowMode = .popup and fullscreen popup

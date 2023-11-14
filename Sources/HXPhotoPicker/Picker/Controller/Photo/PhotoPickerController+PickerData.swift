@@ -28,6 +28,10 @@ extension PhotoPickerController: PhotoPickerDataDelegate {
     public func pickerData(_ pickerData: PhotoPickerData, didUnselectAsset photoAsset: PhotoAsset, at index: Int) {
         pickerDelegate?.pickerController(self, didUnselectAsset: photoAsset, atIndex: index)
     }
+    
+    public func pickerData(_ pickerData: PhotoPickerData, removeSelectedAssetWhenRemovingAssets photoAssets: [PhotoAsset]) {
+        previewViewController?.removeSelectedAssetWhenRemovingAssets(photoAssets)
+    }
 }
 
 extension PhotoPickerController: PhotoFetchDataDelegate {
