@@ -28,7 +28,7 @@ class WeChatViewController: UIViewController {
         return button
     }()
     @objc func didPickerClick() {
-        var config = PhotoTools.getWXPickerConfig()
+        let config = PhotoTools.getWXPickerConfig()
         if UIDevice.isPad {
             let picker = PhotoPickerController(splitPicker: config)
             let split = PhotoSplitViewController(picker: picker)

@@ -97,7 +97,7 @@ class PickerResultViewController: UIViewController,
     override func viewDidLoad() {
         super.viewDidLoad()
         loadFonts()
-        config.editor.buttonType = .top
+//        config.editor.buttonType = .top
         collectionViewTopConstraint.constant = 20
         collectionView.register(ResultViewCell.self, forCellWithReuseIdentifier: "ResultViewCellID")
         collectionView.register(ResultAddViewCell.self, forCellWithReuseIdentifier: "ResultAddViewCellID")
