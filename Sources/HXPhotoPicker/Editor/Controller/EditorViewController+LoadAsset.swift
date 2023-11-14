@@ -15,7 +15,7 @@ extension EditorViewController {
     
     enum LoadAssetStatus {
         case loadding(Bool = false)
-        case successful(EditorAsset.`Type`)
+        case successful(EditorAsset.AssetType)
         case failure
     }
     
@@ -23,7 +23,7 @@ extension EditorViewController {
         let asset = selectedAsset
         initAssetType(asset.type)
     }
-    func initAssetType(_ type: EditorAsset.`Type`) {
+    func initAssetType(_ type: EditorAsset.AssetType) {
         let viewSize = UIDevice.screenSize
         switch type {
         case .image(let image):
@@ -80,8 +80,6 @@ extension EditorViewController {
         case .photoAsset(let photoAsset):
             loadPhotoAsset(photoAsset)
         #endif
-        default:
-            break
         }
     }
     
@@ -205,6 +203,10 @@ extension EditorViewController {
                 parameter?.value = data.exposure / 5
             case .saturation:
                 parameter?.value = data.saturation - 1
+            case .highlights:
+                parameter?.value = data.highlights
+            case .shadows:
+                parameter?.value = data.shadows
             case .warmth:
                 parameter?.value = data.warmth
             case .vignette:
@@ -219,6 +221,7 @@ extension EditorViewController {
             }
         }
         filterEditView.reloadData()
+        filterEditView.scrollToValue()
         filterEditFator = data
     }
     

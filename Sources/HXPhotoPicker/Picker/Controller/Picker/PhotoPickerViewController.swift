@@ -260,7 +260,7 @@ extension PhotoPickerViewController {
         pickerController.cancelCallback()
     }
     
-    func didFilterItemClick() {
+    func didFilterItemClick(modalPresentationStyle: UIModalPresentationStyle) {
         let vc: PhotoPickerFilterViewController
         if #available(iOS 13.0, *) {
             vc = PhotoPickerFilterViewController(style: .insetGrouped)
@@ -286,6 +286,7 @@ extension PhotoPickerViewController {
             $0.videoCount = self.listView.videoCount
         }
         let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = modalPresentationStyle
         present(nav, animated: true)
     }
     
@@ -305,8 +306,8 @@ extension PhotoPickerViewController {
 
 extension PhotoPickerViewController: PhotoNavigationItemDelegate {
     
-    public func photoItem(presentFilterAssets photoItem: PhotoNavigationItem) {
-        didFilterItemClick()
+    public func photoItem(presentFilterAssets photoItem: PhotoNavigationItem, modalPresentationStyle: UIModalPresentationStyle) {
+        didFilterItemClick(modalPresentationStyle: modalPresentationStyle)
     }
 }
 

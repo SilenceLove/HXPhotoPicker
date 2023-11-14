@@ -79,6 +79,7 @@ open class PhotoPickerListViewController:
     
     var orientationDidChange: Bool = false
     var beforeOrientationIndexPath: IndexPath?
+    var canScrollToBeforeIndexPath: Bool = false
     
     public required init(config: PickerConfiguration) {
         self.config = config.photoList
@@ -268,6 +269,44 @@ open class PhotoPickerListViewController:
         }
     }
     
+    public func scrollToCenter(for photoAsset: PhotoAsset?) {
+        if assets.isEmpty {
+            return
+        }
+        if let photoAsset = photoAsset,
+           var item = assets.firstIndex(of: photoAsset) {
+            if needOffset {
+                item += offsetIndex
+            }
+            canScrollToBeforeIndexPath = false
+            collectionView.scrollToItem(
+                at: IndexPath(item: item, section: 0),
+                at: .centeredVertically,
+                animated: false
+            )
+        }
+    }
+    
+    public func scrollCellToVisibleArea(_ cell: PhotoPickerBaseViewCell) {
+        if assets.isEmpty {
+            return
+        }
+        let rect = cell.photoView.convert(cell.photoView.bounds, to: view)
+        var scrollPosition: UICollectionView.ScrollPosition?
+        if rect.minY - collectionView.contentInset.top < 0 {
+            scrollPosition = .top
+        }else if rect.maxY > view.height - collectionView.contentInset.bottom {
+            scrollPosition = .bottom
+        }
+        if let indexPath = collectionView.indexPath(for: cell), let scrollPosition {
+            canScrollToBeforeIndexPath = false
+            collectionView.scrollToItem(
+                at: indexPath,
+                at: scrollPosition,
+                animated: false
+            )
+        }
+    }
     
     public override func deviceOrientationWillChanged(notify: Notification) {
         orientationDidChange = true
@@ -337,9 +376,13 @@ open class PhotoPickerListViewController:
         if orientationDidChange {
             reloadData()
             if navigationController?.topViewController is PhotoPickerViewController {
+                canScrollToBeforeIndexPath = true
                 DispatchQueue.main.async {
-                    if let indexPath = self.beforeOrientationIndexPath {
-                        self.scrollTo(at: indexPath, at: .centeredVertically, animated: false)
+                    if self.canScrollToBeforeIndexPath {
+                        if let indexPath = self.beforeOrientationIndexPath {
+                            self.scrollTo(at: indexPath, at: .centeredVertically, animated: false)
+                        }
+                        self.canScrollToBeforeIndexPath = false
                     }
                 }
             }
@@ -590,6 +633,28 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
                 }
                 menus.append(edit)
             }
+            if photoAsset.editedResult != nil {
+                let removeEdit = UIAction(
+                    title: "清空已编辑的内容".localized,
+                    image: .init(systemName: "xmark.circle"),
+                    attributes: [.destructive]
+                ) { [weak self] _ in
+                    guard let self = self,
+                          let cell = self.getCell(for: indexPath.item),
+                          let photoAsset = cell.photoAsset else {
+                        return
+                    }
+                    if photoAsset.videoEditedResult != nil {
+                        photoAsset.editedResult = nil
+                        cell.isRequestDirectly = true
+                        cell.updatePhotoAsset(photoAsset)
+                    }else if photoAsset.photoEditedResult != nil {
+                        photoAsset.editedResult = nil
+                        cell.updatePhotoAsset(photoAsset)
+                    }
+                }
+                menus.append(removeEdit)
+            }
             #endif
             
             return .init(children: menus)
@@ -633,7 +698,11 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
             view.filterOptions = filterOptions
             view.didFilterHandler = { [weak self] in
                 guard let self = self else { return }
-                self.delegate?.photoList(presentFilter: self)
+                if #available(iOS 13.0, *) {
+                    self.delegate?.photoList(presentFilter: self, modalPresentationStyle: .automatic)
+                } else {
+                    self.delegate?.photoList(presentFilter: self, modalPresentationStyle: .fullScreen)
+                }
             }
             return view
         }
@@ -736,8 +805,10 @@ extension PhotoPickerListViewController: PhotoPickerViewCellDelegate {
             #if HXPICKER_ENABLE_EDITOR
             if photoAsset.videoEditedResult != nil, pickerConfig.isDeselectVideoRemoveEdited {
                 photoAsset.editedResult = nil
-                cell.isRequestDirectly = true
-                cell.photoAsset = photoAsset
+                cell.updatePhotoAsset(photoAsset)
+            }else if photoAsset.photoEditedResult != nil, pickerConfig.isDeselectPhotoRemoveEdited {
+                photoAsset.editedResult = nil
+                cell.updatePhotoAsset(photoAsset)
             }else {
                 cell.updateSelectedState(
                     isSelected: false,

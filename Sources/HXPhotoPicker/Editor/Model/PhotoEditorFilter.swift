@@ -143,6 +143,10 @@ public struct EditorFilterEditFator: Codable {
     var exposure: Float
     /// 饱和度
     var saturation: Float
+    /// 高光
+    var highlights: Float
+    /// 阴影
+    var shadows: Float
     /// 色温
     var warmth: Float
     /// 暗角
@@ -155,6 +159,8 @@ public struct EditorFilterEditFator: Codable {
         contrast != 1 ||
         exposure != 0 ||
         saturation != 1 ||
+        highlights != 0 ||
+        shadows != 0 ||
         warmth != 0 ||
         sharpen != 0 ||
         vignette != 0
@@ -165,6 +171,8 @@ public struct EditorFilterEditFator: Codable {
         contrast: Float = 1,
         exposure: Float = 0,
         saturation: Float = 1,
+        highlights: Float = 0,
+        shadows: Float = 0,
         warmth: Float = 0,
         sharpen: Float = 0,
         vignette: Float = 0
@@ -173,6 +181,8 @@ public struct EditorFilterEditFator: Codable {
         self.contrast = contrast
         self.exposure = exposure
         self.saturation = saturation
+        self.highlights = highlights
+        self.shadows = shadows
         self.warmth = warmth
         self.sharpen = sharpen
         self.vignette = vignette

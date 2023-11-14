@@ -117,17 +117,11 @@ open class PhotoSplitViewController: UISplitViewController, UISplitViewControlle
         guard #available(iOS 14.5, *) else {
             return
         }
-        if !UIDevice.isPad, !UIDevice.isPortrait, !isCollapsed {
-            if modalPresentationStyle == .fullScreen {
-                switch displayMode {
-                case .oneBesideSecondary:
-                    isSplitShowColumn = true
-                default:
-                    isSplitShowColumn = false
-                }
-            }else {
-                isSplitShowColumn = false
-            }
+        if !UIDevice.isPad, !UIDevice.isPortrait,
+           !isCollapsed,
+           modalPresentationStyle == .fullScreen,
+           displayMode == .oneBesideSecondary {
+            isSplitShowColumn = true
         }else {
             isSplitShowColumn = false
         }

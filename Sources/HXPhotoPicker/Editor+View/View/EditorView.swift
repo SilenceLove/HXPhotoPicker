@@ -13,12 +13,12 @@ open class EditorView: UIScrollView {
     // MARK: public
     public weak var editDelegate: EditorViewDelegate?
     
-    /// The address configuration after editing, the default is under tmp
-    /// Please set a different address each time you edit to prevent the existing data from being overwritten
-    /// If editing a GIF, please set the address of the gif suffix
-    /// 编辑之后的地址配置，默认在tmp下
-    /// 每次编辑时请设置不同地址，防止之前存在的数据被覆盖
-    /// 如果编辑的是GIF，请设置gif后缀的地址
+    /// The URL configuration after editing, the default is under tmp
+    /// Please set a different URL each time you edit to prevent the existing data from being overwritten
+    /// If editing a GIF, please set the URL of the gif suffix
+    /// 编辑之后的URL配置，默认在tmp下
+    /// 每次编辑时请设置不同URL，防止之前存在的数据被覆盖
+    /// 如果编辑的是GIF，请设置gif后缀的URL
     public var urlConfig: EditorURLConfig? {
         didSet { adjusterView.urlConfig = urlConfig }
     }

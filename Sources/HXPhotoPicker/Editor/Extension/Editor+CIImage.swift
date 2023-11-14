@@ -60,6 +60,21 @@ extension CIImage {
             }
         }
         
+        if editFator.highlights != 0 || editFator.shadows != 0 {
+            guard let filter = CIFilter(name: "CIHighlightShadowAdjust") else { return inputImage }
+            filter.setDefaults()
+            filter.setValue(inputImage, forKey: kCIInputImageKey)
+            if editFator.highlights != 0 {
+                filter.setValue(1 - editFator.highlights, forKey: "inputHighlightAmount")
+            }
+            if editFator.shadows != 0 {
+                filter.setValue(editFator.shadows, forKey: "inputShadowAmount")
+            }
+            if let image = filter.outputImage {
+                inputImage = image
+            }
+        }
+        
         if editFator.vignette != 0 {
             guard let vignetteFilter = CIFilter(name: "CIVignette") else { return inputImage }
             vignetteFilter.setValue(inputImage, forKey: kCIInputImageKey)

@@ -152,6 +152,9 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     /// 视频最大编辑时长，为0则不限制，超过限制不可编辑（视频时长超出最大选择时长才生效）
     public var maximumVideoEditDuration: Int = 0
     
+    /// 取消选择照片时，是否清空已编辑的内容
+    public var isDeselectPhotoRemoveEdited: Bool = false
+    
     /// 取消选择视频时，是否清空已编辑的内容
     public var isDeselectVideoRemoveEdited: Bool = true
     

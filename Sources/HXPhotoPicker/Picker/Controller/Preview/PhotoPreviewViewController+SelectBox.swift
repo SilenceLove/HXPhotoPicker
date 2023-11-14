@@ -74,6 +74,13 @@ extension PhotoPreviewViewController {
                 cell?.cancelRequest()
                 cell?.requestPreviewAsset()
                 pickerUpdateCell = true
+            }else  if photoAsset.photoEditedResult != nil, pickerConfig.isDeselectPhotoRemoveEdited {
+                photoAsset.editedResult = nil
+                let cell = getCell(for: currentPreviewIndex)
+                cell?.photoAsset = photoAsset
+                cell?.cancelRequest()
+                cell?.requestPreviewAsset()
+                pickerUpdateCell = true
             }
             #endif
             canUpdate = true

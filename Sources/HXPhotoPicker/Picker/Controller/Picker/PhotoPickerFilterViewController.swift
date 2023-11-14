@@ -48,7 +48,7 @@ class PhotoPickerFilterViewController: UITableViewController {
         
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(PhotoPickerFilterViewCell.self)
-        let bottomHeight =  UIDevice.bottomMargin + 100
+        let bottomHeight = UIDevice.bottomMargin + 100
         bottomView.frame = .init(x: 0, y: 20, width: view.width, height: bottomHeight)
         tableView.tableFooterView = bottomView
         
@@ -210,10 +210,12 @@ class PhotoPickerFilterViewController: UITableViewController {
         let contentHeight = tableView.contentSize.height
         if #available(iOS 11.0, *) {
             if contentHeight < view.height - tableView.adjustedContentInset.top {
-                bottomView.y = view.height - bottomView.height
+                bottomView.y = view.height - bottomView.height - UIDevice.bottomMargin
             }else {
                 bottomView.y = contentHeight - bottomView.height + 20
             }
+        }else {
+            bottomView.y = view.height - bottomView.height - UIDevice.bottomMargin
         }
         numberView.frame = .init(x: 0, y: 0, width: view.width, height: 20)
         filterLb.frame = .init(x: 0, y: 20, width: view.width, height: 20)

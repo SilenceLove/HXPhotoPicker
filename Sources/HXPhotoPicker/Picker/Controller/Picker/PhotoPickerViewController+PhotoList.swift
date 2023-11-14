@@ -58,8 +58,8 @@ extension PhotoPickerViewController: PhotoPickerListDelegate {
         presentCameraViewController()
     }
     
-    public func photoList(presentFilter photoList: PhotoPickerList) {
-        didFilterItemClick()
+    public func photoList(presentFilter photoList: PhotoPickerList, modalPresentationStyle: UIModalPresentationStyle) {
+        didFilterItemClick(modalPresentationStyle: modalPresentationStyle)
     }
     
     func quickSelect(_ photoAsset: PhotoAsset, isCapture: Bool = false) {

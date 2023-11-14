@@ -17,12 +17,12 @@ public enum PhotoNavigationItemType {
 
 public protocol PhotoNavigationItemDelegate: PhotoControllerEvent {
     func photoItem(_ photoItem: PhotoNavigationItem, didSelected isSelected: Bool)
-    func photoItem(presentFilterAssets photoItem: PhotoNavigationItem)
+    func photoItem(presentFilterAssets photoItem: PhotoNavigationItem, modalPresentationStyle: UIModalPresentationStyle)
 }
 
 public extension PhotoNavigationItemDelegate {
     func photoItem(_ photoItem: PhotoNavigationItem, didSelected isSelected: Bool) { }
-    func photoItem(presentFilterAssets photoItem: PhotoNavigationItem) { }
+    func photoItem(presentFilterAssets photoItem: PhotoNavigationItem, modalPresentationStyle: UIModalPresentationStyle) { }
 }
 
 public protocol PhotoNavigationItem: UIView, PhotoPickerDataStatus {

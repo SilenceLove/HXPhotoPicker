@@ -12,21 +12,20 @@ public struct EditorAsset {
     
     /// edit object
     /// 编辑对象
-    public let type: `Type`
+    public let type: AssetType
     
     /// edit result
     /// 编辑结果
     public var result: EditedResult?
     
-    public init(type: `Type`, result: EditedResult? = nil) {
+    public init(type: AssetType, result: EditedResult? = nil) {
         self.type = type
         self.result = result
     }
 }
 
 extension EditorAsset {
-    public enum `Type` {
-        case none
+    public enum AssetType {
         case image(UIImage)
         case imageData(Data)
         case video(URL)
@@ -94,7 +93,7 @@ extension EditorAsset {
             case .networkImage:
                 return .image
             #endif
-            case .video, .networkVideo:
+            case .video, .networkVideo, .videoAsset:
                 return .video
             #if HXPICKER_ENABLE_PICKER
             case .photoAsset(let asset):
@@ -103,8 +102,6 @@ extension EditorAsset {
                 }
                 return .video
             #endif
-            default:
-                return .unknown
             }
         }
     }

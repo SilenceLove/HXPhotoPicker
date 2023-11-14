@@ -422,9 +422,9 @@ open class EditorViewController: BaseViewController {
                                 navY = UIDevice.generalStatusBarHeight
                             }
                         }
-                        top = navY + navHeight + 10
+                        top = navY + navHeight + 15
                     }else {
-                        top = navHeight + 10
+                        top = navHeight + 15
                     }
                     if UIDevice.isPad {
                         bottom = UIDevice.bottomMargin + 160

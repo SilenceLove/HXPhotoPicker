@@ -1,39 +1,39 @@
 PODS:
-  - HXPhotoPicker (4.1.0):
-    - HXPhotoPicker/Full (= 4.1.0)
-  - HXPhotoPicker/Camera (4.1.0):
-    - HXPhotoPicker/Camera/Lite (= 4.1.0)
-    - HXPhotoPicker/Camera/Location (= 4.1.0)
-  - HXPhotoPicker/Camera/Lite (4.1.0):
+  - HXPhotoPicker (4.1.1):
+    - HXPhotoPicker/Full (= 4.1.1)
+  - HXPhotoPicker/Camera (4.1.1):
+    - HXPhotoPicker/Camera/Lite (= 4.1.1)
+    - HXPhotoPicker/Camera/Location (= 4.1.1)
+  - HXPhotoPicker/Camera/Lite (4.1.1):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Camera/Location (4.1.0):
+  - HXPhotoPicker/Camera/Location (4.1.1):
     - HXPhotoPicker/Camera/Lite
-  - HXPhotoPicker/Core (4.1.0)
-  - HXPhotoPicker/Editor (4.1.0):
-    - HXPhotoPicker/Editor/KF (= 4.1.0)
-    - HXPhotoPicker/Editor/Lite (= 4.1.0)
-  - HXPhotoPicker/Editor/KF (4.1.0):
+  - HXPhotoPicker/Core (4.1.1)
+  - HXPhotoPicker/Editor (4.1.1):
+    - HXPhotoPicker/Editor/KF (= 4.1.1)
+    - HXPhotoPicker/Editor/Lite (= 4.1.1)
+  - HXPhotoPicker/Editor/KF (4.1.1):
     - HXPhotoPicker/Editor/Lite
     - HXPhotoPicker/EditorView/KF
     - Kingfisher (~> 7.0)
-  - HXPhotoPicker/Editor/Lite (4.1.0):
+  - HXPhotoPicker/Editor/Lite (4.1.1):
     - HXPhotoPicker/EditorView/Lite
-  - HXPhotoPicker/EditorView/KF (4.1.0):
+  - HXPhotoPicker/EditorView/KF (4.1.1):
     - HXPhotoPicker/EditorView/Lite
     - Kingfisher (~> 7.0)
-  - HXPhotoPicker/EditorView/Lite (4.1.0):
+  - HXPhotoPicker/EditorView/Lite (4.1.1):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Full (4.1.0):
+  - HXPhotoPicker/Full (4.1.1):
     - HXPhotoPicker/Camera
     - HXPhotoPicker/Editor
     - HXPhotoPicker/Picker
-  - HXPhotoPicker/Picker (4.1.0):
-    - HXPhotoPicker/Picker/KF (= 4.1.0)
-    - HXPhotoPicker/Picker/Lite (= 4.1.0)
-  - HXPhotoPicker/Picker/KF (4.1.0):
+  - HXPhotoPicker/Picker (4.1.1):
+    - HXPhotoPicker/Picker/KF (= 4.1.1)
+    - HXPhotoPicker/Picker/Lite (= 4.1.1)
+  - HXPhotoPicker/Picker/KF (4.1.1):
     - HXPhotoPicker/Picker/Lite
     - Kingfisher (~> 7.0)
-  - HXPhotoPicker/Picker/Lite (4.1.0):
+  - HXPhotoPicker/Picker/Lite (4.1.1):
     - HXPhotoPicker/Core
   - Kingfisher (7.9.1)
 
@@ -49,7 +49,7 @@ EXTERNAL SOURCES:
     :path: "./"
 
 SPEC CHECKSUMS:
-  HXPhotoPicker: bda0fe0ca879dfd333c498db82903adb0e667719
+  HXPhotoPicker: afffd7086a1cfddcbc87698badd09f0ea7594bf7
   Kingfisher: 1d14e9f59cbe19389f591c929000332bf70efd32
 
 PODFILE CHECKSUM: 21b9e041ba4e451b12f1e956e5cd813bc50684be

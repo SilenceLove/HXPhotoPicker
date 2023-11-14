@@ -28,8 +28,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
             }
             if !photoAsset.isSelected {
                 let cell = listView.getCell(for: photoAsset)
-                cell?.isRequestDirectly = true
-                cell?.photoAsset = photoAsset
+                cell?.updatePhotoAsset(photoAsset)
                 if pickerController.pickerData.append(photoAsset) {
                     listView.updateCellSelectedTitle()
                 }
@@ -52,8 +51,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
                 return
             }
             let cell = listView.getCell(for: photoAsset)
-            cell?.isRequestDirectly = true
-            cell?.photoAsset = photoAsset
+            cell?.updatePhotoAsset(photoAsset)
             if !photoAsset.isSelected {
                 if pickerController.pickerData.append(photoAsset) {
                     listView.updateCellSelectedTitle()

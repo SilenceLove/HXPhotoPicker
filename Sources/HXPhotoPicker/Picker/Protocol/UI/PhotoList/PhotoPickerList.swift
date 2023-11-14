@@ -40,7 +40,7 @@ public protocol PhotoPickerListDelegate: PhotoControllerEvent {
     func photoList(presentCamera photoList: PhotoPickerList)
     
     /// 跳转到筛选界面
-    func photoList(presentFilter photoList: PhotoPickerList)
+    func photoList(presentFilter photoList: PhotoPickerList, modalPresentationStyle: UIModalPresentationStyle)
     
     func photoList(_ photoList: PhotoPickerList, didSelectedAsset asset: PhotoAsset)
     func photoList(_ photoList: PhotoPickerList, didDeselectedAsset asset: PhotoAsset)
@@ -163,8 +163,8 @@ public extension PhotoPickerList {
     }
     
     func reloadCell(for asset: PhotoAsset) {
-        guard let indexPath = getIndexPath(for: asset) else { return }
-        collectionView.reloadItems(at: [indexPath])
+        let cell = getCell(for: asset)
+        cell?.updatePhotoAsset(asset)
     }
     
     func reloadData() {

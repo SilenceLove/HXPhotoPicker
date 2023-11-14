@@ -17,6 +17,8 @@ class EditorFilterEditModel: Equatable {
         case warmth
         case vignette
         case sharpen
+        case highlights
+        case shadows
         
         var title: String {
             switch self {
@@ -34,6 +36,10 @@ class EditorFilterEditModel: Equatable {
                 return "暗角".localized
             case .sharpen:
                 return "锐化".localized
+            case .highlights:
+                return "高光".localized
+            case .shadows:
+                return "阴影".localized
             }
         }
         
@@ -44,7 +50,7 @@ class EditorFilterEditModel: Equatable {
             case .contrast:
                 return "hx_editor_filter_edit_contrast"
             case .exposure:
-                return "hx_editor_filter_edit_contrast"
+                return "hx_editor_filter_edit_exposure"
             case .saturation:
                 return "hx_editor_filter_edit_saturation"
             case .warmth:
@@ -53,6 +59,10 @@ class EditorFilterEditModel: Equatable {
                 return "hx_editor_filter_edit_vignette"
             case .sharpen:
                 return "hx_editor_filter_edit_sharpen"
+            case .highlights:
+                return "hx_editor_filter_edit_highlights"
+            case .shadows:
+                return "hx_editor_filter_edit_shadows"
             }
         }
     }
@@ -85,10 +95,6 @@ class EditorFilterEditView: UIView {
     private var flowLayout: UICollectionViewFlowLayout!
     private var collectionView: UICollectionView!
     
-    func reloadData() {
-        collectionView.reloadData()
-    }
-    
     let models: [EditorFilterEditModel]
     
     init() {
@@ -107,6 +113,14 @@ class EditorFilterEditView: UIView {
             ),
             .init(
                 type: .exposure,
+                parameters: [.init(parameter: .init(defaultValue: 0), sliderType: .center)]
+            ),
+            .init(
+                type: .highlights,
+                parameters: [.init(parameter: .init(defaultValue: 0), sliderType: .normal)]
+            ),
+            .init(
+                type: .shadows,
                 parameters: [.init(parameter: .init(defaultValue: 0), sliderType: .center)]
             ),
             .init(
@@ -145,6 +159,25 @@ class EditorFilterEditView: UIView {
             forCellWithReuseIdentifier: "EditorFilterEditViewCellID"
         )
         addSubview(collectionView)
+    }
+    
+    func scrollToValue() {
+        var item: Int?
+        for (index, model) in models.enumerated() {
+            guard let value = model.parameters.first?.value else {
+                continue
+            }
+            if value != 0 {
+                item = index
+                break
+            }
+        }
+        guard let item else { return }
+        collectionView.scrollToItem(at: .init(item: item, section: 0), at: UIDevice.isPortrait ? .centeredHorizontally : .centeredVertically, animated: false)
+    }
+    
+    func reloadData() {
+        collectionView.reloadData()
     }
     
     override func layoutSubviews() {

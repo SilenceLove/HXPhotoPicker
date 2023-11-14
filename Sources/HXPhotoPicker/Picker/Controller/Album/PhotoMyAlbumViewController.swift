@@ -49,6 +49,7 @@ public class PhotoMyAlbumViewController: UIViewController, UICollectionViewDataS
             automaticallyAdjustsScrollViewInsets = false
         }
         view.addSubview(collectionView)
+        updateColors()
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

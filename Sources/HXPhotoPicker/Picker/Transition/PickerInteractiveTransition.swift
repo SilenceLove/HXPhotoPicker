@@ -301,6 +301,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             panGestureRecognizer.isEnabled = false
             previewViewController.navigationController?.view.isUserInteractionEnabled = false
             let toVC = self.transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
+            let picker = self.pickerController
             UIView.animate(withDuration: 0.25) {
                 previewView.transform = .identity
                 previewView.center = self.previewCenter
@@ -334,7 +335,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                         toVC?.photoToolbar.alpha = 0
                     }
                 }
-                if let picker = self.pickerController {
+                if let picker {
                     picker.pickerDelegate?
                         .pickerController(picker, interPercentDidCancelAnimation: self.type)
                 }
@@ -444,7 +445,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     self.transitionContext = nil
                 }
             }
-            
+            let picker = self.pickerController
             UIView.animate(
                 withDuration: 0.45,
                 delay: 0,
@@ -472,7 +473,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     previewViewController.navBgView?.alpha = 0
                     previewViewController.navigationController?.navigationBar.alpha = 0
                 }
-                if let picker = self.pickerController {
+                if let picker {
                     picker.pickerDelegate?
                         .pickerController(picker, interPercentDidFinishAnimation: self.type)
                 }
@@ -485,9 +486,9 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 } completion: { _ in
                     previewView.isUserInteractionEnabled = true
                     previewView.removeFromSuperview()
-                    if self.type == .dismiss, let pickerController = self.pickerController {
-                        pickerController.pickerDelegate?.pickerController(
-                            pickerController,
+                    if self.type == .dismiss, let picker {
+                        picker.pickerDelegate?.pickerController(
+                            picker,
                             previewDismissComplete: previewViewController.currentPreviewIndex
                         )
                     }
@@ -560,20 +561,24 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             pickerViewController.isDisableLayout = true
             DispatchQueue.main.async {
                 if let pickerCell = pickerViewController.listView.getCell(for: photoAsset) {
-                    pickerViewController.listView.scrollCellToVisibleArea(pickerCell)
                     DispatchQueue.main.async {
-                        pickerViewController.listView.cellReloadImage()
-                    }
-                    self.toView = pickerCell
-                    self.toView?.isHidden = true
-                }else {
-                    pickerViewController.listView.scrollToCenter(for: photoAsset)
-                    pickerViewController.listView.reloadCell(for: photoAsset)
-                    DispatchQueue.main.async {
-                        pickerViewController.listView.cellReloadImage()
-                        let pickerCell = pickerViewController.listView.getCell(for: photoAsset)
+                        pickerViewController.listView.scrollCellToVisibleArea(pickerCell)
                         self.toView = pickerCell
                         self.toView?.isHidden = true
+                        DispatchQueue.main.async {
+                            pickerViewController.listView.cellReloadImage()
+                        }
+                    }
+                }else {
+                    DispatchQueue.main.async {
+                        pickerViewController.listView.scrollToCenter(for: photoAsset)
+                        pickerViewController.listView.reloadCell(for: photoAsset)
+                        DispatchQueue.main.async {
+                            pickerViewController.listView.cellReloadImage()
+                            let pickerCell = pickerViewController.listView.getCell(for: photoAsset)
+                            self.toView = pickerCell
+                            self.toView?.isHidden = true
+                        }
                     }
                 }
             }

@@ -64,6 +64,11 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
         }
     }
     
+    open func updatePhotoAsset(_ asset: PhotoAsset) {
+        isRequestDirectly = true
+        photoAsset = asset
+    }
+    
     open func request() {
         requestThumbnailImage()
         requestICloudState()

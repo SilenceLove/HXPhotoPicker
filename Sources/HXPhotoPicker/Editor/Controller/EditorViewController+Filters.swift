@@ -247,6 +247,8 @@ extension EditorViewController: EditorFilterParameterViewDelegate {
             var contrast: Float = 1
             var exposure: Float = 0
             var saturation: Float = 1
+            var highlights: Float = 0
+            var shadows: Float = 0
             var warmth: Float = 0
             var sharpen: Float = 0
             var vignette: Float = 0
@@ -263,6 +265,10 @@ extension EditorViewController: EditorFilterParameterViewDelegate {
                     exposure = value * 5
                 case .saturation:
                     saturation = 1 + value
+                case .highlights:
+                    highlights = value
+                case .shadows:
+                    shadows = value
                 case .warmth:
                     warmth = value
                 case .vignette:
@@ -275,6 +281,8 @@ extension EditorViewController: EditorFilterParameterViewDelegate {
             filterEditFator.contrast = contrast
             filterEditFator.exposure = exposure
             filterEditFator.saturation = saturation
+            filterEditFator.highlights = highlights
+            filterEditFator.shadows = shadows
             filterEditFator.warmth = warmth
             filterEditFator.sharpen = sharpen
             filterEditFator.vignette = vignette

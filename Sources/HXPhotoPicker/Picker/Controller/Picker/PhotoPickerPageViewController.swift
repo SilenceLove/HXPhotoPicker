@@ -284,8 +284,8 @@ extension PhotoPickerPageViewController: PhotoPickerListDelegate {
         delegate?.photoList(presentCamera: self)
     }
     
-    public func photoList(presentFilter photoList: PhotoPickerList) {
-        delegate?.photoList(presentFilter: self)
+    public func photoList(presentFilter photoList: PhotoPickerList, modalPresentationStyle: UIModalPresentationStyle) {
+        delegate?.photoList(presentFilter: self, modalPresentationStyle: modalPresentationStyle)
     }
     
     public func photoList(_ photoList: PhotoPickerList, didSelectedAsset asset: PhotoAsset) {

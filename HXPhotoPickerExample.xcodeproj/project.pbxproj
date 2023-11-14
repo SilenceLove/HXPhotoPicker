@@ -2970,7 +2970,6 @@
 					"\"SwiftUI\"",
 					"-Wl",
 					"-ld_classic",
-					"-ld64",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xfrontend -debug-time-function-bodies";
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example19;
@@ -3035,7 +3034,6 @@
 					"\"SwiftUI\"",
 					"-Wl",
 					"-ld_classic",
-					"-ld64",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xfrontend -debug-time-function-bodies";
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example19;

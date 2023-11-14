@@ -148,31 +148,45 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 pickerVC.isDisableLayout = true
                 DispatchQueue.main.async {
                     toView = pickerVC.listView.getCell(for: photoAsset)
-                    if let toView = toView as? PhotoPickerBaseViewCell {
-                        pickerVC.listView.scrollCellToVisibleArea(toView)
-                        DispatchQueue.main.async {
-                            pickerVC.listView.cellReloadImage()
+                    DispatchQueue.main.async {
+                        if let toView = toView as? PhotoPickerBaseViewCell {
+                            pickerVC.listView.scrollCellToVisibleArea(toView)
+                            DispatchQueue.main.async {
+                                pickerVC.listView.cellReloadImage()
+                            }
+                            self.pushTransitionAnimation(
+                                photoAsset: photoAsset,
+                                toVC: toVC,
+                                previewVC: previewVC,
+                                pickerVC: pickerVC,
+                                containerView: containerView,
+                                contentView: contentView,
+                                fromView: fromView,
+                                toView: toView,
+                                backgroundColor: backgroundColor,
+                                transitionContext: transitionContext
+                            )
+                        }else {
+                            pickerVC.listView.scrollToCenter(for: photoAsset)
+                            DispatchQueue.main.async {
+                                pickerVC.listView.reloadCell(for: photoAsset)
+                                pickerVC.listView.cellReloadImage()
+                                toView = pickerVC.listView.getCell(for: photoAsset)
+                                self.pushTransitionAnimation(
+                                    photoAsset: photoAsset,
+                                    toVC: toVC,
+                                    previewVC: previewVC,
+                                    pickerVC: pickerVC,
+                                    containerView: containerView,
+                                    contentView: contentView,
+                                    fromView: fromView,
+                                    toView: toView,
+                                    backgroundColor: backgroundColor,
+                                    transitionContext: transitionContext
+                                )
+                            }
                         }
-                    }else {
-                        pickerVC.listView.scrollToCenter(for: photoAsset)
-                        pickerVC.listView.reloadCell(for: photoAsset)
-                        DispatchQueue.main.async {
-                            pickerVC.listView.cellReloadImage()
-                        }
-                        toView = pickerVC.listView.getCell(for: photoAsset)
                     }
-                    self.pushTransitionAnimation(
-                        photoAsset: photoAsset,
-                        toVC: toVC,
-                        previewVC: previewVC,
-                        pickerVC: pickerVC,
-                        containerView: containerView,
-                        contentView: contentView,
-                        fromView: fromView,
-                        toView: toView,
-                        backgroundColor: backgroundColor,
-                        transitionContext: transitionContext
-                    )
                 }
                 return
             }
