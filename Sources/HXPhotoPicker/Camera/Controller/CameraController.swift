@@ -220,6 +220,7 @@ public extension CameraController {
         public let localtion: CLLocation?
     }
     
+    @MainActor
     static func capture(
         _ config: CameraConfiguration = .init(),
         type: CameraController.CaptureType = .all,
@@ -230,6 +231,7 @@ public extension CameraController {
         return try await vc.takePhotograph()
     }
     
+    @MainActor
     static func show(
         _ config: CameraConfiguration = .init(),
         type: CameraController.CaptureType = .all,

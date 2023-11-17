@@ -222,7 +222,7 @@ extension PhotoPickerViewController {
                 }
             }
             if view.itemType == .filter {
-                if !addFilter {
+                if !addFilter || !config.isShowFilterItem {
                     continue
                 }
                 if !isLeft, config.rightNavigationItems.count > 1, view.size.width < 25 {

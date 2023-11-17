@@ -147,8 +147,7 @@ public struct PhotoListConfiguration {
     /// The bottom shows the number of photos/videos
     /// 底部显示 照片/视频 数量
     public var isShowAssetNumber: Bool = true
-    
-    @available(*, deprecated, message: "Use the registration APIs declared in the PhotoNavigationItem protocol")
+     
     public var isShowFilterItem: Bool = true
     
     public var assetNumber: AssetNumber = .init()

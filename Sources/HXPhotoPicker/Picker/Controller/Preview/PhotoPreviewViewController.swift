@@ -578,15 +578,18 @@ extension PhotoPreviewViewController {
             return
         }
         var indexPaths: [IndexPath] = []
+        let tempAssets = previewAssets
         for photoAsset in assets {
             guard let index = previewAssets.firstIndex(of: photoAsset) else {
                 continue
             }
             previewAssets.remove(at: index)
-            indexPaths.append(.init(
-                item: index,
-                section: 0
-            ))
+            if let index = tempAssets.firstIndex(of: photoAsset) {
+                indexPaths.append(.init(
+                    item: index,
+                    section: 0
+                ))
+            }
         }
         collectionView.deleteItems(at: indexPaths)
         if config.isShowBottomView {

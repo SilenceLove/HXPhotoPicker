@@ -107,14 +107,19 @@ class PhotoPreviewSelectedView: UIView,
         }
         let beforeIsEmpty = photoAssetArray.isEmpty
         var indexPaths: [IndexPath] = []
+        let tempAssets = photoAssetArray
         for photoAsset in photoAssets {
-            if let item = photoAssetArray.firstIndex(of: photoAsset) {
-                if let indexPath = currentSelectedIndexPath, item == indexPath.item {
-                    currentSelectedIndexPath = nil
-                }
-                photoAssetArray.remove(at: item)
+            guard let item = photoAssetArray.firstIndex(of: photoAsset) else {
+                continue
+            }
+            if let indexPath = currentSelectedIndexPath, item == indexPath.item {
+                currentSelectedIndexPath = nil
+            }
+            photoAssetArray.remove(at: item)
+            if let item = tempAssets.firstIndex(of: photoAsset) {
                 indexPaths.append(.init(item: item, section: 0))
             }
+            
         }
         collectionView.deleteItems(at: indexPaths)
         if !beforeIsEmpty && photoAssetArray.isEmpty {

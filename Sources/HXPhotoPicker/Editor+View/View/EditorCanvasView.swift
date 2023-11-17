@@ -428,6 +428,7 @@ struct EditorCanvasData: Codable {
                     let newPath = PKStrokePath(controlPoints: newPoints, creationDate: path.creationDate)
                     let newStroke: PKStroke
                     if #available(iOS 16.0, *) {
+                        #if swift(>=5.8)
                         newStroke = PKStroke(
                             ink: stroke.ink,
                             path: newPath,
@@ -435,6 +436,14 @@ struct EditorCanvasData: Codable {
                             mask: stroke.mask,
                             randomSeed: stroke.randomSeed
                         )
+                        #else
+                        newStroke = PKStroke(
+                            ink: stroke.ink,
+                            path: newPath,
+                            transform: stroke.transform,
+                            mask: stroke.mask
+                        )
+                        #endif
                     } else {
                         newStroke = PKStroke(
                             ink: stroke.ink,
