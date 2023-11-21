@@ -516,6 +516,7 @@ extension PhotoAsset {
             )
             return
         }
+        let isGif = phAsset.isImageAnimated
         var imageFileURL: URL
         if let fileURL = fileURL {
             imageFileURL = fileURL
@@ -524,7 +525,7 @@ extension PhotoAsset {
             if mediaSubType == .imageAnimated {
                 suffix = "gif"
             }else {
-                if let photoFormat = photoFormat {
+                if let photoFormat = photoFormat, !isGif {
                     suffix = photoFormat
                 }else {
                     suffix = "png"
@@ -532,7 +533,6 @@ extension PhotoAsset {
             }
             imageFileURL = PhotoTools.getTmpURL(for: suffix)
         }
-        let isGif = phAsset.isImageAnimated
         AssetManager.requestImageURL(
             for: phAsset,
             toFile: imageFileURL
