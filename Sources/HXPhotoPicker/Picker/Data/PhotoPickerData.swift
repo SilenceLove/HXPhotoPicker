@@ -182,11 +182,9 @@ open class PhotoPickerData {
                     canSelect = false
                 }
             }
-            if config.maximumSelectedPhotoCount > 0 {
-                if selectedPhotoAssets.count >= config.maximumSelectedPhotoCount {
-                    text = String.init(format: "最多只能选择%d张照片".localized, arguments: [config.maximumSelectedPhotoCount])
-                    canSelect = false
-                }
+            if config.maximumSelectedPhotoCount > 0, selectedPhotoAssets.count >= config.maximumSelectedPhotoCount {
+                text = String.init(format: "最多只能选择%d张照片".localized, arguments: [config.maximumSelectedPhotoCount])
+                canSelect = false
             }else {
                 if selectedAssets.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0 {
                     text = String.init(format: "已达到最大选择数".localized, arguments: [config.maximumSelectedPhotoCount])
@@ -253,11 +251,9 @@ open class PhotoPickerData {
                     canSelect = false
                 }
             }
-            if config.maximumSelectedVideoCount > 0 {
-                if selectedVideoAssets.count >= config.maximumSelectedVideoCount {
-                    text = String.init(format: "最多只能选择%d个视频".localized, arguments: [config.maximumSelectedVideoCount])
-                    canSelect = false
-                }
+            if config.maximumSelectedVideoCount > 0, selectedVideoAssets.count >= config.maximumSelectedVideoCount {
+                text = String.init(format: "最多只能选择%d个视频".localized, arguments: [config.maximumSelectedVideoCount])
+                canSelect = false
             }else {
                 if selectedAssets.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0 {
                     text = String.init(format: "已达到最大选择数".localized, arguments: [config.maximumSelectedPhotoCount])
