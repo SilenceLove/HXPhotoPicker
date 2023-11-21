@@ -569,7 +569,7 @@ open class EditorViewController: BaseViewController {
     var isPopTransition: Bool = false
     var isTransitionCompletion: Bool = true
     var loadAssetStatus: LoadAssetStatus = .loadding()
-    var assetLoadingView: ProgressHUD?
+    weak var assetLoadingView: ProgressHUD?
     
     var selectedOriginalImage: UIImage?
     var selectedThumbnailImage: UIImage?

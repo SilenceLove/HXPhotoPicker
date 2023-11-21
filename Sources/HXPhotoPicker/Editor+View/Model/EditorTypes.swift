@@ -112,6 +112,7 @@ extension EditorControlView {
         var aspectRatio: CGSize = .zero
     }
 }
+
 extension EditorView {
     enum Operate {
         case startEdit((() -> Void)?)
@@ -154,7 +155,6 @@ extension EditorAdjusterView {
     }
     
 }
-
 
 enum EditorVideoOrientation: Int {
     case portrait = 1

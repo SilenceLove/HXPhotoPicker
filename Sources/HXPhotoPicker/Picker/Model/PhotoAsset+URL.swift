@@ -395,6 +395,18 @@ extension PhotoAsset {
         try await .fetchObject(self, toFile: fileConfig, compression: compression)
     }
     
+    /// 获取 AssetResult
+    /// - Parameters:
+    ///   - compression: 压缩参数
+    ///   - fileConfig: 指定地址（如果为网络资源则忽略）
+    /// - Returns: 获取结果
+    public func assetResult(
+        _ compression: PhotoAsset.Compression? = nil,
+        toFile fileConfig: PhotoAsset.FileConfig? = nil
+    ) async throws -> AssetResult {
+        try await .fetchObject(self, toFile: fileConfig, compression: compression)
+    }
+    
     /// 获取 指定对象
     /// - Parameters:
     ///   - compression: 压缩参数

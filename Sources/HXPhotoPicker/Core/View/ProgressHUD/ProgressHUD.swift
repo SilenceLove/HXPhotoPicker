@@ -210,16 +210,16 @@ final class ProgressHUD: UIView {
         afterDelay: TimeInterval
     ) {
         finished = true
-        self.showDelayTimer?.invalidate()
+        showDelayTimer?.invalidate()
+        showDelayTimer = nil
         if afterDelay > 0 {
-            let timer: Timer = .init(
+            let timer: Timer = .scheduledTimer(
                 timeInterval: afterDelay,
                 target: self,
                 selector: #selector(handleHideTimer(timer:)),
                 userInfo: animated,
                 repeats: false
             )
-            RunLoop.current.add(timer, forMode: RunLoop.Mode.common)
             self.hideDelayTimer = timer
         }else {
             hideViews(animated: animated)
@@ -229,6 +229,8 @@ final class ProgressHUD: UIView {
     @objc
     private func handleHideTimer(timer: Timer) {
         hideViews(animated: (timer.userInfo != nil))
+        hideDelayTimer?.invalidate()
+        hideDelayTimer = nil
     }
     
     private func hideViews(animated: Bool) {

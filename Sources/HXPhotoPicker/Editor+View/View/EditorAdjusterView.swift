@@ -478,7 +478,6 @@ extension EditorAdjusterView {
     func setMirrorTransform(
         transform: CGAffineTransform? = nil,
         animated: Bool = false
-        
     ) {
         if animated {
             UIView.animate {

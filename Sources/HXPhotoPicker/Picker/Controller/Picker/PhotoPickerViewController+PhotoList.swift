@@ -83,7 +83,6 @@ extension PhotoPickerViewController: PhotoPickerListDelegate {
             }
         }
     }
-
     
     func openEditor(
         _ photoAsset: PhotoAsset,

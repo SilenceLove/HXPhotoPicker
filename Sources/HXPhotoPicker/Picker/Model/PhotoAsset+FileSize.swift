@@ -53,19 +53,19 @@ extension PhotoAsset {
         return -1
     }
     func getPHAssetFileSize() -> Int {
-        guard let photoAsset = phAsset else {
+        guard let phAsset else {
             return 0
         }
         var fileSize = 0
-        if photoAsset.isImageAnimated && mediaSubType != .imageAnimated {
+        if phAsset.isImageAnimated && mediaSubType != .imageAnimated {
             if let imageData = PhotoTools.getImageData(for: originalImage) {
                 fileSize = imageData.count
             }
             pFileSize = fileSize
             return fileSize
         }
-        let assetResources = PHAssetResource.assetResources(for: photoAsset)
-        if photoAsset.isLivePhoto {
+        let assetResources = PHAssetResource.assetResources(for: phAsset)
+        if phAsset.isLivePhoto {
             var livePhotoType: PHAssetResourceType = .photo
             var liveVideoType: PHAssetResourceType = .pairedVideo
             for assetResource in assetResources where
@@ -97,7 +97,7 @@ extension PhotoAsset {
             for resource in assetResources {
                 resources[resource.type] = resource
             }
-            if photoAsset.mediaType == .image {
+            if phAsset.mediaType == .image {
                 if let fullPhoto = resources[.fullSizePhoto], resources[.photo] != nil {
                     if let photoFileSize = fullPhoto.value(forKey: "fileSize") as? Int {
                         fileSize += photoFileSize
@@ -107,7 +107,7 @@ extension PhotoAsset {
                         fileSize += photoFileSize
                     }
                 }
-            }else if photoAsset.mediaType == .video {
+            }else if phAsset.mediaType == .video {
                 if let fullVideo = resources[.fullSizeVideo], resources[.video] != nil {
                     if let photoFileSize = fullVideo.value(forKey: "fileSize") as? Int {
                         fileSize += photoFileSize

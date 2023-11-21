@@ -344,6 +344,7 @@ extension PhotoPreviewViewController: PhotoToolBarDelegate {
     
     func startRequestPreviewTimer() {
         requestPreviewTimer?.invalidate()
+        requestPreviewTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(delayRequestPreview), userInfo: nil, repeats: false)
         requestPreviewTimer = Timer(
             timeInterval: 0.2,
             target: self,
@@ -351,12 +352,9 @@ extension PhotoPreviewViewController: PhotoToolBarDelegate {
             userInfo: nil,
             repeats: false
         )
-        RunLoop.main.add(
-            requestPreviewTimer!,
-            forMode: RunLoop.Mode.common
-        )
     }
-    @objc func delayRequestPreview() {
+    @objc
+    func delayRequestPreview() {
         if let cell = getCell(for: currentPreviewIndex) {
             cell.requestPreviewAsset()
             requestPreviewTimer = nil

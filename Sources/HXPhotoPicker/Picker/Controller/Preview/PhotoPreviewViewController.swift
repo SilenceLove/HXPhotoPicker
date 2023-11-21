@@ -143,7 +143,7 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
             if let cell = self.getCell(for: self.currentPreviewIndex) {
                 cell.requestPreviewAsset()
             }else {
-                Timer.scheduledTimer(
+                self.requestPreviewTimer = Timer.scheduledTimer(
                     withTimeInterval: 0.2,
                     repeats: false
                 ) { [weak self] _ in
@@ -167,6 +167,17 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
                 panGestureRecognizerFor: self,
                 type: .pop
             )
+        }
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        guard let viewControllers = navigationController?.viewControllers else {
+            return
+        }
+        if !viewControllers.contains(self) {
+            requestPreviewTimer?.invalidate()
+            requestPreviewTimer = nil
         }
     }
     

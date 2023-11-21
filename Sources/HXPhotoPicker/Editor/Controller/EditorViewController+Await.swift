@@ -11,6 +11,7 @@ import UIKit
 @available(iOS 13.0.0, *)
 public extension EditorViewController {
     
+    @MainActor
     static func edit(
         _ asset: EditorAsset,
         config: EditorConfiguration = .init(),
@@ -21,6 +22,7 @@ public extension EditorViewController {
         return try await vc.edit()
     }
     
+    @MainActor
     static func show(
         _ asset: EditorAsset,
         config: EditorConfiguration = .init(),

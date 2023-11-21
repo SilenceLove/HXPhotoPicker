@@ -71,39 +71,141 @@ public extension AssetManager {
                 presetName = AVAssetExportPresetMediumQuality
             }
         }
-        let exportSession = AVAssetExportSession(
+        guard let exportSession = AVAssetExportSession(
             asset: avAsset,
             presetName: presetName
-        )
-        exportSession?.outputURL = fileURL
-        exportSession?.shouldOptimizeForNetworkUse = true
-        exportSession?.outputFileType = .mp4
+        ) else {
+            completionHandler?(nil, AssetError.exportFailed(nil))
+            return nil
+        }
+        exportSession.outputURL = fileURL
+        exportSession.shouldOptimizeForNetworkUse = true
+        exportSession.outputFileType = .mp4
         if exportParameter.quality > 0 {
             var maxSize: Int?
             if let urlAsset = avAsset as? AVURLAsset {
                 maxSize = urlAsset.url.fileSize
             }
-            exportSession?.fileLengthLimit = PhotoTools.exportSessionFileLengthLimit(
+            exportSession.fileLengthLimit = PhotoTools.exportSessionFileLengthLimit(
                 seconds: avAsset.duration.seconds,
                 maxSize: maxSize,
                 exportPreset: exportParameter.preset,
                 videoQuality: exportParameter.quality
             )
         }
-        exportSession?.exportAsynchronously(completionHandler: {
+        exportSession.exportAsynchronously(completionHandler: {
             DispatchQueue.main.async {
-                switch exportSession?.status {
+                switch exportSession.status {
                 case .completed:
                     completionHandler?(fileURL, nil)
                 case .failed, .cancelled:
-                    completionHandler?(nil, exportSession?.error)
+                    completionHandler?(nil, exportSession.error)
                 default: break
                 }
             }
         })
-        if exportSession == nil {
-            completionHandler?(nil, exportSession?.error)
-        }
         return exportSession
     }
+    
+    typealias ExportSessionResultHandler = (Result<ExportSessionResult, ExportSessionError>) -> Void
+    
+    struct ExportSessionResult {
+        public let session: AVAssetExportSession
+        public let info: [AnyHashable: Any]?
+    }
+    
+    struct ExportSessionError: Error {
+        public let info: [AnyHashable: Any]?
+        public let error: AssetError
+    }
+    
+    @discardableResult
+    static func requestExportSession(
+        for asset: PHAsset,
+        exportPreset: String,
+        iCloudHandler: ((PHImageRequestID) -> Void)? = nil,
+        progressHandler: PHAssetImageProgressHandler? = nil,
+        resultHandler: @escaping ExportSessionResultHandler
+    ) -> PHImageRequestID {
+        requestExportSession(for: asset, exportPreset: exportPreset, isNetworkAccessAllowed: false) {
+            switch $0 {
+            case .success(let result):
+                resultHandler(.success(result))
+            case .failure(let error):
+                switch error.error {
+                case .needSyncICloud:
+                    let iCloudRequestID = self.requestExportSession(
+                        for: asset,
+                        exportPreset: exportPreset,
+                        isNetworkAccessAllowed: true,
+                        progressHandler: progressHandler,
+                        resultHandler: resultHandler
+                    )
+                    iCloudHandler?(iCloudRequestID)
+                default:
+                    resultHandler(.failure(error))
+                }
+            }
+        }
+    }
+    
+    @discardableResult
+    static func requestExportSession(
+        for asset: PHAsset,
+        exportPreset: String,
+        isNetworkAccessAllowed: Bool,
+        progressHandler: PHAssetVideoProgressHandler? = nil,
+        resultHandler: @escaping ExportSessionResultHandler
+    ) -> PHImageRequestID {
+        let options = PHVideoRequestOptions()
+        options.isNetworkAccessAllowed = isNetworkAccessAllowed
+        options.deliveryMode = .highQualityFormat
+        options.progressHandler = progressHandler
+        return requestExportSession(for: asset, options: options, exportPreset: exportPreset, resultHandler: resultHandler)
+    }
+    
+    @discardableResult
+    static func requestExportSession(
+        for asset: PHAsset,
+        options: PHVideoRequestOptions,
+        exportPreset: String,
+        resultHandler: @escaping ExportSessionResultHandler
+    ) -> PHImageRequestID {
+        PHImageManager.default().requestExportSession(
+            forVideo: asset,
+            options: options,
+            exportPreset: exportPreset
+        ) { session, info in
+            DispatchQueue.main.async {
+                if let session, self.assetDownloadFinined(for: info) {
+                    resultHandler(
+                        .success(
+                            .init(session: session, info: info)
+                        )
+                    )
+                }else {
+                    if self.assetIsInCloud(for: info) {
+                        resultHandler(
+                            .failure(
+                                .init(
+                                    info: info,
+                                    error: .needSyncICloud
+                                )
+                            )
+                        )
+                        return
+                    }
+                    resultHandler(
+                        .failure(
+                            .init(
+                                info: info,
+                                error: .requestFailed(info)
+                            )
+                        )
+                    )
+                }
+            }
+        }
+    }
+     
 }

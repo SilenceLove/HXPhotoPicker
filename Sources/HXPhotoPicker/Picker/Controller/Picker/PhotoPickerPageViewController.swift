@@ -217,11 +217,6 @@ public class PhotoPickerPageViewController: BaseViewController, PhotoPickerList 
         super.viewDidLayoutSubviews()
         headerView.frame = .init(x: 0, y: contentInset.top, width: view.width, height: 40)
         scrollView.frame = view.bounds
-        if #available(iOS 11.0, *) {
-            scrollView.contentInsetAdjustmentBehavior = .never
-        }else {
-            automaticallyAdjustsScrollViewInsets = false
-        }
         layoutViews()
         if isDeviceOrientation {
             headerView(headerView, didSelectedButton: headerView.selectedIndex)

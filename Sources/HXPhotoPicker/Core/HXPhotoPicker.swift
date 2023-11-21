@@ -16,6 +16,7 @@ public enum Photo {
     #if HXPICKER_ENABLE_PICKER
     
     @available(iOS 13.0, *)
+    @MainActor
     public static func picker<T: PhotoAssetObject>(
         _ config: PickerConfiguration,
         selectedAssets: [PhotoAsset] = [],
@@ -35,6 +36,7 @@ public enum Photo {
     }
     
     @available(iOS 13.0, *)
+    @MainActor
     public static func picker(
         _ config: PickerConfiguration,
         selectedAssets: [PhotoAsset] = [],
@@ -83,6 +85,7 @@ public enum Photo {
     
     @available(iOS 13.0, *)
     @discardableResult
+    @MainActor
     public static func edit(
         _ asset: EditorAsset,
         config: EditorConfiguration = .init(),
@@ -123,6 +126,7 @@ public enum Photo {
     #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
     
     @available(iOS 13.0, *)
+    @MainActor
     public static func capture(
         _ config: CameraConfiguration = .init(),
         type: CameraController.CaptureType = .all,

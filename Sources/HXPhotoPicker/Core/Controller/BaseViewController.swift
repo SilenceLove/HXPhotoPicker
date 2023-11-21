@@ -46,8 +46,8 @@ open class BaseViewController: UIViewController {
             return
         }
         deviceOrientationWillChanged(notify: .init(name: UIApplication.willChangeStatusBarOrientationNotification))
-        coordinator.animate(alongsideTransition: nil) { _ in
-            self.deviceOrientationDidChanged(
+        coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+            self?.deviceOrientationDidChanged(
                 notify: .init(
                     name: UIApplication.didChangeStatusBarOrientationNotification
                 )

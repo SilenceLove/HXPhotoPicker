@@ -11,13 +11,16 @@ extension UIImageView {
     
     func setImage(_ image: UIImage?, duration: CFTimeInterval = 0.2, animated: Bool = true) {
         if let image = image {
-            self.image = image
             if animated {
-                let transition = CATransition()
-                transition.type = .fade
-                transition.duration = duration
-                transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-                layer.add(transition, forKey: nil)
+                UIView.transition(
+                    with: self,
+                    duration: duration,
+                    options: [.transitionCrossDissolve, .curveEaseInOut, .allowUserInteraction]
+                ) {
+                    self.image = image
+                }
+            }else {
+                self.image = image
             }
         }
     }

@@ -410,8 +410,8 @@ open class PhotoBrowser: PhotoPickerController {
         guard #available(iOS 13.0, *) else {
             return
         }
-        coordinator.animate(alongsideTransition: nil) { _ in
-            self.deviceOrientationDidChanged(
+        coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+            self?.deviceOrientationDidChanged(
                 notify: .init(
                     name: UIApplication.didChangeStatusBarOrientationNotification
                 )
