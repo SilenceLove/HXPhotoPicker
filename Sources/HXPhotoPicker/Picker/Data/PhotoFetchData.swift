@@ -98,7 +98,6 @@ open class PhotoFetchData {
         cancelAssetCollectionsQueue()
         let operation = BlockOperation()
         operation.addExecutionBlock { [unowned operation] in
-            self.assetCollections = []
             var localCount = self.pickerData.localAssets.count + self.pickerData.localCameraAssets.count
             var coverImage = self.pickerData.localCameraAssets.first?.originalImage
             if coverImage == nil {
@@ -140,6 +139,7 @@ open class PhotoFetchData {
                 }
                 return true
             }
+            self.assetCollections = []
             if var collection = assetCollections.first {
                 if let cameraAssetCollection = self.cameraAssetCollection {
                     collection = cameraAssetCollection
