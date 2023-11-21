@@ -582,11 +582,8 @@ extension EditorViewController {
             }else if photoAsset.isNetworkAsset {
                 requestNetworkAsset()
             } else {
-                if isTransitionCompletion {
-                    ProgressHUD.showLoading(addedTo: view, animated: true)
-                }
                 if photoAsset.phAsset != nil && !photoAsset.isGifAsset {
-                    requestAssetData()
+                    requestAssetImage()
                     return
                 }
                 requestAssetURL()
@@ -723,85 +720,144 @@ extension EditorViewController {
         #endif
     }
     
-    func requestAssetData() {
+    func requestAssetImage() {
         guard let photoAsset = selectedAsset.type.photoAsset else {
             return
         }
-        let isHEIC = photoAsset.photoFormat == "heic"
-        editorView.isHEICImage = isHEIC
-        photoAsset.requestImageData(
+        if isTransitionCompletion {
+            assetLoadingView = ProgressHUD.showLoading(addedTo: view, animated: true)
+            bringViews()
+        }else {
+            loadAssetStatus = .loadding(true)
+        }
+        assetRequestID = photoAsset.requestImage(
             filterEditor: true
-        ) { [weak self] _, result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let dataResult):
-                DispatchQueue.global().async {
-                    func handler(_ result: UIImage? = nil) {
-                        var image = result
-                        if image == nil {
-                            image = UIImage(data: dataResult.imageData)
-                        }
-                        guard let image = image?.normalizedImage() else {
-                            DispatchQueue.main.async {
-                                if !self.isTransitionCompletion {
-                                    self.loadAssetStatus = .failure
-                                    return
-                                }
-                                ProgressHUD.hide(forView: self.view, animated: true)
-                                self.loadFailure(message: "图片获取失败!".localized)
-                            }
-                            return
-                        }
-                        DispatchQueue.main.async {
-                            if !self.isTransitionCompletion {
-                                self.loadAssetStatus = .successful(.image(image))
-                                return
-                            }
-                            self.editorView.setImage(image)
-                            self.loadCompletion()
-                            self.loadLastEditedData()
-                            let viewSize = UIDevice.screenSize
-                            DispatchQueue.global().async {
-                                self.loadThumbnailImage(image, viewSize: viewSize)
-                            }
-                            ProgressHUD.hide(forView: self.view, animated: true)
-                        }
-                    }
-                    let dataCount = CGFloat(dataResult.imageData.count)
-                    if dataCount > 3000000 {
-                        PhotoTools.compressImageData(
-                            dataResult.imageData,
-                            compressionQuality: dataCount.compressionQuality,
-                            queueLabel: "com.hxphotopicker.previewrequest"
-                        ) {
-                            guard let imageData = $0 else {
-                                handler()
-                                return
-                            }
-                            handler(.init(data: imageData))
-                        }
+        ) { [weak self] _, requestID in
+            self?.assetRequestID = requestID
+            self?.assetLoadingView?.mode = .circleProgress
+            self?.assetLoadingView?.text = "正在同步iCloud".localized + "..."
+        } progressHandler: { [weak self] _, progress in
+            if progress > 0 {
+                DispatchQueue.main.async {
+                    self?.assetLoadingView?.progress = CGFloat(progress)
+                }
+            }
+        } resultHandler: { [weak self] _, image, info in
+            guard let self else { return }
+            self.assetLoadingView = nil
+            DispatchQueue.main.async {
+                guard let image, !AssetManager.assetDownloadError(for: info) else {
+                    if !self.isTransitionCompletion {
+                        self.loadAssetStatus = .failure
                         return
                     }
-                    handler()
-                }
-            case .failure(let error):
-                if !self.isTransitionCompletion {
-                    self.loadAssetStatus = .failure
+                    ProgressHUD.hide(forView: self.view, animated: true)
+                    if let inICloud = info?.inICloud {
+                        self.loadFailure(message: inICloud ? "iCloud同步失败".localized : "图片获取失败!".localized)
+                    }else {
+                        self.loadFailure(message: "图片获取失败!".localized)
+                    }
                     return
                 }
-                ProgressHUD.hide(forView: self.view, animated: true)
-                if let inICloud = error.info?.inICloud {
-                    self.loadFailure(message: inICloud ? "iCloud同步失败".localized : "图片获取失败!".localized)
-                }else {
-                    self.loadFailure(message: "图片获取失败!".localized)
+                if AssetManager.assetDownloadFinined(for: info) || AssetManager.assetCancelDownload(for: info) {
+                    if !self.isTransitionCompletion {
+                        self.loadAssetStatus = .successful(.image(image))
+                        return
+                    }
+                    self.editorView.setImage(image)
+                    self.loadCompletion()
+                    self.loadLastEditedData()
+                    let viewSize = UIDevice.screenSize
+                    DispatchQueue.global().async {
+                        self.loadThumbnailImage(image, viewSize: viewSize)
+                    }
+                    ProgressHUD.hide(forView: self.view, animated: true)
                 }
             }
         }
+        
+//        let isHEIC = photoAsset.photoFormat == "heic"
+//        editorView.isHEICImage = isHEIC
+//        assetRequestID = photoAsset.requestImageData(
+//            filterEditor: true
+//        ) { [weak self] _, result in
+//            guard let self = self else { return }
+//            self.assetLoadingView = nil
+//            switch result {
+//            case .success(let dataResult):
+//                DispatchQueue.global().async {
+//                    func handler(_ result: UIImage? = nil) {
+//                        var image = result
+//                        if image == nil {
+//                            image = UIImage(data: dataResult.imageData)
+//                        }
+//                        guard let image = image?.normalizedImage() else {
+//                            DispatchQueue.main.async {
+//                                if !self.isTransitionCompletion {
+//                                    self.loadAssetStatus = .failure
+//                                    return
+//                                }
+//                                ProgressHUD.hide(forView: self.view, animated: true)
+//                                self.loadFailure(message: "图片获取失败!".localized)
+//                            }
+//                            return
+//                        }
+//                        DispatchQueue.main.async {
+//                            if !self.isTransitionCompletion {
+//                                self.loadAssetStatus = .successful(.image(image))
+//                                return
+//                            }
+//                            self.editorView.setImage(image)
+//                            self.loadCompletion()
+//                            self.loadLastEditedData()
+//                            let viewSize = UIDevice.screenSize
+//                            DispatchQueue.global().async {
+//                                self.loadThumbnailImage(image, viewSize: viewSize)
+//                            }
+//                            ProgressHUD.hide(forView: self.view, animated: true)
+//                        }
+//                    }
+//                    let dataCount = CGFloat(dataResult.imageData.count)
+//                    if dataCount > 3000000 {
+//                        PhotoTools.compressImageData(
+//                            dataResult.imageData,
+//                            compressionQuality: dataCount.compressionQuality,
+//                            queueLabel: "com.hxphotopicker.previewrequest"
+//                        ) {
+//                            guard let imageData = $0 else {
+//                                handler()
+//                                return
+//                            }
+//                            handler(.init(data: imageData))
+//                        }
+//                        return
+//                    }
+//                    handler()
+//                }
+//            case .failure(let error):
+//                if !self.isTransitionCompletion {
+//                    self.loadAssetStatus = .failure
+//                    return
+//                }
+//                ProgressHUD.hide(forView: self.view, animated: true)
+//                if let inICloud = error.info?.inICloud {
+//                    self.loadFailure(message: inICloud ? "iCloud同步失败".localized : "图片获取失败!".localized)
+//                }else {
+//                    self.loadFailure(message: "图片获取失败!".localized)
+//                }
+//            }
+//        }
     }
     
     func requestAssetURL() {
         guard let photoAsset = selectedAsset.type.photoAsset else {
             return
+        }
+        if isTransitionCompletion {
+            ProgressHUD.showLoading(addedTo: view, animated: true)
+            bringViews()
+        }else {
+            loadAssetStatus = .loadding(true)
         }
         photoAsset.requestAssetImageURL(
             filterEditor: true

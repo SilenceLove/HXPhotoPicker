@@ -468,41 +468,15 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
     func requestAssetImage(for asset: PHAsset) {
         let options = PHImageRequestOptions()
         options.resizeMode = .fast
-        options.deliveryMode = .fastFormat
-        requestID = AssetManager.requestImageData(
-            for: asset,
-            options: options
-        ) { (result) in
-            var info: [AnyHashable: Any]?
-            switch result {
-            case .success(let dataResult):
-                info = dataResult.info
-                DispatchQueue.global().async {
-                    if dataResult.imageData.count > 10000000 {
-                        self.requestID = nil
-                        return
-                    }
-                    var image: UIImage?
-                    if dataResult.imageOrientation != .up {
-                        image = UIImage(data: dataResult.imageData)?.normalizedImage()
-                    }else {
-                        image = UIImage(data: dataResult.imageData)
-                    }
-                    if !AssetManager.assetIsDegraded(for: info) &&
-                        dataResult.imageData.count > 1000000 {
-                        image = image?.scaleSuitableSize()
-                    }
-                    DispatchQueue.main.async {
-                        if self.previewView.superview != nil {
-                            self.previewView.image = image
-                        }
-                    }
+        options.deliveryMode = .highQualityFormat
+        requestID = AssetManager.requestImage(for: asset, targetSize: asset.thumTargetSize, options: options) { image, info in
+            guard let image else { return }
+            DispatchQueue.main.async {
+                if self.previewView.superview != nil {
+                    self.previewView.image = image
                 }
-            case .failure(let error):
-                info = error.info
             }
-            if AssetManager.assetDownloadFinined(for: info) ||
-                AssetManager.assetCancelDownload(for: info) {
+            if AssetManager.assetDownloadFinined(for: info) || AssetManager.assetCancelDownload(for: info) {
                 self.requestID = nil
             }
         }

@@ -98,4 +98,56 @@ extension PHAsset {
             completion(isAdjusted)
         }
     }
+    
+    private var aspectRatio: CGFloat {
+        CGFloat(pixelWidth) / CGFloat(pixelHeight)
+    }
+    
+    var targetSize: CGSize {
+        let scale: CGFloat = UIScreen._scale
+        let targetSize: CGSize
+        if aspectRatio > 1 {
+            let height = min(UIScreen._height, 500) * scale
+            let width = height * aspectRatio
+            targetSize = .init(width: width, height: height)
+        }else {
+            let width = min(UIScreen._width, 500) * scale
+            let height = width / aspectRatio
+            targetSize = .init(width: width, height: height)
+        }
+        return targetSize
+    }
+    
+    var thumTargetSize: CGSize {
+        let targetSize: CGSize
+        if aspectRatio > 1 {
+            let height = UIScreen._height
+            let width = height * aspectRatio
+            targetSize = .init(width: width, height: height)
+        }else {
+            let width = UIScreen._height
+            let height = width / aspectRatio
+            targetSize = .init(width: width, height: height)
+        }
+        return targetSize
+    }
+    
+    func cellThumTargetSize(for targetWidth: CGFloat) -> CGSize {
+        let scale: CGFloat = 0.8
+        var width = targetWidth
+        if pixelWidth < Int(targetWidth) {
+            width *= 0.5
+        }
+        var height = width / aspectRatio
+        let maxHeight = UIScreen._height
+        if height > maxHeight {
+            width = maxHeight / height * width * scale
+            height = maxHeight * scale
+        }
+        if height < targetWidth && width >= targetWidth {
+            width = targetWidth / height * width * scale
+            height = targetWidth * scale
+        }
+        return CGSize(width: width, height: height)
+    }
 }

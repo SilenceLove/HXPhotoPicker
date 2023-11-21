@@ -15,30 +15,6 @@ import ImageIO
 
 public struct PhotoTools {
     
-    /// 根据PHAsset资源获取对应的目标大小
-    public static func transformTargetWidthToSize(
-        targetWidth: CGFloat,
-        asset: PHAsset
-    ) -> CGSize {
-        let scale: CGFloat = 0.8
-        let aspectRatio = CGFloat(asset.pixelWidth) / CGFloat(asset.pixelHeight)
-        var width = targetWidth
-        if asset.pixelWidth < Int(targetWidth) {
-            width *= 0.5
-        }
-        var height = width / aspectRatio
-        let maxHeight = UIDevice.screenSize.height
-        if height > maxHeight {
-            width = maxHeight / height * width * scale
-            height = maxHeight * scale
-        }
-        if height < targetWidth && width >= targetWidth {
-            width = targetWidth / height * width * scale
-            height = targetWidth * scale
-        }
-        return CGSize(width: width, height: height)
-    }
-    
     /// 转换视频时长为 mm:ss 格式的字符串
     public static func transformVideoDurationToString(
         duration: TimeInterval

@@ -20,6 +20,90 @@ public extension PhotoAsset {
         let info: [AnyHashable: Any]?
     }
     
+    @discardableResult
+    func requestThumImage(
+        filterEditor: Bool = false,
+        iCloudHandler: PhotoAssetICloudHandler? = nil,
+        progressHandler: PhotoAssetProgressHandler? = nil,
+        resultHandler: @escaping (PhotoAsset, UIImage?, [AnyHashable: Any]?) -> Void
+    ) -> PHImageRequestID? {
+        #if HXPICKER_ENABLE_EDITOR
+        if let photoEdit = photoEditedResult {
+            resultHandler(self, photoEdit.image, nil)
+            return nil
+        }
+        if let videoEdit = videoEditedResult {
+            resultHandler(self, videoEdit.coverImage, nil)
+            return nil
+        }
+        #endif
+        guard let phAsset else {
+            requestLocalImage(
+                urlType: .original,
+                targetWidth: AssetManager.thumbnailTargetWidth
+            ) { (image, photoAsset) in
+                resultHandler(photoAsset, image, nil)
+            }
+            return nil
+        }
+        return AssetManager.requestImage(for: phAsset, targetSize: phAsset.thumTargetSize, resizeMode: .fast) {
+            iCloudHandler?(self, $0)
+        } progressHandler: { progress, error, stop, info in
+            DispatchQueue.main.async {
+                progressHandler?(self, progress)
+            }
+        } resultHandler: {
+            resultHandler(self, $0, $1)
+        }
+    }
+    
+    @discardableResult
+    func requestImage(
+        filterEditor: Bool = false,
+        iCloudHandler: PhotoAssetICloudHandler? = nil,
+        progressHandler: PhotoAssetProgressHandler? = nil,
+        resultHandler: @escaping (PhotoAsset, UIImage?, [AnyHashable: Any]?) -> Void
+    ) -> PHImageRequestID? {
+        #if HXPICKER_ENABLE_EDITOR
+        if !filterEditor, editedResult != nil {
+            DispatchQueue.global().async {
+                let image = self.getEditedImage()
+                DispatchQueue.main.async {
+                    resultHandler(self, image, nil)
+                }
+            }
+            return nil
+        }
+        #endif
+        guard let phAsset else {
+            return nil
+        }
+        if downloadStatus != .succeed {
+            downloadStatus = .downloading
+        }
+        return AssetManager.requestImage(for: phAsset, targetSize: phAsset.targetSize, resizeMode: .fast) {
+            iCloudHandler?(self, $0)
+        } progressHandler: { progress, error, stop, info in
+            self.downloadProgress = progress
+            DispatchQueue.main.async {
+                progressHandler?(self, progress)
+            }
+        } resultHandler: {
+            if $0 != nil {
+                self.downloadProgress = 1
+                self.downloadStatus = .succeed
+            }else {
+                if AssetManager.assetCancelDownload(for: $1) {
+                    self.downloadStatus = .canceled
+                }else {
+                    self.downloadProgress = 0
+                    self.downloadStatus = .failed
+                }
+            }
+            resultHandler(self, $0, $1)
+        }
+    }
+    
     /// 获取原始图片地址
     /// 网络图片获取方法 getNetworkImageURL
     /// - Parameters:

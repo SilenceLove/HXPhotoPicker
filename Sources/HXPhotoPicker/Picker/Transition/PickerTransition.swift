@@ -705,49 +705,19 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
     func requestAssetImage(for asset: PHAsset, isGIF: Bool = false, isHEIC: Bool = false) {
         let options = PHImageRequestOptions()
         options.resizeMode = .fast
-        options.deliveryMode = .fastFormat
-        requestID = AssetManager.requestImageData(
+        options.deliveryMode = .highQualityFormat
+        requestID = AssetManager.requestImage(
             for: asset,
+            targetSize: asset.thumTargetSize,
             options: options
-        ) {
-            var info: [AnyHashable: Any]?
-            switch $0 {
-            case .success(let dataResult):
-                info = dataResult.info
-                DispatchQueue.global().async {
-                    var image: UIImage?
-                    let dataCount = CGFloat(dataResult.imageData.count)
-                    if dataCount > 10000000 {
-                        self.requestID = nil
-                        return
-                    }
-                    if !AssetManager.assetIsDegraded(for: info),
-                        dataCount > 1000000, !isGIF {
-                        if let imageData = PhotoTools.imageCompress(
-                            dataResult.imageData,
-                            compressionQuality: dataCount.transitionCompressionQuality,
-                            isHEIC: isHEIC
-                        ) {
-                            image = UIImage(data: imageData)?.normalizedImage()
-                        }
-                    }else {
-                        if dataResult.imageOrientation != .up {
-                            image = UIImage(data: dataResult.imageData)?.normalizedImage()
-                        }else {
-                            image = UIImage(data: dataResult.imageData)
-                        }
-                    }
-                    DispatchQueue.main.async {
-                        if self.pushImageView.superview != nil {
-                            self.pushImageView.image = image
-                        }
-                    }
+        ) { image, info in
+            guard let image else { return }
+            DispatchQueue.main.async {
+                if self.pushImageView.superview != nil {
+                    self.pushImageView.image = image
                 }
-            case .failure(let error):
-                info = error.info
             }
-            if AssetManager.assetDownloadFinined(for: info) ||
-                AssetManager.assetCancelDownload(for: info) {
+            if AssetManager.assetDownloadFinined(for: info) || AssetManager.assetCancelDownload(for: info) {
                 self.requestID = nil
             }
         }
