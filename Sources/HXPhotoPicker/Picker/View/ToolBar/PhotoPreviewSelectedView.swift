@@ -11,6 +11,7 @@ import UIKit
 protocol PhotoPreviewSelectedViewDelegate: AnyObject {
     func selectedView(_ selectedView: PhotoPreviewSelectedView, didSelectItemAt photoAsset: PhotoAsset)
     func selectedView(_ selectedView: PhotoPreviewSelectedView, moveItemAt fromIndex: Int, toIndex: Int)
+    func selectedView(_ selectedView: PhotoPreviewSelectedView, didDeleteItemAt photoAsset: PhotoAsset)
 }
 
 class PhotoPreviewSelectedView: UIView,
@@ -24,10 +25,22 @@ class PhotoPreviewSelectedView: UIView,
     var collectionView: UICollectionView!
     var tickColor: UIColor?
     
+    var contentOffset: CGPoint {
+        get {
+            collectionView.contentOffset
+        }
+        set {
+            let minOffsetX: CGFloat = 0
+            let maxOffsetX = max(0, collectionView.contentSize.width - collectionView.width)
+            collectionView.contentOffset = .init(x: min(maxOffsetX, max(minOffsetX, newValue.x)), y: newValue.y)
+        }
+    }
+    
+    var isPhotoList: Bool = false
     var allowDrop: Bool = true
     var assetCount: Int { photoAssetArray.count }
     
-    private var photoAssetArray: [PhotoAsset] = []
+    var photoAssetArray: [PhotoAsset] = []
     private var currentSelectedIndexPath: IndexPath?
     
     override init(frame: CGRect) {
@@ -36,12 +49,6 @@ class PhotoPreviewSelectedView: UIView,
         collectionViewLayout.scrollDirection = .horizontal
         collectionViewLayout.minimumLineSpacing = 5
         collectionViewLayout.minimumInteritemSpacing = 5
-        collectionViewLayout.sectionInset = .init(
-            top: 10,
-            left: 12 + UIDevice.leftMargin,
-            bottom: 5,
-            right: 12 + UIDevice.rightMargin
-        )
         collectionView = UICollectionView(frame: bounds, collectionViewLayout: collectionViewLayout)
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
@@ -56,16 +63,23 @@ class PhotoPreviewSelectedView: UIView,
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
+        reloadSectionInset()
         addSubview(collectionView)
     }
     func reloadSectionInset() {
         if x == 0 {
-            collectionViewLayout.sectionInset = UIEdgeInsets(
-                top: 10,
-                left: 12 + UIDevice.leftMargin,
-                bottom: 5,
-                right: 12 + UIDevice.rightMargin
-            )
+            collectionViewLayout.sectionInset.top = 10
+            collectionViewLayout.sectionInset.bottom = 5
+            if UIDevice.leftMargin > 0 {
+                collectionViewLayout.sectionInset.left = UIDevice.leftMargin
+            }else {
+                collectionViewLayout.sectionInset.left = 12
+            }
+            if UIDevice.rightMargin > 0 {
+                collectionViewLayout.sectionInset.right = UIDevice.rightMargin
+            }else {
+                collectionViewLayout.sectionInset.right = 12
+            }
         }
     }
     func reloadData(photoAssets: [PhotoAsset]) {
@@ -84,7 +98,10 @@ class PhotoPreviewSelectedView: UIView,
         }
     }
     
-    func insertPhotoAsset(photoAsset: PhotoAsset) {
+    func insertPhotoAsset(
+        photoAsset: PhotoAsset,
+        animations: (() -> Void)? = nil
+    ) {
         let beforeIsEmpty = photoAssetArray.isEmpty
         let item = photoAssetArray.count
         let indexPath = IndexPath(item: item, section: 0)
@@ -97,11 +114,15 @@ class PhotoPreviewSelectedView: UIView,
             isHidden = false
             UIView.animate(withDuration: 0.25) {
                 self.alpha = 1
+                animations?()
             }
         }
     }
     
-    func removePhotoAssets(_ photoAssets: [PhotoAsset]) {
+    func removePhotoAssets(
+        _ photoAssets: [PhotoAsset],
+        animations: (() -> Void)? = nil
+    ) {
         if photoAssets.isEmpty {
             return
         }
@@ -125,6 +146,7 @@ class PhotoPreviewSelectedView: UIView,
         if !beforeIsEmpty && photoAssetArray.isEmpty {
             UIView.animate(withDuration: 0.25) {
                 self.alpha = 0
+                animations?()
             } completion: { (isFinish) in
                 if isFinish {
                     self.isHidden = true
@@ -169,12 +191,18 @@ class PhotoPreviewSelectedView: UIView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         let cell: PhotoPreviewSelectedViewCell = collectionView.dequeueReusableCell(for: indexPath)
+        cell.delegate = self
+        cell.isPhotoList = isPhotoList
         cell.tickColor = tickColor
         cell.photoAsset = photoAssetArray[indexPath.item]
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        currentSelectedIndexPath = indexPath
+        if isPhotoList {
+            collectionView.deselectItem(at: indexPath, animated: false)
+        }else {
+            currentSelectedIndexPath = indexPath
+        }
         delegate?.selectedView(self, didSelectItemAt: photoAssetArray[indexPath.item])
     }
     func collectionView(
@@ -218,6 +246,12 @@ class PhotoPreviewSelectedView: UIView,
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension PhotoPreviewSelectedView: PhotoPreviewSelectedViewCellDelegate {
+    func selectedViewCell(didDelete cell: PhotoPreviewSelectedViewCell) {
+        delegate?.selectedView(self, didDeleteItemAt: cell.photoAsset)
     }
 }
 

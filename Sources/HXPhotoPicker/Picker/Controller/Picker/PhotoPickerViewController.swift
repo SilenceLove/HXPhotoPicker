@@ -50,8 +50,8 @@ public class PhotoPickerViewController: PhotoBaseViewController {
             listView.view.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
         }
         let titleColor = isDark ?
-            pickerConfig.navigationTitleDarkColor :
-            pickerConfig.navigationTitleColor
+        pickerConfig.navigationTitleDarkColor :
+        pickerConfig.navigationTitleColor
         if let titleView = titleView {
             titleView.titleColor = titleColor
         }
@@ -65,6 +65,7 @@ public class PhotoPickerViewController: PhotoBaseViewController {
         if #available(iOS 14.5, *) {
             initNavItems()
         }
+        photoToolbar.deviceOrientationDidChanged()
     }
     
     var isDisableLayout: Bool = false
@@ -92,6 +93,25 @@ public class PhotoPickerViewController: PhotoBaseViewController {
             collectionWidth = view.width - 2 * margin
         }
         listView.view.frame = CGRect(x: margin, y: 0, width: collectionWidth, height: view.height)
+        if pickerConfig.albumShowMode.isPop {
+            albumBackgroudView.frame = view.bounds
+            updateAlbumViewFrame()
+            if orientationDidChange {
+                titleView.updateFrame()
+            }
+        }
+        layoutToolbar()
+        if orientationDidChange {
+            orientationDidChange = false
+        }
+        if isFirstLayout {
+            listView.scrollTo(appropriatePlaceAsset)
+            appropriatePlaceAsset = nil
+            isFirstLayout = false
+        }
+    }
+    
+    func layoutToolbar() {
         var collectionTop: CGFloat = UIDevice.navigationBarHeight
         if let nav = navigationController {
             if nav.modalPresentationStyle == .fullScreen && UIDevice.isPortrait {
@@ -121,13 +141,6 @@ public class PhotoPickerViewController: PhotoBaseViewController {
                         collectionTop = UIDevice.navBarHeight
                     }
                 }
-            }
-        }
-        if pickerConfig.albumShowMode.isPop {
-            albumBackgroudView.frame = view.bounds
-            updateAlbumViewFrame()
-            if orientationDidChange {
-                titleView.updateFrame()
             }
         }
         if pickerConfig.isMultipleSelect {
@@ -166,14 +179,6 @@ public class PhotoPickerViewController: PhotoBaseViewController {
                 bottom: promptHeight,
                 right: 0
             )
-        }
-        if orientationDidChange {
-            orientationDidChange = false
-        }
-        if isFirstLayout {
-            listView.scrollTo(appropriatePlaceAsset)
-            appropriatePlaceAsset = nil
-            isFirstLayout = false
         }
     }
     

@@ -66,7 +66,7 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
         if let photoToolbar = config.photoToolbar {
             isShowToolbar = photoToolbar.isShow(pickerConfig, type: previewType != .browser ? .preview : .browser)
         }else {
-            isShowToolbar = false
+            isShowToolbar = config.isShowBottomView
         }
         title = ""
         extendedLayoutIncludesOpaqueBars = true

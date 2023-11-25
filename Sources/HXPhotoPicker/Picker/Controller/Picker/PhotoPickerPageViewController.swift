@@ -289,6 +289,7 @@ extension PhotoPickerPageViewController: PhotoPickerListDelegate {
                 $0.selectCell(for: asset, isSelected: true)
             }
         }
+        delegate?.photoList(self, didSelectedAsset: asset)
     }
     
     public func photoList(_ photoList: PhotoPickerList, didDeselectedAsset asset: PhotoAsset) {
@@ -297,8 +298,12 @@ extension PhotoPickerPageViewController: PhotoPickerListDelegate {
                 $0.selectCell(for: asset, isSelected: false)
             }
         }
+        delegate?.photoList(self, didDeselectedAsset: asset)
     }
     
+    public func photoList(_ photoList: PhotoPickerList, updateAsset asset: PhotoAsset) {
+        delegate?.photoList(self, updateAsset: asset)
+    }
 }
 
 protocol PhotoPickerPageHeaderViewDelegate: AnyObject {

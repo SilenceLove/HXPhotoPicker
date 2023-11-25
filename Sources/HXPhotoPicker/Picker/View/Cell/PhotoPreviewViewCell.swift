@@ -196,4 +196,9 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
             scrollView.frame = bounds
         }
     }
+    
+    open override func prepareForReuse() {
+        super.prepareForReuse()
+        cancelRequest()
+    }
 }

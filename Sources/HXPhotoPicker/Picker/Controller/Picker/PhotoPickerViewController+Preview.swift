@@ -73,6 +73,13 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
             }
         }
         listView.updateCellSelectedTitle()
+        if isShowToolbar {
+            if isSelected {
+                photoToolbar.insertSelectedAsset(photoAsset)
+            }else {
+                photoToolbar.removeSelectedAssets([photoAsset])
+            }
+        }
         photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
         finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
         requestSelectedAssetFileSize()
@@ -98,12 +105,18 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
     
     func previewViewController(movePhotoAsset previewController: PhotoPreviewViewController) {
         listView.updateCellSelectedTitle()
+        if isShowToolbar {
+            photoToolbar.updateSelectedAssets(pickerController.selectedAssetArray)
+        }
     }
     
     func previewViewController(_ previewController: PhotoPreviewViewController, moveItem fromIndex: Int, toIndex: Int) {
         if config.previewStyle == .present {
             pickerController.pickerData.move(fromIndex: fromIndex, toIndex: toIndex)
             listView.updateCellSelectedTitle()
+            if isShowToolbar {
+                photoToolbar.updateSelectedAssets(pickerController.selectedAssetArray)
+            }
         }
     }
     
@@ -134,6 +147,9 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         requestSelectedAssetFileSize()
         if listView.filterOptions.contains(.edited) {
             listView.reloadData()
+        }
+        if isShowToolbar {
+            photoToolbar.reloadSelectedAsset(photoAsset)
         }
     }
     

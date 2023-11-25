@@ -85,9 +85,18 @@ class PhotoPermissionPromptView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         let viewHeight = height
-        promptIcon.x = 12 + leftMargin
+        let leftMargin = self.leftMargin
+        if leftMargin > 0 {
+            promptIcon.x = leftMargin
+        }else {
+            promptIcon.x = 12
+        }
         promptIcon.centerY = viewHeight * 0.5
-        promptArrow.x = width - 12 - promptArrow.width - UIDevice.rightMargin
+        if UIDevice.rightMargin > 0 {
+            promptArrow.x = width - promptArrow.width - UIDevice.rightMargin
+        }else {
+            promptArrow.x = width - 12 - promptArrow.width
+        }
         promptLb.x = promptIcon.frame.maxX + 12
         promptLb.width = promptArrow.x - promptLb.x - 12
         promptLb.centerY = viewHeight * 0.5

@@ -94,8 +94,8 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
         if scrollView != collectionView || orientationDidChange {
             return
         }
-        let offsetX = scrollView.contentOffset.x  + (view.width + 20) * 0.5
         let viewWidth = view.width + 20
+        let offsetX = scrollView.contentOffset.x + viewWidth * 0.5
         var currentIndex = Int(offsetX / viewWidth)
         if currentIndex > assetCount - 1 {
             currentIndex = assetCount - 1
@@ -115,11 +115,11 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
                     selectBoxControl.isSelected = photoAsset.isSelected
                 }
             }
-            if !firstLayoutSubviews && config.isShowBottomView {
+            if !firstLayoutSubviews && isShowToolbar {
                 photoToolbar.selectedViewScrollTo(photoAsset, animated: true)
             }
             #if HXPICKER_ENABLE_EDITOR
-            if config.isShowBottomView {
+            if isShowToolbar {
                 if photoAsset.mediaType == .photo {
                     photoToolbar.updateEditState(pickerController.config.editorOptions.isPhoto)
                 }else if photoAsset.mediaType == .video {
@@ -130,6 +130,9 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
             pickerController.previewUpdateCurrentlyDisplayedAsset(photoAsset: photoAsset, index: currentIndex)
         }
         self.currentPreviewIndex = currentIndex
+        if !firstLayoutSubviews && isShowToolbar {
+            photoToolbar.previewListDidScroll(scrollView)
+        }
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -174,7 +177,7 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
         currentCell?.statusBarShouldBeHidden = statusBarShouldBeHidden
         let videoCell = currentCell as? PreviewVideoViewCell
         if !statusBarShouldBeHidden {
-            if config.isShowBottomView {
+            if isShowToolbar {
                 photoToolbar.isHidden = false
             }
             navBgView?.isHidden = false
@@ -194,7 +197,7 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
                 liveCell.hideMark()
             }
         }
-        if config.isShowBottomView {
+        if isShowToolbar {
             UIView.animate(withDuration: 0.25) {
                 self.photoToolbar.alpha = self.statusBarShouldBeHidden ? 0 : 1
             } completion: {

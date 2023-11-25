@@ -44,6 +44,7 @@ public protocol PhotoPickerListDelegate: PhotoControllerEvent {
     
     func photoList(_ photoList: PhotoPickerList, didSelectedAsset asset: PhotoAsset)
     func photoList(_ photoList: PhotoPickerList, didDeselectedAsset asset: PhotoAsset)
+    func photoList(_ photoList: PhotoPickerList, updateAsset asset: PhotoAsset)
 }
 
 public extension PhotoPickerListDelegate {

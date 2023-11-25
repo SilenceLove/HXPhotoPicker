@@ -30,14 +30,40 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
         if type == .picker {
             if isShowPrompt {
                 viewHeight += 70
+            }else {
+                if isShowSelectedView, selectedView.assetCount > 0 {
+                    viewHeight += 70
+                }
             }
         }else if type == .preview {
-            if isShowSelectedView, selectedView.assetCount > 0 {
+            if isShowPreviewList {
                 viewHeight += 70
+            }else {
+                if isShowSelectedView, selectedView.assetCount > 0 {
+                    viewHeight += 70
+                }
             }
         }
         return viewHeight
     }
+    
+    public var selectViewOffset: CGPoint? {
+        get {
+            if !isShowSelectedView {
+                return nil
+            }
+            return selectedView.contentOffset
+        }
+        set {
+            guard let contentOffset = newValue else {
+                return
+            }
+            selectedView.contentOffset = contentOffset
+        }
+    }
+    
+    var previewAssets: [PhotoAsset] = []
+    private var previewPage: Int?
      
     #if HXPICKER_ENABLE_EDITOR
     private var editBtn: UIButton!
@@ -47,6 +73,7 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     private let type: PhotoToolBarType
     private var promptView: PhotoPermissionPromptView!
     private var selectedView: PhotoPreviewSelectedView!
+    private var previewListView: PhotoPreviewListView!
     private var contentView: UIView!
     private var previewBtn: UIButton!
     private var originalView: UIControl!
@@ -64,12 +91,27 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
         pickerConfig.allowLoadPhotoLibrary
     }
     private var isShowSelectedView: Bool {
-        (type == .preview &&
-         pickerConfig.previewView.bottomView.isShowSelectedView &&
-         pickerConfig.selectMode == .multiple) ||
-        type == .browser
+        switch type {
+        case .picker:
+            return pickerConfig.photoList.bottomView.isShowSelectedView && pickerConfig.selectMode == .multiple
+        case .preview:
+            return pickerConfig.previewView.bottomView.isShowSelectedView && pickerConfig.selectMode == .multiple && !isShowPreviewList
+        case .browser:
+            return true
+        }
+    }
+    private var isShowPreviewList: Bool {
+        switch type {
+        case .picker:
+            return false
+        case .preview:
+            return pickerConfig.previewView.bottomView.isShowPreviewList
+        case .browser:
+            return false
+        }
     }
     
+    private var allowPreviewDidScroll: Bool = true
     private var assetCount: Int = 0
     
     private var isCanLoadOriginal: Bool {
@@ -95,6 +137,9 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
                 promptView = PhotoPermissionPromptView(config: viewConfig)
                 addSubview(promptView)
             }
+            if isShowSelectedView {
+                initSelectedView()
+            }
             previewBtn = UIButton(type: .custom)
             previewBtn.setTitle("预览".localized, for: .normal)
             previewBtn.titleLabel?.font = .systemFont(ofSize: 17)
@@ -111,10 +156,15 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
         }else if type == .preview {
             addSubview(contentView)
             viewConfig = pickerConfig.previewView.bottomView
-            if isShowSelectedView {
-                initSelectedView()
+            if isShowPreviewList {
+                previewListView = PhotoPreviewListView(frame: .init(x: 0, y: 0, width: width, height: 55))
+                previewListView.dataSource = self
+                addSubview(previewListView)
+            }else {
+                if isShowSelectedView {
+                    initSelectedView()
+                }
             }
-            
             #if HXPICKER_ENABLE_EDITOR
             editBtn = UIButton(type: .custom)
             editBtn.setTitle("编辑".localized, for: .normal)
@@ -186,6 +236,7 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     private func initSelectedView() {
         let viewConfig = pickerConfig.previewView.bottomView
         selectedView = PhotoPreviewSelectedView(frame: CGRect(x: 0, y: 0, width: width, height: 70))
+        selectedView.isPhotoList = type == .picker
         if let cellClass = viewConfig.customSelectedViewCellClass {
             selectedView.collectionView.register(
                 cellClass,
@@ -237,12 +288,22 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     
     public func insertSelectedAsset(_ photoAsset: PhotoAsset) {
         if !isShowSelectedView { return }
-        selectedView.insertPhotoAsset(photoAsset: photoAsset)
+        selectedView.insertPhotoAsset(photoAsset: photoAsset) { [weak self] in
+            guard let self, self.isShowPrompt else {
+                return
+            }
+            self.promptView.alpha = 0
+        }
     }
     
     public func removeSelectedAssets(_ photoAssets: [PhotoAsset]) {
         if !isShowSelectedView { return }
-        selectedView.removePhotoAssets(photoAssets)
+        selectedView.removePhotoAssets(photoAssets) { [weak self] in
+            guard let self, self.isShowPrompt else {
+                return
+            }
+            self.promptView.alpha = 1
+        }
     }
     
     public func reloadSelectedAsset(_ photoAsset: PhotoAsset) {
@@ -252,6 +313,9 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     
     public func updateSelectedAssets(_ photoAssets: [PhotoAsset]) {
         if !isShowSelectedView { return }
+        if isShowPrompt, selectedView.photoAssetArray.isEmpty, !photoAssets.isEmpty {
+            promptView.alpha = 0
+        }
         selectedView.reloadData(photoAssets: photoAssets)
     }
     
@@ -262,7 +326,9 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     
     public func deviceOrientationDidChanged() {
         if !isShowSelectedView { return }
-        selectedView.reloadSectionInset()
+        UIView.animate(withDuration: 0.2) {
+            self.selectedView.reloadSectionInset()
+        }
     }
     
     @objc
@@ -338,6 +404,7 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
         super.layoutSubviews()
         contentView.width = width
         contentView.height = 50 + UIDevice.bottomMargin
+        let leftMargin = self.leftMargin
         if type == .picker {
             if isShowPrompt {
                 if pickerConfig.selectMode != .single {
@@ -346,29 +413,56 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
                     promptView.frame = .init(x: 0, y: 0, width: width, height: 55)
                 }
                 contentView.y = promptView.frame.maxY
-            }else {
+            }
+            if isShowSelectedView {
+                selectedView.y = 0
+                selectedView.width = width
+                if !isShowPrompt {
+                    if selectedView.assetCount > 0 {
+                        contentView.y = selectedView.frame.maxY
+                    }else {
+                        contentView.y = height - contentView.height
+                    }
+                }
+            }else if !isShowPrompt {
                 contentView.y = height - contentView.height
             }
-            previewBtn.x = 12 + leftMargin
+            if leftMargin > 0 {
+                previewBtn.x = leftMargin
+            }else {
+                previewBtn.x = 12
+            }
             updateFinishButtonFrame()
             updateOriginalViewFrame()
         }else if type == .preview {
             #if HXPICKER_ENABLE_EDITOR
-            editBtn.x = 12 + UIDevice.leftMargin
+            if UIDevice.leftMargin > 0 {
+                editBtn.x = UIDevice.leftMargin
+            }else {
+                editBtn.x = 12
+            }
             #endif
-            if isShowSelectedView {
-                selectedView.width = width
-                if selectedView.assetCount > 0 {
-                    contentView.y = selectedView.frame.maxY
+            if isShowPreviewList {
+                previewListView.y = 10
+                previewListView.width = width
+                contentView.y = 70
+            }else {
+                if isShowSelectedView {
+                    selectedView.y = 0
+                    selectedView.width = width
+                    if selectedView.assetCount > 0 {
+                        contentView.y = selectedView.frame.maxY
+                    }else {
+                        contentView.y = height - contentView.height
+                    }
                 }else {
                     contentView.y = height - contentView.height
                 }
-            }else {
-                contentView.y = height - contentView.height
             }
             updateFinishButtonFrame()
             updateOriginalViewFrame()
         }else {
+            selectedView.y = 0
             selectedView.width = width
         }
     }
@@ -391,6 +485,104 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     }
 }
 
+extension PhotoToolBarView: PhotoPreviewListViewDataSource {
+    func previewListView(_ previewListView: PhotoPreviewListView, thumbnailOnPage page: Int) -> PhotoAsset? {
+        if !isShowPreviewList || previewAssets.isEmpty { return nil }
+        return previewAssets[page]
+    }
+    
+    func previewListView(_ previewListView: PhotoPreviewListView, thumbnailWidthToHeightOnPage page: Int) -> CGFloat? {
+        if !isShowPreviewList || previewAssets.isEmpty { return nil }
+        let asset = previewAssets[page]
+        guard asset.imageSize.height > 0 else { return nil }
+        return asset.imageSize.width / asset.imageSize.height
+    }
+    
+    func previewListView(_ previewListView: PhotoPreviewListView, pageDidChange page: Int, reason: PhotoPreviewListView.PageChangeReason) {
+        if previewAssets.isEmpty {
+            return
+        }
+        switch reason {
+        case .tapOnPageThumbnail, .scrollingBar:
+            allowPreviewDidScroll = false
+            toolbarDelegate?.photoToolbar(self, previewMoveTo: previewAssets[page])
+        case .configuration, .interactivePaging:
+            break
+        }
+    }
+    
+    public func configPreviewList(_ assets: [PhotoAsset], page: Int) {
+        previewAssets = assets
+        previewListView.configure(numberOfPages: assets.count, currentPage: page)
+    }
+    
+    public func previewListDidScroll(_ scrollView: UIScrollView) {
+        if !isShowPreviewList || previewAssets.isEmpty {
+            return
+        }
+        if !allowPreviewDidScroll {
+            allowPreviewDidScroll = true
+            return
+        }
+        let viewWidth = scrollView.width
+        let offsetX = scrollView.contentOffset.x
+        let page = Int((offsetX + viewWidth / 2) / viewWidth)
+        let currentPage = min(previewAssets.count - 1, max(0, page))
+        if previewListView.collectionView.isTracking || previewListView.collectionView.isDragging {
+            if !scrollView.isTracking && !scrollView.isDragging {
+                return
+            }else {
+                if previewListView.collectionView.isDragging {
+                    previewListView.stopScroll(to: currentPage, animated: false)
+                    previewListView.finishInteractivePaging()
+                    previewPage = currentPage
+                    return
+                }
+            }
+        }
+        var didChangePage: Bool = false
+        if let previewPage {
+            let currentOffsetX = viewWidth * CGFloat(previewPage)
+            if offsetX <= currentOffsetX - viewWidth || offsetX >= currentOffsetX + viewWidth {
+                didChangePage = true
+            }
+        }else {
+            previewPage = currentPage
+        }
+        guard let previewPage else { return }
+        previewListScrollHandler(scrollView, page: previewPage)
+        if didChangePage {
+            previewListScrollHandler(scrollView, page: previewPage, didChange: true)
+            previewListScrollHandler(scrollView, page: currentPage)
+            self.previewPage = currentPage
+        }
+    }
+    
+    func previewListScrollHandler(_ scrollView: UIScrollView, page: Int, didChange: Bool = false) {
+        let offsetX = scrollView.contentOffset.x
+        let viewWidth = scrollView.width
+        let currentOffsetX = viewWidth * CGFloat(page)
+        let scale = abs(currentOffsetX - viewWidth - offsetX) / viewWidth
+        let progress0To2 = scale
+        let isMovingToNextPage = progress0To2 > 1
+        let rawProgress = isMovingToNextPage ? (progress0To2 - 1) : (1 - progress0To2)
+        let progress = didChange ? 1 : min(max(rawProgress, 0), 1)
+        switch previewListView.state {
+        case .transitioningInteractively(_, let forwards):
+            if progress == 1 {
+                previewListView.finishInteractivePaging()
+            } else if forwards == isMovingToNextPage {
+                previewListView.updatePagingProgress(progress)
+            } else {
+                previewListView.cancelInteractivePaging()
+            }
+        case .collapsing, .collapsed, .expanding, .expanded:
+            if progress != 0 {
+                previewListView.startInteractivePaging(forwards: isMovingToNextPage)
+            }
+        }
+    }
+}
 extension PhotoToolBarView {
     
     func configColor() {
@@ -422,6 +614,9 @@ extension PhotoToolBarView {
                 }else {
                     previewBtn.setTitleColor(previewTitleColor.withAlphaComponent(0.6), for: .disabled)
                 }
+            }
+            if isShowSelectedView {
+                selectedView.tickColor = isDark ? config.selectedViewTickDarkColor : config.selectedViewTickColor
             }
         }else if type == .preview {
             #if HXPICKER_ENABLE_EDITOR
@@ -583,12 +778,12 @@ extension PhotoToolBarView {
         if finishWidth < 60 {
             finishWidth = 60
         }
-        finishBtn.frame = CGRect(
-            x: width - UIDevice.rightMargin - finishWidth - 12,
-            y: 0,
-            width: finishWidth,
-            height: 33
-        )
+        finishBtn.size = .init(width: finishWidth, height: 33)
+        if UIDevice.rightMargin > 0 {
+            finishBtn.x = width - UIDevice.rightMargin - finishWidth
+        }else {
+            finishBtn.x = width - finishWidth - 12
+        }
         finishBtn.centerY = 25
     }
 }
@@ -607,5 +802,12 @@ extension PhotoToolBarView: PhotoPreviewSelectedViewDelegate {
         moveItemAt fromIndex: Int, toIndex: Int
     ) {
         toolbarDelegate?.photoToolbar(self, didMoveAsset: fromIndex, with: toIndex)
+    }
+    
+    func selectedView(
+        _ selectedView: PhotoPreviewSelectedView,
+        didDeleteItemAt photoAsset: PhotoAsset
+    ) {
+        toolbarDelegate?.photoToolbar(self, didDeleteAsset: photoAsset)
     }
 }

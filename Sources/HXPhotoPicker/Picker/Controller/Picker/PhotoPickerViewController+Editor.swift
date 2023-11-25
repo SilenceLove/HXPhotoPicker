@@ -64,6 +64,9 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
                 listView.reloadData()
             }
         }
+        if isShowToolbar {
+            photoToolbar.reloadSelectedAsset(photoAsset)
+        }
     }
     
     public func editorViewController(

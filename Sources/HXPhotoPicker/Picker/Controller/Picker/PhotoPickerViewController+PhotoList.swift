@@ -39,6 +39,27 @@ extension PhotoPickerViewController: PhotoPickerListDelegate {
             openEditor(asset, image: cell?.photoView.image, animated: animated)
         }
     }
+    
+    public func photoList(_ photoList: PhotoPickerList, didSelectedAsset asset: PhotoAsset) {
+        if isShowToolbar {
+            photoToolbar.insertSelectedAsset(asset)
+            updateToolbarFrame()
+        }
+    }
+    
+    public func photoList(_ photoList: PhotoPickerList, didDeselectedAsset asset: PhotoAsset) {
+        if isShowToolbar {
+            photoToolbar.removeSelectedAssets([asset])
+            updateToolbarFrame()
+        }
+    }
+    
+    public func photoList(_ photoList: PhotoPickerList, updateAsset asset: PhotoAsset) {
+        if isShowToolbar {
+            photoToolbar.reloadSelectedAsset(asset)
+        }
+    }
+    
     public func photoList(selectedAssetDidChanged photoList: PhotoPickerList) {
         photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
         finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)

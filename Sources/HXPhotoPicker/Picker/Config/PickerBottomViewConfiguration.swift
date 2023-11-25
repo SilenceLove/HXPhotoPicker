@@ -165,6 +165,9 @@ public struct PickerBottomViewConfiguration {
     /// 显示已选资源
     public var isShowSelectedView: Bool = true
     
+    /// 显示预览列表，优先级高于`isShowSelectedView`
+    public var isShowPreviewList: Bool = true
+    
     /// Custom cell, inherit PhotoPreviewSelectedViewCell and modify it
     /// 自定义cell，继承 PhotoPreviewSelectedViewCell 加以修改
     public var customSelectedViewCellClass: PhotoPreviewSelectedViewCell.Type?

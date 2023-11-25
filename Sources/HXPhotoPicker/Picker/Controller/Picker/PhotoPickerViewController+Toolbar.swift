@@ -33,6 +33,16 @@ extension PhotoPickerViewController: PhotoToolBarDelegate {
                 photoToolbar.requestOriginalAssetBtyes()
             }
             photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+            photoToolbar.updateSelectedAssets(pickerController.selectedAssetArray)
+        }
+    }
+    
+    func updateToolbarFrame() {
+        if photoToolbar.viewHeight != photoToolbar.height {
+            UIView.animate(withDuration: 0.25) {
+                self.layoutToolbar()
+                self.photoToolbar.layoutSubviews()
+            }
         }
     }
     
@@ -63,6 +73,37 @@ extension PhotoPickerViewController: PhotoToolBarDelegate {
     
     public func photoToolbar(didFinishClick toolbar: PhotoToolBar) {
         pickerController.finishCallback()
+    }
+    
+    public func photoToolbar(_ toolbar: PhotoToolBar, didSelectedAsset asset: PhotoAsset) {
+        let previewAssets = pickerController.selectedAssetArray
+        let index = previewAssets.firstIndex(of: asset) ?? 0
+        pushPreviewViewController(
+            previewAssets: pickerController.selectedAssetArray,
+            currentPreviewIndex: index,
+            isPreviewSelect: true,
+            animated: true
+        )
+    }
+    
+    public func photoToolbar(_ toolbar: PhotoToolBar, didMoveAsset fromIndex: Int, with toIndex: Int) {
+        pickerController.pickerData.move(fromIndex: fromIndex, toIndex: toIndex)
+        photoToolbar.updateSelectedAssets(pickerController.selectedAssetArray)
+        listView.updateCellSelectedTitle()
+    }
+    
+    public func photoToolbar(_ toolbar: PhotoToolBar, didDeleteAsset asset: PhotoAsset) {
+        pickerController.pickerData.remove(asset)
+        #if HXPICKER_ENABLE_EDITOR
+        if asset.videoEditedResult != nil, pickerConfig.isDeselectVideoRemoveEdited {
+            asset.editedResult = nil
+        }else if asset.photoEditedResult != nil, pickerConfig.isDeselectPhotoRemoveEdited {
+            asset.editedResult = nil
+        }
+        #endif
+        listView.updateCellSelectedTitle()
+        photoToolbar.removeSelectedAssets([asset])
+        updateToolbarFrame()
     }
     
     public func setOriginal(_ isOriginal: Bool) {

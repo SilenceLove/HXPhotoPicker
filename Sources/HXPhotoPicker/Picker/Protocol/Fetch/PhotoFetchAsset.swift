@@ -107,6 +107,10 @@ public extension PhotoFetchAsset {
         if isLimited {
             var removedAssets: [PhotoAsset] = []
             for (index, selectedPHAsset) in selectedPHAssets.enumerated() where !phAssetResult.contains(selectedPHAsset) {
+                let resultCount = PHAsset.fetchAssets(withLocalIdentifiers: [selectedPHAsset.localIdentifier], options: nil).count
+                if resultCount != 0 {
+                    continue
+                }
                 let photoAsset = selectedPhotoAssets[index]
                 pickerData.remove(photoAsset)
                 removedAssets.append(photoAsset)

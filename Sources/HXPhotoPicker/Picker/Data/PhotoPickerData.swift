@@ -63,6 +63,7 @@ open class PhotoPickerData {
         if config.selectMode == .single {
             return
         }
+        selectedAssets = assets
         for photoAsset in assets {
             if photoAsset.mediaType == .photo {
                 selectedPhotoAssets.append(photoAsset)
@@ -88,7 +89,6 @@ open class PhotoPickerData {
                 #endif
             }
         }
-        selectedAssets = assets
     }
     
     public var selectedPhotoAssets: [PhotoAsset] = []
@@ -311,7 +311,7 @@ open class PhotoPickerData {
         guard let index = selectedAssets.firstIndex(of: photoAsset) else {
             return false
         }
-        delegate?.pickerData(self, willUnselectAsset: photoAsset, at: selectedAssets.count - 1)
+        delegate?.pickerData(self, willUnselectAsset: photoAsset, at: index)
         photoAsset.isSelected = false
         if photoAsset.mediaType == .photo {
             selectedPhotoAssets.remove(
@@ -326,7 +326,7 @@ open class PhotoPickerData {
         for (index, asset) in selectedAssets.enumerated() {
             asset.selectIndex = index
         }
-        delegate?.pickerData(self, didUnselectAsset: photoAsset, at: selectedAssets.count)
+        delegate?.pickerData(self, didUnselectAsset: photoAsset, at: index)
         return true
     }
     
@@ -363,9 +363,10 @@ open class PhotoPickerData {
     ) {
         cancelRequestAssetFileSize(isPreview: isPreview)
         let operation = BlockOperation()
+        let assets = selectedAssets
         operation.addExecutionBlock { [unowned operation] in
             var totalFileSize = 0
-            for photoAsset in self.selectedAssets {
+            for photoAsset in assets {
                 if operation.isCancelled { return }
                 if let fileSize = photoAsset.getPFileSize() {
                     totalFileSize += fileSize

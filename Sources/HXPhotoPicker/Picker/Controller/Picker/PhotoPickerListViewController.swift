@@ -652,6 +652,7 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
                         photoAsset.editedResult = nil
                         cell.updatePhotoAsset(photoAsset)
                     }
+                    self.delegate?.photoList(self, updateAsset: photoAsset)
                 }
                 menus.append(removeEdit)
             }

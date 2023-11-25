@@ -132,6 +132,9 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             containerView.addSubview(fromVC.view)
             toVC.view.insertSubview(contentView, at: 1)
             contentView.backgroundColor = backgroundColor
+            if let pickerVC = pickerVC, pickerVC.isShowToolbar, previewVC.isShowToolbar {
+                pickerVC.photoToolbar.selectViewOffset = previewVC.photoToolbar.selectViewOffset
+            }
             
             let cell = previewVC.getCell(for: previewVC.currentPreviewIndex)
             fromView = cell?.scrollContentView
@@ -562,6 +565,12 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             previewViewController?.collectionView.isHidden = true
             pickerController.view.backgroundColor = .clear
             contentView.backgroundColor = backgroundColor
+            if let pickerViewController = pickerController.pickerViewController,
+               let previewViewController = previewViewController,
+               pickerViewController.isShowToolbar,
+               previewViewController.isShowToolbar {
+                pickerViewController.photoToolbar.selectViewOffset = previewViewController.photoToolbar.selectViewOffset
+            }
             let currentPreviewIndex: Int
             if let index = previewViewController?.currentPreviewIndex {
                 currentPreviewIndex = index

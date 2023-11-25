@@ -22,18 +22,18 @@ extension PhotoPreviewViewController: PhotoToolBarDelegate {
             type: previewType != .browser ? .preview : .browser
         )
         photoToolbar.toolbarDelegate = self
+        view.addSubview(photoToolbar)
         
-        if config.isShowBottomView {
-            view.addSubview(photoToolbar)
-            if previewType != .browser {
-                photoToolbar.updateOriginalState(pickerController.isOriginal)
-                photoToolbar.requestOriginalAssetBtyes()
-                let selectedAssetArray = pickerController.selectedAssetArray
-                photoToolbar.updateSelectedAssets(selectedAssetArray)
-                photoToolbar.selectedAssetDidChanged(selectedAssetArray)
-            }else {
-                photoToolbar.updateSelectedAssets(previewAssets)
-            }
+        photoToolbar.configPreviewList(previewAssets, page: currentPreviewIndex)
+        
+        if previewType != .browser {
+            photoToolbar.updateOriginalState(pickerController.isOriginal)
+            photoToolbar.requestOriginalAssetBtyes()
+            let selectedAssetArray = pickerController.selectedAssetArray
+            photoToolbar.updateSelectedAssets(selectedAssetArray)
+            photoToolbar.selectedAssetDidChanged(selectedAssetArray)
+        }else {
+            photoToolbar.updateSelectedAssets(previewAssets)
         }
     }
     
@@ -91,6 +91,10 @@ extension PhotoPreviewViewController: PhotoToolBarDelegate {
             }
         }
         delegate?.previewViewController(movePhotoAsset: self)
+    }
+    
+    public func photoToolbar(_ toolbar: PhotoToolBar, previewMoveTo asset: PhotoAsset) {
+        scrollToPhotoAsset(asset)
     }
     
     func openEditor(_ photoAsset: PhotoAsset) {

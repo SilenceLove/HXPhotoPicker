@@ -66,6 +66,7 @@ extension PhotoPickerViewController {
             if AssetManager.authorizationStatusIsLimited(),
                self.pickerConfig.isRemoveSelectedAssetWhenRemovingAssets {
                 self.photoToolbar.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
+                self.photoToolbar.updateSelectedAssets(self.pickerController.selectedAssetArray)
                 self.finishItem?.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
                 self.requestSelectedAssetFileSize()
             }

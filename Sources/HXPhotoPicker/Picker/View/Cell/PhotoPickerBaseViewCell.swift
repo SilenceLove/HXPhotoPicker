@@ -201,6 +201,11 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     var iCloundLoading = false
     var requestICloudCompletion = false
     
+    open override func prepareForReuse() {
+        super.prepareForReuse()
+        cancelRequest()
+    }
+    
     deinit {
         cancelRequest()
     }

@@ -31,6 +31,8 @@ public protocol PhotoToolBarDelegate: AnyObject {
     
     func photoToolbar(_ toolbar: PhotoToolBar, didSelectedAsset asset: PhotoAsset)
     func photoToolbar(_ toolbar: PhotoToolBar, didMoveAsset fromIndex: Int, with toIndex: Int)
+    func photoToolbar(_ toolbar: PhotoToolBar, didDeleteAsset asset: PhotoAsset)
+    func photoToolbar(_ toolbar: PhotoToolBar, previewMoveTo asset: PhotoAsset)
 }
 
 public extension PhotoToolBarDelegate {
@@ -40,6 +42,8 @@ public extension PhotoToolBarDelegate {
     #endif
     func photoToolbar(_ toolbar: PhotoToolBar, didSelectedAsset asset: PhotoAsset) { }
     func photoToolbar(_ toolbar: PhotoToolBar, didMoveAsset fromIndex: Int, with toIndex: Int) { }
+    func photoToolbar(_ toolbar: PhotoToolBar, didDeleteAsset asset: PhotoAsset) { }
+    func photoToolbar(_ toolbar: PhotoToolBar, previewMoveTo asset: PhotoAsset) { }
 }
 
 /// 具体实现可参考`PhotoToolbarView`
@@ -55,6 +59,8 @@ public protocol PhotoToolBar: UIView, PhotoPickerDataStatus {
     
     /// 视图整体高度
     var viewHeight: CGFloat { get }
+    
+    var selectViewOffset: CGPoint? { get set }
     
     init(_ config: PickerConfiguration, type: PhotoToolBarType)
     
@@ -97,7 +103,11 @@ public protocol PhotoToolBar: UIView, PhotoPickerDataStatus {
     /// 选中照片的预览视图滚动到指定 `PhotoAsset` 对象
     func selectedViewScrollTo(_ photoAsset: PhotoAsset?, animated: Bool)
     
-    /// 屏幕旋转之后的回调
+    func configPreviewList(_ assets: [PhotoAsset], page: Int)
+     
+    func previewListDidScroll(_ scrollView: UIScrollView)
+    
+    /// 屏幕旋转后的回调
     func deviceOrientationDidChanged()
 }
 
@@ -111,6 +121,8 @@ public extension PhotoToolBar {
         }
         return true
     }
+    
+    var selectViewOffset: CGPoint? { get { nil } set { } }
     
     #if HXPICKER_ENABLE_EDITOR
     func updateEditState(_ isEnabled: Bool) { }
@@ -133,6 +145,10 @@ public extension PhotoToolBar {
     func updateSelectedAssets(_ photoAssets: [PhotoAsset]) { }
     
     func selectedViewScrollTo(_ photoAsset: PhotoAsset?, animated: Bool) { }
+    
+    func configPreviewList(_ assets: [PhotoAsset], page: Int) { }
+    
+    func previewListDidScroll(_ scrollView: UIScrollView) { }
     
     func deviceOrientationDidChanged() { }
 }

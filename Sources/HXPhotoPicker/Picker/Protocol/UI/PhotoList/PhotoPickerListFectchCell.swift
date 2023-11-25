@@ -146,22 +146,20 @@ public extension PhotoPickerListFectchCell {
         return cell
     }
     func getCell(for asset: PhotoAsset) -> PhotoPickerBaseViewCell? {
-        if let item = getIndexPath(for: asset)?.item {
-            return getCell(for: item)
-        }
-        return nil
-    }
-    func getIndexPath(for asset: PhotoAsset) -> IndexPath? {
-        if assets.isEmpty {
+        guard let item = getIndexPath(for: asset)?.item else {
             return nil
         }
-        if var item = assets.firstIndex(of: asset) {
-            if needOffset {
-                item += offsetIndex
-            }
-            return IndexPath(item: item, section: 0)
+        return getCell(for: item)
+    }
+    func getIndexPath(for asset: PhotoAsset) -> IndexPath? {
+        if assets.isEmpty { return nil }
+        guard var item = assets.firstIndex(of: asset) else {
+            return nil
         }
-        return nil
+        if needOffset {
+            item += offsetIndex
+        }
+        return IndexPath(item: item, section: 0)
     }
     
     func updateCellSelectedTitle() {
@@ -185,8 +183,7 @@ public extension PhotoPickerListFectchCell {
     
     func updateCell(for asset: PhotoAsset) {
         let cell = getCell(for: asset)
-        cell?.isRequestDirectly = true
-        cell?.photoAsset = asset
+        cell?.updatePhotoAsset(asset)
     }
     
     func resetICloud(for asset: PhotoAsset) {

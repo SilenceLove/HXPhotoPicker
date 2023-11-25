@@ -304,7 +304,9 @@ public extension PhotoPickerListSwipeSelect {
             if isSelected {
                 func addAsset(showTip: Bool) {
                     if pickerController.pickerData.canSelect(photoAsset, isShowHUD: showTip) {
-                        pickerController.pickerData.append(photoAsset)
+                        if pickerController.pickerData.append(photoAsset) {
+                            delegate?.photoList(self as! PhotoPickerList, didSelectedAsset: photoAsset)
+                        }
                         if let cell = cell {
                             cell.updateSelectedState(
                                 isSelected: isSelected,
@@ -343,7 +345,9 @@ public extension PhotoPickerListSwipeSelect {
                     }
                 }
             }else {
-                pickerController.pickerData.remove(photoAsset)
+                if pickerController.pickerData.remove(photoAsset) {
+                    delegate?.photoList(self as! PhotoPickerList, didDeselectedAsset: photoAsset)
+                }
                 if let cell = cell {
                     cell.updateSelectedState(isSelected: isSelected, animated: false)
                 }
