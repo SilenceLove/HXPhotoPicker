@@ -38,6 +38,9 @@
 		D32647C52AD63D6300AD6E79 /* PhotoPickerListFectchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32647C42AD63D6300AD6E79 /* PhotoPickerListFectchCell.swift */; };
 		D32647C72AD63E1000AD6E79 /* PhotoPickerListCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32647C62AD63E1000AD6E79 /* PhotoPickerListCondition.swift */; };
 		D32647C92AD6454E00AD6E79 /* PhotoPickerListAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32647C82AD6454E00AD6E79 /* PhotoPickerListAssets.swift */; };
+		D32A497A2B0EF5470093D3DB /* PhotoPreviewListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32A49792B0EF5470093D3DB /* PhotoPreviewListView.swift */; };
+		D32A497C2B0EF56B0093D3DB /* PhotoPreviewListViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32A497B2B0EF56B0093D3DB /* PhotoPreviewListViewLayout.swift */; };
+		D32A497E2B0EF5840093D3DB /* PhotoPreviewListViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32A497D2B0EF5840093D3DB /* PhotoPreviewListViewCell.swift */; };
 		D32A83932AEE5ED9006517DA /* ProgressCricleJoinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32A83922AEE5ED9006517DA /* ProgressCricleJoinView.swift */; };
 		D32C44622AD26DC3009FED15 /* ExpandButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32C44612AD26DC3009FED15 /* ExpandButton.swift */; };
 		D335E6442AB55C0C00BAC8CD /* EditorCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D335E6432AB55C0C00BAC8CD /* EditorCanvasView.swift */; };
@@ -532,6 +535,9 @@
 		D32647C42AD63D6300AD6E79 /* PhotoPickerListFectchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerListFectchCell.swift; sourceTree = "<group>"; };
 		D32647C62AD63E1000AD6E79 /* PhotoPickerListCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerListCondition.swift; sourceTree = "<group>"; };
 		D32647C82AD6454E00AD6E79 /* PhotoPickerListAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerListAssets.swift; sourceTree = "<group>"; };
+		D32A49792B0EF5470093D3DB /* PhotoPreviewListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPreviewListView.swift; sourceTree = "<group>"; };
+		D32A497B2B0EF56B0093D3DB /* PhotoPreviewListViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPreviewListViewLayout.swift; sourceTree = "<group>"; };
+		D32A497D2B0EF5840093D3DB /* PhotoPreviewListViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPreviewListViewCell.swift; sourceTree = "<group>"; };
 		D32A83922AEE5ED9006517DA /* ProgressCricleJoinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressCricleJoinView.swift; sourceTree = "<group>"; };
 		D32C44612AD26DC3009FED15 /* ExpandButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandButton.swift; sourceTree = "<group>"; };
 		D335E6432AB55C0C00BAC8CD /* EditorCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorCanvasView.swift; sourceTree = "<group>"; };
@@ -1547,7 +1553,6 @@
 				D36879112A399B8C00E70910 /* PhotoPickerSelectableViewCell.swift */,
 				D36879132A399B8C00E70910 /* PhotoPickerViewCell.swift */,
 				D368790F2A399B8C00E70910 /* PhotoPickerWeChatViewCell.swift */,
-				D368790A2A399B8C00E70910 /* PhotoPreviewSelectedViewCell.swift */,
 				D36879142A399B8C00E70910 /* PhotoPreviewViewCell.swift */,
 				D368790B2A399B8C00E70910 /* PickerCameraViewCell.swift */,
 				D36879122A399B8C00E70910 /* PreviewLivePhotoViewCell.swift */,
@@ -2019,7 +2024,11 @@
 				D3A1BE6D2AB2ADAA004D1DE6 /* PhotoToolBarView.swift */,
 				D3A1BE6F2AB2FE0E004D1DE6 /* PhotoPermissionPromptView.swift */,
 				D368791E2A399B8C00E70910 /* PhotoPreviewSelectedView.swift */,
+				D368790A2A399B8C00E70910 /* PhotoPreviewSelectedViewCell.swift */,
 				D3B5598D2ADCD19500B35493 /* PhotoToolBarEmptyView.swift */,
+				D32A49792B0EF5470093D3DB /* PhotoPreviewListView.swift */,
+				D32A497B2B0EF56B0093D3DB /* PhotoPreviewListViewLayout.swift */,
+				D32A497D2B0EF5840093D3DB /* PhotoPreviewListViewCell.swift */,
 			);
 			path = ToolBar;
 			sourceTree = "<group>";
@@ -2684,9 +2693,11 @@
 				D360E7CB2A6B726500740B6B /* EditorVideoControlView.swift in Sources */,
 				D360E7CC2A6B726600740B6B /* EditorVideoControlViewCell.swift in Sources */,
 				D360E7CD2A6B726600740B6B /* EditorVolumeView.swift in Sources */,
+				D32A497E2B0EF5840093D3DB /* PhotoPreviewListViewCell.swift in Sources */,
 				D335E6442AB55C0C00BAC8CD /* EditorCanvasView.swift in Sources */,
 				D360E7CE2A6B726600740B6B /* EditorChartlet.swift in Sources */,
 				D360E7CF2A6B726600740B6B /* EditorPlayAuido.swift in Sources */,
+				D32A497C2B0EF56B0093D3DB /* PhotoPreviewListViewLayout.swift in Sources */,
 				D360E7D02A6B726600740B6B /* VideoEditorMusic.swift in Sources */,
 				D360E7D12A6B726600740B6B /* PhotoEditorFilter.swift in Sources */,
 				D360E7D22A6B726600740B6B /* EditorType.swift in Sources */,
@@ -2740,6 +2751,7 @@
 				D360E7FC2A6B726600740B6B /* EditorView+CGFloat.swift in Sources */,
 				D34417CE2AD3E6FF00ABFC68 /* Core+UICollectionView.swift in Sources */,
 				D360E7FD2A6B726600740B6B /* EditorView+AVAsset.swift in Sources */,
+				D32A497A2B0EF5470093D3DB /* PhotoPreviewListView.swift in Sources */,
 				D360E7FE2A6B726600740B6B /* EditorView+UIView.swift in Sources */,
 				D360E7FF2A6B726600740B6B /* EditorView+PhotoTools.swift in Sources */,
 				D360E8002A6B726600740B6B /* EditorVideoTool.swift in Sources */,
@@ -2969,10 +2981,9 @@
 					"-weak_framework",
 					"\"SwiftUI\"",
 					"-Wl",
-					"-ld_classic",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xfrontend -debug-time-function-bodies";
-				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example19;
+				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example20;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -3033,10 +3044,9 @@
 					"-weak_framework",
 					"\"SwiftUI\"",
 					"-Wl",
-					"-ld_classic",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xfrontend -debug-time-function-bodies";
-				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example19;
+				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example20;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
