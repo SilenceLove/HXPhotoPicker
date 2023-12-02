@@ -1,5 +1,28 @@
 # Release Notes
 
+## 4.1.2
+
+### Added
+
+- Picker
+  - `PhotoToolbar` of photo list supports displaying selected list view
+  - `PhotoToolbar` in the preview interface adds a list view of preview data
+
+### Resolved
+
+- Picker
+  - When the original image is selected, quickly selecting/deselecting photos may cause a crash.
+  - When the album permissions restrict some photos, switching the album after selecting the photos causes the number displayed in the `PhotoToolbar` to be incorrect.
+  - The album list may be blank
+  - The problem of obtaining the wrong address suffix name when GIF is displayed as a static image
+  - Modification of the judgment logic of the maximum number of choices
+  
+### Optimizer
+
+- Picker
+  - `PhotoToolbar` safe area distance alignment when horizontal screen
+  - The logic of loading images in the preview interface is optimized, and the images are clearer during initial loading.
+
 ## 4.1.1
 
 ### Added
