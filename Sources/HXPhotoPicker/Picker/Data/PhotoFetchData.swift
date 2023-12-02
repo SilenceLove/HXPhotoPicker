@@ -81,7 +81,7 @@ open class PhotoFetchData {
                 }
             }else {
                 cameraAssetCollection = PhotoAssetCollection(
-                    albumName: self.config.emptyAlbumName,
+                    albumName: self.config.emptyAlbumName.localized,
                     coverImage: self.config.emptyCoverImageName.image
                 )
             }

@@ -142,7 +142,7 @@ public class AlbumViewController: PhotoBaseViewController, PhotoAlbumListDelegat
         }else {
             if self.assetCollections.isEmpty {
                 let assetCollection = PhotoAssetCollection(
-                    albumName: pickerConfig.emptyAlbumName,
+                    albumName: pickerConfig.emptyAlbumName.localized,
                     coverImage: pickerConfig.emptyCoverImageName.image
                 )
                 if splitViewController is PhotoSplitViewController {

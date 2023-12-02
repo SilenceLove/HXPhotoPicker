@@ -209,6 +209,7 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
 
         UIView.animate(withDuration: 0.25) {
             self.navBgView?.alpha = self.statusBarShouldBeHidden ? 0 : 1
+            self.updateColors()
         } completion: {
             if $0 {
                 self.navBgView?.isHidden = self.statusBarShouldBeHidden

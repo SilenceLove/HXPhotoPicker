@@ -79,9 +79,13 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
         if isTransitioning {
             return
         }
-        view.backgroundColor = PhotoManager.isDark ?
-            config.backgroundDarkColor :
-            config.backgroundColor
+        if statusBarShouldBeHidden {
+            view.backgroundColor = config.statusBarHiddenBgColor
+        }else {
+            view.backgroundColor = PhotoManager.isDark ?
+                config.backgroundDarkColor :
+                config.backgroundColor
+        }
     }
     
     public override func viewDidLayoutSubviews() {
@@ -135,7 +139,12 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
     public override func deviceOrientationDidChanged(notify: Notification) {
         photoToolbar.deviceOrientationDidChanged()
     }
-    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if isShowToolbar {
+            photoToolbar.viewWillAppear(self)
+        }
+    }
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         viewDidAppear = true
@@ -168,6 +177,16 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
                 type: .pop
             )
         }
+        if isShowToolbar {
+            photoToolbar.viewDidAppear(self)
+        }
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if isShowToolbar {
+            photoToolbar.viewWillDisappear(self)
+        }
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
@@ -178,6 +197,9 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
         if !viewControllers.contains(self) {
             requestPreviewTimer?.invalidate()
             requestPreviewTimer = nil
+        }
+        if isShowToolbar {
+            photoToolbar.viewDidDisappear(self)
         }
     }
     
@@ -461,6 +483,9 @@ extension PhotoPreviewViewController {
         if previewAssets.isEmpty {
             return
         }
+        if isShowToolbar {
+            photoToolbar.previewListInsert(photoAsset, at: item)
+        }
         previewAssets.insert(photoAsset, at: item)
         if item == currentPreviewIndex {
             getCell(for: item)?.cancelRequest()
@@ -524,8 +549,9 @@ extension PhotoPreviewViewController {
             photoAssets.append(photoAsset)
         }
         collectionView.deleteItems(at: indexPaths)
-        if config.isShowBottomView {
+        if isShowToolbar {
             photoToolbar.removeSelectedAssets(photoAssets)
+            photoToolbar.previewListRemove(photoAssets)
         }
         pickerController.pickerDelegate?.pickerController(
             pickerController,
@@ -548,11 +574,12 @@ extension PhotoPreviewViewController {
 //        collectionView.reloadItems(at: [IndexPath.init(item: index, section: 0)])
     }
     func addedCameraPhotoAsset(_ photoAsset: PhotoAsset) {
-        if config.isShowBottomView {
+        if isShowToolbar {
             photoToolbar.updateSelectedAssets(pickerController.selectedAssetArray)
             configBottomViewFrame()
             photoToolbar.layoutSubviews()
             photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+            photoToolbar.previewListInsert(photoAsset, at: currentPreviewIndex)
         }
         getCell(for: currentPreviewIndex)?.cancelRequest()
         previewAssets.insert(
@@ -603,7 +630,8 @@ extension PhotoPreviewViewController {
             }
         }
         collectionView.deleteItems(at: indexPaths)
-        if config.isShowBottomView {
+        if isShowToolbar {
+            photoToolbar.previewListRemove(assets)
             photoToolbar.removeSelectedAssets(assets)
             photoToolbar.requestOriginalAssetBtyes()
             photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)

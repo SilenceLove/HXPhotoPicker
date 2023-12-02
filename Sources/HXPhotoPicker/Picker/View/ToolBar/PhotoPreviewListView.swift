@@ -58,9 +58,12 @@ class PhotoPreviewListView: UIView {
     
     weak var dataSource: (any PhotoPreviewListViewDataSource)?
     
+    var selectColor: UIColor?
+    var selectBgColor: UIColor?
+    
     private(set) var state: State = .collapsed(indexPathForFinalDestinationItem: nil)
     
-    private var indexPathForCurrentCenterItem: IndexPath? {
+    var indexPathForCurrentCenterItem: IndexPath? {
         collectionView.indexPathForHorizontalCenterItem
     }
     
@@ -132,12 +135,6 @@ class PhotoPreviewListView: UIView {
         ])
     }
     
-    // MARK: - Override
-    
-    override var intrinsicContentSize: CGSize {
-        CGSize(width: super.intrinsicContentSize.width, height: 55)
-    }
-    
     // MARK: - Lifecycle
     
     override func layoutSubviews() {
@@ -155,21 +152,60 @@ class PhotoPreviewListView: UIView {
             bottom: 0,
             right: offset
         )
+        if let lastChangedPage, UIDevice.isPad {
+            updateLayout(expandingItemAt: .init(item: lastChangedPage, section: 0), animated: false)
+        }
     }
     
     // MARK: - Methods
     
     func configure(numberOfPages: Int, currentPage: Int) {
         self.numberOfPages = numberOfPages
-        collectionView.reloadData()
         DispatchQueue.main.async {
-            let indexPath = IndexPath(item: currentPage, section: 0)
-            self.expandAndScrollToItem(
-                at: indexPath,
-                causingBy: .configuration,
-                animated: false
-            )
+            self.collectionView.reloadData()
+            DispatchQueue.main.async {
+                let indexPath = IndexPath(item: currentPage, section: 0)
+                self.expandAndScrollToItem(
+                    at: indexPath,
+                    causingBy: .configuration,
+                    animated: false
+                )
+            }
         }
+    }
+    
+    func insertData(with indexs: [Int]) {
+        var indexPaths: [IndexPath] = []
+        for index in indexs {
+            indexPaths.append(.init(item: index, section: 0))
+        }
+        numberOfPages += indexs.count
+        collectionView.insertItems(at: indexPaths)
+        correctExpandingItemAspectRatioIfNeeded()
+    }
+    
+    func removeData(with indexs: [Int]) {
+        var indexPaths: [IndexPath] = []
+        for index in indexs {
+            indexPaths.append(.init(item: index, section: 0))
+        }
+        numberOfPages -= indexs.count
+        collectionView.deleteItems(at: indexPaths)
+        correctExpandingItemAspectRatioIfNeeded()
+    }
+    
+    func reloadData(with indexs: [Int]) {
+        var indexPaths: [IndexPath] = []
+        for index in indexs {
+            indexPaths.append(.init(item: index, section: 0))
+        }
+        collectionView.reloadItems(at: indexPaths)
+        correctExpandingItemAspectRatioIfNeeded()
+    }
+    
+    func reloadData() {
+        collectionView.reloadData()
+        correctExpandingItemAspectRatioIfNeeded()
     }
     
     func stopScroll(to page: Int, animated: Bool) {
@@ -380,6 +416,8 @@ extension PhotoPreviewListView: UICollectionViewDataSource {
     }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: PhotoPreviewListViewCell = collectionView.dequeueReusableCell(for: indexPath)
+        cell.tickColor = selectColor
+        cell.tickBgColor = selectBgColor
         cell.photoAsset = dataSource?.previewListView(self, thumbnailOnPage: indexPath.item)
         return cell
     }
@@ -433,10 +471,18 @@ extension PhotoPreviewListView: UICollectionViewDelegate {
         withVelocity velocity: CGPoint,
         targetContentOffset: UnsafeMutablePointer<CGPoint>
     ) {
-        let targetPoint = CGPoint(
-            x: targetContentOffset.pointee.x + collectionView.adjustedContentInset.left,
-            y: 0
-        )
+        let targetPoint: CGPoint
+        if #available(iOS 11.0, *) {
+            targetPoint = .init(
+                x: targetContentOffset.pointee.x + collectionView.adjustedContentInset.left,
+                y: 0
+            )
+        } else {
+            targetPoint = .init(
+                x: targetContentOffset.pointee.x + collectionView.contentInset.left,
+                y: 0
+            )
+        }
         let targetIndexPath = collectionView.indexPathForItem(at: targetPoint)
         state = .collapsed(
             indexPathForFinalDestinationItem: targetIndexPath
@@ -449,7 +495,7 @@ extension PhotoPreviewListView: UICollectionViewDelegate {
          * or
          * when the finger is released at the point where it exceeds the limit of left and right edges.
          */
-        if !scrollView.isDragging {
+        if !scrollView.isDragging, !decelerate {
             guard let indexPath = indexPathForCurrentCenterItem ?? state.indexPathForFinalDestinationItem else {
                 return
             }

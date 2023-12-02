@@ -104,11 +104,22 @@ public protocol PhotoToolBar: UIView, PhotoPickerDataStatus {
     func selectedViewScrollTo(_ photoAsset: PhotoAsset?, animated: Bool)
     
     func configPreviewList(_ assets: [PhotoAsset], page: Int)
-     
+    
+    func previewListInsert(_ asset: PhotoAsset, at index: Int)
+    
+    func previewListRemove(_ assets: [PhotoAsset])
+    
+    func previewListReload(_ assets: [PhotoAsset])
+    
     func previewListDidScroll(_ scrollView: UIScrollView)
     
     /// 屏幕旋转后的回调
     func deviceOrientationDidChanged()
+    
+    func viewWillAppear(_ viewController: UIViewController)
+    func viewDidAppear(_ viewController: UIViewController)
+    func viewWillDisappear(_ viewController: UIViewController)
+    func viewDidDisappear(_ viewController: UIViewController)
 }
 
 public extension PhotoToolBar {
@@ -148,7 +159,18 @@ public extension PhotoToolBar {
     
     func configPreviewList(_ assets: [PhotoAsset], page: Int) { }
     
+    func previewListInsert(_ asset: PhotoAsset, at index: Int) { }
+    
+    func previewListRemove(_ assets: [PhotoAsset]) { }
+    
+    func previewListReload(_ assets: [PhotoAsset]) { }
+    
     func previewListDidScroll(_ scrollView: UIScrollView) { }
     
     func deviceOrientationDidChanged() { }
+    
+    func viewWillAppear(_ viewController: UIViewController) { }
+    func viewDidAppear(_ viewController: UIViewController) { }
+    func viewWillDisappear(_ viewController: UIViewController) { }
+    func viewDidDisappear(_ viewController: UIViewController) { }
 }

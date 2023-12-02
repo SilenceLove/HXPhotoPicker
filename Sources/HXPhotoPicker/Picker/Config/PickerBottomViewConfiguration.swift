@@ -161,12 +161,17 @@ public struct PickerBottomViewConfiguration {
     /// 暗黑风格下提示语箭头颜色
     public var promptArrowDarkColor: UIColor = .systemBlue
     
+    /// 显示预览列表，优先级高于`isShowSelectedView`
+    public var isShowPreviewList: Bool = true
+    
+    public var previewListTickColor: UIColor = .white
+    public var previewListTickBgColor: UIColor = .systemBlue
+    public var previewListTickDarkColor: UIColor = .white
+    public var previewListTickBgDarkColor: UIColor = .systemBlue
+    
     /// Show selected resources
     /// 显示已选资源
     public var isShowSelectedView: Bool = true
-    
-    /// 显示预览列表，优先级高于`isShowSelectedView`
-    public var isShowPreviewList: Bool = true
     
     /// Custom cell, inherit PhotoPreviewSelectedViewCell and modify it
     /// 自定义cell，继承 PhotoPreviewSelectedViewCell 加以修改
@@ -174,7 +179,7 @@ public struct PickerBottomViewConfiguration {
     
     /// The selected tick color of the selected resource
     /// 已选资源选中的勾勾颜色
-    public var selectedViewTickColor: UIColor = .white
+    public var selectedViewTickColor: UIColor = .systemBlue
     public var selectedViewTickDarkColor: UIColor = .systemBlue
     
     public init() {

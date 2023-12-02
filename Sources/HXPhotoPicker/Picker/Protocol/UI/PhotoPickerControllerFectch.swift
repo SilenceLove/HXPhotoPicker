@@ -13,6 +13,9 @@ public protocol PhotoPickerControllerViewFectch: UIView {
 }
 public extension PhotoPickerControllerViewFectch {
     var pickerController: PhotoPickerController {
+        if !Thread.isMainThread {
+            assertionFailure()
+        }
         guard let controller = viewController?.navigationController as? PhotoPickerController else {
             return .init()
         }
@@ -25,6 +28,9 @@ public protocol PhotoPickerControllerFectch: UIViewController {
 }
 public extension PhotoPickerControllerFectch {
     var pickerController: PhotoPickerController {
+        if !Thread.isMainThread {
+            assertionFailure()
+        }
         guard let controller = navigationController as? PhotoPickerController else {
             return .init()
         }

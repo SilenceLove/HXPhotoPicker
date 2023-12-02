@@ -51,6 +51,9 @@ public struct PhotoListConfiguration {
     /// 暗黑模式下取消按钮图片名
     public var cancelDarkImageName: String = "hx_picker_photolist_cancel"
     
+    /// 导航栏是否显示筛选按钮
+    public var isShowFilterItem: Bool = true
+    
     /// Display quantity per line
     /// 每行显示数量
     public var rowNumber: Int = UIDevice.isPad ? 5 : 4
@@ -147,8 +150,6 @@ public struct PhotoListConfiguration {
     /// The bottom shows the number of photos/videos
     /// 底部显示 照片/视频 数量
     public var isShowAssetNumber: Bool = true
-     
-    public var isShowFilterItem: Bool = true
     
     public var assetNumber: AssetNumber = .init()
     

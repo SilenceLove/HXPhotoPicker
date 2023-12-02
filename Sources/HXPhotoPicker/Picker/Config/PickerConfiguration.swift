@@ -229,7 +229,7 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     
     /// Album name when there are no resources in the album
     /// 当相册里没有资源时的相册名称
-    public var emptyAlbumName: String = "所有照片".hx.localized
+    public var emptyAlbumName: String = "所有照片"
     
     /// The name of the cover image when there are no assets in the album
     /// 当相册里没有资源时的封面图片名

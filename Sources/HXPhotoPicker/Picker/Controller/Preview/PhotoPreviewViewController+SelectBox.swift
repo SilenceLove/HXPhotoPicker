@@ -32,8 +32,9 @@ extension PhotoPreviewViewController {
             func addAsset() {
                 if pickerController.pickerData.append(photoAsset) {
                     canUpdate = true
-                    if config.isShowBottomView {
+                    if isShowToolbar {
                         photoToolbar.insertSelectedAsset(photoAsset)
+                        photoToolbar.previewListReload([photoAsset])
                     }
                     if beforeIsEmpty {
                         bottomNeedAnimated = true
@@ -63,8 +64,9 @@ extension PhotoPreviewViewController {
             if !beforeIsEmpty && pickerController.selectedAssetArray.isEmpty {
                 bottomNeedAnimated = true
             }
-            if config.isShowBottomView {
+            if isShowToolbar {
                 photoToolbar.removeSelectedAssets([photoAsset])
+                photoToolbar.previewListReload([photoAsset])
             }
             #if HXPICKER_ENABLE_EDITOR
             if photoAsset.videoEditedResult != nil, pickerConfig.isDeselectVideoRemoveEdited {
@@ -101,7 +103,7 @@ extension PhotoPreviewViewController {
         pickerUpdateCell: Bool,
         bottomNeedAnimated: Bool
     ) {
-        if config.isShowBottomView {
+        if isShowToolbar {
             if bottomNeedAnimated {
                 UIView.animate(withDuration: 0.25) {
                     self.configBottomViewFrame()
@@ -122,7 +124,7 @@ extension PhotoPreviewViewController {
             isSelected: isSelected,
             updateCell: pickerUpdateCell
         )
-        if config.isShowBottomView {
+        if isShowToolbar {
             photoToolbar.requestOriginalAssetBtyes()
             photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
         }

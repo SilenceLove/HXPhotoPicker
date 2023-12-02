@@ -10,6 +10,7 @@ import UIKit
 import Photos
 import HXPhotoPicker
 import Kingfisher
+import AVKit
 
 class PickerResultViewController: UIViewController,
                                   UICollectionViewDataSource,
@@ -460,6 +461,7 @@ class PickerResultViewController: UIViewController,
 //        )
         if #available(iOS 13.0, *) {
             Task {
+                var videoURL: URL?
                 for (index, selectedAsset) in selectedAssets.enumerated() {
                     do {
                         print("第" + String(index + 1) + "个")
@@ -476,6 +478,9 @@ class PickerResultViewController: UIViewController,
                                 "本地图片地址" : "本地视频地址",
                                 result.url
                             )
+                            if result.mediaType == .video {
+                                videoURL = result.url
+                            }
                         }
                     } catch {
                         print("地址获取失败: ", error)
@@ -483,6 +488,11 @@ class PickerResultViewController: UIViewController,
                 }
                 view.hx.hide(animated: false)
                 view.hx.showSuccess(text: "获取完成", delayHide: 1.5, animated: true)
+                if let videoURL {
+                    let vc = AVPlayerViewController()
+                    vc.player = .init(url: videoURL)
+                    self.present(vc, animated: true)
+                }
             }
         } else {
             selectedAssets.getURLs(

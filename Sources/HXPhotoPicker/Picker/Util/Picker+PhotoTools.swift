@@ -404,6 +404,8 @@ extension PhotoTools {
         config.previewView.bottomView.finishButtonBackgroundColor = wxColor
         config.previewView.bottomView.finishButtonDisableBackgroundColor = "#666666".color.withAlphaComponent(0.3)
         
+        config.previewView.bottomView.previewListTickColor = .white
+        config.previewView.bottomView.previewListTickBgColor = wxColor
         config.previewView.bottomView.selectedViewTickColor = wxColor
         config.previewView.disableFinishButtonWhenNotSelected = true
         
@@ -489,6 +491,8 @@ extension PhotoTools {
         config.previewView.bottomView.originalSelectBox.selectedBackgroundColor = redColor
         config.previewView.bottomView.finishButtonBackgroundColor = redColor
         config.previewView.bottomView.selectedViewTickColor = redColor
+        config.previewView.bottomView.previewListTickColor = .white
+        config.previewView.bottomView.previewListTickBgColor = redColor
         
         #if HXPICKER_ENABLE_EDITOR
         config.editor.video.cropTime.maximumTime = 0

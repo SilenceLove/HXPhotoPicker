@@ -31,6 +31,10 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
                 cell?.updatePhotoAsset(photoAsset)
                 if pickerController.pickerData.append(photoAsset) {
                     listView.updateCellSelectedTitle()
+                    if isShowToolbar {
+                        photoToolbar.insertSelectedAsset(photoAsset)
+                        updateToolbarFrame()
+                    }
                 }
             }else {
                 listView.reloadCell(for: photoAsset)
@@ -55,6 +59,10 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
             if !photoAsset.isSelected {
                 if pickerController.pickerData.append(photoAsset) {
                     listView.updateCellSelectedTitle()
+                    if isShowToolbar {
+                        photoToolbar.insertSelectedAsset(photoAsset)
+                        updateToolbarFrame()
+                    }
                 }
                 photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
                 finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)

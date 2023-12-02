@@ -23,15 +23,13 @@ extension PhotoPreviewViewController: PhotoToolBarDelegate {
         )
         photoToolbar.toolbarDelegate = self
         view.addSubview(photoToolbar)
-        
-        photoToolbar.configPreviewList(previewAssets, page: currentPreviewIndex)
-        
         if previewType != .browser {
             photoToolbar.updateOriginalState(pickerController.isOriginal)
             photoToolbar.requestOriginalAssetBtyes()
             let selectedAssetArray = pickerController.selectedAssetArray
             photoToolbar.updateSelectedAssets(selectedAssetArray)
             photoToolbar.selectedAssetDidChanged(selectedAssetArray)
+            photoToolbar.configPreviewList(previewAssets, page: currentPreviewIndex)
         }else {
             photoToolbar.updateSelectedAssets(previewAssets)
         }
@@ -348,8 +346,7 @@ extension PhotoPreviewViewController: PhotoToolBarDelegate {
     
     func startRequestPreviewTimer() {
         requestPreviewTimer?.invalidate()
-        requestPreviewTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(delayRequestPreview), userInfo: nil, repeats: false)
-        requestPreviewTimer = Timer(
+        requestPreviewTimer = Timer.scheduledTimer(
             timeInterval: 0.2,
             target: self,
             selector: #selector(delayRequestPreview),

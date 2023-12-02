@@ -36,6 +36,9 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
                     return
                 }
                 reloadCell(for: currentPreviewIndex)
+                if isShowToolbar {
+                    photoToolbar.previewListReload([photoAsset])
+                }
                 if !photoAsset.isSelected {
                     didSelectBoxControlClick()
                 }
@@ -67,6 +70,9 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
             }
             if beforeHasEdit {
                 reloadCell(for: currentPreviewIndex)
+                if isShowToolbar {
+                    photoToolbar.previewListReload([photoAsset])
+                }
             }
         }
         delegate?.previewViewController(self, editAssetFinished: photoAsset)

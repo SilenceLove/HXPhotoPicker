@@ -250,6 +250,10 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
                 isFilterEditor: true
             ) {
                 listView.updateCellSelectedTitle()
+                if isShowToolbar {
+                    photoToolbar.insertSelectedAsset(photoAsset)
+                    updateToolbarFrame()
+                }
             }
         }
         if photoAsset.isLocalAsset {

@@ -34,18 +34,22 @@ public extension AssetManager {
         let options = PHImageRequestOptions()
         options.resizeMode = .fast
         var isSimplify = false
+        let targetSize: CGSize
         #if HXPICKER_ENABLE_PICKER
         isSimplify = PhotoManager.shared.thumbnailLoadMode == .simplify
-        #endif
         if isSimplify {
             options.deliveryMode = .fastFormat
         }
+        targetSize = isSimplify ? .init(
+            width: targetWidth,
+            height: targetWidth
+        ) : asset.cellThumTargetSize(for: targetWidth)
+        #else
+        targetSize = asset.cellThumTargetSize(for: targetWidth)
+        #endif
         return requestImage(
             for: asset,
-            targetSize: isSimplify ? .init(
-                width: targetWidth,
-                height: targetWidth
-            ) : asset.cellThumTargetSize(for: targetWidth),
+            targetSize: targetSize,
             options: options
         ) { (image, info) in
             DispatchQueue.main.async {

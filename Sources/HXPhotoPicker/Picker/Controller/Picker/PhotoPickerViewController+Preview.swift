@@ -71,15 +71,15 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
             if !isSelected && updateCell {
                 listView.updateCell(for: photoAsset)
             }
-        }
-        listView.updateCellSelectedTitle()
-        if isShowToolbar {
-            if isSelected {
-                photoToolbar.insertSelectedAsset(photoAsset)
-            }else {
-                photoToolbar.removeSelectedAssets([photoAsset])
+            if isShowToolbar {
+                if isSelected {
+                    photoToolbar.insertSelectedAsset(photoAsset)
+                }else {
+                    photoToolbar.removeSelectedAssets([photoAsset])
+                }
             }
         }
+        listView.updateCellSelectedTitle()
         photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
         finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
         requestSelectedAssetFileSize()

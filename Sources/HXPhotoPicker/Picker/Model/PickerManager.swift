@@ -143,7 +143,7 @@ extension PickerManager {
                 collection = assetCollection
             }else {
                 collection = PhotoAssetCollection(
-                    albumName: config.emptyAlbumName,
+                    albumName: config.emptyAlbumName.localized,
                     coverImage: config.emptyCoverImageName.image
                 )
                 cameraAssetCollection = collection
@@ -163,7 +163,7 @@ extension PickerManager {
                 assetCollection = collection
             }else {
                 assetCollection = PhotoAssetCollection(
-                    albumName: self.config.emptyAlbumName,
+                    albumName: self.config.emptyAlbumName.localized,
                     coverImage: self.config.emptyCoverImageName.image
                 )
             }

@@ -25,15 +25,17 @@ public struct PreviewViewConfiguration {
     /// 暗黑风格下背景颜色
     public var backgroundDarkColor: UIColor = .black
     
+    /// 当状态栏/导航栏隐藏时背景颜色
+    public var statusBarHiddenBgColor: UIColor = .black
+    
     /// 选择框配置
     public var selectBox: SelectBoxConfiguration = .init()
     
     /// 多选模式下，未选择资源时是否禁用完成按钮
     /// false：默认选择当前预览的资源
-    public var disableFinishButtonWhenNotSelected: Bool = false {
-        didSet {
-            bottomView.disableFinishButtonWhenNotSelected = disableFinishButtonWhenNotSelected
-        }
+    public var disableFinishButtonWhenNotSelected: Bool {
+        get { bottomView.disableFinishButtonWhenNotSelected }
+        set { bottomView.disableFinishButtonWhenNotSelected = newValue }
     }
     
     /// 视频播放类型

@@ -182,6 +182,34 @@ public class PhotoPickerViewController: PhotoBaseViewController {
         }
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if isShowToolbar {
+            photoToolbar.viewWillAppear(self)
+        }
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if isShowToolbar {
+            photoToolbar.viewDidAppear(self)
+        }
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if isShowToolbar {
+            photoToolbar.viewWillDisappear(self)
+        }
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isShowToolbar {
+            photoToolbar.viewDidDisappear(self)
+        }
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

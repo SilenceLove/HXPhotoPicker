@@ -20,11 +20,17 @@ open class PhotoThumbnailView: UIView {
     
     /// 占位图
     public var placeholder: UIImage? {
-        didSet {
+        get {
+            if _image != nil {
+                return nil
+            }
+            return imageView.image
+        }
+        set {
             if _image != nil {
                 return
             }
-            imageView.image = placeholder
+            imageView.image = newValue
         }
     }
     

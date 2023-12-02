@@ -512,8 +512,41 @@ extension PhotoToolBarView: PhotoPreviewListViewDataSource {
     }
     
     public func configPreviewList(_ assets: [PhotoAsset], page: Int) {
+        if !isShowPreviewList { return }
         previewAssets = assets
         previewListView.configure(numberOfPages: assets.count, currentPage: page)
+    }
+    
+    public func previewListInsert(_ asset: PhotoAsset, at index: Int) {
+        if !isShowPreviewList { return }
+        previewAssets.insert(asset, at: index)
+        previewListView.insertData(with: [index])
+    }
+    
+    public func previewListRemove(_ assets: [PhotoAsset]) {
+        if !isShowPreviewList { return }
+        var indexs: [Int] = []
+        let tempAssets = previewAssets
+        for asset in assets {
+            guard let index = tempAssets.firstIndex(of: asset) else {
+                continue
+            }
+            indexs.append(index)
+            previewAssets.remove(at: index)
+        }
+        previewListView.removeData(with: indexs)
+    }
+    
+    public func previewListReload(_ assets: [PhotoAsset]) {
+        if !isShowPreviewList { return }
+        var indexs: [Int] = []
+        for asset in assets {
+            guard let index = previewAssets.firstIndex(of: asset) else {
+                continue
+            }
+            indexs.append(index)
+        }
+        previewListView.reloadData(with: indexs)
     }
     
     public func previewListDidScroll(_ scrollView: UIScrollView) {
@@ -582,6 +615,16 @@ extension PhotoToolBarView: PhotoPreviewListViewDataSource {
             }
         }
     }
+    
+    public func viewWillDisappear(_ viewController: UIViewController) {
+        if !isShowPreviewList { return }
+        guard let index = previewListView.indexPathForCurrentCenterItem?.item, previewListView.collectionView.isDragging else {
+            return
+        }
+        previewListView.stopScroll(to: index, animated: false)
+        previewListView.finishInteractivePaging()
+        previewPage = index
+    }
 }
 extension PhotoToolBarView {
     
@@ -638,6 +681,10 @@ extension PhotoToolBarView {
                 }
             }
             #endif
+            if isShowPreviewList {
+                previewListView.selectColor = isDark ? config.previewListTickDarkColor : config.previewListTickColor
+                previewListView.selectBgColor = isDark ? config.previewListTickBgDarkColor : config.previewListTickBgColor
+            }
             if isShowSelectedView {
                 selectedView.tickColor = isDark ? config.selectedViewTickDarkColor : config.selectedViewTickColor
             }
