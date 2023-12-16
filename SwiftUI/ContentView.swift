@@ -14,14 +14,33 @@ import HXPhotoPicker
 struct ContentView: View {
     @State var photoAssets: [PhotoAsset]
     @State var assets: [Asset]
+    @State var assetResults: [AssetResult] = []
+    @State var transitionTypes: [PhotoBrowser.TransitionType] = []
     
     init(photoAssets: [PhotoAsset], assets: [Asset]) {
         self.photoAssets = photoAssets
         self.assets = assets
+        var transitionTypes: [PhotoBrowser.TransitionType] = []
+        for _ in assets {
+            transitionTypes.append(.end)
+        }
+        self.transitionTypes = transitionTypes
+        
+        itemSpacing = 12
+        itemCount = UIDevice.isPad ? 5 : 3
+        let itemWidth = (UIDevice.screenSize.width - (itemSpacing * 2 + itemSpacing * (itemCount - 1))) / itemCount
+        itemSize = CGSize(width: itemWidth, height: itemWidth)
+        var items: [GridItem] = []
+        let count = Int(itemCount)
+        for _ in 0..<count {
+            items.append(.init(.fixed(itemSize.width), spacing: itemSpacing))
+        }
+        gridItemLayout = items
     }
     
     @State private var config: PickerConfiguration = {
         var config = PickerConfiguration.default
+        config.modalPresentationStyle = .fullScreen
         config.photoList.bottomView.disableFinishButtonWhenNotSelected = false
         return config
     }()
@@ -30,41 +49,41 @@ struct ContentView: View {
     @State private var isShowingDelete = false
     @State private var pageIndex: Int = 0
     @State private var draggedItem: Int = 0
+    private let itemSize: CGSize
+    private let itemCount: CGFloat
+    private let itemSpacing: CGFloat
+    private let gridItemLayout: [GridItem]
     
-    private var itemCount: CGFloat = UIDevice.isPad ? 5 : 3
-    private var itemSpacing: CGFloat = 12
-    private var gridItemLayout = {
-        var items: [GridItem] = []
-        let count = UIDevice.isPad ? 5 : 3
-        for _ in 0..<count {
-            items.append(.init(.flexible(), spacing: 12))
-        }
-        return items
-    }()
+    private let framesModel: FramesModel = .init()
     
     var body: some View {
         NavigationView {
-            GeometryReader { geometry in
+            GeometryReader { scrollProxy in
                 ScrollView {
                     LazyVGrid(columns: gridItemLayout, spacing: itemSpacing) {
-                        let itemWidth = (geometry.size.width - (itemSpacing * 2 + itemSpacing * (itemCount - 1))) / itemCount
-                        let itemSize = CGSize(width: itemWidth, height: itemWidth)
-                        ForEach(0..<assets.count, id:\.self) { index in
-                            let asset = assets[index]
+                        ForEach(Array(assets.enumerated()), id: \.element.id) { (index, asset) in
                             ZStack {
-                                PhotoView(asset: asset, imageSize: itemSize)
-                                    .onTapGesture {
+                                GeometryReader { proxy in
+                                    let frame = proxy.frame(in: .named("ScrollView"))
+                                    Button {
+                                        let scrollTop = scrollProxy.frame(in: .global).minY
                                         PhotoBrowser(
                                             pageIndex: index,
                                             rowCount: itemCount,
                                             photoAssets: $photoAssets,
-                                            assets: $assets
+                                            assets: $assets,
+                                            transitionTypes: $transitionTypes
                                         ).show(
                                             asset.result.image,
-                                            topMargin: geometry.frame(in: .global).minY,
                                             itemSize: itemSize
-                                        )
+                                        ) {
+                                            let frame = self.framesModel.frames[$0]
+                                            return .init(x: frame.minX, y: frame.minY + scrollTop)
+                                        }
+                                    } label: {
+                                        photoView(asset, index: index, frame: frame)
                                     }
+                                }
                                 VStack {
                                     HStack {
                                         Spacer()
@@ -93,20 +112,9 @@ struct ContentView: View {
                                     Spacer()
                                 }
                             }
+                            .frame(width: itemSize.width, height: itemSize.height)
                             .cornerRadius(5)
-                            .onDrag {
-                                draggedItem = index
-                                return NSItemProvider(object: "\(index)" as NSString)
-                            }
-                            .onDrop(
-                                of: ["\(index)"],
-                                delegate: DragDropDelegate(
-                                    fromIndex: $draggedItem,
-                                    toIndex: index,
-                                    photoAssets: $photoAssets,
-                                    assets: $assets
-                                )
-                            )
+                            .opacity(transitionTypes[index].opacity)
                         }
                         .padding([.leading, .trailing], itemSpacing)
                         
@@ -117,7 +125,7 @@ struct ContentView: View {
                             } label: {
                                 ZStack {
                                     Color(hex: 0xEEEEEE)
-                                        .frame(width: itemWidth, height: itemWidth)
+                                        .frame(width: itemSize.width, height: itemSize.height)
                                         .cornerRadius(5)
                                     Image(systemName: "plus")
                                         .foregroundColor(Color(hex: 0x999999))
@@ -135,43 +143,46 @@ struct ContentView: View {
                     }))
                     .padding([.leading, .trailing], itemSpacing)
                 }
-                .sheet(isPresented: $isShowingPicker, content: {
-                    PhotoPickerView(config: config, photoAssets: $photoAssets, assets: $assets)
+                .coordinateSpace(name: "ScrollView")
+                .fullScreenCover(isPresented: $isShowingPicker, content: {
+                    PhotoPickerView(config: config, photoAssets: $photoAssets, assetResults: $assetResults)
                         .ignoresSafeArea()
                 })
+    //                .sheet(isPresented: $isShowingPicker, content: {
+    //                    PhotoPickerView(config: config, photoAssets: $photoAssets, assetResults: $assetResults)
+    //                        .ignoresSafeArea()
+    //                })
                 .sheet(isPresented: $isShowingSetting, content: {
                     ConfigView(config: $config)
                         .ignoresSafeArea()
                 })
             }
         }
+        .onChange(of: photoAssets, perform: { newValue in
+            var transitionTypes: [PhotoBrowser.TransitionType] = []
+            for _ in newValue {
+                transitionTypes.append(.end)
+            }
+            self.transitionTypes = transitionTypes
+            var assets: [Asset] = []
+            var frames: [CGRect] = []
+            for (index, photoAsset) in newValue.enumerated() {
+                assets.append(.init(
+                    result: assetResults[index],
+                    videoDuration: photoAsset.videoTime ?? "",
+                    photoAsset: photoAsset
+                ))
+                frames.append(.zero)
+            }
+            framesModel.frames = frames
+            self.assets = assets
+        })
         .navigationViewStyle(StackNavigationViewStyle())
     }
-}
-
-@available(iOS 14.0, *)
-struct DragDropDelegate: DropDelegate {
-    @Binding var fromIndex: Int
-    let toIndex: Int
-    @Binding var photoAssets: [PhotoAsset]
-    @Binding var assets: [Asset]
-    
-    func dropEntered(info: DropInfo) {
-        if fromIndex != toIndex {
-            withAnimation {
-                photoAssets.swapAt(fromIndex, toIndex)
-                assets.swapAt(fromIndex, toIndex)
-            }
-            fromIndex = toIndex
-        }
-    }
-    
-    func dropUpdated(info: DropInfo) -> DropProposal? {
-        .init(operation: .move)
-    }
-    
-    func performDrop(info: DropInfo) -> Bool {
-        true
+    func photoView(_ asset: Asset, index: Int, frame: CGRect) -> AnyView {
+        framesModel.frames[index] = frame
+        return AnyView(PhotoView(asset: asset)
+            .frame(width: itemSize.width, height: itemSize.height))
     }
 }
 
@@ -186,4 +197,8 @@ extension Color {
             opacity: alpha
         )
     }
+}
+
+class FramesModel {
+    var frames: [CGRect] = []
 }

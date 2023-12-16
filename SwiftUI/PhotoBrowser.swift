@@ -14,12 +14,27 @@ import Foundation
 @available(iOS 13.0, *)
 struct PhotoBrowser {
     
+    enum TransitionType {
+        case start
+        case end
+        
+        var opacity: CGFloat {
+            switch self {
+            case .start:
+                return 0
+            case .end:
+                return 1
+            }
+        }
+    }
+    
     let pageIndex: Int
     let rowCount: CGFloat
     @Binding var photoAssets: [PhotoAsset]
     @Binding var assets: [Asset]
+    @Binding var transitionTypes: [TransitionType]
     
-    func show(_ image: UIImage, topMargin: CGFloat, itemSize: CGSize) {
+    func show(_ image: UIImage, itemSize: CGSize, pointHandler: @escaping (Int) -> CGPoint) {
         var config = HXPhotoPicker.PhotoBrowser.Configuration()
         config.showDelete = true
         HXPhotoPicker.PhotoBrowser.show(
@@ -28,20 +43,13 @@ struct PhotoBrowser {
             config: config,
             transitionalImage: image
         ) { index in
-            let count = index + 1
-            var row = CGFloat(count / Int(rowCount))
-            let remainder = CGFloat(count).truncatingRemainder(dividingBy: rowCount)
-            var xPadding: CGFloat = remainder
-            if remainder != 0 {
-                row += 1
-            }else {
-                xPadding = 3
-            }
-            let x: CGFloat = 12 * xPadding + (xPadding - 1) * itemSize.width
-            let y: CGFloat = topMargin + (row - 1) * (itemSize.height + 12)
-            let view = UIView(frame: .init(x: x, y: y, width: itemSize.width, height: itemSize.height))
+            transitionTypes[index] = .start
+            let point = pointHandler(index)
+            let view = UIView(frame: .init(x: point.x, y: point.y, width: itemSize.width, height: itemSize.height))
             view.layer.cornerRadius = 5
             return view
+        } transitionCompletion: { index in
+            transitionTypes[index] = .end
         } deleteAssetHandler: { index, _, browser in
             PhotoTools.showAlert(
                 viewController: browser,

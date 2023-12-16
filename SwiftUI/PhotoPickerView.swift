@@ -15,8 +15,7 @@ struct PhotoPickerView: UIViewControllerRepresentable {
     
     var config: PickerConfiguration
     @Binding var photoAssets: [PhotoAsset]
-    @Binding var assets: [Asset]
-    
+    @Binding var assetResults: [AssetResult]
 
     func makeUIViewController(context: Context) -> UIViewController {
         let controller: PhotoPickerController
@@ -31,16 +30,8 @@ struct PhotoPickerView: UIViewControllerRepresentable {
         Task {
             do {
                 let assetResults: [AssetResult] = try await controller.pickerAsset()
+                self.assetResults = assetResults
                 photoAssets = controller.selectedAssetArray
-                var assets: [Asset] = []
-                for (index, photoAsset) in photoAssets.enumerated() {
-                    assets.append(.init(
-                        result: assetResults[index],
-                        videoDuration: photoAsset.videoTime ?? "",
-                        photoAsset: photoAsset
-                    ))
-                }
-                self.assets = assets
             } catch {
                 let pickerError = error as! PickerError
                 print(pickerError)
@@ -55,14 +46,18 @@ struct PhotoPickerView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ photoPickerController: UIViewController, context: Context) {
         
-        
     }
  
 }
 
 @available(iOS 13.0, *)
-struct Asset {
+struct Asset: Equatable, Identifiable {
+    var id: String { photoAsset.phAsset?.localIdentifier ?? photoAsset.localAssetIdentifier }
     let result: AssetResult
     let videoDuration: String
     let photoAsset: PhotoAsset
+    
+    static func == (lhs: Asset, rhs: Asset) -> Bool {
+        lhs.photoAsset == rhs.photoAsset
+    }
 }
