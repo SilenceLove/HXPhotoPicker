@@ -80,7 +80,8 @@ class EditorFiltersView: UIView {
             addSubview(loaddingView)
             
             let operation = BlockOperation()
-            operation.addExecutionBlock { [unowned operation] in
+            operation.addExecutionBlock { [unowned operation, weak self] in
+                guard let self = self else { return }
                 if operation.isCancelled { return }
                 self.image = originalImage.scaleToFillSize(size: CGSize(width: 80, height: 80), equalRatio: true)
                 if operation.isCancelled { return }
@@ -97,7 +98,8 @@ class EditorFiltersView: UIView {
                 self.addSubview(self.loaddingView)
             }
             let operation = BlockOperation()
-            operation.addExecutionBlock { [unowned operation] in
+            operation.addExecutionBlock { [unowned operation, weak self] in
+                guard let self = self else { return }
                 if operation.isCancelled { return }
                 self.image = originalImage.scaleToFillSize(size: CGSize(width: 80, height: 80), equalRatio: true)
                 if operation.isCancelled { return }

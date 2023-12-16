@@ -217,7 +217,9 @@ class CameraRenderer {
     }
     
     deinit {
-        currentFilter.reset()
+        if !filters.isEmpty {
+            currentFilter.reset()
+        }
     }
 }
 

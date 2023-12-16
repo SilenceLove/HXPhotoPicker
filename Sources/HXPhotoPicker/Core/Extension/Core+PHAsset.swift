@@ -6,6 +6,7 @@
 //
 
 import Photos
+import UIKit
 
 extension PHAsset {
     

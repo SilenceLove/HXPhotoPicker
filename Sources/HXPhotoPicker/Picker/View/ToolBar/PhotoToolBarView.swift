@@ -505,6 +505,7 @@ extension PhotoToolBarView: PhotoPreviewListViewDataSource {
         switch reason {
         case .tapOnPageThumbnail, .scrollingBar:
             allowPreviewDidScroll = false
+            previewPage = page
             toolbarDelegate?.photoToolbar(self, previewMoveTo: previewAssets[page])
         case .configuration, .interactivePaging:
             break
@@ -600,6 +601,7 @@ extension PhotoToolBarView: PhotoPreviewListViewDataSource {
         let isMovingToNextPage = progress0To2 > 1
         let rawProgress = isMovingToNextPage ? (progress0To2 - 1) : (1 - progress0To2)
         let progress = didChange ? 1 : min(max(rawProgress, 0), 1)
+        
         switch previewListView.state {
         case .transitioningInteractively(_, let forwards):
             if progress == 1 {
@@ -610,7 +612,7 @@ extension PhotoToolBarView: PhotoPreviewListViewDataSource {
                 previewListView.cancelInteractivePaging()
             }
         case .collapsing, .collapsed, .expanding, .expanded:
-            if progress != 0 {
+            if progress != 0, !didChange {
                 previewListView.startInteractivePaging(forwards: isMovingToNextPage)
             }
         }

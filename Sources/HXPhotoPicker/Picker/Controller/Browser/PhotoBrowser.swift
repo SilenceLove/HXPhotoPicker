@@ -49,6 +49,9 @@ open class PhotoBrowser: PhotoPickerController {
     /// 转场动画时触发
     public var transitionAnimator: TransitionAnimator?
     
+    /// 转场动画结束时触发
+    public var transitionCompletion: TransitionCompletion?
+    
     /// 删除预览资源时触发
     public var deleteAssetHandler: AssetHandler?
     
@@ -130,6 +133,7 @@ open class PhotoBrowser: PhotoPickerController {
         numberOfPages: @escaping NumberOfPagesHandler,
         assetForIndex: @escaping RequiredAsset,
         transitionAnimator: TransitionAnimator? = nil,
+        transitionCompletion: TransitionCompletion? = nil,
         cellForIndex: CellReloadContext? = nil,
         cellWillDisplay: ContextUpdate? = nil,
         cellDidEndDisplaying: ContextUpdate? = nil,
@@ -143,6 +147,7 @@ open class PhotoBrowser: PhotoPickerController {
             transitionalImage: transitionalImage
         )
         browser.transitionAnimator = transitionAnimator
+        browser.transitionCompletion = transitionCompletion
         browser.numberOfPages = numberOfPages
         browser.assetForIndex = assetForIndex
         browser.cellWillDisplay = cellWillDisplay
@@ -173,6 +178,7 @@ open class PhotoBrowser: PhotoPickerController {
         fromVC: UIViewController? = nil,
         transitionalImage: UIImage? = nil,
         transitionHandler: TransitionAnimator? = nil,
+        transitionCompletion: TransitionCompletion? = nil,
         deleteAssetHandler: AssetHandler? = nil,
         longPressHandler: AssetHandler? = nil
     ) -> PhotoBrowser {
@@ -183,6 +189,7 @@ open class PhotoBrowser: PhotoPickerController {
             transitionalImage: transitionalImage
         )
         browser.transitionAnimator = transitionHandler
+        browser.transitionCompletion = transitionCompletion
         browser.deleteAssetHandler = deleteAssetHandler
         browser.longPressHandler = longPressHandler
         browser.show(fromVC)
@@ -452,6 +459,7 @@ extension PhotoBrowser {
     public typealias ContextUpdate = (PhotoPreviewViewCell, Int, PhotoBrowser) -> Void
     /// (当前转场动画对应的index) -> 动画开始/结束位置对应的View，用于获取坐标
     public typealias TransitionAnimator = (Int) -> UIView?
+    public typealias TransitionCompletion = (Int) -> Void
     /// (当前界面显示的index，对应的 PhotoAsset 对象，照片浏览器对象)
     public typealias AssetHandler = (Int, PhotoAsset, PhotoBrowser) -> Void
     /// (当前界面显示的index，照片浏览器对象)
@@ -667,6 +675,14 @@ extension PhotoBrowser: PhotoPickerControllerDelegate {
             pageIndicator?.alpha = 1
             gradualShadowImageView.alpha = 1
         }
+    }
+    
+    public func pickerController(_ pickerController: PhotoPickerController, previewPresentComplete atIndex: Int) {
+        transitionCompletion?(atIndex)
+    }
+    
+    public func pickerController(_ pickerController: PhotoPickerController, previewDismissComplete atIndex: Int) {
+        transitionCompletion?(atIndex)
     }
 }
 

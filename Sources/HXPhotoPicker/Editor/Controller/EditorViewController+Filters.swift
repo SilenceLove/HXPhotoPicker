@@ -24,7 +24,8 @@ extension EditorViewController: EditorFiltersViewDelegate {
                 imageFilterQueue.cancelAllOperations()
                 if filterEditFator.isApply {
                     let operation = BlockOperation()
-                    operation.addExecutionBlock { [unowned operation] in
+                    operation.addExecutionBlock { [unowned operation, weak self] in
+                        guard let self = self else { return }
                         if operation.isCancelled { return }
                         if let image = originalImage?.ci_Image?.apply(self.filterEditFator),
                            let cgImage = self.imageFilterContext.createCGImage(image, from: image.extent) {
@@ -62,7 +63,8 @@ extension EditorViewController: EditorFiltersViewDelegate {
                         editorView.mosaicCGImage = mosaicImage
                     }else {
                         let operation = BlockOperation()
-                        operation.addExecutionBlock { [unowned operation] in
+                        operation.addExecutionBlock { [unowned operation, weak self] in
+                            guard let self = self else { return }
                             if operation.isCancelled { return }
                             if let mosaic_Image = image.ci_Image?.applyMosaic(level: self.config.mosaic.mosaicWidth) {
                                 let mosaicCGImage = self.imageFilterContext.createCGImage(
@@ -86,7 +88,8 @@ extension EditorViewController: EditorFiltersViewDelegate {
             if let handler = filterInfo.filterHandler {
                 imageFilterQueue.cancelAllOperations()
                 let operation = BlockOperation()
-                operation.addExecutionBlock { [unowned operation] in
+                operation.addExecutionBlock { [unowned operation, weak self] in
+                    guard let self = self else { return }
                     if operation.isCancelled { return }
                     var ciImage = originalImage?.ci_Image
                     if self.filterEditFator.isApply {
@@ -199,7 +202,8 @@ extension EditorViewController: EditorFilterParameterViewDelegate {
                     var ciImage = originalImage?.ci_Image
                     imageFilterQueue.cancelAllOperations()
                     let operation = BlockOperation()
-                    operation.addExecutionBlock { [unowned operation] in
+                    operation.addExecutionBlock { [unowned operation, weak self] in
+                        guard let self = self else { return }
                         if operation.isCancelled { return }
                         if self.filterEditFator.isApply {
                             ciImage = ciImage?.apply(self.filterEditFator)
@@ -305,7 +309,8 @@ extension EditorViewController: EditorFilterParameterViewDelegate {
         let lastImage = editorView.image
         imageFilterQueue.cancelAllOperations()
         let operation = BlockOperation()
-        operation.addExecutionBlock { [unowned operation] in
+        operation.addExecutionBlock { [unowned operation, weak self] in
+            guard let self = self else { return }
             if operation.isCancelled { return }
             if self.filterEditFator.isApply {
                 ciImage = ciImage?.apply(self.filterEditFator)

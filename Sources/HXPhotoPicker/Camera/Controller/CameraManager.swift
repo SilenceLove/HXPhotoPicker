@@ -49,6 +49,7 @@ class CameraManager: NSObject {
     private var didWriterVideoInput = false
     private var videoInpuCompletion = false
     private var audioInpuCompletion = false
+    private var isDevicePortrait = true
     let videoFilter: CameraRenderer
     let photoFilter: CameraRenderer
     var filterIndex: Int {
@@ -64,18 +65,23 @@ class CameraManager: NSObject {
     init(config: CameraConfiguration) {
         self.flashMode = config.flashMode
         self.config = config
-        var photoFilters = self.config.photoFilters
-        photoFilters.insert(OriginalFilter(), at: 0)
-        var videoFilters = self.config.videoFilters
-        videoFilters.insert(OriginalFilter(), at: 0)
-        var index = config.defaultFilterIndex
-        if index == -1 {
-            index = 0
+        if config.cameraType == .metal {
+            var photoFilters = self.config.photoFilters
+            photoFilters.insert(OriginalFilter(), at: 0)
+            var videoFilters = self.config.videoFilters
+            videoFilters.insert(OriginalFilter(), at: 0)
+            var index = config.defaultFilterIndex
+            if index == -1 {
+                index = 0
+            }else {
+                index += 1
+            }
+            self.photoFilter = .init(photoFilters, index)
+            self.videoFilter = .init(videoFilters, index)
         }else {
-            index += 1
+            self.photoFilter = .init([], 0)
+            self.videoFilter = .init([], 0)
         }
-        self.photoFilter = .init(photoFilters, index)
-        self.videoFilter = .init(videoFilters, index)
         super.init()
         videoOutput = AVCaptureVideoDataOutput()
         videoOutput.videoSettings = [
@@ -419,8 +425,13 @@ extension CameraManager {
         guard let device = activeCamera else {
             return
         }
-        let textureRect = CGRect(origin: point, size: .zero)
-        let deviceRect = videoOutput.metadataOutputRectConverted(fromOutputRect: textureRect)
+        let deviceRect: CGRect
+        if config.cameraType == .metal {
+            let textureRect = CGRect(origin: point, size: .zero)
+            deviceRect = videoOutput.metadataOutputRectConverted(fromOutputRect: textureRect)
+        }else {
+            deviceRect = .init(origin: point, size: .zero)
+        }
         let exposureMode = AVCaptureDevice.ExposureMode.continuousAutoExposure
         let focusMode = AVCaptureDevice.FocusMode.continuousAutoFocus
         let canResetFocus = device.isFocusPointOfInterestSupported &&
@@ -578,7 +589,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         )
         DispatchQueue.global().async {
             var finalPixelBuffer = photoPixelBuffer
-            if self.photoFilter.filterIndex > 0 {
+            if self.config.cameraType == .metal, self.photoFilter.filterIndex > 0 {
                 if !self.photoFilter.isPrepared {
                     if let formatDescription = photoFormatDescription {
                         self.photoFilter.prepare(
@@ -652,7 +663,7 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
                 return
             }
             finalVideoPixelBuffer = videoPixelBuffer
-            if videoFilter.filterIndex > 0 {
+            if config.cameraType == .metal, videoFilter.filterIndex > 0 {
                 if !videoFilter.isPrepared {
                     videoFilter.prepare(
                         with: formatDescription,
@@ -836,14 +847,57 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
             ]
         )
         videoInput.expectsMediaDataInRealTime = true
-//        videoInput.transform = .init(rotationAngle: .pi * 0.5)
-//        if currentOrienation == .landscapeRight {
-//            videoInput.transform = videoInput.transform.rotated(by: .pi * -0.5)
-//        }else if currentOrienation == .landscapeLeft {
-//            videoInput.transform = videoInput.transform.rotated(by: .pi * 0.5)
-//        }
+        
+        var isFront: Bool = false
         if let position = activeCamera?.position, position == .front {
+            isFront = true
             videoInput.transform = videoInput.transform.scaledBy(x: -1, y: 1)
+        }
+        
+        if isDevicePortrait {
+            if currentOrienation == .landscapeRight {
+                if config.cameraType == .metal {
+                    if !isFront {
+                        videoInput.transform = videoInput.transform.rotated(by: .pi * -0.5)
+                    }else {
+                        videoInput.transform = videoInput.transform.rotated(by: .pi * 0.5)
+                    }
+                }else {
+                    if isFront {
+                        videoInput.transform = videoInput.transform.rotated(by: .pi)
+                    }
+                }
+            }else if currentOrienation == .landscapeLeft {
+                if config.cameraType == .metal {
+                    if !isFront {
+                        videoInput.transform = videoInput.transform.rotated(by: .pi * 0.5)
+                    }else {
+                        videoInput.transform = videoInput.transform.rotated(by: -.pi * 0.5)
+                    }
+                }else {
+                    if !isFront {
+                        videoInput.transform = videoInput.transform.rotated(by: .pi)
+                    }
+                }
+            }else {
+                if config.cameraType == .normal {
+                    videoInput.transform = videoInput.transform.rotated(by: .pi * 0.5)
+                }
+            }
+        }else {
+            if currentOrienation == .landscapeRight {
+                if config.cameraType == .normal {
+                    if isFront {
+                        videoInput.transform = videoInput.transform.rotated(by: .pi)
+                    }
+                }
+            }else if currentOrienation == .landscapeLeft {
+                if config.cameraType == .normal {
+                    if !isFront {
+                        videoInput.transform = videoInput.transform.rotated(by: .pi)
+                    }
+                }
+            }
         }
         
         let audioInput = AVAssetWriterInput(
@@ -877,8 +931,10 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
     }
     
     func resetFilter() {
-        videoFilter.reset()
-        photoFilter.reset()
+        if config.cameraType == .metal {
+            videoFilter.reset()
+            photoFilter.reset()
+        }
     }
 }
 
@@ -904,9 +960,11 @@ extension CameraManager {
         }
         if let connection = photoOutput.connection(with: .video) {
             if connection.isVideoMirroringSupported {
+                connection.automaticallyAdjustsVideoMirroring = false
                 connection.isVideoMirrored = false
             }
         }
+        isDevicePortrait = UIDevice.isPortrait
         recordDuration = 0
         captureState = .start
         isRecording = true

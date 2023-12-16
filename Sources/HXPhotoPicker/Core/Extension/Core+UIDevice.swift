@@ -16,14 +16,12 @@ extension UIDevice {
         if isPad {
             return true
         }
+        let statusBarOrientation = UIApplication.interfaceOrientation
         if  statusBarOrientation == .landscapeLeft ||
             statusBarOrientation == .landscapeRight {
             return false
         }
         return true
-    }
-    class var statusBarOrientation: UIInterfaceOrientation {
-        UIApplication.shared.statusBarOrientation
     }
     class var navigationBarHeight: CGFloat {
         if #available(iOS 12, *), isPad {

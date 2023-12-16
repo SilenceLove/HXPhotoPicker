@@ -181,7 +181,8 @@ extension PickerManager {
     ) {
         cancelFetchAssetQueue()
         let operation = BlockOperation()
-        operation.addExecutionBlock { [unowned operation] in
+        operation.addExecutionBlock { [unowned operation, weak self] in
+            guard let self = self else { return }
             for photoAsset in self.localAssetArray {
                 photoAsset.isSelected = false
             }
@@ -327,7 +328,8 @@ public extension PickerManager {
             return
         }
         let operation = BlockOperation()
-        operation.addExecutionBlock { [unowned operation] in
+        operation.addExecutionBlock { [unowned operation, weak self] in
+            guard let self = self else { return }
             var totalFileSize = 0
             for photoAsset in self.selectedAssetArray {
                 if operation.isCancelled {

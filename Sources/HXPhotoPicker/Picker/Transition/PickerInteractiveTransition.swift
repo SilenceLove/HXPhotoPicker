@@ -481,17 +481,17 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 previewViewController.photoToolbar.mask = nil
                 toVC?.photoToolbar.mask = nil
                 self.toView?.isHidden = false
+                if self.type == .dismiss, let picker {
+                    picker.pickerDelegate?.pickerController(
+                        picker,
+                        previewDismissComplete: previewViewController.currentPreviewIndex
+                    )
+                }
                 UIView.animate(withDuration: 0.2) {
                     previewView.alpha = 0
                 } completion: { _ in
                     previewView.isUserInteractionEnabled = true
                     previewView.removeFromSuperview()
-                    if self.type == .dismiss, let picker {
-                        picker.pickerDelegate?.pickerController(
-                            picker,
-                            previewDismissComplete: previewViewController.currentPreviewIndex
-                        )
-                    }
                     self.previewView = nil
                     self.previewViewController = nil
                     self.toView = nil

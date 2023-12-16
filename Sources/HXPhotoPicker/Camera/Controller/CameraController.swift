@@ -15,6 +15,7 @@ open class CameraController: UINavigationController {
     
     public enum CameraType {
         case normal
+        case metal
     }
     
     /// 相机拍摄类型

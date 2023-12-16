@@ -257,7 +257,8 @@ extension EditorViewController {
             let lastImage = editorView.image
             imageFilterQueue.cancelAllOperations()
             let operation = BlockOperation()
-            operation.addExecutionBlock { [unowned operation] in
+            operation.addExecutionBlock { [unowned operation, weak self] in
+                guard let self = self else { return }
                 if operation.isCancelled { return }
                 var ciImage = originalImage?.ci_Image
                 if self.filterEditFator.isApply {
@@ -295,7 +296,8 @@ extension EditorViewController {
             if filterEditFator.isApply {
                 imageFilterQueue.cancelAllOperations()
                 let operation = BlockOperation()
-                operation.addExecutionBlock { [unowned operation] in
+                operation.addExecutionBlock { [unowned operation, weak self] in
+                    guard let self = self else { return }
                     if operation.isCancelled { return }
                     var ciImage = originalImage?.ci_Image
                     if self.filterEditFator.isApply {

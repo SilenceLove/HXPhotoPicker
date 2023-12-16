@@ -8,7 +8,7 @@
 import UIKit
 
 extension UIApplication {
-    class var _keyWindow: UIWindow? {
+    static var _keyWindow: UIWindow? {
         if #available(iOS 13.0, *), Thread.isMainThread,
            let window = shared.windows.filter({ $0.isKeyWindow }).last {
             return window
@@ -17,6 +17,14 @@ extension UIApplication {
             return shared.keyWindow
         }
         return window
+    }
+    
+    static var interfaceOrientation: UIInterfaceOrientation {
+        if #available(iOS 13.0, *), Thread.isMainThread,
+           let orientation = _keyWindow?.windowScene?.interfaceOrientation {
+            return orientation
+        }
+        return shared.statusBarOrientation
     }
 }
 

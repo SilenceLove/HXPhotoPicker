@@ -101,6 +101,10 @@ public final class PhotoManager: NSObject {
     }
     #endif
     
+    #if HXPICKER_ENABLE_CAMERA
+    var cameraType: CameraController.CameraType = .normal
+    #endif
+    
     let uuid: String = UUID().uuidString
     
     private override init() {

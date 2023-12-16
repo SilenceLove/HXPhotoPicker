@@ -50,7 +50,7 @@ class PhotoPreviewListViewCell: UICollectionViewCell {
     }
     
     func reqeustAssetImage() {
-        photoView.requestThumbnailImage(targetWidth: width * 2)
+        photoView.requestThumbnailImage(targetWidth: width * 1.5)
     }
     
     func cancelRequest() {

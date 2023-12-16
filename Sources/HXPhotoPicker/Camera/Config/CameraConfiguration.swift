@@ -94,18 +94,22 @@ public struct CameraConfiguration: IndicatorTypeConfig {
     /// 摄像头最大缩放比例
     public var videoMaxZoomScale: CGFloat = 6
     
+    /// cameraType == .metal 时才有效
     /// 默认滤镜对应滤镜数组的下标，为 -1 默认不加滤镜
     public var defaultFilterIndex: Int = -1
     
+    /// cameraType == .metal 时才有效
     /// 切换滤镜显示名称
     public var changeFilterShowName: Bool = true
     
+    /// cameraType == .metal 时才有效
     /// 拍照时的滤镜数组，请与 videoFilters 效果保持一致
     /// 左滑/右滑切换滤镜
     public var photoFilters: [CameraFilter] = [
         InstantFilter(), Apply1977Filter(), ToasterFilter(), TransferFilter()
     ]
     
+    /// cameraType == .metal 时才有效
     /// 录制视频的滤镜数组，请与 photoFilters 效果保持一致
     /// 左滑/右滑切换滤镜
     public var videoFilters: [CameraFilter] = [

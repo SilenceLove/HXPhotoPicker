@@ -99,7 +99,8 @@ open class PhotoFetchData {
         let localAssets = pickerData.localAssets
         let localCameraAssets = pickerData.localCameraAssets
         let operation = BlockOperation()
-        operation.addExecutionBlock { [unowned operation] in
+        operation.addExecutionBlock { [unowned operation, weak self] in
+            guard let self = self else { return }
             var localCount = localAssets.count + localCameraAssets.count
             var coverImage = localCameraAssets.first?.originalImage
             if coverImage == nil {
@@ -179,8 +180,9 @@ open class PhotoFetchData {
         let localAssets = pickerData.localAssets
         let localCameraAssets = pickerData.localCameraAssets
         let operation = BlockOperation()
-        operation.addExecutionBlock { [unowned operation] in
+        operation.addExecutionBlock { [unowned operation, weak self] in
             if operation.isCancelled { return }
+            guard let self = self else { return}
             localAssets.forEach { $0.isSelected = false }
             localCameraAssets.forEach { $0.isSelected = false }
             let result = self.config.fetchAsset.fetchPhotoAssets(
