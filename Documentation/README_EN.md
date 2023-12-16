@@ -85,7 +85,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.1.2"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.1.3"))
 ]
 ```
 
@@ -277,7 +277,7 @@ photoAsset.getURL(compression: compression) { result in
   
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
-| [v4.1.2](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#412) | 2023-12-02 | 15.0.0 | 5.9.0 | 12.0+ |
+| [v4.1.3](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#413) | 2023-12-16 | 15.0.0 | 5.9.0 | 12.0+ |
 
 </details>
 
@@ -286,6 +286,7 @@ photoAsset.getURL(compression: compression) { result in
   
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v4.1.2](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#412) | 2023-12-02 | 15.0.0 | 5.9.0 | 12.0+ |
 | [v4.1.1](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#411) | 2023-11-14 | 15.0.0 | 5.9.0 | 12.0+ |
 | [v4.1.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#410) | 2023-11-07 | 15.0.0 | 5.9.0 | 12.0+ |
 | [v4.0.9](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#409) | 2023-10-22 | 15.0.0 | 5.9.0 | 12.0+ |

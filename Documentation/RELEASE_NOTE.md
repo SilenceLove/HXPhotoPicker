@@ -1,5 +1,14 @@
 # Release Notes
 
+## 4.1.3
+
+### Resolved
+
+- Picker
+  - The list at the bottom of the preview interface may be messed up
+- [[605]](https://github.com/SilenceLove/HXPhotoPicker/issues/605)
+- [[599]](https://github.com/SilenceLove/HXPhotoPicker/issues/599)
+
 ## 4.1.2
 
 ### Added

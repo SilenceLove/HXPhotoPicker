@@ -1,5 +1,14 @@
 # 更新日志 
 
+## 4.1.3
+
+### 修复
+
+- Picker
+  - 预览界面底部列表可能错乱的问题
+- [[605]](https://github.com/SilenceLove/HXPhotoPicker/issues/605)
+- [[599]](https://github.com/SilenceLove/HXPhotoPicker/issues/599)
+
 ## 4.1.2
 
 ### 新增
