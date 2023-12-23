@@ -63,12 +63,19 @@ extension PhotoPickerViewController {
             }else {
                 ProgressHUD.hide(forView: self.navigationController?.view, animated: false)
             }
-            if AssetManager.authorizationStatusIsLimited(),
-               self.pickerConfig.isRemoveSelectedAssetWhenRemovingAssets {
-                self.photoToolbar.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
-                self.photoToolbar.updateSelectedAssets(self.pickerController.selectedAssetArray)
-                self.finishItem?.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
-                self.requestSelectedAssetFileSize()
+            if AssetManager.authorizationStatusIsLimited() {
+                if self.pickerConfig.isRemoveSelectedAssetWhenRemovingAssets {
+                    self.photoToolbar.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
+                    self.photoToolbar.updateSelectedAssets(self.pickerController.selectedAssetArray)
+                    self.finishItem?.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
+                    self.requestSelectedAssetFileSize()
+                }
+                if let previewViewController = self.navigationController?.topViewController as? PhotoPreviewViewController {
+                    previewViewController.updateAsstes(for: result.assets)
+                }else if let presentedViewController = self.presentedViewController as? PhotoPickerController,
+                         let previewViewController = presentedViewController.previewViewController {
+                    previewViewController.updateAsstes(for: result.assets)
+                }
             }
         }
     }
@@ -87,6 +94,7 @@ extension PhotoPickerViewController {
             }
             assetCollection = collection
         }
+        initView()
         updateTitle()
         fetchPhotoAssets()
         reloadAlbumData()

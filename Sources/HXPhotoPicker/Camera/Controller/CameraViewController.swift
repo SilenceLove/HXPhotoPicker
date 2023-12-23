@@ -223,6 +223,7 @@ open class CameraViewController: BaseViewController {
     }
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        guard UIImagePickerController.isSourceTypeAvailable(.camera), let cameraManager else { return }
         let isFront = cameraManager.activeCamera?.position == .front
         DispatchQueue.global().async {
             if let sampleBuffer = PhotoManager.shared.sampleBuffer,
@@ -239,9 +240,6 @@ open class CameraViewController: BaseViewController {
                 PhotoManager.shared.saveCameraPreview()
                 PhotoManager.shared.sampleBuffer = nil
             }
-        }
-        if !UIImagePickerController.isSourceTypeAvailable(.camera) {
-            return
         }
         cameraManager.stopRunning()
         if config.cameraType == .metal {

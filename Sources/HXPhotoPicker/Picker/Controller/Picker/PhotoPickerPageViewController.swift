@@ -91,6 +91,7 @@ public class PhotoPickerPageViewController: BaseViewController, PhotoPickerList 
                 contentVCs.insert(vc, at: 0)
             }
             headerView.titles = titles
+            headerView.selectedIndex = 0
             
             scrollView.subviews.forEach { $0.removeFromSuperview() }
             children.forEach { $0.removeFromParent() }
@@ -99,6 +100,7 @@ public class PhotoPickerPageViewController: BaseViewController, PhotoPickerList 
                 scrollView.addSubview($0.view)
             }
             layoutViews()
+            scrollView.contentOffset = .zero
         }
     }
     

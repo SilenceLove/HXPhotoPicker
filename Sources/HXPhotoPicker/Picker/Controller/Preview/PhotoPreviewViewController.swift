@@ -654,4 +654,35 @@ extension PhotoPreviewViewController {
             }
         }
     }
+    
+    func updateAsstes(for assets: [PhotoAsset]) {
+        previewAssets = assets
+        collectionView.reloadData()
+        let count = assetCount
+        if count > 0 {
+            var page = currentPreviewIndex
+            if page > count - 1 {
+                DispatchQueue.main.async {
+                    self.scrollToItem(count - 1)
+                }
+                page = count - 1
+            }else {
+                DispatchQueue.main.async {
+                    self.scrollViewDidScroll(self.collectionView)
+                    self.startRequestPreviewTimer()
+                }
+            }
+            if isShowToolbar {
+                photoToolbar.configPreviewList(assets, page: page)
+                configBottomViewFrame()
+            }
+        }else {
+            if let viewControllers = navigationController?.viewControllers,
+               viewControllers.count > 1 {
+                navigationController?.popViewController(animated: true)
+            }else {
+                dismiss(animated: true, completion: nil)
+            }
+        }
+    }
 }

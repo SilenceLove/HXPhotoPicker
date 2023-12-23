@@ -97,17 +97,15 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
         case .preview:
             return pickerConfig.previewView.bottomView.isShowSelectedView && pickerConfig.selectMode == .multiple && !isShowPreviewList
         case .browser:
-            return true
+            return !isShowPreviewList
         }
     }
     private var isShowPreviewList: Bool {
         switch type {
         case .picker:
             return false
-        case .preview:
+        case .preview, .browser:
             return pickerConfig.previewView.bottomView.isShowPreviewList
-        case .browser:
-            return false
         }
     }
     
@@ -181,8 +179,16 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
             #endif
         }else {
             viewConfig = pickerConfig.previewView.bottomView
-            initSelectedView()
-            selectedView.allowDrop = false
+            if isShowPreviewList {
+                previewListView = PhotoPreviewListView(frame: .init(x: 0, y: 0, width: width, height: 55))
+                previewListView.dataSource = self
+                addSubview(previewListView)
+            }else {
+                if isShowSelectedView {
+                    initSelectedView()
+                    selectedView.allowDrop = false
+                }
+            }
         }
         
         if type != .browser {
@@ -230,6 +236,16 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
             contentView.addSubview(finishBtn)
         }
         layoutSubviews()
+        bringSubviewToFront(contentView)
+        if selectedView != nil {
+            bringSubviewToFront(selectedView)
+        }
+        if previewListView != nil {
+            bringSubviewToFront(previewListView)
+        }
+        if promptView != nil {
+            bringSubviewToFront(promptView)
+        }
         configColor()
     }
     
@@ -313,8 +329,12 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     
     public func updateSelectedAssets(_ photoAssets: [PhotoAsset]) {
         if !isShowSelectedView { return }
-        if isShowPrompt, selectedView.photoAssetArray.isEmpty, !photoAssets.isEmpty {
-            promptView.alpha = 0
+        if isShowPrompt {
+            if selectedView.photoAssetArray.isEmpty, !photoAssets.isEmpty {
+                promptView.alpha = 0
+            }else if photoAssets.isEmpty {
+                promptView.alpha = 1
+            }
         }
         selectedView.reloadData(photoAssets: photoAssets)
     }
@@ -462,8 +482,15 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
             updateFinishButtonFrame()
             updateOriginalViewFrame()
         }else {
-            selectedView.y = 0
-            selectedView.width = width
+            if isShowPreviewList {
+                previewListView.y = 10
+                previewListView.width = width
+            }else {
+                if isShowSelectedView {
+                    selectedView.y = 0
+                    selectedView.width = width
+                }
+            }
         }
     }
     
@@ -728,7 +755,13 @@ extension PhotoToolBarView {
                 for: .disabled
             )
         }else {
-            selectedView.tickColor = isDark ? config.selectedViewTickDarkColor : config.selectedViewTickColor
+            if isShowPreviewList {
+                previewListView.selectColor = isDark ? config.previewListTickDarkColor : config.previewListTickColor
+                previewListView.selectBgColor = isDark ? config.previewListTickBgDarkColor : config.previewListTickBgColor
+            }
+            if isShowSelectedView {
+                selectedView.tickColor = isDark ? config.selectedViewTickDarkColor : config.selectedViewTickColor
+            }
         }
     }
 }

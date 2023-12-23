@@ -31,7 +31,11 @@ extension PhotoPreviewViewController: PhotoToolBarDelegate {
             photoToolbar.selectedAssetDidChanged(selectedAssetArray)
             photoToolbar.configPreviewList(previewAssets, page: currentPreviewIndex)
         }else {
-            photoToolbar.updateSelectedAssets(previewAssets)
+            if config.bottomView.isShowPreviewList {
+                photoToolbar.configPreviewList(previewAssets, page: currentPreviewIndex)
+            }else {
+                photoToolbar.updateSelectedAssets(previewAssets)
+            }
         }
     }
     

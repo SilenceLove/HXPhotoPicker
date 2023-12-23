@@ -221,6 +221,9 @@ extension PhotoPickerViewController: PhotoPickerControllerDelegate {
         _ pickerController: PhotoPickerController,
         dismissPreviewViewForIndexAt index: Int
     ) -> UIView? {
+        if pickerController.previewAssets.isEmpty {
+            return nil
+        }
         let photoAsset = pickerController.previewAssets[index]
         if let cell = listView.getCell(for: photoAsset) {
             listView.scrollCellToVisibleArea(cell)

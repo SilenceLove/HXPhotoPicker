@@ -25,7 +25,7 @@ public class PhotoPickerViewController: PhotoBaseViewController {
     var albumView: PhotoAlbumList!
     var photoToolbar: PhotoToolBar!
     var isShowToolbar: Bool = false
-    
+    var didInitViews: Bool = false
     var showLoading: Bool = false
     
     var orientationDidChange: Bool = false
@@ -194,6 +194,7 @@ public class PhotoPickerViewController: PhotoBaseViewController {
         if isShowToolbar {
             photoToolbar.viewDidAppear(self)
         }
+        weakController?.resetDelegate()
     }
     
     public override func viewWillDisappear(_ animated: Bool) {
@@ -221,7 +222,11 @@ public class PhotoPickerViewController: PhotoBaseViewController {
 
 extension PhotoPickerViewController {
     
-    private func initView() {
+    func initView() {
+        if didInitViews {
+            return
+        }
+        didInitViews = true
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
         if #unavailable(iOS 11.0) {

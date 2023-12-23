@@ -30,7 +30,12 @@ extension PhotoPickerController: PhotoPickerDataDelegate {
     }
     
     public func pickerData(_ pickerData: PhotoPickerData, removeSelectedAssetWhenRemovingAssets photoAssets: [PhotoAsset]) {
-        previewViewController?.removeSelectedAssetWhenRemovingAssets(photoAssets)
+        if let presentedViewController = presentedViewController as? PhotoPickerController,
+           let previewViewController = presentedViewController.previewViewController {
+            previewViewController.removeSelectedAssetWhenRemovingAssets(photoAssets)
+        }else {
+            previewViewController?.removeSelectedAssetWhenRemovingAssets(photoAssets)
+        }
     }
 }
 

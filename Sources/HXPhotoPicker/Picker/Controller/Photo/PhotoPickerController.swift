@@ -403,6 +403,10 @@ open class PhotoPickerController: UINavigationController {
         }
     }
     
+    func resetDelegate() {
+        delegate = self
+    }
+    
     public override func present(
         _ viewControllerToPresent: UIViewController,
         animated flag: Bool,
