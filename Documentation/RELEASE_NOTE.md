@@ -1,5 +1,14 @@
 # Release Notes
 
+## 4.1.4
+
+### Resolved
+
+- [[613]](https://github.com/SilenceLove/HXPhotoPicker/issues/613)
+- [[612]](https://github.com/SilenceLove/HXPhotoPicker/issues/612)
+- [[610]](https://github.com/SilenceLove/HXPhotoPicker/issues/610)
+- [[591]](https://github.com/SilenceLove/HXPhotoPicker/issues/591)
+
 ## 4.1.3
 
 ### Resolved
