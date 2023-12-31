@@ -255,6 +255,12 @@ class PhotoPreviewListView: UIView {
         }
         let layout = PhotoPreviewListViewLayout(style: style)
         collectionView.setCollectionViewLayout(layout, animated: animated)
+        if let indexPath {
+            DispatchQueue.main.async {
+                let cell = self.collectionView.cellForItem(at: indexPath) as? PhotoPreviewListViewCell
+                cell?.reqeustAssetImage(3)
+            }
+        }
     }
     
     /// Expand an item and scroll there.
