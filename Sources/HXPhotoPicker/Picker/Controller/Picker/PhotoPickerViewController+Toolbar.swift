@@ -103,6 +103,10 @@ extension PhotoPickerViewController: PhotoToolBarDelegate {
         #endif
         listView.updateCellSelectedTitle()
         photoToolbar.removeSelectedAssets([asset])
+        if pickerController.isOriginal {
+            photoToolbar.requestOriginalAssetBtyes()
+        }
+        photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
         updateToolbarFrame()
     }
     
