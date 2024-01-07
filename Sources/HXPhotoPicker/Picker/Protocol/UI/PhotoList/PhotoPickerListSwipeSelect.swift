@@ -352,8 +352,8 @@ public extension PhotoPickerListSwipeSelect {
                     cell.updateSelectedState(isSelected: isSelected, animated: false)
                 }
             }
+            delegate?.photoList(selectedAssetDidChanged: self as! PhotoPickerList)
         }
-        delegate?.photoList(selectedAssetDidChanged: self as! PhotoPickerList)
         if pickerController.pickerData.isFull && showHUD {
             swipeSelectPanGR?.isEnabled = false
             ProgressHUD.showWarning(
