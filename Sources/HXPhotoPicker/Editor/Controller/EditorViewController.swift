@@ -397,13 +397,17 @@ open class EditorViewController: BaseViewController {
             if UIDevice.isPortrait {
                 let top: CGFloat
                 let bottom: CGFloat
+                var bottomMargin = UIDevice.bottomMargin
+                if !self.isFullScreen, UIDevice.isPad {
+                    bottomMargin = 0
+                }
                 if self.config.buttonType == .bottom {
                     if self.isFullScreen {
                         top = UIDevice.isPad ? 50 : UIDevice.topMargin + 10
                     }else {
                         top = 30
                     }
-                    bottom = UIDevice.bottomMargin + 55 + 140
+                    bottom = bottomMargin + 55 + 140
                 }else {
                     let navHeight: CGFloat
                     if let barHeight = self.navigationController?.navigationBar.height {
@@ -427,9 +431,9 @@ open class EditorViewController: BaseViewController {
                         top = navHeight + 15
                     }
                     if UIDevice.isPad {
-                        bottom = UIDevice.bottomMargin + 160
+                        bottom = bottomMargin + 160
                     }else {
-                        bottom = UIDevice.bottomMargin + 140
+                        bottom = bottomMargin + 140
                     }
                 }
                 let left = UIDevice.isPad ? 30 : UIDevice.leftMargin + 15
@@ -833,15 +837,18 @@ open class EditorViewController: BaseViewController {
         }
         
         if config.buttonType == .bottom {
-            cancelButton.y = view.height - UIDevice.bottomMargin - buttonHeight
+            var bottomMargin = UIDevice.bottomMargin
+            if !isFullScreen, UIDevice.isPad {
+                bottomMargin = 0
+            }
+            cancelButton.y = view.height - bottomMargin - buttonHeight
             finishButton.centerY = cancelButton.centerY
             resetButton.centerY = cancelButton.centerY
-            
             toolsView.frame = CGRect(
                 x: cancelButton.frame.maxX,
-                y: view.height - UIDevice.bottomMargin - buttonHeight,
+                y: view.height - bottomMargin - buttonHeight,
                 width: finishButton.x - cancelButton.frame.maxX,
-                height: buttonHeight + UIDevice.bottomMargin
+                height: buttonHeight + bottomMargin
             )
             if !config.cropSize.aspectRatios.isEmpty {
                 ratioToolView.frame = .init(x: 0, y: toolsView.y - 40, width: view.width, height: 40)
@@ -864,9 +871,13 @@ open class EditorViewController: BaseViewController {
                 ratioToolHeight = 40
             }
             #endif
+            var bottomMargin = UIDevice.bottomMargin
             if isFullScreen {
                 cancelButton.centerY = navY + navHeight / 2
             }else {
+                if UIDevice.isPad {
+                    bottomMargin = 0
+                }
                 cancelButton.centerY = navHeight / 2
             }
             finishButton.centerY = cancelButton.centerY
@@ -874,15 +885,15 @@ open class EditorViewController: BaseViewController {
              
             toolsView.frame = CGRect(
                 x: 0,
-                y: view.height - UIDevice.bottomMargin - toolsHeight,
+                y: view.height - bottomMargin - toolsHeight,
                 width: view.width,
-                height: toolsHeight + UIDevice.bottomMargin
+                height: toolsHeight + bottomMargin
             )
             let rotateBottom: CGFloat
             if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
-                rotateBottom = UIDevice.bottomMargin + 5
+                rotateBottom = bottomMargin + 5
             }else {
-                rotateBottom = UIDevice.isPad ? UIDevice.bottomMargin + 10 : UIDevice.bottomMargin
+                rotateBottom = UIDevice.isPad ? bottomMargin + 10 : bottomMargin
             }
             if !config.cropSize.aspectRatios.isEmpty {
                 ratioToolView.frame = .init(
