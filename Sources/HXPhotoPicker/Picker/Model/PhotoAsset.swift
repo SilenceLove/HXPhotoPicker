@@ -64,6 +64,8 @@ open class PhotoAsset: Equatable, PhotoAssetEquatable {
     public var originalImage: UIImage? { getOriginalImage() }
 
     /// 图片/视频文件大小
+    /// 1000 = 1kb
+    /// 1000000 = 1Mb
     public var fileSize: Int { getFileSize() }
     
     /// 视频时长 格式：00:00
