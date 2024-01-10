@@ -414,20 +414,46 @@ struct EditorCanvasData: Codable {
                     for point in points {
                         let xScale = point.location.x / size.width
                         let yScale = point.location.y / size.height
-                        let newPoint = PKStrokePoint(
-                            location: .init(x: viewSize.width * xScale, y: viewSize.height * yScale),
-                            timeOffset: point.timeOffset,
-                            size: point.size,
-                            opacity: point.opacity,
-                            force: point.force,
-                            azimuth: point.azimuth,
-                            altitude: point.altitude
-                        )
+                        let newPoint: PKStrokePoint
+                        if #available(iOS 17.0, *) {
+                            #if swift(>=5.9)
+                            newPoint = PKStrokePoint(
+                                location: .init(x: viewSize.width * xScale, y: viewSize.height * yScale),
+                                timeOffset: point.timeOffset,
+                                size: point.size,
+                                opacity: point.opacity,
+                                force: point.force,
+                                azimuth: point.azimuth,
+                                altitude: point.altitude,
+                                secondaryScale: point.secondaryScale
+                            )
+                            #else
+                            newPoint = PKStrokePoint(
+                                location: .init(x: viewSize.width * xScale, y: viewSize.height * yScale),
+                                timeOffset: point.timeOffset,
+                                size: point.size,
+                                opacity: point.opacity,
+                                force: point.force,
+                                azimuth: point.azimuth,
+                                altitude: point.altitude
+                            )
+                            #endif
+                        }else {
+                            newPoint = PKStrokePoint(
+                                location: .init(x: viewSize.width * xScale, y: viewSize.height * yScale),
+                                timeOffset: point.timeOffset,
+                                size: point.size,
+                                opacity: point.opacity,
+                                force: point.force,
+                                azimuth: point.azimuth,
+                                altitude: point.altitude
+                            )
+                        }
                         newPoints.append(newPoint)
                     }
                     let newPath = PKStrokePath(controlPoints: newPoints, creationDate: path.creationDate)
                     let newStroke: PKStroke
-                    if #available(iOS 16.0, *) {
+                    if #available(iOS 16.2, *) {
                         #if swift(>=5.8)
                         newStroke = PKStroke(
                             ink: stroke.ink,
