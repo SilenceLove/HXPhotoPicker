@@ -123,8 +123,8 @@ class EditorMusicView: UIView {
         backgroundButton.setTitleColor(.white, for: .normal)
         backgroundButton.titleLabel?.adjustsFontSizeToFitWidth = true
         backgroundButton.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
-        backgroundButton.setImage("hx_photo_box_normal".image, for: .normal)
-        backgroundButton.setImage("hx_photo_box_selected".image, for: .selected)
+        backgroundButton.setImage("hx_editor_box_normal".image, for: .normal)
+        backgroundButton.setImage("hx_editor_box_selected".image, for: .selected)
         backgroundButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
         backgroundButton.tintColor = .white
         backgroundButton.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)
@@ -137,8 +137,8 @@ class EditorMusicView: UIView {
         originalSoundButton.setTitleColor(.white, for: .normal)
         originalSoundButton.titleLabel?.adjustsFontSizeToFitWidth = true
         originalSoundButton.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
-        originalSoundButton.setImage("hx_photo_box_normal".image, for: .normal)
-        originalSoundButton.setImage("hx_photo_box_selected".image, for: .selected)
+        originalSoundButton.setImage("hx_editor_box_normal".image, for: .normal)
+        originalSoundButton.setImage("hx_editor_box_selected".image, for: .selected)
         originalSoundButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
         originalSoundButton.tintColor = .white
         originalSoundButton.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)
@@ -150,8 +150,8 @@ class EditorMusicView: UIView {
         showLyricButton.setTitleColor(.white, for: .normal)
         showLyricButton.titleLabel?.adjustsFontSizeToFitWidth = true
         showLyricButton.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
-        showLyricButton.setImage("hx_photo_box_normal".image, for: .normal)
-        showLyricButton.setImage("hx_photo_box_selected".image, for: .selected)
+        showLyricButton.setImage("hx_editor_box_normal".image, for: .normal)
+        showLyricButton.setImage("hx_editor_box_selected".image, for: .selected)
         showLyricButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
         showLyricButton.tintColor = .white
         showLyricButton.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)

@@ -537,6 +537,21 @@ public struct PhotoTools {
         let color = self.getColor(red: red, green: green, blue: blue, alpha: alpha)
         return CIImage(color: color).cropped(to: rect)
     }
+    
+    
+    static func createPixelBuffer(_ size: CGSize) -> CVPixelBuffer? {
+        var pixelBuffer: CVPixelBuffer?
+        let pixelBufferAttributes = [kCVPixelBufferIOSurfacePropertiesKey: [:] as [String: Any]]
+        CVPixelBufferCreate(
+            nil,
+            Int(size.width),
+            Int(size.height),
+            kCVPixelFormatType_32BGRA,
+            pixelBufferAttributes as CFDictionary,
+            &pixelBuffer
+        )
+        return pixelBuffer
+    }
     #endif
      
     private init() { }

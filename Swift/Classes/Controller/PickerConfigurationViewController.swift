@@ -191,6 +191,7 @@ class PickerConfigurationViewController: UITableViewController {
         }else {
             rowType = ConfigSection.allCases[indexPath.section].allRowCase[indexPath.row]
         }
+        
         cell.setupData(rowType, getRowContent(rowType))
         return cell
     }
@@ -261,7 +262,24 @@ extension PickerConfigurationViewController: PhotoPickerControllerDelegate {
     }
 }
 
+@available(iOS 14.0, *)
+extension PickerConfigurationViewController: UIColorPickerViewControllerDelegate {
+    func colorPickerViewControllerDidSelectColor(
+        _ viewController: UIColorPickerViewController
+    ) {
+        config.setThemeColor(viewController.selectedColor)
+    }
+}
+
 extension PickerConfigurationViewController {
+    func presentThemeColor(_ indexPath: IndexPath) {
+        if #available(iOS 14.0, *) {
+            let vc = UIColorPickerViewController()
+            vc.selectedColor = config.navigationTintColor ?? UIColor.systemBlue
+            vc.delegate = self
+            present(vc, animated: true, completion: nil)
+        }
+    }
     func presentColorConfig(_ indexPath: IndexPath) {
         let vc = PickerColorConfigurationViewController.init(config: config)
         vc.didDoneHandler = { [weak self] in
@@ -706,14 +724,25 @@ extension PickerConfigurationViewController {
         }
     }
     enum ColorRowType: String, CaseIterable, ConfigRowTypeRule {
+        case theme
         case color
         
         var title: String {
-            "设置颜色"
+            switch self {
+            case .theme:
+                "设置主题色"
+            case .color:
+                "设置颜色"
+            }
         }
         
         var detailTitle: String {
-            ".color"
+            switch self {
+            case .theme:
+                "setThemeColor()"
+            case .color:
+                ".color"
+            }
         }
         
         func getFunction<T>(
@@ -721,7 +750,12 @@ extension PickerConfigurationViewController {
                 (IndexPath) -> Void
             ) where T: UIViewController {
             guard let controller = controller as? PickerConfigurationViewController else { return { _ in } }
-            return controller.presentColorConfig(_:)
+            switch self {
+            case .theme:
+                return controller.presentThemeColor(_:)
+            case .color:
+                return controller.presentColorConfig(_:)
+            }
         }
     }
     enum EditorRowType: String, CaseIterable, ConfigRowTypeRule {

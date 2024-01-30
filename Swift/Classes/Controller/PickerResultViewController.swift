@@ -629,13 +629,19 @@ class PickerResultViewController: UIViewController,
                 }
             }
             if photoAsset.mediaSubType == .localLivePhoto {
-                photoAsset.requestLocalLivePhoto { imageURL, videoURL in
-                    guard let imageURL = imageURL, let videoURL = videoURL else {
+                photoAsset.requestLocalLivePhotoURL {
+                    switch $0 {
+                    case .success(let result):
+                        guard let livePhoto = result.livePhoto else {
+                            photoBrowser.view.hx.hide(animated: true)
+                            photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
+                            return
+                        }
+                        saveAlbum(.livePhoto(imageURL: livePhoto.imageURL, videoURL: livePhoto.videoURL))
+                    default:
                         photoBrowser.view.hx.hide(animated: true)
                         photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
-                        return
                     }
-                    saveAlbum(.livePhoto(imageURL: imageURL, videoURL: videoURL))
                 }
                 return
             }
