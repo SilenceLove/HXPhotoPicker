@@ -230,7 +230,7 @@ class CameraBottomView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        maskLayer.frame = CGRect(x: 0, y: -20, width: width, height: height + 20)
+        maskLayer.frame = CGRect(x: 0, y: -20, width: width, height: height + UIDevice.bottomMargin + 20)
         backButton.x = width * 0.5 - 120
         backButton.centerY = height * 0.5
         takeBgView.center = CGPoint(x: width * 0.5, y: height * 0.5)

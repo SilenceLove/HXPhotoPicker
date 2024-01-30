@@ -249,11 +249,20 @@ open class CameraViewController: BaseViewController {
     
     func layoutSubviews() {
         let previewRect: CGRect
+        let ratioSize = config.aspectRatio.size
         if UIDevice.isPad || !UIDevice.isPortrait {
             if UIDevice.isPad {
                 previewRect = view.bounds
             }else {
-                let size = CGSize(width: view.height * 16 / 9, height: view.height)
+                let size: CGSize
+                switch ratioSize {
+                case .init(width: -1, height: -1):
+                    size = view.size
+                case .zero, .init(width: 9, height: 16):
+                    size = CGSize(width: view.height * 16 / 9, height: view.height)
+                default:
+                    size = CGSize(width: view.height * ratioSize.height / ratioSize.width, height: view.height)
+                }
                 previewRect = CGRect(
                     x: (view.width - size.width) * 0.5,
                     y: (view.height - size.height) * 0.5,
@@ -261,7 +270,15 @@ open class CameraViewController: BaseViewController {
                 )
             }
         }else {
-            let size = CGSize(width: view.width, height: view.width / 9 * 16)
+            let size: CGSize
+            switch ratioSize {
+            case .init(width: -1, height: -1):
+                size = view.size
+            case .zero, .init(width: 9, height: 16):
+                size = CGSize(width: view.width, height: view.width / 9 * 16)
+            default:
+                size = CGSize(width: view.width, height: view.width / ratioSize.width * ratioSize.height)
+            }
             previewRect = CGRect(
                 x: (view.width - size.width) * 0.5,
                 y: (view.height - size.height) * 0.5,
@@ -283,7 +300,11 @@ open class CameraViewController: BaseViewController {
         let bottomY: CGFloat
         if UIDevice.isPortrait && !UIDevice.isPad {
             if UIDevice.isAllIPhoneX {
-                bottomY = view.height - 110 - previewRect.minY
+                if ratioSize.equalTo(.init(width: 9, height: 16)) {
+                    bottomY = view.height - 110 - previewRect.minY
+                }else {
+                    bottomY = view.height - bottomHeight - UIDevice.bottomMargin
+                }
             }else {
                 bottomY = view.height - bottomHeight
             }
@@ -430,6 +451,7 @@ extension CameraViewController {
                 }
             } catch {
                 self.cameraManager.session.commitConfiguration()
+                self.sessionCommitConfiguration = true
                 DispatchQueue.main.async {
                     PhotoTools.showConfirm(
                         viewController: self,
@@ -442,40 +464,35 @@ extension CameraViewController {
                 }
             }
         }
-//        DispatchQueue.global().async {
-//        }
     }
     
     func addAudioInput() {
         AVCaptureDevice.requestAccess(for: .audio) { isGranted in
-            self.cameraManager.sessionQueue.async {
-//            DispatchQueue.global().async {
-                if isGranted {
-                    do {
-                        try self.cameraManager.addAudioInput()
-                        self.cameraManager.addAudioOutput()
-                    } catch {
-                        DispatchQueue.main.async {
-                            self.addAudioInputFailed()
-                        }
-                    }
-                }else {
+            if isGranted {
+                do {
+                    try self.cameraManager.addAudioInput()
+                    self.cameraManager.addAudioOutput()
+                } catch {
                     DispatchQueue.main.async {
-                        PhotoTools.showAlert(
-                            viewController: self,
-                            title: "无法使用麦克风".localized,
-                            message: "请在设置-隐私-相机中允许访问麦克风".localized,
-                            leftActionTitle: "取消".localized,
-                            rightActionTitle: "前往系统设置".localized
-                        ) { _ in
-                            self.addAudioInputFailed()
-                        } rightHandler: { _ in
-                            PhotoTools.openSettingsURL()
-                        }
+                        self.addAudioInputFailed()
                     }
                 }
-                self.addOutputCompletion()
+            }else {
+                DispatchQueue.main.async {
+                    PhotoTools.showAlert(
+                        viewController: self,
+                        title: "无法使用麦克风".localized,
+                        message: "请在设置-隐私-相机中允许访问麦克风".localized,
+                        leftActionTitle: "取消".localized,
+                        rightActionTitle: "前往系统设置".localized
+                    ) { _ in
+                        self.addAudioInputFailed()
+                    } rightHandler: { _ in
+                        PhotoTools.openSettingsURL()
+                    }
+                }
             }
+            self.addOutputCompletion()
         }
     }
     

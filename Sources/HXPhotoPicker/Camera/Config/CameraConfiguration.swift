@@ -61,6 +61,10 @@ public struct CameraConfiguration: IndicatorTypeConfig {
     /// 相机分辨率
     public var sessionPreset: Preset = .hd1280x720
     
+    /// 相机画面比例
+    /// iPad无效
+    public var aspectRatio: AspectRatio = ._9x16
+    
     /// 摄像头默认位置
     public var position: DevicePosition = .back
     
@@ -151,6 +155,32 @@ extension CameraConfiguration {
         case back
         /// 前置
         case front
+    }
+    
+    public enum AspectRatio {
+        case fullScreen
+        case _9x16
+        case _16x9
+        case _3x4
+        case _1x1
+        case custom(CGSize)
+        
+        var size: CGSize {
+            switch self {
+            case .fullScreen:
+                return .init(width: -1, height: -1)
+            case ._9x16:
+                return .init(width: 9, height: 16)
+            case ._16x9:
+                return .init(width: 16, height: 9)
+            case ._3x4:
+                return .init(width: 3, height: 4)
+            case ._1x1:
+                return .init(width: 1, height: 1)
+            case .custom(let size):
+                return size
+            }
+        }
     }
     
     public enum TakePhotoMode {
