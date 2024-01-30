@@ -270,6 +270,25 @@ photoAsset.getURL(compression: compression) { result in
 }
 ```
 
+#### Get Other
+
+```swift
+/// Get thumbnail
+let thumImage = try await photoAsset.requesthumbnailImage()
+
+/// Get preview
+let previewImage = try await photoAsset.requestPreviewImage()
+
+/// Get AVAsset
+let avAsset = try await photoAsset.requestAVAsset()
+
+/// Get AVPlayerItem
+let playerItem = try await photoAsset.requestPlayerItem()
+
+/// Get PHLivePhoto
+let livePhoto = try await photoAsset.requestLivePhoto()
+```
+
 ## Release Notes
 
 <details open id="Latest updates">
@@ -335,6 +354,7 @@ HXPhotoPicker is released under the MIT license. See LICENSE for details.
 
 [![Stargazers over time](https://starchart.cc/SilenceLove/HXPhotoPicker.svg)](https://starchart.cc/SilenceLove/HXPhotoPicker)
 
-[🔝](#readme)
+[🔝](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/README_EN.md#-features)
+
 
 

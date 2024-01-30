@@ -1,5 +1,32 @@
 # 更新日志 
 
+## 4.1.6
+
+### 新增
+
+- Picker
+  - 一键设置主题色`config.setThemeColor(.systemBlue)`
+  - `PhotoAsset`新增获取用于展示的内容
+  ```
+    /// 获取缩略图
+    let thumImage = try await photoAsset.requesthumbnailImage()
+
+    /// 获取预览图
+    let previewImage = try await photoAsset.requestPreviewImage()
+
+    /// 获取 AVAsset
+    let avAsset = try await photoAsset.requestAVAsset()
+
+    /// 获取 AVPlayerItem
+    let playerItem = try await photoAsset.requestPlayerItem()
+
+    /// 获取 PHLivePhoto
+    let livePhoto = try await photoAsset.requestLivePhoto()
+  ```
+
+- Camera
+  - 相机画面大小可以自定义`config.aspectRatio = ._9x16`
+
 ## 4.1.5
 
 ### 修复

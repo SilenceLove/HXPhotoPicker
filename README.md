@@ -296,6 +296,24 @@ photoAsset.getURL(compression: compression) { result in
 }
 ```
 
+#### 获取其他
+
+```swift
+/// 获取缩略图
+let thumImage = try await photoAsset.requesthumbnailImage()
+
+/// 获取预览图
+let previewImage = try await photoAsset.requestPreviewImage()
+
+/// 获取 AVAsset
+let avAsset = try await photoAsset.requestAVAsset()
+
+/// 获取 AVPlayerItem
+let playerItem = try await photoAsset.requestPlayerItem()
+
+/// 获取 PHLivePhoto
+let livePhoto = try await photoAsset.requestLivePhoto()
+```
 
 ## <a id="更新记录"></a> 更新日志
 

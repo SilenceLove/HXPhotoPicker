@@ -1,5 +1,23 @@
 # Release Notes
 
+## 4.1.6
+
+### Added
+
+- Picker
+  - Set theme color with one click`config.setThemeColor(.systemBlue)`
+  - `PhotoAsset`Added content for display
+  ``` 
+    let thumImage = try await photoAsset.requesthumbnailImage() 
+    let previewImage = try await photoAsset.requestPreviewImage() 
+    let avAsset = try await photoAsset.requestAVAsset() 
+    let playerItem = try await photoAsset.requestPlayerItem() 
+    let livePhoto = try await photoAsset.requestLivePhoto()
+  ```
+
+- Camera
+  - Camera screen size can be customized`config.aspectRatio = ._9x16`
+
 ## 4.1.5
 
 ### Resolved
