@@ -305,6 +305,8 @@ extension PhotoPickerViewController {
         } else {
             vc = PhotoPickerFilterViewController(style: .grouped)
         }
+        vc.themeColor = config.filterThemeColor
+        vc.themeDarkColor = config.filterThemeDarkColor
         vc.selectOptions = pickerConfig.selectOptions
         #if HXPICKER_ENABLE_EDITOR
         vc.editorOptions = pickerConfig.editorOptions

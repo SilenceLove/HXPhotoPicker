@@ -78,6 +78,11 @@ public struct PreviewViewConfiguration {
         bottomConfig.disableFinishButtonWhenNotSelected = false
         self.bottomView = bottomConfig
     }
+    
+    public mutating func setThemeColor(_ color: UIColor) {
+        selectBox.setThemeColor(color)
+        bottomView.setThemeColor(color)
+    }
 }
 
 extension PreviewViewConfiguration {

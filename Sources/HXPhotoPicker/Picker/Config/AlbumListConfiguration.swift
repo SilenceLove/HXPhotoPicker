@@ -116,4 +116,9 @@ public struct AlbumListConfiguration {
         albumNameFont = .mediumPingFang(ofSize: 15)
         photoCountFont = .systemFont(ofSize: 13, weight: .medium)
     }
+    
+    public mutating func setThemeColor(_ color: UIColor) {
+        tickColor = color
+        tickDarkColor = color
+    }
 }

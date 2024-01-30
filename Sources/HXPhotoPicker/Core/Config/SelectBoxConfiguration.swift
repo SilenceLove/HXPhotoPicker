@@ -57,4 +57,9 @@ public struct SelectBoxConfiguration {
     public var borderDarkColor: UIColor = .white
     
     public init() { }
+    
+    public mutating func setThemeColor(_ color: UIColor) {
+        selectedBackgroundColor = color
+        selectedBackgroudDarkColor = color
+    }
 }

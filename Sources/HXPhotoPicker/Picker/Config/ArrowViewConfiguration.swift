@@ -23,4 +23,9 @@ public struct ArrowViewConfiguration {
     public var arrowDarkColor: UIColor = "#ffffff".hx.color
     
     public init() { }
+    
+    public mutating func setThemeColor(_ color: UIColor) {
+        backgroundColor = color
+        backgroudDarkColor = color
+    }
 }

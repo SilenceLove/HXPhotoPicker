@@ -145,4 +145,13 @@ public struct PhotoAlbumControllerConfiguration {
         headerTitleFont = .systemFont(ofSize: 21, weight: .semibold)
         headerButtonTitleFont = .systemFont(ofSize: 16, weight: .regular)
     }
+    
+    public mutating func setThemeColor(_ color: UIColor) {
+        headerButtonTitleColor = color
+        headerButtonTitleDarkColor = color
+        imageColor = color
+        imageDarkColor = color
+        mediaTitleColor = color
+        mediaTitleDarkColor = color
+    }
 }

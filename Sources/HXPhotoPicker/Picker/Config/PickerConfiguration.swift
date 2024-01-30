@@ -247,8 +247,6 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     /// 未授权提示界面相关配置
     public var notAuthorized: NotAuthorizedConfiguration = .init()
     
-    public var notAuthorizedView: PhotoDeniedAuthorization.Type = DeniedAuthorizationView.self
-    
     /// Whether to cache the [Camera Roll/All Photos] album
     /// 是否缓存[相机胶卷/所有照片]相册
     public var isCacheCameraAlbum: Bool = true
@@ -271,5 +269,17 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     
     public static var redBook: PickerConfiguration {
         PhotoTools.redBookConfig
+    }
+    
+    /// 设置主题色
+    public mutating func setThemeColor(_ color: UIColor) {
+        navigationTitleColor = color
+        navigationTitleDarkColor = color
+        navigationTintColor = color
+        navigationDarkTintColor = color
+        albumList.setThemeColor(color)
+        albumController.setThemeColor(color)
+        photoList.setThemeColor(color)
+        previewView.setThemeColor(color)
     }
 }

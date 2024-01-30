@@ -21,4 +21,8 @@ public struct AlbumTitleViewConfiguration {
     public var arrow: ArrowViewConfiguration = .init()
     
     public init() { }
+    
+    public mutating func setThemeColor(_ color: UIColor) {
+        arrow.setThemeColor(color)
+    }
 }

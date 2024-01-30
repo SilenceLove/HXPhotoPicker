@@ -394,7 +394,7 @@ open class PhotoPickerController: UINavigationController {
     
     private func initViews() {
         configColor()
-        deniedView = config.notAuthorizedView.init(config: config)
+        deniedView = config.notAuthorized.notAuthorizedView.init(config: config)
         deniedView.pickerDelegate = self
         if let view = splitViewController?.view {
             deniedView.frame = view.bounds

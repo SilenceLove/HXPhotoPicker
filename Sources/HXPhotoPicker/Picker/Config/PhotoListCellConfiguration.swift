@@ -73,4 +73,8 @@ public struct PhotoListCellConfiguration {
     public init() { 
         targetWidth = UIDevice.isPad ? 400 : min(UIScreen._width, UIScreen._height)
     }
+    
+    public mutating func setThemeColor(_ color: UIColor) {
+        selectBox.setThemeColor(color)
+    }
 }

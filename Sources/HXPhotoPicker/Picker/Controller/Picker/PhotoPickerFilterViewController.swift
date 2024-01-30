@@ -19,6 +19,9 @@ class PhotoPickerFilterViewController: UITableViewController {
     
     var didSelectedHandler: ((PhotoPickerFilterViewController) -> Void)?
     
+    var themeColor: UIColor?
+    var themeDarkColor: UIColor?
+    
     private var bottomView: UIView!
     private var numberView: PhotoPickerBottomNumberView!
     private var filterLb: UILabel!
@@ -110,8 +113,21 @@ class PhotoPickerFilterViewController: UITableViewController {
         bottomView = UIView()
         bottomView.addSubview(numberView)
         bottomView.addSubview(filterLb)
+        
+        updateColors()
     }
     
+    func updateColors() {
+        if PhotoManager.isDark {
+            if let themeDarkColor {
+                navigationController?.navigationBar.tintColor = themeDarkColor
+            }
+        }else {
+            if let themeColor {
+                navigationController?.navigationBar.tintColor = themeColor
+            }
+        }
+    }
     
     @objc
     private func didDoneClick() {
@@ -133,6 +149,15 @@ class PhotoPickerFilterViewController: UITableViewController {
         let row = sections[indexPath.section].rows[indexPath.row]
         cell.textLabel?.text = row.title
         cell.accessoryType = row.isSelected ? .checkmark : .none
+        if PhotoManager.isDark {
+            if let themeDarkColor {
+                cell.tintColor = themeDarkColor
+            }
+        }else {
+            if let themeColor {
+                cell.tintColor = themeColor
+            }
+        }
         cell.selectionStyle = .none
         switch row.options {
         case .any:
@@ -219,6 +244,16 @@ class PhotoPickerFilterViewController: UITableViewController {
         }
         numberView.frame = .init(x: 0, y: 0, width: view.width, height: 20)
         filterLb.frame = .init(x: 0, y: 20, width: view.width, height: 20)
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                tableView.reloadData()
+                updateColors()
+            }
+        }
     }
 }
 

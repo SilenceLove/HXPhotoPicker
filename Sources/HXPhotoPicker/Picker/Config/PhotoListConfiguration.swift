@@ -54,6 +54,9 @@ public struct PhotoListConfiguration {
     /// 导航栏是否显示筛选按钮
     public var isShowFilterItem: Bool = true
     
+    public var filterThemeColor: UIColor?
+    public var filterThemeDarkColor: UIColor?
+    
     /// Display quantity per line
     /// 每行显示数量
     public var rowNumber: Int = UIDevice.isPad ? 5 : 4
@@ -170,6 +173,19 @@ public struct PhotoListConfiguration {
         #else
         cameraType = .system(.init())
         #endif
+    }
+    
+    public mutating func setThemeColor(_ color: UIColor) {
+        titleView.setThemeColor(color)
+        bottomView.setThemeColor(color)
+        cell.setThemeColor(color)
+        assetNumber.setThemeColor(color)
+        if var cameraConfig = cameraType.customConfig {
+            cameraConfig.tintColor = color
+            cameraType = .custom(cameraConfig)
+        }
+        filterThemeColor = color 
+        filterThemeDarkColor = color
     }
 }
 
@@ -299,6 +315,11 @@ extension PhotoListConfiguration {
         public init() {
             textFont = .mediumPingFang(ofSize: 15)
             filterFont = .regularPingFang(ofSize: 13)
+        }
+        
+        public mutating func setThemeColor(_ color: UIColor) {
+            filterContentColor = color
+            filterContentDarkColor = color
         }
     }
 }

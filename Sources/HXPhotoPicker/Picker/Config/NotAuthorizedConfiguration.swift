@@ -11,6 +11,8 @@ import UIKit
 // MARK: 未授权界面配置类
 public struct NotAuthorizedConfiguration {
     
+    public var notAuthorizedView: PhotoDeniedAuthorization.Type = DeniedAuthorizationView.self
+    
     /// 背景颜色
     public var backgroundColor: UIColor = .white
     
@@ -57,4 +59,9 @@ public struct NotAuthorizedConfiguration {
     public var jumpButtonTitleDarkColor: UIColor = "#333333".hx.color
     
     public init() { }
+    
+    public mutating func setThemeColor(_ color: UIColor) {
+        closeButtonColor = color
+        jumpButtonBackgroundColor = color
+    }
 }
