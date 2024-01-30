@@ -469,6 +469,7 @@
 		D3CF484E2AE75C57006B0591 /* PhotoPreviewContentLivePhotoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CF484D2AE75C57006B0591 /* PhotoPreviewContentLivePhotoView.swift */; };
 		D3CF48502AE75C5F006B0591 /* PhotoPreviewContentVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CF484F2AE75C5F006B0591 /* PhotoPreviewContentVideoView.swift */; };
 		D3CF9F272B2D396A00380C00 /* CameraNormalPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CF9F262B2D396A00380C00 /* CameraNormalPreviewView.swift */; };
+		D3DFADE22B60C47A00D22290 /* AssetManager+PlayerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DFADE12B60C47A00D22290 /* AssetManager+PlayerItem.swift */; };
 		D3EF65BD2AAD653100084E87 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CBE6452AAAD5340031802A /* ContentView.swift */; };
 		D3EF65BE2AAD653100084E87 /* PhotoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D35D3CAB2AAC0B8B004CBC30 /* PhotoView.swift */; };
 		D3EF65BF2AAD653100084E87 /* PhotoPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CBE64A2AAAD5E80031802A /* PhotoPickerView.swift */; };
@@ -935,6 +936,7 @@
 		D3CF484D2AE75C57006B0591 /* PhotoPreviewContentLivePhotoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPreviewContentLivePhotoView.swift; sourceTree = "<group>"; };
 		D3CF484F2AE75C5F006B0591 /* PhotoPreviewContentVideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPreviewContentVideoView.swift; sourceTree = "<group>"; };
 		D3CF9F262B2D396A00380C00 /* CameraNormalPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraNormalPreviewView.swift; sourceTree = "<group>"; };
+		D3DFADE12B60C47A00D22290 /* AssetManager+PlayerItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AssetManager+PlayerItem.swift"; sourceTree = "<group>"; };
 		D3F8A4462ACFAF230089735A /* AlbumSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumSectionHeaderView.swift; sourceTree = "<group>"; };
 		EB5A7C302146238021CB4177 /* Pods-SwiftUIExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftUIExample.debug.xcconfig"; path = "Target Support Files/Pods-SwiftUIExample/Pods-SwiftUIExample.debug.xcconfig"; sourceTree = "<group>"; };
 		F2D4E82ADF83F2407972EA83 /* Pods_SwiftUIExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftUIExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1352,6 +1354,7 @@
 				D3ACE5A02AC179B300C84604 /* AssetManager+Authorization.swift */,
 				D36878992A399B8C00E70910 /* AssetManager+Asset.swift */,
 				D36878922A399B8C00E70910 /* AssetManager+AVAsset.swift */,
+				D3DFADE12B60C47A00D22290 /* AssetManager+PlayerItem.swift */,
 				D368788C2A399B8C00E70910 /* AssetManager+AVAssetExportSession.swift */,
 				D368788B2A399B8C00E70910 /* AssetManager+Image.swift */,
 				D36878952A399B8C00E70910 /* AssetManager+ImageData.swift */,
@@ -2620,6 +2623,7 @@
 				D360E7912A6B726500740B6B /* PickerManager.swift in Sources */,
 				D3CF484E2AE75C57006B0591 /* PhotoPreviewContentLivePhotoView.swift in Sources */,
 				D360E7922A6B726500740B6B /* PickerTypes.swift in Sources */,
+				D3DFADE22B60C47A00D22290 /* AssetManager+PlayerItem.swift in Sources */,
 				D360E7932A6B726500740B6B /* Picker+Int.swift in Sources */,
 				D345BAFE2AE0E2E500D3A1C5 /* PhotoAlbumViewController.swift in Sources */,
 				D3418DBD2AA6D0C9005EB5FF /* ProgressIndefiniteView.swift in Sources */,
@@ -2987,7 +2991,7 @@
 					"-Wl",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xfrontend -debug-time-function-bodies";
-				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example22;
+				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example23;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -3050,7 +3054,7 @@
 					"-Wl",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xfrontend -debug-time-function-bodies";
-				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example22;
+				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example23;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
