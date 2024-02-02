@@ -12,6 +12,11 @@ import AVFoundation
 #if !targetEnvironment(macCatalyst)
 public struct CameraConfiguration: IndicatorTypeConfig {
     
+    /// 图片资源
+    public var imageResource: HX.ImageResource.Camera {
+        HX.ImageResource.shared.camera
+    }
+    
     public var modalPresentationStyle: UIModalPresentationStyle
     
     /// If the built-in language is not enough, you can add a custom language text

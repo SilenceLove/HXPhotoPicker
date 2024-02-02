@@ -9,6 +9,11 @@ import UIKit
 
 public struct EditorConfiguration: IndicatorTypeConfig {
     
+    /// 图片资源
+    public var imageResource: HX.ImageResource.Editor {
+        HX.ImageResource.shared.editor
+    }
+    
     public var modalPresentationStyle: UIModalPresentationStyle
     
     /// If the built-in language is not enough, you can add a custom language text

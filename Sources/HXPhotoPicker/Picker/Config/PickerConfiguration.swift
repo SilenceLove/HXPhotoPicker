@@ -10,6 +10,11 @@ import UIKit
 
 public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     
+    /// 图片资源
+    public var imageResource: HX.ImageResource.Picker {
+        HX.ImageResource.shared.picker
+    }
+    
     /// 获取 AssetCollection
     public var fetchAssetCollection: PhotoFetchAssetCollection.Type = DefaultPhotoFetchAssetCollection.self
     
@@ -273,8 +278,6 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     
     /// 设置主题色
     public mutating func setThemeColor(_ color: UIColor) {
-        navigationTitleColor = color
-        navigationTitleDarkColor = color
         navigationTintColor = color
         navigationDarkTintColor = color
         albumList.setThemeColor(color)
