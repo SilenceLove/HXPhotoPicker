@@ -142,7 +142,7 @@ public extension PhotoAsset {
         ) { (result) in
             switch result {
             case .success(let dataResult):
-                if let compressionScale = compressionScale {
+                if let compressionScale = compressionScale, compressionScale < 1 {
                     DispatchQueue.global().async {
                         if let data = PhotoTools.imageCompress(
                             dataResult.imageData,
@@ -162,8 +162,7 @@ public extension PhotoAsset {
                 }
                 let image = UIImage(
                     data: dataResult.imageData
-                )?
-                .normalizedImage()
+                )?.normalizedImage()
                 completion?(image, self)
             case .failure:
                 completion?(nil, self)

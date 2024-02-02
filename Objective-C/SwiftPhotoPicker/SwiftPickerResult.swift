@@ -21,7 +21,7 @@ class SwiftPickerResult: NSObject {
     
     @objc
     var compression: SwiftCompression? = .init(
-        imageCompressionQuality: 6,
+        imageCompressionQuality: 0.6,
         videoExportParameter: .init(
             preset: .ratio_960x540,
             quality: 6

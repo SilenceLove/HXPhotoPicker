@@ -17,13 +17,13 @@ public struct PickerResult {
     
     /// Whether to select the original image
     /// 是否选择的原图
-    public let isOriginal: Bool
+    public var isOriginal: Bool
     
     /// isOriginal = false
     /// The original image does not select the compression parameter when getting the URL
     /// 原图未选中获取 URL 时的压缩参数
     public var compression: PhotoAsset.Compression? = .init(
-        imageCompressionQuality: 6,
+        imageCompressionQuality: 0.6,
         videoExportParameter: .init(
             preset: .ratio_960x540,
             quality: 6

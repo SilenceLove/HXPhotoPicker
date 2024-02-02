@@ -527,10 +527,14 @@ extension PhotoAsset {
             if mediaSubType == .imageAnimated {
                 suffix = "gif"
             }else {
-                if let photoFormat = photoFormat, !isGif {
-                    suffix = photoFormat
+                if let compressionQuality, compressionQuality < 1, !isGif {
+                    suffix = "jpeg"
                 }else {
-                    suffix = "png"
+                    if let photoFormat = photoFormat, !isGif {
+                        suffix = photoFormat
+                    }else {
+                        suffix = "png"
+                    }
                 }
             }
             imageFileURL = PhotoTools.getTmpURL(for: suffix)
@@ -598,7 +602,7 @@ extension PhotoAsset {
                     }
                     return
                 }
-                if let compressionQuality = compressionQuality {
+                if let compressionQuality = compressionQuality, compressionQuality < 1 {
                     if FileManager.default.fileExists(atPath: imageURL.path) {
                         try? FileManager.default.removeItem(at: imageURL)
                     }
@@ -636,7 +640,7 @@ extension PhotoAsset {
             }
             return
         }else if !isGif {
-            if let compressionQuality = compressionQuality {
+            if let compressionQuality = compressionQuality, compressionQuality < 1 {
                 DispatchQueue.global().async {
                     guard let imageData = try? Data(contentsOf: imageURL) else {
                         DispatchQueue.main.async {
