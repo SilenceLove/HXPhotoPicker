@@ -77,7 +77,7 @@ class EditorVideoControlMaskView: UIView {
         bottomView.backgroundColor = .clear
         addSubview(bottomView)
         
-        leftImageView = UIImageView(image: "hx_editor_video_control_arrow_left".image?.withRenderingMode(.alwaysTemplate))
+        leftImageView = UIImageView(image: .imageResource.editor.video.leftArrow.image?.withRenderingMode(.alwaysTemplate))
         leftImageView.size = leftImageView.image?.size ?? .zero
         leftImageView.tintColor = arrowNormalColor
         leftControl = UIView()
@@ -90,7 +90,7 @@ class EditorVideoControlMaskView: UIView {
         leftControl.addGestureRecognizer(leftControlPanGR)
         addSubview(leftControl)
         
-        rightImageView = UIImageView(image: "hx_editor_video_control_arrow_right".image?.withRenderingMode(.alwaysTemplate))
+        rightImageView = UIImageView(image: .imageResource.editor.video.rightArrow.image?.withRenderingMode(.alwaysTemplate))
         rightImageView.size = rightImageView.image?.size ?? .zero
         rightImageView.tintColor = arrowNormalColor
         rightControl = UIView()

@@ -350,7 +350,7 @@ class EditorFiltersViewCell: UICollectionViewCell {
         selectedView.layer.cornerRadius = 4
         contentView.addSubview(selectedView)
         editButton = UIButton(type: .custom)
-        editButton.setImage("hx_editor_tools_filter_edit".image, for: .normal)
+        editButton.setImage(.imageResource.editor.filter.edit.image, for: .normal)
         editButton.addTarget(self, action: #selector(didEditButtonClick), for: .touchUpInside)
         contentView.addSubview(editButton)
         filterNameLb = UILabel()

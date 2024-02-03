@@ -496,7 +496,10 @@ public extension EditorConfiguration {
         /// 是否允许添加 从相册选取
         public var allowAddAlbum: Bool = true
         /// 相册图标
-        public var albumImageName: String = "hx_editor_tools_chartle_album"
+        public var albumImageName: String {
+            get { .imageResource.editor.sticker.album }
+            set { HX.imageResource.editor.sticker.album = newValue }
+        }
         /// 相册配置
         public var albumPickerConfigHandler: (() -> PickerConfiguration)?
         #endif
@@ -588,39 +591,39 @@ public extension EditorConfiguration {
         
         public static var `default`: ToolsView {
             let time = Options(
-                imageName: "hx_editor_tools_play",
+                imageName: .imageResource.editor.tools.video,
                 type: .time
             )
             let graffiti = Options(
-                imageName: "hx_editor_tools_graffiti",
+                imageName: .imageResource.editor.tools.graffiti,
                 type: .graffiti
             )
             let chartlet = Options(
-                imageName: "hx_editor_photo_tools_emoji",
+                imageName: .imageResource.editor.tools.chartlet,
                 type: .chartlet
             )
             let text = Options(
-                imageName: "hx_editor_photo_tools_text",
+                imageName: .imageResource.editor.tools.text,
                 type: .text
             )
             let cropSize = Options(
-                imageName: "hx_editor_photo_crop",
+                imageName: .imageResource.editor.tools.cropSize,
                 type: .cropSize
             )
             let music = Options(
-                imageName: "hx_editor_tools_music",
+                imageName:.imageResource.editor.tools.music,
                 type: .music
             )
             let mosaic = Options(
-                imageName: "hx_editor_tools_mosaic",
+                imageName: .imageResource.editor.tools.mosaic,
                 type: .mosaic
             )
             let filterEdit = Options(
-                imageName: "hx_editor_tools_filter_change",
+                imageName: .imageResource.editor.tools.adjustment,
                 type: .filterEdit
             )
             let filter = Options(
-                imageName: "hx_editor_tools_filter",
+                imageName: .imageResource.editor.tools.filter,
                 type: .filter
             )
             return .init(toolOptions: [time, graffiti, chartlet, text, music, cropSize, mosaic, filterEdit, filter])

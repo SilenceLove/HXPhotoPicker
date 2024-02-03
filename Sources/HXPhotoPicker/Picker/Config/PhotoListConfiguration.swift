@@ -45,11 +45,17 @@ public struct PhotoListConfiguration {
     
     /// Cancel button image name
     /// 取消按钮图片名
-    public var cancelImageName: String = "hx_picker_photolist_cancel"
+    public var cancelImageName: String {
+        get { .imageResource.picker.photoList.cancel }
+        set { HX.imageResource.picker.photoList.cancel = newValue }
+    }
     
     /// Cancel button image name in dark mode
     /// 暗黑模式下取消按钮图片名
-    public var cancelDarkImageName: String = "hx_picker_photolist_cancel"
+    public var cancelDarkImageName: String {
+        get { .imageResource.picker.photoList.cancelDark }
+        set { HX.imageResource.picker.photoList.cancelDark = newValue }
+    }
     
     /// 导航栏是否显示筛选按钮
     public var isShowFilterItem: Bool = true
@@ -242,11 +248,17 @@ extension PhotoListConfiguration {
         
         /// camera icon
         /// 相机图标
-        public var cameraImageName: String = "hx_picker_photoList_photograph"
+        public var cameraImageName: String {
+            get { .imageResource.picker.photoList.cell.camera }
+            set { HX.imageResource.picker.photoList.cell.camera = newValue }
+        }
         
         /// Camera icon in dark style / icon after successful camera preview
         /// 暗黑风格下的相机图标 / 相机预览成功之后的图标
-        public var cameraDarkImageName: String = "hx_picker_photoList_photograph_white"
+        public var cameraDarkImageName: String {
+            get { .imageResource.picker.photoList.cell.cameraDark }
+            set { HX.imageResource.picker.photoList.cell.cameraDark = newValue }
+        }
         
         public init() { }
     }

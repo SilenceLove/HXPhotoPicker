@@ -67,10 +67,16 @@ public struct PreviewViewConfiguration {
     public var cancelPosition: PhotoPickerViewController.CancelPosition = .right
     
     /// 取消按钮图片名
-    public var cancelImageName: String = "hx_picker_photolist_cancel"
+    public var cancelImageName: String {
+        get { .imageResource.picker.preview.cancel }
+        set { HX.imageResource.picker.preview.cancel = newValue }
+    }
     
     /// 暗黑模式下取消按钮图片名
-    public var cancelDarkImageName: String = "hx_picker_photolist_cancel"
+    public var cancelDarkImageName: String {
+        get { .imageResource.picker.preview.cancelDark }
+        set { HX.imageResource.picker.preview.cancelDark = newValue }
+    }
     
     public init() {
         PhotoManager.shared.loadNetworkVideoMode = loadNetworkVideoMode

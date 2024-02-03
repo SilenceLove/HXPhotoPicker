@@ -35,6 +35,10 @@ extension UIImage {
         return image
     }
     
+    static var imageResource: HX.ImageResource {
+        HX.ImageResource.shared
+    }
+    
     func scaleSuitableSize() -> UIImage? {
         var imageSize = self.size
         while imageSize.width * imageSize.height > 3 * 1000 * 1000 {

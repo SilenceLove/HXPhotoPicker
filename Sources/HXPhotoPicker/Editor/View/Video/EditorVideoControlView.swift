@@ -101,8 +101,8 @@ class EditorVideoControlView: UIView {
         addSubview(bgView)
         
         playButton = UIButton(type: .custom)
-        playButton.setImage("hx_editor_video_control_play".image, for: .normal)
-        playButton.setImage("hx_editor_video_control_pause".image, for: .selected)
+        playButton.setImage(.imageResource.editor.video.play.image, for: .normal)
+        playButton.setImage(.imageResource.editor.video.pause.image, for: .selected)
         playButton.addTarget(self, action: #selector(didPlayButtonClick), for: .touchUpInside)
         playView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
         playView.contentView.addSubview(playButton)

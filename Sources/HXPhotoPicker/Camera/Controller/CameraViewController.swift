@@ -539,7 +539,7 @@ extension CameraViewController {
     func addSwithCameraButton() {
         view.layer.addSublayer(topMaskLayer)
         navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: "hx_camera_overturn".image,
+            image: .imageResource.camera.switchCamera.image,
             style: .plain,
             target: self,
             action: #selector(didSwitchCameraClick)

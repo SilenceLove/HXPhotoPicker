@@ -27,8 +27,8 @@ public class PhotoPickerFilterItemView: UIView, PhotoNavigationItem {
     var button: UIButton!
     func initView() {
         button = UIButton(type: .custom)
-        button.setImage("hx_picker_photolist_nav_filter_normal".image?.withRenderingMode(.alwaysTemplate), for: .normal)
-        button.setImage("hx_picker_photolist_nav_filter_selected".image?.withRenderingMode(.alwaysTemplate), for: .selected)
+        button.setImage(.imageResource.picker.photoList.filterNormal.image?.withRenderingMode(.alwaysTemplate), for: .normal)
+        button.setImage(.imageResource.picker.photoList.filterSelected.image?.withRenderingMode(.alwaysTemplate), for: .selected)
         button.addTarget(self, action: #selector(didFilterClick), for: .touchUpInside)
         addSubview(button)
         if let btnSize = button.currentImage?.size {

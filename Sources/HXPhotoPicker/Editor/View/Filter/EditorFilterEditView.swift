@@ -46,23 +46,23 @@ class EditorFilterEditModel: Equatable {
         var imageNamed: String {
             switch self {
             case .brightness:
-                return "hx_editor_filter_edit_brightness"
+                return .imageResource.editor.adjustment.brightness
             case .contrast:
-                return "hx_editor_filter_edit_contrast"
+                return .imageResource.editor.adjustment.contrast
             case .exposure:
-                return "hx_editor_filter_edit_exposure"
+                return .imageResource.editor.adjustment.exposure
             case .saturation:
-                return "hx_editor_filter_edit_saturation"
+                return .imageResource.editor.adjustment.saturation
             case .warmth:
-                return "hx_editor_filter_edit_warmth"
+                return .imageResource.editor.adjustment.warmth
             case .vignette:
-                return "hx_editor_filter_edit_vignette"
+                return .imageResource.editor.adjustment.vignette
             case .sharpen:
-                return "hx_editor_filter_edit_sharpen"
+                return .imageResource.editor.adjustment.sharpen
             case .highlights:
-                return "hx_editor_filter_edit_highlights"
+                return .imageResource.editor.adjustment.highlights
             case .shadows:
-                return "hx_editor_filter_edit_shadows"
+                return .imageResource.editor.adjustment.shadows
             }
         }
     }

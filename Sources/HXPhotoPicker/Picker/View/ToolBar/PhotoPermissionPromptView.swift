@@ -21,7 +21,7 @@ class PhotoPermissionPromptView: UIView {
     private var promptArrow: UIImageView!
     
     private func initView() {
-        let promptIconImage = UIImage.image(for: "hx_picker_photolist_bottom_prompt")?.withRenderingMode(.alwaysTemplate)
+        let promptIconImage: UIImage? = .imageResource.picker.photoList.bottomView.permissionsPrompt.image?.withRenderingMode(.alwaysTemplate)
         promptIcon = UIImageView(image: promptIconImage)
         if let imageSize = promptIcon.image?.size {
             promptIcon.size = imageSize
@@ -35,7 +35,7 @@ class PhotoPermissionPromptView: UIView {
         promptLb.adjustsFontSizeToFitWidth = true
         addSubview(promptLb)
         
-        let promptArrowImage = UIImage.image(for: "hx_picker_photolist_bottom_prompt_arrow")?.withRenderingMode(.alwaysTemplate)
+        let promptArrowImage = HX.imageResource.picker.photoList.bottomView.permissionsArrow.image?.withRenderingMode(.alwaysTemplate)
         promptArrow = UIImageView(image: promptArrowImage)
         if let imageSize = promptArrow.image?.size {
             promptArrow.size = imageSize

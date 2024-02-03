@@ -83,7 +83,7 @@ class EditorMusicView: UIView {
         addSubview(collectionView)
         if config.showSearch {
             searchButton = UIButton(type: .system)
-            searchButton.setImage("hx_editor_video_music_search".image?.withRenderingMode(.alwaysTemplate), for: .normal)
+            searchButton.setImage(.imageResource.editor.music.search.image?.withRenderingMode(.alwaysTemplate), for: .normal)
             searchButton.setTitle("搜索".localized, for: .normal)
             searchButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -3, bottom: 0, right: 0)
             searchButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 3, bottom: 0, right: 0)
@@ -101,7 +101,7 @@ class EditorMusicView: UIView {
         }
         
         volumeButton = UIButton(type: .system)
-        volumeButton.setImage("hx_editor_video_music_volume".image?.withRenderingMode(.alwaysTemplate), for: .normal)
+        volumeButton.setImage(.imageResource.editor.music.volum.image?.withRenderingMode(.alwaysTemplate), for: .normal)
         volumeButton.setTitle("音量".localized, for: .normal)
         volumeButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -3, bottom: 0, right: 0)
         volumeButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 3, bottom: 0, right: 0)
@@ -123,8 +123,8 @@ class EditorMusicView: UIView {
         backgroundButton.setTitleColor(.white, for: .normal)
         backgroundButton.titleLabel?.adjustsFontSizeToFitWidth = true
         backgroundButton.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
-        backgroundButton.setImage("hx_editor_box_normal".image, for: .normal)
-        backgroundButton.setImage("hx_editor_box_selected".image, for: .selected)
+        backgroundButton.setImage(.imageResource.editor.music.selectionBoxNormal.image, for: .normal)
+        backgroundButton.setImage(.imageResource.editor.music.selectionBoxSelected.image, for: .selected)
         backgroundButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
         backgroundButton.tintColor = .white
         backgroundButton.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)
@@ -137,8 +137,8 @@ class EditorMusicView: UIView {
         originalSoundButton.setTitleColor(.white, for: .normal)
         originalSoundButton.titleLabel?.adjustsFontSizeToFitWidth = true
         originalSoundButton.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
-        originalSoundButton.setImage("hx_editor_box_normal".image, for: .normal)
-        originalSoundButton.setImage("hx_editor_box_selected".image, for: .selected)
+        originalSoundButton.setImage(.imageResource.editor.music.selectionBoxNormal.image, for: .normal)
+        originalSoundButton.setImage(.imageResource.editor.music.selectionBoxSelected.image, for: .selected)
         originalSoundButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
         originalSoundButton.tintColor = .white
         originalSoundButton.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)
@@ -150,8 +150,8 @@ class EditorMusicView: UIView {
         showLyricButton.setTitleColor(.white, for: .normal)
         showLyricButton.titleLabel?.adjustsFontSizeToFitWidth = true
         showLyricButton.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
-        showLyricButton.setImage("hx_editor_box_normal".image, for: .normal)
-        showLyricButton.setImage("hx_editor_box_selected".image, for: .selected)
+        showLyricButton.setImage(.imageResource.editor.music.selectionBoxNormal.image, for: .normal)
+        showLyricButton.setImage(.imageResource.editor.music.selectionBoxSelected.image, for: .selected)
         showLyricButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
         showLyricButton.tintColor = .white
         showLyricButton.addTarget(self, action: #selector(didButtonClick(button:)), for: .touchUpInside)

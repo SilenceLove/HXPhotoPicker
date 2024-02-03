@@ -1085,8 +1085,6 @@ extension EditorViewController {
                     self.showTools(optionType == .cropSize)
                 }
                 toolsView.selectedOptionType(optionType)
-            }else {
-                showChangeButton()
             }
         }else if selectedAsset.contentType == .video {
             if let optionType = config.video.defaultSelectedToolOption {
@@ -1094,11 +1092,7 @@ extension EditorViewController {
                     self.showTools(optionType == .cropSize)
                 }
                 toolsView.selectedOptionType(optionType)
-            }else {
-                showChangeButton()
             }
-        }else {
-            showChangeButton()
         }
     }
     

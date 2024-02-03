@@ -33,7 +33,6 @@ extension EditorViewController: EditorViewDelegate {
                 checkSelectedTool()
                 hideMusicView()
                 showToolsView()
-                showChangeButton()
                 return
             default:
                 break
@@ -41,10 +40,8 @@ extension EditorViewController: EditorViewDelegate {
         }
         if isToolsDisplay {
             hideToolsView()
-            hideChangeButton()
         }else {
             showToolsView()
-            showChangeButton()
         }
         isToolsDisplay = !isToolsDisplay
     }

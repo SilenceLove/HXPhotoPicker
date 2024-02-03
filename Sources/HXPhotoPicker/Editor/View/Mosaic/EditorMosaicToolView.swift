@@ -52,7 +52,7 @@ class EditorMosaicToolView: UIView {
     
     private func initViews() {
         mosaicButton = UIButton(type: .custom)
-        let mosaicImage = "hx_editor_tool_mosaic_normal".image?.withRenderingMode(.alwaysTemplate)
+        let mosaicImage: UIImage? = .imageResource.editor.mosaic.mosaic.image?.withRenderingMode(.alwaysTemplate)
         mosaicButton.setImage(mosaicImage, for: .normal)
         mosaicButton.setImage(mosaicImage, for: .selected)
         mosaicButton.addTarget(self, action: #selector(didMosaicClick(button:)), for: .touchUpInside)
@@ -62,7 +62,7 @@ class EditorMosaicToolView: UIView {
         addSubview(mosaicButton)
         
         smearButton = UIButton(type: .custom)
-        let smearImage = "hx_editor_tool_mosaic_color".image?.withRenderingMode(.alwaysTemplate)
+        let smearImage: UIImage? = .imageResource.editor.mosaic.smear.image?.withRenderingMode(.alwaysTemplate)
         smearButton.setImage(smearImage, for: .normal)
         smearButton.setImage(smearImage, for: .selected)
         smearButton.addTarget(self, action: #selector(didSmearClick(button:)), for: .touchUpInside)
@@ -70,7 +70,7 @@ class EditorMosaicToolView: UIView {
         addSubview(smearButton)
         
         undoButton = UIButton(type: .custom)
-        undoButton.setImage("hx_editor_brush_repeal".image, for: .normal)
+        undoButton.setImage(.imageResource.editor.mosaic.undo.image, for: .normal)
         undoButton.addTarget(self, action: #selector(didUndoClick(button:)), for: .touchUpInside)
         undoButton.tintColor = .white
         undoButton.isEnabled = false

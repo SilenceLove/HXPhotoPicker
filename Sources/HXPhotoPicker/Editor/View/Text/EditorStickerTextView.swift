@@ -12,13 +12,16 @@ class EditorStickerTextView: UIView {
     var textView: UITextView!
     private var textButton: UIButton!
     private var flowLayout: UICollectionViewFlowLayout!
-    private var collectionView: UICollectionView!
+    var collectionView: UICollectionView!
     
     var text: String {
         textView.text
     }
     var currentSelectedIndex: Int = 0 {
         didSet {
+            if currentSelectedIndex < 0 {
+                return
+            }
             collectionView.scrollToItem(
                 at: IndexPath(item: currentSelectedIndex, section: 0),
                 at: .centeredHorizontally,
@@ -27,6 +30,13 @@ class EditorStickerTextView: UIView {
         }
     }
     
+    var customColor: PhotoEditorBrushCustomColor
+    var isShowCustomColor: Bool {
+        if #available(iOS 14.0, *), config.colors.count > 1 {
+            return true
+        }
+        return false
+    }
     var currentSelectedColor: UIColor = .clear
     var typingAttributes: [NSAttributedString.Key: Any] = [:]
     var stickerText: EditorStickerText?
@@ -46,6 +56,11 @@ class EditorStickerTextView: UIView {
         stickerText: EditorStickerText?
     ) {
         self.config = config
+        if #available(iOS 14.0, *), config.colors.count > 1, let color = config.colors.last?.color {
+            self.customColor = .init(color: color)
+        }else {
+            self.customColor = .init(color: .clear)
+        }
         self.stickerText = stickerText
         super.init(frame: .zero)
         initViews()
@@ -72,8 +87,8 @@ class EditorStickerTextView: UIView {
         addSubview(textView)
         
         textButton = UIButton(type: .custom)
-        textButton.setImage("hx_editor_photo_text_normal".image, for: .normal)
-        textButton.setImage("hx_editor_photo_text_selected".image, for: .selected)
+        textButton.setImage(.imageResource.editor.text.backgroundNormal.image, for: .normal)
+        textButton.setImage(.imageResource.editor.text.backgroundSelected.image, for: .selected)
         textButton.addTarget(self, action: #selector(didTextButtonClick(button:)), for: .touchUpInside)
         addSubview(textButton)
         
@@ -121,6 +136,7 @@ class EditorStickerTextView: UIView {
     }
     
     private func setupTextColors() {
+        var hasColor: Bool = false
         for (index, colorHex) in config.colors.enumerated() {
             let color = colorHex.color
             if let text = stickerText {
@@ -142,6 +158,7 @@ class EditorStickerTextView: UIView {
                         animated: true,
                         scrollPosition: .centeredHorizontally
                     )
+                    hasColor = true
                 }
             }else {
                 if index == 0 {
@@ -153,7 +170,15 @@ class EditorStickerTextView: UIView {
                         animated: true,
                         scrollPosition: .centeredHorizontally
                     )
+                    hasColor = true
                 }
+            }
+        }
+        if !hasColor {
+            if let text = stickerText {
+                changeTextColor(color: text.textColor)
+                currentSelectedColor = text.textColor
+                currentSelectedIndex = -1
             }
         }
         if textButton.isSelected {
@@ -325,7 +350,7 @@ class EditorStickerTextViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        imageView = UIImageView(image: "hx_editor_brush_color_custom".image)
+        imageView = UIImageView(image: .imageResource.editor.text.customColor.image)
         imageView.isHidden = true
         
         let bgLayer = CAShapeLayer()

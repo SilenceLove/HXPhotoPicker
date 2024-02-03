@@ -28,7 +28,7 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell {
         scrollContentView.videoView.delegate = self
         initView()
         playButton = UIButton.init(type: UIButton.ButtonType.custom)
-        playButton.setImage("hx_picker_cell_video_play".image, for: UIControl.State.normal)
+        playButton.setImage(.imageResource.picker.preview.videoPlay.image, for: UIControl.State.normal)
         playButton.setImage(UIImage.init(), for: UIControl.State.selected)
         playButton.addTarget(self, action: #selector(didPlayButtonClick(button:)), for: UIControl.Event.touchUpInside)
         playButton.size = playButton.currentImage!.size

@@ -151,7 +151,7 @@ class EditorMusicListViewController: BaseViewController {
         searchView.clearButtonMode = .whileEditing
         searchView.returnKeyType = .search
         let searchIcon = UIImageView()
-        searchIcon.image = "hx_editor_video_music_search".image?.withRenderingMode(.alwaysTemplate)
+        searchIcon.image = .imageResource.editor.music.search.image?.withRenderingMode(.alwaysTemplate)
         searchIcon.tintColor = .white.withAlphaComponent(0.4)
         searchIcon.size = searchIcon.image?.size ?? .zero
         searchView.leftView = searchIcon

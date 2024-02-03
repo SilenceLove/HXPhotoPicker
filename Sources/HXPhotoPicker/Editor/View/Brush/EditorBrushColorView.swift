@@ -87,7 +87,7 @@ public class EditorBrushColorView: UIView {
         )
         
         undoButton = UIButton(type: .system)
-        undoButton.setImage(UIImage.image(for: "hx_editor_brush_repeal"), for: .normal)
+        undoButton.setImage(.imageResource.editor.brush.undo.image, for: .normal)
         undoButton.addTarget(self, action: #selector(didUndoClick(button:)), for: .touchUpInside)
         undoButton.tintColor = .white
         undoButton.isEnabled = false
@@ -334,7 +334,7 @@ class EditorBrushColorViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        imageView = UIImageView(image: "hx_editor_brush_color_custom".image)
+        imageView = UIImageView(image: .imageResource.editor.brush.customColor.image)
         imageView.isHidden = true
         
         let bgLayer = CAShapeLayer()

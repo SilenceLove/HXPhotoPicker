@@ -143,15 +143,15 @@ class EditorStickersItemView: EditorStickersItemBaseView {
         externalBorder.contentsScale = UIScreen._scale
         
         deleteBtn = UIButton(type: .custom)
-        deleteBtn.setBackgroundImage("hx_editor_view_sticker_item_delete".image, for: .normal)
+        deleteBtn.setBackgroundImage(.imageResource.editor.sticker.delete.image, for: .normal)
         deleteBtn.addTarget(self, action: #selector(didDeleteButtonClick), for: .touchUpInside)
         deleteBtn.isHidden = true
         
         let image: UIImage?
         if !item.isAudio {
-            image = "hx_editor_view_sticker_item_scale".image
+            image = .imageResource.editor.sticker.scale.image
         }else {
-            image = "hx_editor_view_sticker_item_rotate".image
+            image = .imageResource.editor.sticker.rotate.image
         }
         scaleBtn = UIImageView(image: image)
         scaleBtn.isUserInteractionEnabled = true

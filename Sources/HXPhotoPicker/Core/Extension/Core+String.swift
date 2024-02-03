@@ -24,6 +24,10 @@ extension String: HXPickerCompatibleValue {
     
     var image: UIImage? { UIImage.image(for: self) }
     
+    static var imageResource: HX.ImageResource {
+        HX.ImageResource.shared
+    }
+    
     var lrc: String? {
         var lrcString: String?
         if let bundle = PhotoManager.shared.bundle,

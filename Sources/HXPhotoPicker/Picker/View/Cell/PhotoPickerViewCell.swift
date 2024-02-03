@@ -72,11 +72,11 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         assetTypeLb.textAlignment = .right
         contentView.addSubview(assetTypeLb)
         
-        assetTypeIcon = UIImageView(image: UIImage.image(for: "hx_picker_cell_video_icon"))
+        assetTypeIcon = UIImageView(image: .imageResource.picker.photoList.cell.video.image)
         assetTypeIcon.isHidden = true
         contentView.addSubview(assetTypeIcon)
         
-        assetEditMarkIcon = UIImageView(image: UIImage.image(for: "hx_picker_cell_photo_edit_icon"))
+        assetEditMarkIcon = UIImageView(image: .imageResource.picker.photoList.cell.photoEdited.image)
         assetEditMarkIcon.isHidden = true
         contentView.addSubview(assetEditMarkIcon)
         
@@ -85,7 +85,7 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         disableMaskLayer.isHidden = true
         contentView.layer.addSublayer(disableMaskLayer)
         
-        iCloudMarkView = UIImageView(image: "hx_picker_photo_icloud_mark".image)
+        iCloudMarkView = UIImageView(image: .imageResource.picker.photoList.cell.iCloud.image)
         if let imageSize = iCloudMarkView.image?.size {
             iCloudMarkView.size = imageSize
         }
@@ -309,9 +309,9 @@ extension PhotoPickerViewCell {
             assetTypeMaskView.isHidden = false
 //            #if HXPICKER_ENABLE_EDITOR
 //            if photoAsset.videoEditedResult == nil {
-//                assetTypeIcon.image = UIImage.image(for: "hx_picker_cell_video_icon")
+//                assetTypeIcon.image = .imageResource.picker.photoList.cell.video.image
 //            }else {
-//                assetTypeIcon.image = UIImage.image(for: "hx_picker_cell_video_edit_icon")
+//                assetTypeIcon.image = .imageResource.picker.photoList.cell.videoEdited.image
 //            }
 //            #endif
         }else if photoAsset.mediaSubType == .livePhoto ||

@@ -115,7 +115,7 @@ class EditorMosaicView: UIView {
                     mosaicPathLayer.path = path.cgPath
                 }
             }else if type == .smear {
-                let image = "hx_editor_mosaic_brush_image".image?.withRenderingMode(.alwaysTemplate)
+                let image: UIImage? = .imageResource.editor.mosaic.smearMask.image?.withRenderingMode(.alwaysTemplate)
                 let pointXArray = [
                     point.x - 4,
                     point.x + 4,
@@ -323,7 +323,7 @@ class EditorMosaicView: UIView {
                 mosaicPath.append(path)
                 mosaicPaths.append(path)
             }else if mosaicData.type == .smear {
-                let image = "hx_editor_mosaic_brush_image".image?.withRenderingMode(.alwaysTemplate)
+                let image: UIImage? = .imageResource.editor.mosaic.smearMask.image?.withRenderingMode(.alwaysTemplate)
                 let path = MosaicPath(
                     type: .smear,
                     width: mosaicData.lineWidth * viewSize.width
@@ -416,7 +416,7 @@ extension EditorMosaicView {
         }
         override func draw(in ctx: CGContext) {
             ctx.saveGState()
-            if let image = "hx_editor_mosaic_brush_image".image?.withRenderingMode(
+            if let image = UIImage.imageResource.editor.mosaic.smearMask.image?.withRenderingMode(
                 .alwaysTemplate
             ), let cgImage = image.cgImage {
                 let colorRef = CGColorSpaceCreateDeviceRGB()

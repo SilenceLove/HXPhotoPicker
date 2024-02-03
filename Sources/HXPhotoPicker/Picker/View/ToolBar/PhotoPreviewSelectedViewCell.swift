@@ -68,7 +68,7 @@ open class PhotoPreviewSelectedViewCell: UICollectionViewCell {
         contentView.addSubview(photoView)
         
         deleteBtn = UIButton(type: .custom)
-        deleteBtn.setImage("hx_picker_toolbar_select_cell_delete".image, for: .normal)
+        deleteBtn.setImage(.imageResource.picker.photoList.bottomView.delete.image, for: .normal)
         deleteBtn.addTarget(self, action: #selector(didDeleteButtonClick), for: .touchUpInside)
         contentView.addSubview(deleteBtn)
         

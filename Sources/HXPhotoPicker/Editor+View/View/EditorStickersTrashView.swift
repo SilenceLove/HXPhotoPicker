@@ -17,7 +17,7 @@ class EditorStickersTrashView: UIView {
         didSet {
             bgView.isHidden = inArea
             redView.isHidden = !inArea
-            imageView.image = inArea ? "hx_editor_photo_trash_open".image : "hx_editor_photo_trash_close".image
+            imageView.image = inArea ? .imageResource.editor.sticker.trashOpen.image : .imageResource.editor.sticker.trashClose.image
             imageView.size = imageView.image?.size ?? .zero
             imageView.centerX = width * 0.5
             textLb.text = inArea ? "松手即可删除".localized : "拖动到此处删除".localized
@@ -42,7 +42,7 @@ class EditorStickersTrashView: UIView {
         redView.isHidden = true
         redView.backgroundColor = "FF5653".color
         
-        imageView = UIImageView(image: "hx_editor_photo_trash_close".image)
+        imageView = UIImageView(image: .imageResource.editor.sticker.trashClose.image)
         imageView.size = imageView.image?.size ?? .zero
         
         textLb = UILabel()

@@ -161,17 +161,17 @@ class PhotoPickerFilterViewController: UITableViewController {
         cell.selectionStyle = .none
         switch row.options {
         case .any:
-            cell.imageView?.image = "hx_photo_list_filter_any".image?.withRenderingMode(.alwaysTemplate)
+            cell.imageView?.image = .imageResource.picker.photoList.filter.any.image?.withRenderingMode(.alwaysTemplate)
         case .edited:
-            cell.imageView?.image = "hx_photo_list_filter_edited".image?.withRenderingMode(.alwaysTemplate)
+            cell.imageView?.image = .imageResource.picker.photoList.filter.edited.image?.withRenderingMode(.alwaysTemplate)
         case .photo:
-            cell.imageView?.image = "hx_photo_list_filter_photo".image?.withRenderingMode(.alwaysTemplate)
+            cell.imageView?.image = .imageResource.picker.photoList.filter.photo.image?.withRenderingMode(.alwaysTemplate)
         case .gif:
-            cell.imageView?.image = "hx_photo_list_filter_gif".image?.withRenderingMode(.alwaysTemplate)
+            cell.imageView?.image = .imageResource.picker.photoList.filter.gif.image?.withRenderingMode(.alwaysTemplate)
         case .livePhoto:
-            cell.imageView?.image = "hx_photo_list_filter_livePhoto".image?.withRenderingMode(.alwaysTemplate)
+            cell.imageView?.image = .imageResource.picker.photoList.filter.livePhoto.image?.withRenderingMode(.alwaysTemplate)
         case .video:
-            cell.imageView?.image = "hx_photo_list_filter_video".image?.withRenderingMode(.alwaysTemplate)
+            cell.imageView?.image = .imageResource.picker.photoList.filter.video.image?.withRenderingMode(.alwaysTemplate)
         default:
             break
         }

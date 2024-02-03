@@ -238,7 +238,10 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     
     /// The name of the cover image when there are no assets in the album
     /// 当相册里没有资源时的封面图片名
-    public var emptyCoverImageName: String = "hx_picker_album_empty"
+    public var emptyCoverImageName: String {
+        get { .imageResource.picker.albumList.emptyCover }
+        set { HX.imageResource.picker.albumList.emptyCover = newValue }
+    }
     
     /// Photo list configuration
     /// 照片列表配置

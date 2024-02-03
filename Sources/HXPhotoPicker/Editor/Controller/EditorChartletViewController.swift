@@ -77,7 +77,7 @@ public class EditorChartletViewController: BaseViewController, EditorChartletLis
         
         backButton = UIButton(type: .system)
         backButton.tintColor = .white
-        backButton.setImage("hx_photo_edit_pull_down".image, for: .normal)
+        backButton.setImage(.imageResource.editor.sticker.back.image, for: .normal)
         backButton.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
         
         titleFlowLayout = UICollectionViewFlowLayout()
@@ -136,10 +136,10 @@ public class EditorChartletViewController: BaseViewController, EditorChartletLis
                 if let url = title.url {
                     titleChartlet = EditorChartletTitle(url: url)
                 }else {
-                    titleChartlet = .init(image: "hx_picker_album_empty".image)
+                    titleChartlet = .init(image: .imageResource.picker.albumList.emptyCover.image)
                 }
                 #else
-                titleChartlet = .init(image: "hx_picker_album_empty".image)
+                titleChartlet = .init(image: .imageResource.picker.albumList.emptyCover.image)
                 #endif
             }
             if index == 0 {

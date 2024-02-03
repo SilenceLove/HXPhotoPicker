@@ -80,7 +80,7 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         liveMarkView.height = 24
         liveMarkView.layer.cornerRadius = 3
         liveMarkView.layer.masksToBounds = true
-        let imageView = UIImageView(image: "hx_picker_livePhoto".image?.withRenderingMode(.alwaysTemplate))
+        let imageView = UIImageView(image: .imageResource.picker.preview.livePhoto.image?.withRenderingMode(.alwaysTemplate))
         imageView.tintColor = "#666666".color
         if let imageSize = imageView.image?.size {
             imageView.size = imageSize

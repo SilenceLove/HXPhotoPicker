@@ -20,10 +20,16 @@ public struct NotAuthorizedConfiguration {
     public var darkBackgroundColor: UIColor = "#2E2F30".hx.color
     
     /// 关闭按钮图片名
-    public var closeButtonImageName: String = "hx_picker_notAuthorized_close"
+    public var closeButtonImageName: String {
+        get { .imageResource.picker.notAuthorized.close }
+        set { HX.imageResource.picker.notAuthorized.close = newValue }
+    }
     
     /// 暗黑风格下的关闭按钮图片名
-    public var closeButtonDarkImageName: String = "hx_picker_notAuthorized_close_dark"
+    public var closeButtonDarkImageName: String {
+        get { .imageResource.picker.notAuthorized.closeDark }
+        set { HX.imageResource.picker.notAuthorized.closeDark = newValue }
+    }
     
     /// 关闭按钮颜色
     public var closeButtonColor: UIColor? = .systemBlue

@@ -64,7 +64,7 @@ class CameraBottomView: UIView {
         layer.addSublayer(maskLayer)
         
         backButton = UIButton(type: .system)
-        backButton.setImage("hx_camera_down_back".image, for: .normal)
+        backButton.setImage(.imageResource.camera.back.image, for: .normal)
         backButton.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
         backButton.size = backButton.currentImage?.size ?? .zero
         backButton.tintColor = .white

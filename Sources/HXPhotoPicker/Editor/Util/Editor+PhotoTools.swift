@@ -24,7 +24,10 @@ extension PhotoTools {
     }
     
     public static func defaultColors() -> [String] {
-        ["#ffffff", "#2B2B2B", "#FA5150", "#FEC200", "#07C160", "#10ADFF", "#6467EF"]
+        if #available(iOS 14.0, *) {
+            return ["#ffffff", "#2B2B2B", "#FA5150", "#FEC200", "#07C160", "#10ADFF", "#6467EF", "#9EB6DC"]
+        }
+        return ["#ffffff", "#2B2B2B", "#FA5150", "#FEC200", "#07C160", "#10ADFF", "#6467EF"]
     }
     static func defaultMusicInfos() -> [VideoEditorMusicInfo] {
         var infos: [VideoEditorMusicInfo] = []
