@@ -45,7 +45,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
                 case .failure:
                     ProgressHUD.showWarning(
                         addedTo: self.navigationController?.view,
-                        text: "保存失败".localized,
+                        text: .textManager.camera.saveSystemAlbumFailedHudTitle.text,
                         animated: true,
                         delayHide: 1.5
                     )
@@ -74,7 +74,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
                 case .failure:
                     ProgressHUD.showWarning(
                         addedTo: self.navigationController?.view,
-                        text: "保存失败".localized,
+                        text: .textManager.camera.saveSystemAlbumFailedHudTitle.text,
                         animated: true,
                         delayHide: 1.5
                     )

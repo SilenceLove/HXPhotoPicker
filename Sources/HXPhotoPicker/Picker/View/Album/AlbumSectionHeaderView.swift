@@ -21,9 +21,9 @@ class AlbumSectionHeaderView: UITableViewHeaderFooterView {
         super.init(reuseIdentifier: reuseIdentifier)
         backgroundView = UIView()
         titleLb = UILabel()
-        titleLb.text = "只能查看允许访问的照片和相关相册".localized
+        titleLb.text = .textManager.picker.albumList.permissionsTitle.text
         titleLb.textAlignment = .center
-        titleLb.font = UIFont.systemFont(ofSize: 14)
+        titleLb.font = .textManager.picker.albumList.permissionsTitleFont
         titleLb.adjustsFontSizeToFitWidth = true
         titleLb.numberOfLines = 0
         

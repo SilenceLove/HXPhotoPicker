@@ -213,29 +213,29 @@ open class EditorViewController: BaseViewController {
         toolsView.delegate = self
         
         cancelButton = UIButton(type: .custom)
-        cancelButton.setTitle("取消".localized, for: .normal)
+        cancelButton.setTitle(.textManager.editor.tools.cancelTitle.text, for: .normal)
         cancelButton.setTitleColor(config.cancelButtonTitleColor, for: .normal)
         cancelButton.setTitleColor(config.cancelButtonTitleColor.withAlphaComponent(0.5), for: .highlighted)
-        cancelButton.titleLabel?.font = UIFont.regularPingFang(ofSize: 17)
+        cancelButton.titleLabel?.font = .textManager.editor.tools.cancelTitleFont
         cancelButton.contentHorizontalAlignment = .left
         cancelButton.addTarget(self, action: #selector(didCancelButtonClick(button:)), for: .touchUpInside)
         
         finishButton = UIButton(type: .custom)
-        finishButton.setTitle("完成".localized, for: .normal)
+        finishButton.setTitle(.textManager.editor.tools.finishTitle.text, for: .normal)
         finishButton.setTitleColor(config.finishButtonTitleNormalColor, for: .normal)
         finishButton.setTitleColor(config.finishButtonTitleNormalColor.withAlphaComponent(0.5), for: .highlighted)
         finishButton.setTitleColor(config.finishButtonTitleDisableColor.withAlphaComponent(0.5), for: .disabled)
-        finishButton.titleLabel?.font = UIFont.regularPingFang(ofSize: 17)
+        finishButton.titleLabel?.font = .textManager.editor.tools.finishTitleFont
         finishButton.contentHorizontalAlignment = .right
         finishButton.addTarget(self, action: #selector(didFinishButtonClick(button:)), for: .touchUpInside)
         finishButton.isEnabled = !config.isWhetherFinishButtonDisabledInUneditedState
         
         resetButton = UIButton(type: .custom)
-        resetButton.setTitle("还原".localized, for: .normal)
+        resetButton.setTitle(.textManager.editor.tools.resetTitle.text, for: .normal)
         resetButton.setTitleColor(.white, for: .normal)
         resetButton.setTitleColor(.white.withAlphaComponent(0.5), for: .highlighted)
         resetButton.setTitleColor(.white.withAlphaComponent(0.5), for: .disabled)
-        resetButton.titleLabel?.font = UIFont.regularPingFang(ofSize: 17)
+        resetButton.titleLabel?.font = .textManager.editor.tools.resetTitleFont
         resetButton.addTarget(self, action: #selector(didResetButtonClick(button:)), for: .touchUpInside)
         resetButton.alpha = 0
         resetButton.isHidden = true
@@ -327,21 +327,21 @@ open class EditorViewController: BaseViewController {
             editorView.drawType = .canvas
             
             drawCancelButton = UIButton(type: .custom)
-            drawCancelButton.setTitle("取消".localized, for: .normal)
+            drawCancelButton.setTitle(.textManager.editor.brush.cancelTitle.text, for: .normal)
             drawCancelButton.setTitleColor(config.cancelButtonTitleColor, for: .normal)
             drawCancelButton.setTitleColor(config.cancelButtonTitleColor.withAlphaComponent(0.5), for: .highlighted)
-            drawCancelButton.titleLabel?.font = UIFont.regularPingFang(ofSize: 17)
+            drawCancelButton.titleLabel?.font = .textManager.editor.brush.cancelTitleFont
             drawCancelButton.contentHorizontalAlignment = .left
             drawCancelButton.alpha = 0
             drawCancelButton.isHidden = true
             drawCancelButton.addTarget(self, action: #selector(didCancelButtonClick(button:)), for: .touchUpInside)
             
             drawFinishButton = UIButton(type: .custom)
-            drawFinishButton.setTitle("完成".localized, for: .normal)
+            drawFinishButton.setTitle(.textManager.editor.brush.finishTitle.text, for: .normal)
             drawFinishButton.setTitleColor(config.finishButtonTitleNormalColor, for: .normal)
             drawFinishButton.setTitleColor(config.finishButtonTitleNormalColor.withAlphaComponent(0.5), for: .highlighted)
             drawFinishButton.setTitleColor(config.finishButtonTitleDisableColor.withAlphaComponent(0.5), for: .disabled)
-            drawFinishButton.titleLabel?.font = UIFont.regularPingFang(ofSize: 17)
+            drawFinishButton.titleLabel?.font = .textManager.editor.brush.finishTitleFont
             drawFinishButton.contentHorizontalAlignment = .right
             drawFinishButton.alpha = 0
             drawFinishButton.isHidden = true
@@ -1029,7 +1029,7 @@ open class EditorViewController: BaseViewController {
         if !config.cropSize.aspectRatios.isEmpty {
             var ratioWidth: CGFloat = 50
             for ratio in ratioToolView.ratios {
-                let itemWidth = ratio.title.width(ofFont: .systemFont(ofSize: 14), maxHeight: .max) + 12
+                let itemWidth = ratio.title.text.width(ofFont: .systemFont(ofSize: 14), maxHeight: .max) + 12
                 if itemWidth > ratioWidth {
                     ratioWidth = itemWidth
                 }

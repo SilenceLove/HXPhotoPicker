@@ -230,7 +230,7 @@ public extension PhotoAsset {
         syncICloud { _, _ in
             loadingView = ProgressHUD.showProgress(
                 addedTo: view,
-                text: "正在同步iCloud".localized + "...",
+                text: .textPhotoList.iCloudSyncHudTitle.text + "...",
                 animated: true
             )
         } progressHandler: { _, progress in
@@ -240,7 +240,7 @@ public extension PhotoAsset {
             if !isSuccess {
                 ProgressHUD.showWarning(
                     addedTo: view,
-                    text: "iCloud同步失败".localized,
+                    text: .textPhotoList.iCloudSyncFailedHudTitle.text,
                     animated: true,
                     delayHide: 1.5
                 )

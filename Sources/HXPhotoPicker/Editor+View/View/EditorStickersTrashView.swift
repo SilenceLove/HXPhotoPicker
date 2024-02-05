@@ -20,7 +20,7 @@ class EditorStickersTrashView: UIView {
             imageView.image = inArea ? .imageResource.editor.sticker.trashOpen.image : .imageResource.editor.sticker.trashClose.image
             imageView.size = imageView.image?.size ?? .zero
             imageView.centerX = width * 0.5
-            textLb.text = inArea ? "松手即可删除".localized : "拖动到此处删除".localized
+            textLb.text = inArea ? .textManager.editor.sticker.trashOpenTitle.text : .textManager.editor.sticker.trashCloseTitle.text
         }
     }
     override init(frame: CGRect) {
@@ -46,7 +46,7 @@ class EditorStickersTrashView: UIView {
         imageView.size = imageView.image?.size ?? .zero
         
         textLb = UILabel()
-        textLb.text = "拖动到此处删除".localized
+        textLb.text = .textManager.editor.sticker.trashCloseTitle.text
         textLb.textColor = .white
         textLb.textAlignment = .center
         textLb.font = UIFont.systemFont(ofSize: 14)

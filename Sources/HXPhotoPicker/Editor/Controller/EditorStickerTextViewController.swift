@@ -61,18 +61,19 @@ final class EditorStickerTextViewController: BaseViewController {
         bgView = UIVisualEffectView.init(effect: effext)
         
         cancelButton = UIButton(type: .system)
-        cancelButton.setTitle("取消".localized, for: .normal)
+        cancelButton.setTitle(.textManager.editor.text.cancelTitle.text, for: .normal)
         cancelButton.setTitleColor(.white, for: .normal)
-        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        cancelButton.titleLabel?.font = .textManager.editor.text.cancelTitleFont
         cancelButton.size = CGSize(width: 60, height: 30)
         cancelButton.addTarget(self, action: #selector(didCancelButtonClick), for: .touchUpInside)
         
         finishButton = UIButton(type: .system)
-        let text = "完成".localized
+        let text: String = .textManager.editor.text.finishTitle.text
+        let finishFont: UIFont = .textManager.editor.text.finishTitleFont
         finishButton.setTitle(text, for: .normal)
         finishButton.setTitleColor(config.doneTitleColor, for: .normal)
-        finishButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
-        var textWidth = text.width(ofFont: .systemFont(ofSize: 17), maxHeight: 30)
+        finishButton.titleLabel?.font = finishFont
+        var textWidth = text.width(ofFont: finishFont, maxHeight: 30)
         if textWidth < 60 {
             textWidth = 60
         }else {

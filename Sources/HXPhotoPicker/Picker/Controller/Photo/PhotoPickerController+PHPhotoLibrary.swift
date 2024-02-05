@@ -66,7 +66,7 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
             assetCollection.updateResult(for: result)
             if assetCollection == self.fetchData.cameraAssetCollection && result.count == 0 {
                 assetCollection.update(
-                    albumName: self.config.emptyAlbumName.localized,
+                    albumName: .textManager.picker.albumList.emptyAlbumName.text,
                     coverImage: self.config.emptyCoverImageName.image
                 )
             }

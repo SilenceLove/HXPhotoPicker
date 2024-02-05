@@ -8,11 +8,11 @@
 
 import UIKit
 
-public enum HX {
+public extension HX {
     
-    public static var imageResource: ImageResource { .shared }
+    static var imageResource: ImageResource { .shared }
     
-    public class ImageResource {
+    class ImageResource {
         public static let shared = ImageResource()
         
         #if HXPICKER_ENABLE_PICKER
@@ -106,7 +106,7 @@ public extension HX.ImageResource {
                 public var photo: String = "hx_photo_list_filter_photo"
                 /// 动图图标
                 public var gif: String = "hx_photo_list_filter_gif"
-                /// 实况图片图标
+                /// 实况图标
                 public var livePhoto: String = "hx_photo_list_filter_livePhoto"
                 /// 视频图标
                 public var video: String = "hx_photo_list_filter_video"

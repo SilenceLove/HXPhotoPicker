@@ -63,7 +63,7 @@ extension EditorViewController {
     
     func imageProcessing() {
         if editorView.isCropedImage || imageFilter != nil || filterEditFator.isApply {
-            ProgressHUD.showLoading(addedTo: view, text: "正在处理...".localized, animated: true)
+            ProgressHUD.showLoading(addedTo: view, text: .textManager.editor.processingHUDTitle.text, animated: true)
             if editorView.isCropedImage {
                 editorView.cropImage { [weak self] result in
                     guard let self = self else { return }
@@ -74,7 +74,7 @@ extension EditorViewController {
                     case .failure:
                         ProgressHUD.showWarning(
                             addedTo: self.view,
-                            text: "处理失败".localized,
+                            text: .textManager.editor.processingFailedHUDTitle.text,
                             animated: true,
                             delayHide: 1.5
                         )
@@ -89,7 +89,7 @@ extension EditorViewController {
                     guard let result = $0 else {
                         ProgressHUD.showWarning(
                             addedTo: self.view,
-                            text: "处理失败".localized,
+                            text: .textManager.editor.processingFailedHUDTitle.text,
                             animated: true,
                             delayHide: 1.5
                         )
@@ -249,7 +249,7 @@ extension EditorViewController {
             if editorView.isCropedVideo {
                 let progressView = ProgressHUD.showProgress(
                     addedTo: view,
-                    text: "正在处理...".localized,
+                    text: .textManager.editor.processingHUDTitle.text,
                     animated: true
                 )
                 editorView.cropVideo(
@@ -280,7 +280,7 @@ extension EditorViewController {
                         }
                         ProgressHUD.showWarning(
                             addedTo: self.view,
-                            text: "处理失败".localized,
+                            text: .textManager.editor.processingFailedHUDTitle.text,
                             animated: true,
                             delayHide: 1.5
                         )
@@ -342,12 +342,12 @@ extension EditorViewController {
     func videoFilterProcessing(_ factor: EditorVideoFactor) {
         guard let avAsset = editorView.avAsset else {
             ProgressHUD.hide(forView: self.view, animated: true)
-            ProgressHUD.showWarning(addedTo: self.view, text: "处理失败".localized, animated: true, delayHide: 1.5)
+            ProgressHUD.showWarning(addedTo: self.view, text: .textManager.editor.processingFailedHUDTitle.text, animated: true, delayHide: 1.5)
             return
         }
         let progressView = ProgressHUD.showProgress(
             addedTo: view,
-            text: "正在处理...".localized,
+            text: .textManager.editor.processingHUDTitle.text,
             animated: true
         )
         let urlConfig: EditorURLConfig
@@ -400,7 +400,7 @@ extension EditorViewController {
                 if error.isCancel {
                     return
                 }
-                ProgressHUD.showWarning(addedTo: self.view, text: "处理失败".localized, animated: true, delayHide: 1.5)
+                ProgressHUD.showWarning(addedTo: self.view, text: .textManager.editor.processingFailedHUDTitle.text, animated: true, delayHide: 1.5)
             }
         }
         self.videoTool = videoTool

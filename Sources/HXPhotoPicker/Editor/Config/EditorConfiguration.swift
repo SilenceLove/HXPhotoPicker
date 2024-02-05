@@ -14,6 +14,11 @@ public struct EditorConfiguration: IndicatorTypeConfig {
         HX.ImageResource.shared.editor
     }
     
+    /// 文本管理
+    public var textManager: HX.TextManager.Editor {
+        HX.TextManager.shared.editor
+    }
+    
     public var modalPresentationStyle: UIModalPresentationStyle
     
     /// If the built-in language is not enough, you can add a custom language text
@@ -308,15 +313,15 @@ public extension EditorConfiguration {
         /// aspect ratio configuration
         /// 宽高比配置
         public var aspectRatios: [EditorRatioToolConfig] = [
-            .init(title: "原始比例", ratio: .init(width: -1, height: -1)),
-            .init(title: "自由格式", ratio: .zero),
-            .init(title: "正方形", ratio: .init(width: 1, height: 1)),
-            .init(title: "16:9", ratio: .init(width: 16, height: 9)),
-            .init(title: "5:4", ratio: .init(width: 5, height: 4)),
-            .init(title: "7:5", ratio: .init(width: 7, height: 5)),
-            .init(title: "4:3", ratio: .init(width: 4, height: 3)),
-            .init(title: "5:3", ratio: .init(width: 5, height: 3)),
-            .init(title: "3:2", ratio: .init(width: 3, height: 2))
+            .init(title: .localized("原始比例"), ratio: .init(width: -1, height: -1)),
+            .init(title: .localized("自由格式"), ratio: .zero),
+            .init(title: .localized("正方形"), ratio: .init(width: 1, height: 1)),
+            .init(title: .custom("16:9"), ratio: .init(width: 16, height: 9)),
+            .init(title: .custom("5:4"), ratio: .init(width: 5, height: 4)),
+            .init(title: .custom("7:5"), ratio: .init(width: 7, height: 5)),
+            .init(title: .custom("4:3"), ratio: .init(width: 4, height: 3)),
+            .init(title: .custom("5:3"), ratio: .init(width: 5, height: 3)),
+            .init(title: .custom("3:2"), ratio: .init(width: 3, height: 2))
         ]
         
         /// When the default fixed ratio, click restore to reset to the original aspect ratio
@@ -451,7 +456,10 @@ public extension EditorConfiguration {
         /// 完成按钮背景颜色
         public var finishButtonBackgroundColor: UIColor = .clear
         /// 搜索框的 placeholder
-        public var placeholder: String = ""
+        public var placeholder: String {
+            get { .textManager.editor.music.searchPlaceholder.text }
+            set { HX.TextManager.shared.editor.music.searchPlaceholder = .custom(newValue) }
+        }
         /// 滚动停止时自动播放音乐
         public var autoPlayWhenScrollingStops: Bool = false
         /// 配乐信息 / 搜索列表默认的第一页

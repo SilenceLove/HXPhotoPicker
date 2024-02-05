@@ -25,7 +25,23 @@ extension String: HXPickerCompatibleValue {
     var image: UIImage? { UIImage.image(for: self) }
     
     static var imageResource: HX.ImageResource {
-        HX.ImageResource.shared
+        .shared
+    }
+    
+    static var textManager: HX.TextManager {
+        .shared
+    }
+    
+    static var textNotAuthorized: HX.TextManager.Picker.NotAuthorized {
+        textManager.picker.notAuthorized
+    }
+    
+    static var textPhotoList: HX.TextManager.Picker.PhotoList {
+        textManager.picker.photoList
+    }
+    
+    static var textPreview: HX.TextManager.Picker.Preview {
+        textManager.picker.preview
     }
     
     var lrc: String? {

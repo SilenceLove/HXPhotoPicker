@@ -61,7 +61,7 @@ public class PhotoPickerBottomNumberView: UICollectionReusableView {
             contentLb.text = videoString + "个视频".localized
         }else {
             if showEmpty {
-                contentLb.text = "没有项目".localized
+                contentLb.text = .textPhotoList.filterBottomEmptyItemTitle.text
             }else {
                 contentLb.text = nil
             }
@@ -81,38 +81,38 @@ public class PhotoPickerBottomNumberView: UICollectionReusableView {
         filterLb.isHidden = false
         var filterContent = ""
         if filterOptions.contains(.edited) {
-            filterContent += "已编辑".localized
+            filterContent += .textPhotoList.filter.editedTitle.text
         }
         if filterOptions.contains(.photo) {
             if !filterContent.isEmpty {
                 filterContent += "、"
             }
-            filterContent += "筛选照片".localized
+            filterContent += .textPhotoList.filter.photoTitle.text
         }
         if filterOptions.contains(.gif) {
             if !filterContent.isEmpty {
                 filterContent += "、"
             }
-            filterContent += "GIF"
+            filterContent += .textPhotoList.filter.gifTitle.text
         }
         if filterOptions.contains(.livePhoto) {
             if !filterContent.isEmpty {
                 filterContent += "、"
             }
-            filterContent += "LivePhoto"
+            filterContent += .textPhotoList.filter.livePhotoTitle.text
         }
         if filterOptions.contains(.video) {
             if !filterContent.isEmpty {
                 filterContent += "、"
             }
-            filterContent += "筛选视频".localized
+            filterContent += .textPhotoList.filter.videoTitle.text
         }
         guard let config = config else {
             return
         }
         let isDark = PhotoManager.isDark
         let atbStr = NSMutableAttributedString(
-            string: "筛选条件".localized + "：",
+            string: .textPhotoList.filterBottomTitle.text + "：",
             attributes: [
                 .font: config.filterFont,
                 .foregroundColor: isDark ? config.filterTitleDarkColor : config.filterTitleColor

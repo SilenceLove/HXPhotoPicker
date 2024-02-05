@@ -17,7 +17,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
         if !UIImagePickerController.isSourceTypeAvailable(.camera) {
             ProgressHUD.showWarning(
                 addedTo: pickerController.view,
-                text: "相机不可用!".localized,
+                text: .textPhotoList.cameraUnavailableHudTitle.text,
                 animated: true,
                 delayHide: 1.5
             )
@@ -192,7 +192,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
         ProgressHUD.hide(forView: navigationController?.view, animated: false)
         ProgressHUD.showWarning(
             addedTo: navigationController?.view,
-            text: "视频导出失败".localized,
+            text: .textPhotoList.videoExportFailedHudTitle.text,
             animated: true,
             delayHide: 1.5
         )
@@ -223,7 +223,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
                     )
                     ProgressHUD.showWarning(
                         addedTo: self.navigationController?.view,
-                        text: "保存失败".localized,
+                        text: .textPhotoList.saveSystemAlbumFailedHudTitle.text,
                         animated: true,
                         delayHide: 1.5
                     )

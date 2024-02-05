@@ -289,7 +289,7 @@ extension PhotoPickerViewCell {
             return
         }
         if photoAsset.isGifAsset {
-            assetTypeLb.text = "GIF"
+            assetTypeLb.text = .textPhotoList.cell.gifTitle.text
             assetTypeMaskView.isHidden = false
         }else if photoAsset.mediaSubType.isVideo {
             if let videoTime = photoAsset.videoTime {
@@ -316,7 +316,7 @@ extension PhotoPickerViewCell {
 //            #endif
         }else if photoAsset.mediaSubType == .livePhoto ||
                     photoAsset.mediaSubType == .localLivePhoto {
-            assetTypeLb.text = "Live"
+            assetTypeLb.text = .textPhotoList.cell.LivePhotoTitle.text
             assetTypeMaskView.isHidden = false
         }else {
             assetTypeLb.text = nil
@@ -328,7 +328,7 @@ extension PhotoPickerViewCell {
             if let editedResult = photoAsset.editedResult {
                 switch editedResult {
                 case .image(let result, _):
-                    assetTypeLb.text = result.imageType == .gif ? "GIF" : nil
+                    assetTypeLb.text = result.imageType == .gif ? .textPhotoList.cell.gifTitle.text : nil
                     assetTypeMaskView.isHidden = false
                     assetEditMarkIcon.isHidden = false
                 default:

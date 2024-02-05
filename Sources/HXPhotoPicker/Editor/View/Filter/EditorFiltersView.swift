@@ -122,7 +122,7 @@ class EditorFiltersView: UIView {
         let filterInfos = filterConfig.infos
         filters = []
         let originalFilter = PhotoEditorFilter(
-            filterName: isVideo ? "原片".localized : "原图".localized
+            filterName: isVideo ? .textManager.editor.filter.originalVideoTitle.text : .textManager.editor.filter.originalPhotoTitle.text
         )
         originalFilter.isOriginal = true
         if selectedIndex == 0 {
@@ -355,14 +355,14 @@ class EditorFiltersViewCell: UICollectionViewCell {
         contentView.addSubview(editButton)
         filterNameLb = UILabel()
         filterNameLb.textColor = .white
-        filterNameLb.font = .regularPingFang(ofSize: 13)
+        filterNameLb.font = .textManager.editor.filter.nameFont
         filterNameLb.textAlignment = .center
         filterNameLb.adjustsFontSizeToFitWidth = true
         contentView.addSubview(filterNameLb)
         parameterLb = UILabel()
         parameterLb.text = "0"
         parameterLb.textColor = .white
-        parameterLb.font = .regularPingFang(ofSize: 11)
+        parameterLb.font = .textManager.editor.filter.parameterFont
         parameterLb.textAlignment = .center
         parameterLb.isHidden = true
         contentView.addSubview(parameterLb)

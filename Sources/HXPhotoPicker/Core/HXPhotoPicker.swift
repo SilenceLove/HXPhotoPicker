@@ -155,6 +155,74 @@ public enum Photo {
 }
 #endif
 
+public enum HX {
+    
+    #if HXPICKER_ENABLE_PICKER
+    @available(iOS 13.0, *)
+    @MainActor
+    public static func picker<T: PhotoAssetObject>(
+        _ config: PickerConfiguration,
+        selectedAssets: [PhotoAsset] = [],
+        delegate: PhotoPickerControllerDelegate? = nil,
+        compression: PhotoAsset.Compression? = nil,
+        fromVC: UIViewController? = nil,
+        toFile fileConfig: PickerResult.FileConfigHandler? = nil
+    ) async throws -> [T] {
+        try await Photo.picker(
+            config,
+            selectedAssets: selectedAssets,
+            delegate: delegate,
+            compression: compression,
+            fromVC: fromVC,
+            toFile: fileConfig
+        )
+    }
+    
+    @available(iOS 13.0, *)
+    @MainActor
+    public static func picker(
+        _ config: PickerConfiguration,
+        selectedAssets: [PhotoAsset] = [],
+        delegate: PhotoPickerControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) async throws -> PickerResult {
+        try await Photo.picker(
+            config,
+            selectedAssets: selectedAssets,
+            delegate: delegate,
+            fromVC: fromVC
+        )
+    }
+    #endif
+    
+    #if HXPICKER_ENABLE_EDITOR
+    @available(iOS 13.0, *)
+    @discardableResult
+    @MainActor
+    public static func edit(
+        _ asset: EditorAsset,
+        config: EditorConfiguration = .init(),
+        delegate: EditorViewControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) async throws -> EditorAsset {
+        try await Photo.edit(asset, config: config, delegate: delegate, fromVC: fromVC)
+    }
+    #endif
+    
+    #if HXPICKER_ENABLE_CAMERA
+    @available(iOS 13.0, *)
+    @MainActor
+    public static func capture(
+        _ config: CameraConfiguration = .init(),
+        type: CameraController.CaptureType = .all,
+        delegate: CameraControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) async throws -> CameraController.CaptureResult {
+        try await Photo.capture(config, type: type, delegate: delegate, fromVC: fromVC)
+    }
+    #endif
+}
+
 public struct HXPickerWrapper<Base> {
     public let base: Base
     public init(_ base: Base) {

@@ -85,13 +85,17 @@ public extension AssetManager {
     static func requestImage(
         for asset: PHAsset,
         targetSize: CGSize,
+        deliveryMode: PHImageRequestOptionsDeliveryMode = .opportunistic,
         resizeMode: PHImageRequestOptionsResizeMode,
+        normalizedCropRect: CGRect = .zero,
         isNetworkAccessAllowed: Bool,
         progressHandler: PHAssetImageProgressHandler?,
         resultHandler: @escaping ImageResultHandler
     ) -> PHImageRequestID {
         let options = PHImageRequestOptions()
+        options.deliveryMode = deliveryMode
         options.resizeMode = resizeMode
+        options.normalizedCropRect = normalizedCropRect
         options.isNetworkAccessAllowed = isNetworkAccessAllowed
         options.progressHandler = progressHandler
         return requestImage(for: asset, targetSize: targetSize, options: options, resultHandler: resultHandler)
@@ -101,7 +105,9 @@ public extension AssetManager {
     static func requestImage(
         for asset: PHAsset,
         targetSize: CGSize,
+        deliveryMode: PHImageRequestOptionsDeliveryMode = .opportunistic,
         resizeMode: PHImageRequestOptionsResizeMode,
+        normalizedCropRect: CGRect = .zero,
         iCloudHandler: ((PHImageRequestID) -> Void)? = nil,
         progressHandler: PHAssetImageProgressHandler? = nil,
         resultHandler: @escaping ImageResultHandler
@@ -109,7 +115,9 @@ public extension AssetManager {
         requestImage(
             for: asset,
             targetSize: targetSize,
+            deliveryMode: deliveryMode,
             resizeMode: resizeMode,
+            normalizedCropRect: normalizedCropRect,
             isNetworkAccessAllowed: false,
             progressHandler: nil
         ) { image, info in

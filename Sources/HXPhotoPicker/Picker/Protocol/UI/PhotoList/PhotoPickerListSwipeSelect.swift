@@ -358,10 +358,7 @@ public extension PhotoPickerListSwipeSelect {
             swipeSelectPanGR?.isEnabled = false
             ProgressHUD.showWarning(
                 addedTo: navigationController?.view,
-                text: String(
-                    format: "已达到最大选择数".localized,
-                    arguments: [pickerController.config.maximumSelectedPhotoCount]
-                ),
+                text: .textManager.picker.maximumSelectedHudTitle.text,
                 animated: true,
                 delayHide: 1.5
             )

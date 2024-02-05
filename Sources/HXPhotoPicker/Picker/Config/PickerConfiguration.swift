@@ -15,6 +15,11 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
         HX.ImageResource.shared.picker
     }
     
+    /// 文本管理
+    public var textManager: HX.TextManager.Picker {
+        HX.TextManager.shared.picker
+    }
+    
     /// 获取 AssetCollection
     public var fetchAssetCollection: PhotoFetchAssetCollection.Type = DefaultPhotoFetchAssetCollection.self
     
@@ -234,7 +239,10 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     
     /// Album name when there are no resources in the album
     /// 当相册里没有资源时的相册名称
-    public var emptyAlbumName: String = "所有照片"
+    public var emptyAlbumName: String {
+        get { .textManager.picker.albumList.emptyAlbumName.text }
+        set { HX.textManager.picker.albumList.emptyAlbumName = .custom(newValue) }
+    }
     
     /// The name of the cover image when there are no assets in the album
     /// 当相册里没有资源时的封面图片名

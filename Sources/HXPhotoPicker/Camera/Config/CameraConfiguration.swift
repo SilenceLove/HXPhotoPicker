@@ -17,6 +17,11 @@ public struct CameraConfiguration: IndicatorTypeConfig {
         HX.ImageResource.shared.camera
     }
     
+    /// 文本管理
+    public var textManager: HX.TextManager.Camera {
+        HX.TextManager.shared.camera
+    }
+    
     public var modalPresentationStyle: UIModalPresentationStyle
     
     /// If the built-in language is not enough, you can add a custom language text

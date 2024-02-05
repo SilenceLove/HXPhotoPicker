@@ -168,9 +168,9 @@ extension EditorViewController {
             initAssetType(type)
         case .failure:
             if selectedAsset.contentType == .video {
-                loadFailure(message: "视频获取失败!".localized)
+                loadFailure(message: .textManager.editor.videoLoadFailedAlertMessage.text)
             }else {
-                loadFailure(message: "图片获取失败!".localized)
+                loadFailure(message: .textManager.editor.photoLoadFailedAlertMessage.text)
             }
         }
     }

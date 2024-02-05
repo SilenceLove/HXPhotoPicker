@@ -29,8 +29,8 @@ class PhotoPermissionPromptView: UIView {
         addSubview(promptIcon)
         
         promptLb = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 60))
-        promptLb.text = "无法访问相册中所有照片，\n请允许访问「照片」中的「所有照片」".localized
-        promptLb.font = .systemFont(ofSize: 15)
+        promptLb.text = .textPhotoList.bottomView.permissionsTitle.text
+        promptLb.font = .textPhotoList.bottomView.permissionsTitleFont
         promptLb.numberOfLines = 0
         promptLb.adjustsFontSizeToFitWidth = true
         addSubview(promptLb)

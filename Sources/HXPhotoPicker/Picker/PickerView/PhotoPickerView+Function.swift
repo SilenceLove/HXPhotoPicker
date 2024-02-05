@@ -366,10 +366,7 @@ extension PhotoPickerView {
         if manager.selectArrayIsFull() && showHUD {
             ProgressHUD.showWarning(
                 addedTo: UIApplication.shared.keyWindow,
-                text: String(
-                    format: "已达到最大选择数".localized,
-                    arguments: [manager.config.maximumSelectedPhotoCount]
-                ),
+                text: .textManager.picker.maximumSelectedHudTitle.text,
                 animated: true,
                 delayHide: 1.5
             )

@@ -175,7 +175,7 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
         ProgressHUD.hide(forView: self, animated: false)
         ProgressHUD.showWarning(
             addedTo: self,
-            text: "视频导出失败".localized,
+            text: .textPhotoList.videoExportFailedHudTitle.text,
             animated: true,
             delayHide: 1.5
         )
@@ -200,7 +200,7 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
                     )
                     ProgressHUD.showWarning(
                         addedTo: self,
-                        text: "保存失败".localized,
+                        text: .textPhotoList.saveSystemAlbumFailedHudTitle.text,
                         animated: true,
                         delayHide: 1.5
                     )

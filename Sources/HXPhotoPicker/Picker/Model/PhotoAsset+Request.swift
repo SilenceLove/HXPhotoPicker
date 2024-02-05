@@ -170,6 +170,56 @@ public extension PhotoAsset {
         }
     }
     
+    @discardableResult
+    func requestImage(
+        targetSize: CGSize,
+        isEqualRatio: Bool = true,
+        completion: ((UIImage?, PhotoAsset) -> Void)?
+    ) -> PHImageRequestID? {
+        #if HXPICKER_ENABLE_EDITOR
+        if editedResult != nil {
+            DispatchQueue.global().async {
+                let image = self.getEditedImage()?.scaleToFillSize(size: targetSize, equalRatio: isEqualRatio)
+                DispatchQueue.main.async {
+                    completion?(image, self)
+                }
+            }
+            return nil
+        }
+        #endif
+        guard let phAsset = phAsset else {
+            requestLocalImage(
+                urlType: .original
+            ) { (image, photoAsset) in
+                DispatchQueue.global().async {
+                    let image = image?.scaleToFillSize(size: targetSize, equalRatio: isEqualRatio)
+                    DispatchQueue.main.async {
+                        completion?(image, photoAsset)
+                    }
+                }
+            }
+            return nil
+        }
+        
+        return AssetManager.requestImage(
+            for: phAsset,
+            targetSize: targetSize,
+            deliveryMode: .highQualityFormat,
+            resizeMode: .fast
+        ) { image, info in
+            if isEqualRatio {
+                completion?(image, self)
+            }else {
+                DispatchQueue.global().async {
+                    let image = image?.scaleToFillSize(size: targetSize, equalRatio: isEqualRatio)
+                    DispatchQueue.main.async {
+                        completion?(image, self)
+                    }
+                }
+            }
+        }
+    }
+    
     /// 请求获取缩略图
     /// - Parameter completion: 完成回调
     /// - Returns: 请求ID

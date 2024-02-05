@@ -22,8 +22,8 @@ public class PhotoTextCancelItemView: UIView, PhotoNavigationItem {
     var button: UIButton!
     func initView() {
         button = UIButton(type: .system)
-        button.setTitle("取消".localized, for: .normal)
-        button.titleLabel?.font = .mediumPingFang(ofSize: 17)
+        button.setTitle(.textManager.picker.navigationCancelTitle.text, for: .normal)
+        button.titleLabel?.font = .textManager.picker.navigationCancelTitleFont
         button.addTarget(self, action: #selector(didCancelClick), for: .touchUpInside)
         addSubview(button)
         if let textSize = button.titleLabel?.textSize {

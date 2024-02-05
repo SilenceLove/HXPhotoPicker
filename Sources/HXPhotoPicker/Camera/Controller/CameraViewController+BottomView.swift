@@ -50,7 +50,7 @@ extension CameraViewController: CameraBottomViewDelegate {
             bottomView.isGestureEnable = true
             ProgressHUD.showWarning(
                 addedTo: self.view,
-                text: "拍摄失败!".localized,
+                text: .textManager.camera.captureFailedHudTitle.text,
                 animated: true,
                 delayHide: 1.5
             )
@@ -97,7 +97,7 @@ extension CameraViewController: CameraBottomViewDelegate {
                     arguments: [Int(config.videoMinimumDuration)]
                 )
             }else {
-                text = "拍摄失败!".localized
+                text = .textManager.camera.captureFailedHudTitle.text
             }
             ProgressHUD.showWarning(
                 addedTo: view,

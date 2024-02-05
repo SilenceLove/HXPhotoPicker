@@ -40,9 +40,9 @@ class PhotoPickerFilterViewController: UITableViewController {
                 break
             }
         }
-        navigationItem.title = "筛选".localized
+        navigationItem.title = .textPhotoList.filter.title.text
         navigationItem.rightBarButtonItem = .init(
-            title: "完成".localized,
+            title: .textPhotoList.filter.finishTitle.text,
             style: .done,
             target: self,
             action: #selector(didDoneClick)
@@ -56,39 +56,39 @@ class PhotoPickerFilterViewController: UITableViewController {
         tableView.tableFooterView = bottomView
         
         sections = []
-        sections.append(.init(rows: [.init(title: "所有项目".localized, options: .any, isSelected: options == .any)]))
+        sections.append(.init(rows: [.init(title: .textPhotoList.filter.anyTitle.text, options: .any, isSelected: options == .any)]))
         var rows: [PhotoPickerFilterSection.Row] = []
         if selectOptions.isPhoto && selectOptions.isVideo {
             if !editorOptions.isEmpty, selectMode == .multiple {
-                rows.append(.init(title: "已编辑".localized, options: .edited, isSelected: options.contains(.edited)))
+                rows.append(.init(title: .textPhotoList.filter.editedTitle.text, options: .edited, isSelected: options.contains(.edited)))
             }
-            rows.append(.init(title: "筛选照片".localized, options: .photo, isSelected: options.contains(.photo)))
+            rows.append(.init(title: .textPhotoList.filter.photoTitle.text, options: .photo, isSelected: options.contains(.photo)))
             if selectOptions.contains(.gifPhoto) {
-                rows.append(.init(title: "GIF", options: .gif, isSelected: options.contains(.gif)))
+                rows.append(.init(title: .textPhotoList.filter.gifTitle.text, options: .gif, isSelected: options.contains(.gif)))
             }
             if selectOptions.contains(.livePhoto) {
-                rows.append(.init(title: "LivePhoto", options: .livePhoto, isSelected: options.contains(.livePhoto)))
+                rows.append(.init(title: .textPhotoList.filter.livePhotoTitle.text, options: .livePhoto, isSelected: options.contains(.livePhoto)))
             }
-            rows.append(.init(title: "筛选视频".localized, options: .video, isSelected: options.contains(.video)))
+            rows.append(.init(title: .textPhotoList.filter.videoTitle.text, options: .video, isSelected: options.contains(.video)))
         }else if selectOptions.isPhoto {
             if editorOptions.isPhoto, selectMode == .multiple {
-                rows.append(.init(title: "已编辑".localized, options: .edited, isSelected: options.contains(.edited)))
+                rows.append(.init(title: .textPhotoList.filter.editedTitle.text, options: .edited, isSelected: options.contains(.edited)))
             }
-            rows.append(.init(title: "筛选照片".localized, options: .photo, isSelected: options.contains(.photo)))
+            rows.append(.init(title: .textPhotoList.filter.photoTitle.text, options: .photo, isSelected: options.contains(.photo)))
             if selectOptions.contains(.gifPhoto) {
-                rows.append(.init(title: "GIF", options: .gif, isSelected: options.contains(.gif)))
+                rows.append(.init(title: .textPhotoList.filter.gifTitle.text, options: .gif, isSelected: options.contains(.gif)))
             }
             if selectOptions.contains(.livePhoto) {
-                rows.append(.init(title: "LivePhoto", options: .livePhoto, isSelected: options.contains(.livePhoto)))
+                rows.append(.init(title: .textPhotoList.filter.livePhotoTitle.text, options: .livePhoto, isSelected: options.contains(.livePhoto)))
             }
         }else if selectOptions.isVideo {
             if editorOptions.isVideo, selectMode == .multiple {
-                rows.append(.init(title: "已编辑".localized, options: .edited, isSelected: options.contains(.edited)))
+                rows.append(.init(title: .textPhotoList.filter.editedTitle.text.localized, options: .edited, isSelected: options.contains(.edited)))
             }
-            rows.append(.init(title: "筛选视频".localized, options: .video, isSelected: options.contains(.video)))
+            rows.append(.init(title: .textPhotoList.filter.videoTitle.text.localized, options: .video, isSelected: options.contains(.video)))
         }
         if !rows.isEmpty {
-            sections.append(.init(title: "仅显示".localized, rows: rows))
+            sections.append(.init(title: .textPhotoList.filter.sectionTitle.text, rows: rows))
         }
     }
     
@@ -99,8 +99,8 @@ class PhotoPickerFilterViewController: UITableViewController {
         numberView.config = .init()
         
         filterLb = UILabel()
-        filterLb.text = options == .any ? "无筛选条件".localized : "筛选结果".localized
-        filterLb.font = .systemFont(ofSize: 12)
+        filterLb.text = options == .any ? .textPhotoList.filter.bottomEmptyTitle.text : .textPhotoList.filter.bottomTitle.text
+        filterLb.font = .textPhotoList.filter.bottomTitleFont
         if #available(iOS 13.0, *) {
             filterLb.textColor = UIColor(dynamicProvider: {
                 $0.userInterfaceStyle == .dark ? .white : .black
@@ -227,7 +227,7 @@ class PhotoPickerFilterViewController: UITableViewController {
         numberView.photoCount = photoCount
         numberView.videoCount = videoCount
         numberView.configData(true)
-        filterLb.text = options == .any ? "无筛选条件".localized : "筛选结果".localized
+        filterLb.text = options == .any ? .textPhotoList.filter.bottomEmptyTitle.text : .textPhotoList.filter.bottomTitle.text
     }
     
     override func viewDidLayoutSubviews() {

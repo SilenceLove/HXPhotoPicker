@@ -17,7 +17,7 @@ public class AlbumTitleView: UIControl, PhotoPickerNavigationTitle {
            if let title = title {
                titleLb.text = title
            }else {
-               titleLb.text = "照片".localized
+               titleLb.text = .textPhotoList.emptyNavigationTitle.text
            }
            updateFrame()
        }
@@ -93,7 +93,7 @@ public class AlbumTitleView: UIControl, PhotoPickerNavigationTitle {
     }
     
     private func initViews() {
-        let text = "相册".localized
+        let text: String = .textManager.picker.albumList.navigationTitle.text
         let font = UIFont.semiboldPingFang(ofSize: 18)
         titleLb = UILabel(
             frame: CGRect(

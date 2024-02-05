@@ -97,7 +97,7 @@ class EditorRatioToolView: UIView {
         if UIDevice.isPortrait {
             var contentWidth = UIDevice.rightMargin + 24
             for (index, ratio) in ratios.enumerated() {
-                let itemWidth = ratio.title.width(ofFont: .systemFont(ofSize: UIDevice.isPad ? 16 : 14), maxHeight: .max) + 12
+                let itemWidth = ratio.title.text.width(ofFont: .systemFont(ofSize: UIDevice.isPad ? 16 : 14), maxHeight: .max) + 12
                 contentWidth += itemWidth
                 if index < ratios.count - 1 {
                     contentWidth += 12
@@ -209,7 +209,7 @@ extension EditorRatioToolView: UICollectionViewDelegate, UICollectionViewDelegat
     ) -> CGSize {
         if UIDevice.isPortrait {
             let config = ratios[indexPath.item]
-            let itemWidth = config.title.width(ofFont: .systemFont(ofSize: UIDevice.isPad ? 16 : 14), maxHeight: .max) + 12
+            let itemWidth = config.title.text.width(ofFont: .systemFont(ofSize: UIDevice.isPad ? 16 : 14), maxHeight: .max) + 12
             return .init(width: itemWidth, height: collectionView.height)
         }
         return .init(width: collectionView.width, height: 25)

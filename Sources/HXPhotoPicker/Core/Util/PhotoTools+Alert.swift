@@ -131,10 +131,10 @@ extension PhotoTools {
         guard let vc = viewController else { return }
         showAlert(
             viewController: vc,
-            title: "无法使用相机功能".localized,
-            message: "请前往系统设置中，允许访问「相机」。".localized,
-            leftActionTitle: "取消".localized,
-            rightActionTitle: "前往系统设置".localized
+            title: .textManager.cameraNotAuthorized.title.text,
+            message: .textManager.cameraNotAuthorized.message.text,
+            leftActionTitle: .textManager.cameraNotAuthorized.leftTitle.text,
+            rightActionTitle: .textManager.cameraNotAuthorized.rightTitle.text
         ) { _ in
             cancelHandler?()
         } rightHandler: { _ in

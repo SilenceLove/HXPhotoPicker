@@ -18,17 +18,17 @@ public class PhotoPickerEmptyView: UIView {
         super.init(frame: .zero)
         
         titleLb = UILabel()
-        titleLb.text = "没有照片".localized
+        titleLb.text = .textPhotoList.emptyTitle.text
         titleLb.numberOfLines = 0
         titleLb.textAlignment = .center
-        titleLb.font = UIFont.semiboldPingFang(ofSize: 20)
+        titleLb.font = .textPhotoList.emptyTitleFont
         addSubview(titleLb)
         
         subTitleLb = UILabel()
-        subTitleLb.text = "你可以使用相机拍些照片".localized
+        subTitleLb.text = .textPhotoList.emptySubTitle.text
         subTitleLb.numberOfLines = 0
         subTitleLb.textAlignment = .center
-        subTitleLb.font = UIFont.mediumPingFang(ofSize: 16)
+        subTitleLb.font = .textPhotoList.emptySubTitleFont
         addSubview(subTitleLb)
         
         configColor()

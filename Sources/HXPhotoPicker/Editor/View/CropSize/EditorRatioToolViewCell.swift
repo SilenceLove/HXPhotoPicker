@@ -21,7 +21,7 @@ class EditorRatioToolViewCell: UICollectionViewCell {
             guard let config = config else {
                 return
             }
-            titleLb.text = config.title.localized
+            titleLb.text = config.title.text
             titleLb.textColor = config.titleNormalColor.color
             bgView.backgroundColor = config.backgroundNormalColor.color
         }
@@ -79,7 +79,7 @@ class EditorRatioToolViewCell: UICollectionViewCell {
         }else {
             if let config = config, let font = titleLb.font {
                 bgView.y = 0
-                let titleWidth = config.title.width(ofFont: font, maxHeight: .max) + 12
+                let titleWidth = config.title.text.width(ofFont: font, maxHeight: .max) + 12
                 bgView.size = .init(width: min(titleWidth, 120), height: height)
                 bgView.centerX = width * 0.5
             }

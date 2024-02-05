@@ -23,23 +23,23 @@ class EditorFilterEditModel: Equatable {
         var title: String {
             switch self {
             case .brightness:
-                return "亮度".localized
+                return .textManager.editor.adjustment.brightnessTitle.text
             case .contrast:
-                return "对比度".localized
+                return .textManager.editor.adjustment.contrastTitle.text
             case .exposure:
-                return "曝光度".localized
+                return .textManager.editor.adjustment.exposureTitle.text
             case .saturation:
-                return "饱和度".localized
+                return .textManager.editor.adjustment.saturationTitle.text
             case .warmth:
-                return "色温".localized
+                return .textManager.editor.adjustment.warmthTitle.text
             case .vignette:
-                return "暗角".localized
+                return .textManager.editor.adjustment.vignetteTitle.text
             case .sharpen:
-                return "锐化".localized
+                return .textManager.editor.adjustment.sharpenTitle.text
             case .highlights:
-                return "高光".localized
+                return .textManager.editor.adjustment.highlightsTitle.text
             case .shadows:
-                return "阴影".localized
+                return .textManager.editor.adjustment.shadowsTitle.text
             }
         }
         

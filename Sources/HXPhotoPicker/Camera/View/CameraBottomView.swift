@@ -122,14 +122,14 @@ class CameraBottomView: UIView {
         }
         
         photoButton = UIButton(type: .custom)
-        photoButton.setTitle("照片".localized, for: .normal)
+        photoButton.setTitle(.textManager.camera.capturePhotoTitle.text, for: .normal)
         photoButton.setTitleColor(.white.withAlphaComponent(0.5), for: .normal)
         photoButton.setTitleColor(.white, for: .selected)
         photoButton.titleLabel?.font = .systemFont(ofSize: 15)
         photoButton.addTarget(self, action: #selector(didPhotoButtonClick), for: .touchUpInside)
         
         videoButton = UIButton(type: .custom)
-        videoButton.setTitle("视频".localized, for: .normal)
+        videoButton.setTitle(.textManager.camera.captureVideoTitle.text.localized, for: .normal)
         videoButton.setTitleColor(.white.withAlphaComponent(0.5), for: .normal)
         videoButton.setTitleColor(.white, for: .selected)
         videoButton.titleLabel?.font = .systemFont(ofSize: 15)
@@ -306,7 +306,7 @@ extension CameraBottomView {
         switch type {
         case .photo:
             takeBgView.addGestureRecognizer(tapGesture)
-            tipLb.text = "轻触拍照".localized
+            tipLb.text = .textManager.camera.capturePhotoTipTitle.text
             if takePhotoMode == .click {
                 photoButton.isSelected = true
                 takeType = .photo
@@ -314,7 +314,7 @@ extension CameraBottomView {
         case .video:
             if takePhotoMode == .press {
                 takeBgView.addGestureRecognizer(longPress)
-                tipLb.text = "按住摄像".localized
+                tipLb.text = .textManager.camera.captureVideoTipTitle.text
             }else {
                 takeMaskLayer.lineWidth = 10
                 takeMaskLayer.strokeEnd = 1
@@ -322,7 +322,7 @@ extension CameraBottomView {
                 takeBgView.layer.mask = takeMaskLayer
                 takeBgView.addGestureRecognizer(tapGesture)
                 videoButton.isSelected = true
-                tipLb.text = "点击摄像".localized
+                tipLb.text = .textManager.camera.captureVideoClickTipTitle.text
                 addSubview(videoTimeLb)
                 takeType = .video
             }
@@ -330,7 +330,7 @@ extension CameraBottomView {
             takeBgView.addGestureRecognizer(tapGesture)
             if takePhotoMode == .press {
                 takeBgView.addGestureRecognizer(longPress)
-                tipLb.text = "轻触拍照，按住摄像".localized
+                tipLb.text = .textManager.camera.captureTipTitle.text
             }else {
                 takeMaskLayer.lineWidth = 10
                 takeMaskLayer.strokeEnd = 1

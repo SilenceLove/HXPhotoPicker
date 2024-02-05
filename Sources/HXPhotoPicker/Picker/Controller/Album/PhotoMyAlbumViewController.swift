@@ -30,7 +30,7 @@ public class PhotoMyAlbumViewController: UIViewController, UICollectionViewDataS
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        title = "我的相册".localized
+        title = .textManager.picker.albumList.myAlbumNavigationTitle.text
         flowLayout = UICollectionViewFlowLayout()
         flowLayout.minimumLineSpacing = 12
         flowLayout.minimumInteritemSpacing = 12

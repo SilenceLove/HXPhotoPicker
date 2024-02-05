@@ -84,9 +84,9 @@ open class CameraViewController: BaseViewController {
             view.addSubview(bottomView)
             PhotoTools.showConfirm(
                 viewController: self,
-                title: "相机不可用!".localized,
+                title: .textManager.camera.unavailableTitle.text,
                 message: nil,
-                actionTitle: "确定".localized
+                actionTitle: .textManager.camera.unavailableDoneTitle.text
             ) { [weak self] _ in
                 self?.backClick(true)
             }
@@ -403,7 +403,7 @@ extension CameraViewController {
     func switchCameraFailed() {
         ProgressHUD.showWarning(
             addedTo: view,
-            text: "摄像头切换失败!".localized,
+            text: .textManager.camera.switchCameraFailedTitle.text,
             animated: true,
             delayHide: 1.5
         )
@@ -455,9 +455,9 @@ extension CameraViewController {
                 DispatchQueue.main.async {
                     PhotoTools.showConfirm(
                         viewController: self,
-                        title: "相机初始化失败!".localized,
+                        title: .textManager.camera.failedTitle.text,
                         message: nil,
-                        actionTitle: "确定".localized
+                        actionTitle: .textManager.camera.failedDoneTitle.text
                     ) { [weak self] _ in
                         self?.backClick(true)
                     }
@@ -481,10 +481,10 @@ extension CameraViewController {
                 DispatchQueue.main.async {
                     PhotoTools.showAlert(
                         viewController: self,
-                        title: "无法使用麦克风".localized,
-                        message: "请在设置-隐私-相机中允许访问麦克风".localized,
-                        leftActionTitle: "取消".localized,
-                        rightActionTitle: "前往系统设置".localized
+                        title: .textManager.camera.notAuthorized.audioTitle.text,
+                        message: .textManager.camera.notAuthorized.audioMessage.text,
+                        leftActionTitle: .textManager.camera.notAuthorized.audioLeftTitle.text,
+                        rightActionTitle: .textManager.camera.notAuthorized.audioRightTitle.text
                     ) { _ in
                         self.addAudioInputFailed()
                     } rightHandler: { _ in
@@ -499,7 +499,7 @@ extension CameraViewController {
     func addAudioInputFailed() {
         ProgressHUD.showWarning(
             addedTo: self.view,
-            text: "麦克风添加失败，录制视频会没有声音哦!".localized,
+            text: .textManager.camera.audioInputFailedTitle.text,
             animated: true,
             delayHide: 1.5
         )

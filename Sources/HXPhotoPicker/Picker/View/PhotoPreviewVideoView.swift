@@ -280,7 +280,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
             case AVPlayerItem.Status.failed:
                 // 初始化失败
                 self.cancelPlayer()
-                ProgressHUD.showWarning(addedTo: self, text: "视频加载失败!".localized, animated: true, delayHide: 1.5)
+                ProgressHUD.showWarning(addedTo: self, text: .textPreview.videoLoadFailedHudTitle.text, animated: true, delayHide: 1.5)
             default:
                 break
             }

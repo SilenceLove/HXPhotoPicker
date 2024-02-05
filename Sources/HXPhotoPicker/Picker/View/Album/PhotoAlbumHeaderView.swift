@@ -31,7 +31,7 @@ public class PhotoAlbumHeaderView: UITableViewHeaderFooterView {
         contentView.addSubview(titleLb)
         
         allBtn = UIButton(type: .system)
-        allBtn.setTitle("查看全部".localized, for: .normal)
+        allBtn.setTitle(.textManager.picker.albumList.lookAllSectionTitle.text, for: .normal)
         allBtn.addTarget(self, action: #selector(didAllButtonClick), for: .touchUpInside)
         contentView.addSubview(allBtn)
     }

@@ -170,7 +170,7 @@ public class VideoEditorMusic: Equatable, Codable {
         lyrics = sorted
         if lyrics.isEmpty {
             lyricIsEmpty = true
-            lyrics.append(.init(lyric: "此歌曲暂无歌词，请您欣赏".localized))
+            lyrics.append(.init(lyric: .textManager.editor.music.lyricEmptyTitle.text))
         }
     }
      
@@ -178,7 +178,7 @@ public class VideoEditorMusic: Equatable, Codable {
         atTime time: TimeInterval
     ) -> VideoEditorLyric? {
         if lyricIsEmpty {
-            return .init(lyric: "此歌曲暂无歌词，请您欣赏".localized)
+            return .init(lyric: .textManager.editor.music.lyricEmptyTitle.text)
         }
         for lyric in lyrics {
             if lyric.second.isEmpty || lyric.second == "60000:50:00" {

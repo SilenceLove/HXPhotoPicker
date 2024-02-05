@@ -594,11 +594,11 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
                 let image: UIImage?
                 let attributes: UIMenuElement.Attributes
                 if photoAsset.isSelected {
-                    title = "取消选择".localized
+                    title = .textPhotoList.hapticTouchDeselectedTitle.text
                     image = UIImage(systemName: "minus.circle")
                     attributes = [.destructive]
                 }else {
-                    title = "选择".localized
+                    title = .textPhotoList.hapticTouchSelectedTitle.text
                     image = UIImage(systemName: "checkmark.circle")
                     attributes = []
                 }
@@ -625,7 +625,7 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
             }
             if self.pickerConfig.editorOptions.contains(options) {
                 let edit = UIAction(
-                    title: "编辑".localized,
+                    title: .textPhotoList.hapticTouchEditTitle.text,
                     image: UIImage(systemName: "slider.horizontal.3")
                 ) { [weak self] _ in
                     guard let self = self else { return }
@@ -635,7 +635,7 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
             }
             if photoAsset.editedResult != nil {
                 let removeEdit = UIAction(
-                    title: "清空已编辑的内容".localized,
+                    title: .textPhotoList.hapticTouchRemoveEditTitle.text,
                     image: .init(systemName: "xmark.circle"),
                     attributes: [.destructive]
                 ) { [weak self] _ in

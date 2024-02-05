@@ -52,7 +52,7 @@ public class PhotoPickerPageViewController: BaseViewController, PhotoPickerList 
             var titles: [String] = []
             contentVCs = []
             if !assetResult.videoAssets.isEmpty {
-                titles.append("视频".localized)
+                titles.append(.textPhotoList.pageVideoTitle.text)
                 let assets = assetResult.videoAssets
                 let vc = PhotoPickerListViewController.init(config: pickerConfig)
                 vc.delegate = self
@@ -60,7 +60,7 @@ public class PhotoPickerPageViewController: BaseViewController, PhotoPickerList 
                 contentVCs.append(vc)
             }
             if !assetResult.normalAssets.isEmpty {
-                titles.append("照片".localized)
+                titles.append(.textPhotoList.pagePhotoTitle.text)
                 let assets = assetResult.normalAssets
                 let vc = PhotoPickerListViewController.init(config: pickerConfig)
                 vc.delegate = self
@@ -68,7 +68,7 @@ public class PhotoPickerPageViewController: BaseViewController, PhotoPickerList 
                 contentVCs.append(vc)
             }
             if !assetResult.gifAssets.isEmpty {
-                titles.append("GIF")
+                titles.append(.textPhotoList.pageGifTitle.text)
                 let assets = assetResult.gifAssets
                 let vc = PhotoPickerListViewController.init(config: pickerConfig)
                 vc.delegate = self
@@ -76,7 +76,7 @@ public class PhotoPickerPageViewController: BaseViewController, PhotoPickerList 
                 contentVCs.append(vc)
             }
             if !assetResult.livePhotoAssets.isEmpty {
-                titles.append("LivePhoto")
+                titles.append(.textPhotoList.pageLivePhotoTitle.text)
                 let assets = assetResult.livePhotoAssets
                 let vc = PhotoPickerListViewController.init(config: pickerConfig)
                 vc.delegate = self
@@ -84,7 +84,7 @@ public class PhotoPickerPageViewController: BaseViewController, PhotoPickerList 
                 contentVCs.append(vc)
             }
             if !titles.isEmpty {
-                titles.insert("全部".localized, at: 0)
+                titles.insert(.textPhotoList.pageAllTitle.text, at: 0)
                 let vc = PhotoPickerListViewController.init(config: pickerConfig)
                 vc.delegate = self
                 vc.assetResult = assetResult

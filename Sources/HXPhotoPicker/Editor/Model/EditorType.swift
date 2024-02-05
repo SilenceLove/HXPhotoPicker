@@ -8,7 +8,7 @@
 import UIKit
  
 public struct EditorRatioToolConfig {
-    public let title: String
+    public let title: HX.TextManager.TextType
     let titleNormalColor: String
     let titleSelectedColor: String
     let backgroundNormalColor: String
@@ -16,7 +16,7 @@ public struct EditorRatioToolConfig {
     public let ratio: CGSize
     
     public init(
-        title: String,
+        title: HX.TextManager.TextType,
         titleNormalColor: String = "#a1a1a1",
         titleSelectedColor: String = "#ebebeb",
         backgroundNormalColor: String = "",

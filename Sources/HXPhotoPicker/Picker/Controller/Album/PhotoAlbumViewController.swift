@@ -29,9 +29,9 @@ public class PhotoAlbumViewController: UIViewController, PhotoAlbumController {
     
     public override func viewDidLoad() {
         if config.albumShowMode.isPop {
-            title = "选择相册".localized
+            title = .textManager.picker.albumList.selectNavigationTitle.text
         }else {
-            title = "相册".localized
+            title = .textManager.picker.albumList.navigationTitle.text
         }
         navigationController?.navigationBar.isTranslucent = config.navigationBarIsTranslucent
 //        if #available(iOS 11.0, *) {
@@ -94,10 +94,10 @@ public class PhotoAlbumViewController: UIViewController, PhotoAlbumController {
             systemAlbums.append(assetCollection)
         }
         if !userAlbums.isEmpty {
-            datas.append(.init(title: "我的相册".localized, assetCollections: userAlbums))
+            datas.append(.init(title: .textManager.picker.albumList.myAlbumSectionTitle.text, assetCollections: userAlbums))
         }
         if !systemAlbums.isEmpty {
-            datas.append(.init(title: "媒体类型".localized, assetCollections: systemAlbums))
+            datas.append(.init(title: .textManager.picker.albumList.mediaSectionTitle.text, assetCollections: systemAlbums))
         }
         tableView.reloadData()
     }

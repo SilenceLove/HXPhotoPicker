@@ -503,7 +503,7 @@ extension EditorViewController: EditorToolsViewDelegate {
                     if infos.isEmpty {
                         ProgressHUD.showWarning(
                             addedTo: view,
-                            text: "暂无配乐".localized,
+                            text: .textManager.editor.music.emptyHudTitle.text,
                             animated: true,
                             delayHide: 1.5
                         )

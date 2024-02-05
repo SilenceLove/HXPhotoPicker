@@ -67,8 +67,8 @@ class CameraResultViewController: UIViewController {
         }
         
         doneButton = UIButton(type: .system)
-        doneButton.setTitle("完成".localized, for: .normal)
-        doneButton.titleLabel?.font = .mediumPingFang(ofSize: 16)
+        doneButton.setTitle(.textManager.camera.resultFinishTitle.text, for: .normal)
+        doneButton.titleLabel?.font = .textManager.camera.resultFinishTitleFont
         doneButton.layer.cornerRadius = 3
         doneButton.layer.masksToBounds = true
         doneButton.addTarget(self, action: #selector(didDoneButtonClick(button:)), for: .touchUpInside)

@@ -46,6 +46,7 @@ open class PhotoSplitViewController: UISplitViewController, UISplitViewControlle
         modalPresentationStyle = picker.config.modalPresentationStyle
         viewControllers = [album, picker]
         delegate = self
+        album.albumViewController?.initItems()
     }
     
     open override func viewDidLoad() {

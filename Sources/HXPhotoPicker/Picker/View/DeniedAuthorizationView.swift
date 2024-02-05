@@ -66,14 +66,14 @@ public class DeniedAuthorizationView: UIView, PhotoDeniedAuthorization {
     
     private func configViews() {
         
-        titleLb.text = "无法访问相册中照片".localized
-        titleLb.font = UIFont.semiboldPingFang(ofSize: 20)
+        titleLb.text = .textNotAuthorized.title.text
+        titleLb.font = .textNotAuthorized.titleFont
         
-        subTitleLb.text = "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".localized
-        subTitleLb.font = UIFont.regularPingFang(ofSize: 17)
+        subTitleLb.text = .textNotAuthorized.subTitle.text
+        subTitleLb.font = .textNotAuthorized.subTitleFont
         
-        jumpBtn.setTitle("前往系统设置".localized, for: .normal)
-        jumpBtn.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
+        jumpBtn.setTitle(.textNotAuthorized.buttonTitle.text, for: .normal)
+        jumpBtn.titleLabel?.font = .textNotAuthorized.buttonTitleFont
         
         configColor()
     }

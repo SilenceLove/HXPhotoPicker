@@ -239,14 +239,14 @@ extension AvatarPickerConfigurationViewController {
     func aspectRatiosAction(_ indexPath: IndexPath) {
         if config.editor.cropSize.aspectRatios.isEmpty {
             config.editor.cropSize.aspectRatios = [
-                .init(title: "自由格式", ratio: .init(width: 0, height: 0)),
-                .init(title: "正方形", ratio: .init(width: 1, height: 1)),
-                .init(title: "3:2", ratio: .init(width: 3, height: 2)),
-                .init(title: "2:3", ratio: .init(width: 2, height: 3)),
-                .init(title: "4:3", ratio: .init(width: 4, height: 3)),
-                .init(title: "3:4", ratio: .init(width: 3, height: 4)),
-                .init(title: "16:9", ratio: .init(width: 16, height: 9)),
-                .init(title: "9:16", ratio: .init(width: 9, height: 16))
+                .init(title: .localized("自由格式"), ratio: .init(width: 0, height: 0)),
+                .init(title: .localized("正方形"), ratio: .init(width: 1, height: 1)),
+                .init(title: .localized("3:2"), ratio: .init(width: 3, height: 2)),
+                .init(title: .localized("2:3"), ratio: .init(width: 2, height: 3)),
+                .init(title: .localized("4:3"), ratio: .init(width: 4, height: 3)),
+                .init(title: .localized("3:4"), ratio: .init(width: 3, height: 4)),
+                .init(title: .localized("16:9"), ratio: .init(width: 16, height: 9)),
+                .init(title: .localized("9:16"), ratio: .init(width: 9, height: 16))
             ]
         }else {
             config.editor.cropSize.aspectRatios = []

@@ -71,9 +71,9 @@ class EditorVolumeView: UIView {
         addSubview(bgView)
         
         musicTitleLb = UILabel()
-        musicTitleLb.text = "配乐".localized
+        musicTitleLb.text = .textManager.editor.music.volumeMusicButtonTitle.text
         musicTitleLb.textColor = .white
-        musicTitleLb.font = .systemFont(ofSize: 15)
+        musicTitleLb.font = .textManager.editor.music.volumeMusicButtonTitleFont
         musicTitleLb.adjustsFontSizeToFitWidth = true
         addSubview(musicTitleLb)
         
@@ -97,9 +97,9 @@ class EditorVolumeView: UIView {
         addSubview(musicVolumeNumberLb)
         
         originalTitleLb = UILabel()
-        originalTitleLb.text = "视频原声".localized
+        originalTitleLb.text = .textManager.editor.music.volumeOriginalButtonTitle.text
         originalTitleLb.textColor = .white
-        originalTitleLb.font = .systemFont(ofSize: 15)
+        originalTitleLb.font = .textManager.editor.music.volumeOriginalButtonTitleFont
         originalTitleLb.adjustsFontSizeToFitWidth = true
         addSubview(originalTitleLb)
         

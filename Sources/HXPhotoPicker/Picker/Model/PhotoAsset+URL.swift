@@ -15,6 +15,7 @@ public extension PhotoAsset {
     /// 获取image，视频为封面图片
     /// - Parameters:
     ///   - compressionQuality: 压缩参数 0-1
+    ///   - resolution: 缩小到指定分辨率，优先级小于`compressionQuality`
     ///   - completion: 获取完成
     func getImage(
         compressionQuality: CGFloat? = nil,
@@ -55,6 +56,40 @@ public extension PhotoAsset {
         }
         #endif
         requestImage(compressionScale: compressionQuality) { image, _ in
+            completion(image)
+        }
+    }
+    
+    /// 获取image，视频为封面图片
+    /// - Parameters:
+    ///   - targetSize: 指定`imageSize`
+    ///   - isEqualRatio: 宽高比与原图一致
+    ///   - completion: 获取完成
+    func getImage(
+        targetSize: CGSize,
+        isEqualRatio: Bool = true,
+        completion: @escaping (UIImage?) -> Void
+    ) {
+        #if canImport(Kingfisher)
+        let hasEdited: Bool
+        #if HXPICKER_ENABLE_EDITOR
+        hasEdited = editedResult != nil
+        #else
+        hasEdited = false
+        #endif
+        if isNetworkAsset && !hasEdited {
+            getNetworkImage { image in
+                DispatchQueue.global().async {
+                    let image = image?.scaleToFillSize(size: targetSize, equalRatio: isEqualRatio)
+                    DispatchQueue.main.async {
+                        completion(image)
+                    }
+                }
+            }
+            return
+        }
+        #endif
+        requestImage(targetSize: targetSize, isEqualRatio: isEqualRatio) { image, _ in
             completion(image)
         }
     }
@@ -417,6 +452,26 @@ extension PhotoAsset {
         toFile fileConfig: PhotoAsset.FileConfig? = nil
     ) async throws -> T {
         try await T.fetchObject(self, toFile: fileConfig, compression: compression)
+    }
+    
+    /// 获取`UIImage`，视频为封面图片
+    /// - Parameters:
+    ///   - targetSize: 指定`imageSize`
+    ///   - isEqualRatio: 宽高比与原图一致
+    /// - Returns: 获取结果
+    public func image(
+        targetSize: CGSize,
+        isEqualRatio: Bool = true
+    ) async throws -> UIImage {
+        try await withCheckedThrowingContinuation { continuation in
+            getImage(targetSize: targetSize, isEqualRatio: isEqualRatio) { image in
+                if let image = image {
+                    continuation.resume(with: .success(image))
+                }else {
+                    continuation.resume(with: .failure(PickerError.imageFetchFaild))
+                }
+            }
+        }
     }
     
     fileprivate func image(_ compressionQuality: CGFloat?) async throws -> UIImage {

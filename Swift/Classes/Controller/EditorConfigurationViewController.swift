@@ -512,15 +512,15 @@ extension EditorConfigurationViewController {
         let alert = UIAlertController.init(title: "aspectRatiosAction", message: nil, preferredStyle: .alert)
         alert.addAction(.init(title: "默认数组", style: .default, handler: { [weak self] _ in
             self?.config.cropSize.aspectRatios = [
-                .init(title: "原始比例", ratio: .init(width: -1, height: -1)),
-                .init(title: "自由格式", ratio: .zero),
-                .init(title: "正方形", ratio: .init(width: 1, height: 1)),
-                .init(title: "16:9", ratio: .init(width: 16, height: 9)),
-                .init(title: "5:4", ratio: .init(width: 5, height: 4)),
-                .init(title: "7:5", ratio: .init(width: 7, height: 5)),
-                .init(title: "4:3", ratio: .init(width: 4, height: 3)),
-                .init(title: "5:3", ratio: .init(width: 5, height: 3)),
-                .init(title: "3:2", ratio: .init(width: 3, height: 2))
+                .init(title: .localized("原始比例"), ratio: .init(width: -1, height: -1)),
+                .init(title: .localized("自由格式"), ratio: .zero),
+                .init(title: .localized("正方形"), ratio: .init(width: 1, height: 1)),
+                .init(title: .localized("16:9"), ratio: .init(width: 16, height: 9)),
+                .init(title: .localized("5:4"), ratio: .init(width: 5, height: 4)),
+                .init(title: .localized("7:5"), ratio: .init(width: 7, height: 5)),
+                .init(title: .localized("4:3"), ratio: .init(width: 4, height: 3)),
+                .init(title: .localized("5:3"), ratio: .init(width: 5, height: 3)),
+                .init(title: .localized("3:2"), ratio: .init(width: 3, height: 2))
             ]
             self?.config.cropSize.defaultSeletedIndex = 0
             self?.config.cropSize.aspectRatio = .zero
@@ -528,14 +528,14 @@ extension EditorConfigurationViewController {
         }))
         alert.addAction(.init(title: "[0, 0], [1, 1], [1, 2], [1, 3], [1, 4], [2, 1], [3, 1], [4, 1]", style: .default, handler: { [weak self] _ in
             self?.config.cropSize.aspectRatios = [
-                .init(title: "自由格式", ratio: .zero),
-                .init(title: "正方形", ratio: .init(width: 1, height: 1)),
-                .init(title: "1:2", ratio: .init(width: 1, height: 2)),
-                .init(title: "1:3", ratio: .init(width: 1, height: 3)),
-                .init(title: "1:4", ratio: .init(width: 1, height: 4)),
-                .init(title: "2:1", ratio: .init(width: 2, height: 1)),
-                .init(title: "3:1", ratio: .init(width: 3, height: 1)),
-                .init(title: "4:1", ratio: .init(width: 4, height: 1))
+                .init(title: .localized("自由格式"), ratio: .zero),
+                .init(title: .localized("正方形"), ratio: .init(width: 1, height: 1)),
+                .init(title: .localized("1:2"), ratio: .init(width: 1, height: 2)),
+                .init(title: .localized("1:3"), ratio: .init(width: 1, height: 3)),
+                .init(title: .localized("1:4"), ratio: .init(width: 1, height: 4)),
+                .init(title: .localized("2:1"), ratio: .init(width: 2, height: 1)),
+                .init(title: .localized("3:1"), ratio: .init(width: 3, height: 1)),
+                .init(title: .localized("4:1"), ratio: .init(width: 4, height: 1))
             ]
             self?.config.cropSize.defaultSeletedIndex = 0
             self?.config.cropSize.aspectRatio = .zero
@@ -543,14 +543,14 @@ extension EditorConfigurationViewController {
         }))
         alert.addAction(.init(title: "[0, 0], [1, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]", style: .default, handler: { [weak self] _ in
             self?.config.cropSize.aspectRatios = [
-                .init(title: "自由格式", ratio: .zero),
-                .init(title: "正方形", ratio: .init(width: 1, height: 1)),
-                .init(title: "1:2", ratio: .init(width: 1, height: 2)),
-                .init(title: "2:3", ratio: .init(width: 2, height: 3)),
-                .init(title: "3:4", ratio: .init(width: 3, height: 4)),
-                .init(title: "4:3", ratio: .init(width: 4, height: 5)),
-                .init(title: "5:6", ratio: .init(width: 5, height: 6)),
-                .init(title: "6:7", ratio: .init(width: 6, height: 7))
+                .init(title: .localized("自由格式"), ratio: .zero),
+                .init(title: .localized("正方形"), ratio: .init(width: 1, height: 1)),
+                .init(title: .localized("1:2"), ratio: .init(width: 1, height: 2)),
+                .init(title: .localized("2:3"), ratio: .init(width: 2, height: 3)),
+                .init(title: .localized("3:4"), ratio: .init(width: 3, height: 4)),
+                .init(title: .localized("4:3"), ratio: .init(width: 4, height: 5)),
+                .init(title: .localized("5:6"), ratio: .init(width: 5, height: 6)),
+                .init(title: .localized("6:7"), ratio: .init(width: 6, height: 7))
             ]
             self?.config.cropSize.defaultSeletedIndex = 0
             self?.config.cropSize.aspectRatio = .zero

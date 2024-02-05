@@ -90,7 +90,7 @@ public class AlbumViewController: PhotoBaseViewController, PhotoAlbumListDelegat
         listView.reloadData()
     }
     
-    private func initItems() {
+    func initItems() {
         let items = config.leftNavigationItems + config.rightNavigationItems
         var leftItems: [UIBarButtonItem] = []
         var rightItems: [UIBarButtonItem] = []
@@ -104,13 +104,13 @@ public class AlbumViewController: PhotoBaseViewController, PhotoAlbumListDelegat
             }
         }
         if let titleLabel = titleLabel {
-            titleLabel.text = "相册".localized
+            titleLabel.text = .textManager.picker.albumList.navigationTitle.text
         }
         if UIDevice.isPad {
             if !pickerController.splitType.isSplit {
-                title = "返回".localized
+                title = .textManager.picker.albumList.backTitle.text
             }else {
-                title = "相册".localized
+                title = .textManager.picker.albumList.navigationTitle.text
                 rightItems = []
             }
         }else {
@@ -125,13 +125,13 @@ public class AlbumViewController: PhotoBaseViewController, PhotoAlbumListDelegat
                     rightItems = []
                 }
             }else {
-                title = "返回".localized
+                title = .textManager.picker.albumList.backTitle.text
             }
         }
-        
         navigationItem.leftBarButtonItems = leftItems
         navigationItem.rightBarButtonItems = rightItems
     }
+    
     func reloadTableView(assetCollections: [PhotoAssetCollection]) {
         self.assetCollections = assetCollections
         if splitViewController is PhotoSplitViewController {
@@ -142,7 +142,7 @@ public class AlbumViewController: PhotoBaseViewController, PhotoAlbumListDelegat
         }else {
             if self.assetCollections.isEmpty {
                 let assetCollection = PhotoAssetCollection(
-                    albumName: pickerConfig.emptyAlbumName.localized,
+                    albumName: .textManager.picker.albumList.emptyAlbumName.text,
                     coverImage: pickerConfig.emptyCoverImageName.image
                 )
                 if splitViewController is PhotoSplitViewController {

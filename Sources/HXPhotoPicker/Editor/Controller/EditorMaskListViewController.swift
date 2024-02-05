@@ -35,7 +35,7 @@ class EditorMaskListViewController: BaseViewController {
         super.viewDidLoad()
         initViews()
         view.backgroundColor = .clear
-        title = "蒙版素材".localized
+        title = .textManager.editor.crop.maskListTitle.text
         let finishButtonWidth = finishButton.currentTitle?.width(
             ofFont: finishButton.titleLabel!.font,
             maxHeight: 50
@@ -52,11 +52,9 @@ class EditorMaskListViewController: BaseViewController {
         bgView = UIVisualEffectView.init(effect: visualEffect)
         
         finishButton = UIButton(type: .system)
-        let title = "完成".localized
-        let font = UIFont.systemFont(ofSize: 17)
-        finishButton.setTitle(title, for: .normal)
+        finishButton.setTitle(.textManager.editor.crop.maskListFinishTitle.text, for: .normal)
         finishButton.setTitleColor(config.angleScaleColor, for: .normal)
-        finishButton.titleLabel?.font = font
+        finishButton.titleLabel?.font = .textManager.editor.crop.maskListFinishTitleFont
         finishButton.isEnabled = false
         finishButton.addTarget(self, action: #selector(didFinishButtonClick), for: .touchUpInside)
         
@@ -144,7 +142,7 @@ extension EditorMaskListViewController: UICollectionViewDataSource, UICollection
                 dismiss(animated: true)
                 delegate?.editorMaskListViewController(self, didSelected: image)
             }else {
-                ProgressHUD.showWarning(addedTo: view, text: "处理失败".localized, animated: true, delayHide: 1.5)
+                ProgressHUD.showWarning(addedTo: view, text: .textManager.editor.processingFailedHUDTitle.text, animated: true, delayHide: 1.5)
             }
         case .text(let text, let font):
             ProgressHUD.showLoading(addedTo: self.view)

@@ -252,7 +252,7 @@ extension PhotoPreviewViewController: PhotoToolBarDelegate {
         if assetCount == 0 {
             ProgressHUD.showWarning(
                 addedTo: view,
-                text: "没有可选资源".localized,
+                text: .textPreview.emptyAssetHudTitle.text,
                 animated: true,
                 delayHide: 1.5
             )

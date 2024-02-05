@@ -306,7 +306,7 @@ extension PhotoPreviewViewController {
                     )
                 }else {
                     cancelItem = UIBarButtonItem(
-                        title: "取消".localized,
+                        title: .textPreview.cancelTitle.text,
                         style: .done,
                         target: self,
                         action: #selector(didCancelItemClick)

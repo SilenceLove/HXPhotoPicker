@@ -565,7 +565,7 @@ extension EditorViewController {
                     self.loadAssetStatus = .failure
                     return
                 }
-                self.loadFailure(message: "图片获取失败!".localized)
+                self.loadFailure(message: .textManager.editor.photoLoadFailedAlertMessage.text)
             }
         }
     }
@@ -655,7 +655,7 @@ extension EditorViewController {
                             return
                         }
                         ProgressHUD.hide(forView: self.view, animated: true)
-                        self.loadFailure(message: "图片获取失败!".localized)
+                        self.loadFailure(message: .textManager.editor.photoLoadFailedAlertMessage.text)
                     }
                 }
             }else {
@@ -716,7 +716,7 @@ extension EditorViewController {
                     return
                 }
                 ProgressHUD.hide(forView: self.view, animated: true)
-                self.loadFailure(message: "图片获取失败!".localized)
+                self.loadFailure(message: .textManager.editor.photoLoadFailedAlertMessage.text)
             }
         }
         #endif
@@ -737,7 +737,7 @@ extension EditorViewController {
         ) { [weak self] _, requestID in
             self?.assetRequestID = requestID
             self?.assetLoadingView?.mode = .circleProgress
-            self?.assetLoadingView?.text = "正在同步iCloud".localized + "..."
+            self?.assetLoadingView?.text = .textManager.editor.iCloudSyncHudTitle.text + "..."
         } progressHandler: { [weak self] _, progress in
             if progress > 0 {
                 DispatchQueue.main.async {
@@ -755,9 +755,9 @@ extension EditorViewController {
                     }
                     ProgressHUD.hide(forView: self.view, animated: true)
                     if let inICloud = info?.inICloud {
-                        self.loadFailure(message: inICloud ? "iCloud同步失败".localized : "图片获取失败!".localized)
+                        self.loadFailure(message: inICloud ? .textManager.editor.iCloudSyncFailedAlertMessage.text : .textManager.editor.photoLoadFailedAlertMessage.text)
                     }else {
-                        self.loadFailure(message: "图片获取失败!".localized)
+                        self.loadFailure(message: .textManager.editor.photoLoadFailedAlertMessage.text)
                     }
                     return
                 }
@@ -777,78 +777,6 @@ extension EditorViewController {
                 }
             }
         }
-        
-//        let isHEIC = photoAsset.photoFormat == "heic"
-//        editorView.isHEICImage = isHEIC
-//        assetRequestID = photoAsset.requestImageData(
-//            filterEditor: true
-//        ) { [weak self] _, result in
-//            guard let self = self else { return }
-//            self.assetLoadingView = nil
-//            switch result {
-//            case .success(let dataResult):
-//                DispatchQueue.global().async {
-//                    func handler(_ result: UIImage? = nil) {
-//                        var image = result
-//                        if image == nil {
-//                            image = UIImage(data: dataResult.imageData)
-//                        }
-//                        guard let image = image?.normalizedImage() else {
-//                            DispatchQueue.main.async {
-//                                if !self.isTransitionCompletion {
-//                                    self.loadAssetStatus = .failure
-//                                    return
-//                                }
-//                                ProgressHUD.hide(forView: self.view, animated: true)
-//                                self.loadFailure(message: "图片获取失败!".localized)
-//                            }
-//                            return
-//                        }
-//                        DispatchQueue.main.async {
-//                            if !self.isTransitionCompletion {
-//                                self.loadAssetStatus = .successful(.image(image))
-//                                return
-//                            }
-//                            self.editorView.setImage(image)
-//                            self.loadCompletion()
-//                            self.loadLastEditedData()
-//                            let viewSize = UIDevice.screenSize
-//                            DispatchQueue.global().async {
-//                                self.loadThumbnailImage(image, viewSize: viewSize)
-//                            }
-//                            ProgressHUD.hide(forView: self.view, animated: true)
-//                        }
-//                    }
-//                    let dataCount = CGFloat(dataResult.imageData.count)
-//                    if dataCount > 3000000 {
-//                        PhotoTools.compressImageData(
-//                            dataResult.imageData,
-//                            compressionQuality: dataCount.compressionQuality,
-//                            queueLabel: "com.hxphotopicker.previewrequest"
-//                        ) {
-//                            guard let imageData = $0 else {
-//                                handler()
-//                                return
-//                            }
-//                            handler(.init(data: imageData))
-//                        }
-//                        return
-//                    }
-//                    handler()
-//                }
-//            case .failure(let error):
-//                if !self.isTransitionCompletion {
-//                    self.loadAssetStatus = .failure
-//                    return
-//                }
-//                ProgressHUD.hide(forView: self.view, animated: true)
-//                if let inICloud = error.info?.inICloud {
-//                    self.loadFailure(message: inICloud ? "iCloud同步失败".localized : "图片获取失败!".localized)
-//                }else {
-//                    self.loadFailure(message: "图片获取失败!".localized)
-//                }
-//            }
-//        }
     }
     
     func requestAssetURL() {
@@ -913,7 +841,7 @@ extension EditorViewController {
                     return
                 }
                 ProgressHUD.hide(forView: self.view, animated: true)
-                self.loadFailure(message: "图片获取失败!".localized)
+                self.loadFailure(message: .textManager.editor.photoLoadFailedAlertMessage.text)
             }
         }
     }
@@ -939,7 +867,7 @@ extension EditorViewController {
         ) { [weak self] (_, requestID) in
             self?.assetRequestID = requestID
             self?.assetLoadingView?.mode = .circleProgress
-            self?.assetLoadingView?.text = "正在同步iCloud".localized + "..."
+            self?.assetLoadingView?.text = .textManager.editor.iCloudSyncHudTitle.text + "..."
         } progressHandler: { [weak self] (_, progress) in
             if progress > 0 {
                 self?.assetLoadingView?.progress = CGFloat(progress)
@@ -966,10 +894,10 @@ extension EditorViewController {
             }
             ProgressHUD.hide(forView: self.view, animated: false)
             guard let info = info else {
-                self.loadFailure(message: "视频获取失败!".localized)
+                self.loadFailure(message: .textManager.editor.videoLoadFailedAlertMessage.text)
                 return
             }
-            self.loadFailure(message: info.inICloud ? "iCloud同步失败".localized : "视频获取失败!".localized)
+            self.loadFailure(message: info.inICloud ? .textManager.editor.iCloudSyncFailedAlertMessage.text : .textManager.editor.videoLoadFailedAlertMessage.text)
         }
     }
     #endif
@@ -1096,15 +1024,15 @@ extension EditorViewController {
         }
     }
     
-    func loadFailure(message: String = "视频获取失败!".localized) {
+    func loadFailure(message: String = .textManager.editor.videoLoadFailedAlertMessage.text) {
         if isDismissed {
             return
         }
         PhotoTools.showConfirm(
             viewController: self,
-            title: "提示".localized,
+            title: .textManager.editor.loadFailedAlertTitle.text,
             message: message,
-            actionTitle: "确定".localized
+            actionTitle: .textManager.editor.loadFailedAlertDoneTitle.text
         ) { [weak self] _ in
             self?.backClick(true)
         }
