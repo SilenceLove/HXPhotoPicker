@@ -173,13 +173,13 @@ public extension PhotoAsset {
     @discardableResult
     func requestImage(
         targetSize: CGSize,
-        isEqualRatio: Bool = true,
+        targetMode: HX.ImageTargetMode = .fill,
         completion: ((UIImage?, PhotoAsset) -> Void)?
     ) -> PHImageRequestID? {
         #if HXPICKER_ENABLE_EDITOR
         if editedResult != nil {
             DispatchQueue.global().async {
-                let image = self.getEditedImage()?.scaleToFillSize(size: targetSize, equalRatio: isEqualRatio)
+                let image = self.getEditedImage()?.scaleToFillSize(size: targetSize, mode: targetMode)
                 DispatchQueue.main.async {
                     completion?(image, self)
                 }
@@ -192,7 +192,7 @@ public extension PhotoAsset {
                 urlType: .original
             ) { (image, photoAsset) in
                 DispatchQueue.global().async {
-                    let image = image?.scaleToFillSize(size: targetSize, equalRatio: isEqualRatio)
+                    let image = image?.scaleToFillSize(size: targetSize, mode: targetMode)
                     DispatchQueue.main.async {
                         completion?(image, photoAsset)
                     }
@@ -207,11 +207,11 @@ public extension PhotoAsset {
             deliveryMode: .highQualityFormat,
             resizeMode: .fast
         ) { image, info in
-            if isEqualRatio {
+            if targetMode == .fill {
                 completion?(image, self)
             }else {
                 DispatchQueue.global().async {
-                    let image = image?.scaleToFillSize(size: targetSize, equalRatio: isEqualRatio)
+                    let image = image?.scaleToFillSize(size: targetSize, mode: targetMode)
                     DispatchQueue.main.async {
                         completion?(image, self)
                     }

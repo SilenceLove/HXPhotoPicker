@@ -23,7 +23,7 @@ public struct PickerResult {
     /// The original image does not select the compression parameter when getting the URL
     /// 原图未选中获取 URL 时的压缩参数
     public var compression: PhotoAsset.Compression? = .init(
-        imageCompressionQuality: 0.6,
+        imageCompressionQuality: 0.5,
         videoExportParameter: .init(
             preset: .ratio_960x540,
             quality: 6
@@ -46,7 +46,7 @@ public struct PickerResult {
 // MARK: Get Image / Video URL
 public extension PickerResult {
     
-    /// get / 获取  image
+    /// 获取  image
     /// - Parameters:
     ///   - compressionScale: Compression ratio, valid when obtaining resources in the system album / 压缩比例，获取系统相册里的资源时有效
     ///   - imageHandler: Triggered every time an image is fetched / 每一次获取image都会触发
@@ -58,6 +58,26 @@ public extension PickerResult {
     ) {
         photoAssets.getImage(
             compressionScale: compressionScale,
+            imageHandler: imageHandler,
+            completionHandler: completionHandler
+        )
+    }
+    
+    /// 获取 image
+    /// - Parameters:
+    ///   - targetSize: 指定`imageSize`
+    ///   - targetMode: 裁剪模式
+    ///   - imageHandler: 每一次获取image都会触发
+    ///   - completionHandler: 全部获取完成(失败的不会添加)
+    func getImage(
+        targetSize: CGSize,
+        targetMode: HX.ImageTargetMode = .fill,
+        imageHandler: PickerResult.ImageHandler? = nil,
+        completionHandler: @escaping ([UIImage]) -> Void
+    ) {
+        photoAssets.getImage(
+            targetSize: targetSize,
+            targetMode: targetMode,
             imageHandler: imageHandler,
             completionHandler: completionHandler
         )
@@ -216,6 +236,26 @@ public extension PickerResult {
                     toFileConfig = fileConfig
                 }
                 let result: T = try await photoAsset.object(_compression, toFile: toFileConfig)
+                results.append(result)
+            } catch {
+                throw PickerError.objsFetchFaild(photoAsset, index, error)
+            }
+        }
+        if Task.isCancelled { throw PickerError.canceled }
+        return results
+    }
+    
+    /// 获取 UIImage 对象数组
+    /// - Parameters:
+    ///   - targetSize: 指定`imageSize`
+    ///   - targetMode: 裁剪模式
+    /// - Returns: `UIImage` 对象数组
+    func images(targetSize: CGSize, targetMode: HX.ImageTargetMode = .fill) async throws -> [UIImage] {
+        var results: [UIImage] = []
+        for (index, photoAsset) in photoAssets.enumerated() {
+            if Task.isCancelled { throw PickerError.canceled }
+            do {
+                let result = try await photoAsset.image(targetSize: targetSize, targetMode: targetMode)
                 results.append(result)
             } catch {
                 throw PickerError.objsFetchFaild(photoAsset, index, error)

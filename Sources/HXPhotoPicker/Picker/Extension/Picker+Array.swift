@@ -44,6 +44,42 @@ public extension Array where Element: PhotoAsset {
         }
     }
     
+    /// 获取 image
+    /// - Parameters:
+    ///   - targetSize: 指定`imageSize`
+    ///   - targetMode: 裁剪模式
+    ///   - imageHandler: 每一次获取image都会触发
+    ///   - completionHandler: 全部获取完成(失败的不会添加)   
+    func getImage(
+        targetSize: CGSize,
+        targetMode: HX.ImageTargetMode = .fill,
+        imageHandler: PickerResult.ImageHandler? = nil,
+        completionHandler: @escaping ([UIImage]) -> Void
+    ) {
+        let group = DispatchGroup()
+        let queue = DispatchQueue(label: "HXPhotoPicker.get.targetimage")
+        var images: [UIImage] = []
+        for (index, photoAsset) in enumerated() {
+            queue.async(
+                group: group,
+                execute: DispatchWorkItem(block: {
+                    let semaphore = DispatchSemaphore(value: 0)
+                    photoAsset.getImage(targetSize: targetSize, targetMode: targetMode) {
+                        imageHandler?($0, $1, index)
+                        if let image = $0 {
+                            images.append(image)
+                        }
+                        semaphore.signal()
+                    }
+                    semaphore.wait()
+                })
+            )
+        }
+        group.notify(queue: .main) {
+            completionHandler(images)
+        }
+    }
+    
     /// 获取视频地址
     /// - Parameters:
     ///   - exportParameter: 导出参数，nil 为原始视频

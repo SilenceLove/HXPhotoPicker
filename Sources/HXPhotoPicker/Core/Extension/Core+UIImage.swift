@@ -47,13 +47,14 @@ extension UIImage {
         }
         return self.scaleToFillSize(size: imageSize)
     }
-    func scaleToFillSize(size: CGSize, equalRatio: Bool = false, scale: CGFloat = 0) -> UIImage? {
+    func scaleToFillSize(size: CGSize, mode: HX.ImageTargetMode = .fill, scale: CGFloat = 0) -> UIImage? {
         if __CGSizeEqualToSize(self.size, size) {
             return self
         }
         let scale = scale == 0 ? self.scale : scale
+        let isEqualRatio = size.width / size.height != width / height
         let rect: CGRect
-        if size.width / size.height != width / height && equalRatio {
+        if !isEqualRatio && mode == .fill {
             let scale = size.width / width
             var scaleHeight = scale * height
             var scaleWidth = size.width
@@ -68,7 +69,19 @@ extension UIImage {
                 height: scaleHeight
             )
         }else {
-            rect = CGRect(origin: .zero, size: size)
+            if mode == .fit {
+                rect = CGRect(origin: .zero, size: size)
+            }else {
+                let scale = size.width / width
+                let scaleHeight = scale * size.height
+                let scaleWidth = size.width
+                rect = CGRect(
+                    x: -(width - scaleWidth) * 0.5,
+                    y: -(height - scaleHeight) * 0.5,
+                    width: width,
+                    height: height
+                )
+            }
         }
         let format = UIGraphicsImageRendererFormat()
         format.opaque = false

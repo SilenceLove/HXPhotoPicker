@@ -63,12 +63,12 @@ public extension PhotoAsset {
     /// 获取image，视频为封面图片
     /// - Parameters:
     ///   - targetSize: 指定`imageSize`
-    ///   - isEqualRatio: 宽高比与原图一致
+    ///   - targetMode: 裁剪模式
     ///   - completion: 获取完成
     func getImage(
         targetSize: CGSize,
-        isEqualRatio: Bool = true,
-        completion: @escaping (UIImage?) -> Void
+        targetMode: HX.ImageTargetMode = .fill,
+        completion: @escaping (UIImage?, PhotoAsset) -> Void
     ) {
         #if canImport(Kingfisher)
         let hasEdited: Bool
@@ -80,17 +80,17 @@ public extension PhotoAsset {
         if isNetworkAsset && !hasEdited {
             getNetworkImage { image in
                 DispatchQueue.global().async {
-                    let image = image?.scaleToFillSize(size: targetSize, equalRatio: isEqualRatio)
+                    let image = image?.scaleToFillSize(size: targetSize, mode: targetMode)
                     DispatchQueue.main.async {
-                        completion(image)
+                        completion(image, self)
                     }
                 }
             }
             return
         }
         #endif
-        requestImage(targetSize: targetSize, isEqualRatio: isEqualRatio) { image, _ in
-            completion(image)
+        requestImage(targetSize: targetSize, targetMode: targetMode) {
+            completion($0, $1)
         }
     }
     
@@ -457,14 +457,14 @@ extension PhotoAsset {
     /// 获取`UIImage`，视频为封面图片
     /// - Parameters:
     ///   - targetSize: 指定`imageSize`
-    ///   - isEqualRatio: 宽高比与原图一致
+    ///   - targetMode: 裁剪模式
     /// - Returns: 获取结果
     public func image(
         targetSize: CGSize,
-        isEqualRatio: Bool = true
+        targetMode: HX.ImageTargetMode = .fill
     ) async throws -> UIImage {
         try await withCheckedThrowingContinuation { continuation in
-            getImage(targetSize: targetSize, isEqualRatio: isEqualRatio) { image in
+            getImage(targetSize: targetSize, targetMode: targetMode) { image, _ in
                 if let image = image {
                     continuation.resume(with: .success(image))
                 }else {

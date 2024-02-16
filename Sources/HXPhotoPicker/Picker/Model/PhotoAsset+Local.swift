@@ -185,7 +185,7 @@ extension PhotoAsset {
                             width: targetWidth,
                             height: targetWidth
                         ),
-                        equalRatio: true
+                        mode: .fill
                     )
                     self.localImageAsset?.thumbnail = thumbnail
                     DispatchQueue.main.async {
