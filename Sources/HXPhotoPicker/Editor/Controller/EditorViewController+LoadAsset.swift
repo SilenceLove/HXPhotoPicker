@@ -373,7 +373,7 @@ extension EditorViewController {
         }
         ratioToolView.layoutSubviews()
         rotateScaleView.layoutSubviews()
-        func loadData(_ data: EditorCropSizeFator?) {
+        func loadData(_ data: EditorCropSizeFator?, isRound: Bool) {
             guard let data = data else {
                 return
             }
@@ -386,7 +386,7 @@ extension EditorViewController {
                     }
                     let scale1 = CGFloat(Int(aspectRatio.ratio.width / aspectRatio.ratio.height * 1000)) / 1000
                     let scale2 = CGFloat(Int(data.aspectRatio.width / data.aspectRatio.height * 1000)) / 1000
-                    if scale1 == scale2 {
+                    if scale1 == scale2, !isRound {
                         finishRatioIndex = index
                         break
                     }
@@ -408,10 +408,16 @@ extension EditorViewController {
         }
         DispatchQueue.main.async {
             switch result {
-            case .image(_, let editedData):
-                loadData(editedData.cropSize)
-            case .video(_, let editedData):
-                loadData(editedData.cropSize)
+            case .image(let editedResult, let editedData):
+                loadData(
+                    editedData.cropSize,
+                    isRound: editedResult.data?.content.adjustedFactor?.isRoundMask ?? false
+                )
+            case .video(let editedResult, let editedData):
+                loadData(
+                    editedData.cropSize,
+                    isRound: editedResult.data?.content.adjustedFactor?.isRoundMask ?? false
+                )
             }
         }
     }

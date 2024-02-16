@@ -44,16 +44,16 @@ class EditorFrameView: UIView {
     
     var maskImage: UIImage? {
         get {
-            customMaskView.maskImage
+            customMaskView.tmpMaskImage
         }
         set {
             setMaskImage(newValue, animated: false)
         }
     }
     
-    func setMaskImage(_ image: UIImage?, animated: Bool) {
+    func setMaskImage(_ image: UIImage?, animated: Bool, completion: (() -> Void)? = nil) {
         let maskImage = image?.convertBlackImage()
-        customMaskView.setMaskImage(maskImage, animated: animated)
+        customMaskView.setMaskImage(maskImage, animated: animated, completion: completion)
         setRoundCrop(isRound: false, animated: animated)
     }
     

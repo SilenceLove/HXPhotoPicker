@@ -48,7 +48,7 @@ open class EditorViewController: BaseViewController {
         finishHandler = finish
         cancelHandler = cancel
         editedResult = asset.result
-        finishRatioIndex = config.cropSize.defaultSeletedIndex
+        finishRatioIndex = config.cropSize.isRoundCrop ? -1 : config.cropSize.defaultSeletedIndex
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -191,7 +191,7 @@ open class EditorViewController: BaseViewController {
         
         ratioToolView = EditorRatioToolView(
             ratios: config.cropSize.aspectRatios,
-            selectedIndex: config.cropSize.defaultSeletedIndex
+            selectedIndex: config.cropSize.isRoundCrop ? -1 : config.cropSize.defaultSeletedIndex
         )
         ratioToolView.delegate = self
         ratioToolView.alpha = 0

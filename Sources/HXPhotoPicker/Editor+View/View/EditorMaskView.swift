@@ -104,10 +104,12 @@ class EditorMaskView: UIView {
     
     var maskInsets: UIEdgeInsets = .zero
     var maskImage: UIImage?
+    var tmpMaskImage: UIImage?
     
-    func setMaskImage(_ image: UIImage?, animated: Bool) {
+    func setMaskImage(_ image: UIImage?, animated: Bool, completion: (() -> Void)? = nil) {
         maskImageView.frame = maskRect
         customMaskEffectView.frame = maskRect
+        tmpMaskImage = image
         if animated {
             if image != nil {
                 maskImage = image
@@ -121,11 +123,13 @@ class EditorMaskView: UIView {
                     self.maskImage = image
                     self.maskImageView.image = image
                 }
+                completion?()
             }
         }else {
             maskImage = image
             maskImageView.image = image
             customMaskView.alpha = image == nil ? 0 : 1
+            completion?()
         }
     }
     

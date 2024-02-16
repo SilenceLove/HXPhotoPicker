@@ -83,7 +83,7 @@ class EditorFiltersView: UIView {
             operation.addExecutionBlock { [unowned operation, weak self] in
                 guard let self = self else { return }
                 if operation.isCancelled { return }
-                self.image = originalImage.scaleToFillSize(size: CGSize(width: 80, height: 80), equalRatio: true)
+                self.image = originalImage.scaleToFillSize(size: CGSize(width: 80, height: 80))
                 if operation.isCancelled { return }
                 DispatchQueue.main.async {
                     self.didLoad = true
@@ -101,7 +101,7 @@ class EditorFiltersView: UIView {
             operation.addExecutionBlock { [unowned operation, weak self] in
                 guard let self = self else { return }
                 if operation.isCancelled { return }
-                self.image = originalImage.scaleToFillSize(size: CGSize(width: 80, height: 80), equalRatio: true)
+                self.image = originalImage.scaleToFillSize(size: CGSize(width: 80, height: 80))
                 if operation.isCancelled { return }
                 DispatchQueue.main.async {
                     self.didLoad = true

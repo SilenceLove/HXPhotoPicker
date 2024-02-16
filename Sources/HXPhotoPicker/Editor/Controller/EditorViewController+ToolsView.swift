@@ -68,7 +68,7 @@ extension EditorViewController: EditorToolsViewDelegate {
                 guard let self = self else {
                     return
                 }
-                if let ratio = self.ratioToolView.selectedRatio?.ratio, !ratio.equalTo(.zero) {
+                if let ratio = self.ratioToolView.selectedRatio?.ratio, !ratio.equalTo(.zero), !self.editorView.isRoundMask {
                     self.ratioToolView(self.ratioToolView, didSelectedRatioAt: ratio)
                 }
             }

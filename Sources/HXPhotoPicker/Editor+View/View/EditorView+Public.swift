@@ -547,8 +547,8 @@ public extension EditorView {
     }
     
     /// 设置蒙版图片
-    func setMaskImage(_ image: UIImage?, animated: Bool) {
-        adjusterView.setMaskImage(image, animated: animated)
+    func setMaskImage(_ image: UIImage?, animated: Bool, completion: (() -> Void)? = nil) {
+        adjusterView.setMaskImage(image, animated: animated, completion: completion)
     }
     
     // MARK: 编辑调整

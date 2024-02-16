@@ -136,7 +136,13 @@ extension EditorViewController {
         rotateScaleView.reset()
         if !config.cropSize.aspectRatios.isEmpty {
             scaleSwitchSelectType = nil
-            ratioToolView.scrollToFree(animated: true)
+            if config.cropSize.isFixedRatio,
+               !config.cropSize.isResetToOriginal,
+               config.cropSize.isRoundCrop {
+                ratioToolView.deselected()
+            }else {
+                ratioToolView.scrollToFree(animated: true)
+            }
             hideScaleSwitchView(true)
         }
         button.isEnabled = false

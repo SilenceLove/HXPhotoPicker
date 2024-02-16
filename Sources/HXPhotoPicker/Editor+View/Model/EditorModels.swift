@@ -686,6 +686,7 @@ extension EditAdjustmentData {
             let contentOffsetScale: CGPoint
             let min_zoom_scale: CGFloat
             let isRoundMask: Bool
+            
             let ratioFactor: EditorControlView.Factor?
         }
     }

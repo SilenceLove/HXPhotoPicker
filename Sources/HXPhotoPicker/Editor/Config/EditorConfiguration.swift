@@ -291,6 +291,7 @@ public extension EditorConfiguration {
         /// Selecting does not mean that the default is the corresponding aspect ratio
         /// 宽高比数组默认选择的下标
         /// 选中不代表默认就是对应的宽高比
+        /// isRoundCrop = true 时无效
         /// ```
         /// // If you want the default corresponding aspect ratio also set `aspectRatio`
         /// // 如果想要默认对应的宽高比也要设置 `aspectRatio`

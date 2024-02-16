@@ -149,7 +149,6 @@ extension EditorAdjusterView {
             let contentInset = scrollView.contentInset
             let contentSize = scrollView.contentSize
             let contentOffset = scrollView.contentOffset
-            
             var oldData = AdjustedFactor()
             // 记录当前数据
             oldData.zoomScale = scrollView.zoomScale
@@ -167,6 +166,7 @@ extension EditorAdjusterView {
             oldData.min_zoom_scale = scrollView.zoomScale / getScrollViewMinimumZoomScale(oldData.maskRect)
             oldData.isRoundMask = isRoundMask
             oldData.maskImage = oldMaskImage
+            
             oldAdjustedFactor = oldData
             
             oldRatioFactor = .init(fixedRatio: frameView.isFixedRatio, aspectRatio: frameView.aspectRatio)
@@ -348,6 +348,7 @@ extension EditorAdjusterView {
             oldData.min_zoom_scale = scrollView.zoomScale / getScrollViewMinimumZoomScale(oldData.maskRect)
             oldData.isRoundMask = isRoundMask
             oldData.maskImage = adjustedFactor.maskImage
+            
             cAdjustmentData = oldData
         }
         let maxWidth = containerView.width
@@ -375,6 +376,9 @@ extension EditorAdjusterView {
             return false
         }
         if isFixedRatio && !isResetIgnoreFixedRatio {
+            if initialRoundMask, !isRoundMask {
+                return true
+            }
             // 开启了固定比例
             let zoomScale = initialZoomScale
             let maskViewFrame = getMaskRect(true)
@@ -446,6 +450,11 @@ extension EditorAdjusterView {
         }else {
             if !isFixedRatio {
                 frameView.aspectRatio = .zero
+            }else {
+                if initialRoundMask, !isRoundMask {
+                    frameView.aspectRatio = .init(width: 1, height: 1)
+                    setRoundCrop(isRound: true, animated: animated)
+                }
             }
         }
         let mask_Image = adjustedFactor.maskImage
@@ -538,14 +547,12 @@ extension EditorAdjusterView {
         updateMaskRect(to: maskRect, animated: animated)
         frameView.hide(isMaskBg: false, animated: animated)
         frameView.hideVideoSilder(animated)
-        let scrollCotentInset = getScrollViewContentInset(maskRect)
         func animatedAction() {
             setScrollViewContentInset(maskRect)
             scrollView.zoomScale = zoomScale
             scrollView.contentOffset = getEndZoomOffset(
                 fromRect: controlBeforeRect,
-                zoomScale: zoomScale,
-                scrollCotentInset: scrollCotentInset
+                zoomScale: zoomScale
             )
         }
         frameView.blackMask(isShow: true, animated: animated)
@@ -554,21 +561,16 @@ extension EditorAdjusterView {
                 animatedAction()
             } completion: {
                 completion?($0)
-//                self.frameView.blackMask(isShow: false, animated: false)
-//                self.frameView.hide(isLines: false, animated: animated)
             }
         }else {
             animatedAction()
             completion?(true)
-//            frameView.blackMask(isShow: false, animated: false)
-//            frameView.hide(isLines: false, animated: animated)
         }
     }
     
     func getEndZoomOffset(
         fromRect: CGRect,
-        zoomScale: CGFloat,
-        scrollCotentInset: UIEdgeInsets
+        zoomScale: CGFloat
     ) -> CGPoint {
         let offsetX = fromRect.minX * zoomScale - scrollView.contentInset.left
         let offsetY = fromRect.minY * zoomScale - scrollView.contentInset.top
