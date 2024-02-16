@@ -32,6 +32,7 @@ class PhotoLoadingView: UIView {
     }
     
     func startAnimating() {
+        loadingView.stopAnimating()
         loadingView.resetMask()
         loadingView.startAnimating()
     }

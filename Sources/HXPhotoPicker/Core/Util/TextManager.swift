@@ -120,7 +120,7 @@ public extension HX.TextManager {
             public var filterBottomTitle: TextType = .localized("筛选条件")
             public var filterBottomEmptyItemTitle: TextType = .localized("没有项目")
             
-            public var hapticTouchSelectedTitle: TextType = .localized("取消选择")
+            public var hapticTouchSelectedTitle: TextType = .localized("选择")
             public var hapticTouchDeselectedTitle: TextType = .localized("取消选择")
             public var hapticTouchEditTitle: TextType = .localized("编辑")
             public var hapticTouchRemoveEditTitle: TextType = .localized("清空已编辑的内容")
@@ -162,7 +162,7 @@ public extension HX.TextManager {
             
             public struct Cell {
                 public var gifTitle: TextType = .custom("GIF")
-                public var LivePhotoTitle: TextType = .custom("LivePhoto")
+                public var LivePhotoTitle: TextType = .custom("Live")
             }
         }
         

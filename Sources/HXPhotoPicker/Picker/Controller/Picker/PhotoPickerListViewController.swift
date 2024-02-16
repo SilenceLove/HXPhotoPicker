@@ -720,6 +720,11 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
         PhotoManager.shared.thumbnailLoadModeDidChange(.simplify)
         return true
     }
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if scrollToTop { return }
+        updateCellLoadMode(.complete)
+        cellReloadImage()
+    }
     public func scrollViewDidEndDragging(
         _ scrollView: UIScrollView,
         willDecelerate decelerate: Bool
@@ -754,8 +759,15 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
         scrollReachDistance = true
     }
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        if scrollToTop {
+            let scrollY = offsetY + scrollView.contentInset.top
+            if scrollY < scrollView.height {
+                updateCellLoadMode(.complete)
+            }
+        }
         if didChangeCellLoadMode {
-            if abs(targetOffsetY - scrollView.contentOffset.y) < 1250 {
+            if abs(targetOffsetY - offsetY) < 1250 {
                 updateCellLoadMode(.complete)
             }
         }
@@ -769,7 +781,9 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
         didChangeCellLoadMode = mode != .complete
     }
     public func cellReloadImage() {
-        if !scrollEndReload && !didChangeCellLoadMode {
+        if !scrollEndReload &&
+            !didChangeCellLoadMode &&
+            PhotoManager.shared.thumbnailLoadMode == .complete {
             return
         }
         for baseCell in collectionView.visibleCells where baseCell is PhotoPickerBaseViewCell {

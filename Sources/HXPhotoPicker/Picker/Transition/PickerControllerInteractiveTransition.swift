@@ -107,7 +107,9 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
         guard let pickerController = pickerController else {
             return
         }
-        
+        let velocity = panGR.velocity(in: pickerController.view)
+        let pickerWidth = pickerController.view.width
+        let pickerHeight = pickerController.view.height
         switch panGR.state {
         case .began:
             if canInteration {
@@ -121,19 +123,21 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
                 return
             }
             let point = panGR.translation(in: pickerController.view)
-            var scale = (point.x / pickerController.view.width)
+            var scale = (point.x / pickerWidth)
             if scale < 0 {
                 scale = 0
             }
             if type == .pop {
-                if let transitionContext = transitionContext,
-                   let toVC = transitionContext.viewController(forKey: .to) {
-                    let toScale = toVC.view.width * 0.3 * scale
-                    toVC.view.x = -(toVC.view.width * 0.3) + toScale
+                if velocity.x < pickerWidth {
+                    if let transitionContext = transitionContext,
+                       let toVC = transitionContext.viewController(forKey: .to) {
+                        let toScale = toVC.view.width * 0.3 * scale
+                        toVC.view.x = -(toVC.view.width * 0.3) + toScale
+                    }
+                    pickerController.view.x = pickerWidth * scale
                 }
-                pickerController.view.x = pickerController.view.width * scale
             }else {
-                pickerController.view.y = beganPoint.y + scale * pickerController.view.height
+                pickerController.view.y = beganPoint.y + scale * pickerHeight
                 if pickerController.view.y < 0 {
                     pickerController.view.y = 0
                 }
@@ -145,37 +149,36 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
                 return
             }
             let isFinish: Bool
-            let velocity = panGR.velocity(in: pickerController.view)
             if type == .pop {
-                if velocity.x > pickerController.view.width {
+                if velocity.x > pickerWidth {
                     isFinish = true
                 }else {
-                    isFinish = pickerController.view.x > pickerController.view.width * 0.6
+                    isFinish = pickerController.view.x > pickerWidth * 0.6
                 }
             }else {
-                isFinish = pickerController.view.y > pickerController.view.height * 0.4
+                isFinish = pickerController.view.y > pickerHeight * 0.4
             }
             if isFinish {
                 finish()
-                var duration: TimeInterval = 0.2
+                var duration: TimeInterval = 0.3
                 if type == .pop {
-                    if velocity.x > pickerController.view.width {
-                        duration *= pickerController.view.width / velocity.x
+                    if velocity.x > pickerWidth {
+                        duration *= pickerWidth / min(velocity.x, pickerWidth * 2)
                     }
                 }
                 UIView.animate(
                     withDuration: duration,
                     delay: 0,
-                    options: .curveEaseIn
+                    options: .curveEaseOut
                 ) {
                     if self.type == .pop {
                         if let transitionContext = self.transitionContext,
                            let toVC = transitionContext.viewController(forKey: .to) {
                             toVC.view.x = 0
                         }
-                        pickerController.view.x = pickerController.view.width
+                        pickerController.view.x = pickerWidth
                     }else {
-                        pickerController.view.y = pickerController.view.height
+                        pickerController.view.y = pickerHeight
                     }
                     self.bgView?.alpha = 0
                 } completion: { _ in

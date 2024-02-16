@@ -260,7 +260,9 @@ extension PhotoListConfiguration {
             set { HX.imageResource.picker.photoList.cell.cameraDark = newValue }
         }
         
-        public init() { }
+        public init() {
+            HX.imageResource.picker.photoList.cell.camera = "hx_picker_photoList_photograph"
+        }
     }
 }
 

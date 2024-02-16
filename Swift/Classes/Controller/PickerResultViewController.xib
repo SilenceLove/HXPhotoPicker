@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -64,7 +64,7 @@
                                     </connections>
                                 </button>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="pickerStyle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jxh-Aa-vem">
-                                    <rect key="frame" x="48" y="627.5" width="67.5" height="16"/>
+                                    <rect key="frame" x="37" y="627.5" width="67.5" height="16"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
@@ -83,9 +83,10 @@
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="iMO-BX-q69">
-                                    <rect key="frame" x="125.5" y="620" width="163" height="32"/>
+                                    <rect key="frame" x="114.5" y="620" width="245" height="32"/>
                                     <segments>
                                         <segment title="fullScreen"/>
+                                        <segment title="push"/>
                                         <segment title="automatic"/>
                                     </segments>
                                 </segmentedControl>
@@ -97,7 +98,7 @@
                                 <constraint firstItem="Aul-E4-bnE" firstAttribute="top" secondItem="iMO-BX-q69" secondAttribute="bottom" constant="15" id="J0x-sY-crh"/>
                                 <constraint firstItem="2Kv-7w-a30" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="KYh-c8-vQy"/>
                                 <constraint firstItem="mPQ-uN-Ram" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="KwU-l3-Txc"/>
-                                <constraint firstItem="iMO-BX-q69" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="Q1s-Sq-WrJ"/>
+                                <constraint firstItem="iMO-BX-q69" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" constant="30" id="Q1s-Sq-WrJ"/>
                                 <constraint firstAttribute="bottom" secondItem="Aul-E4-bnE" secondAttribute="bottom" constant="20" id="UjA-kj-hPZ"/>
                                 <constraint firstItem="iMO-BX-q69" firstAttribute="leading" secondItem="Jxh-Aa-vem" secondAttribute="trailing" constant="10" id="Xfl-1C-JrK"/>
                                 <constraint firstItem="mPQ-uN-Ram" firstAttribute="leading" secondItem="NwQ-gx-TFH" secondAttribute="leading" constant="5" id="YYZ-3a-ufY"/>

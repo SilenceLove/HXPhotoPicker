@@ -102,8 +102,9 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         self.inICloud = inICloud
         iCloudMarkView.isHidden = !inICloud
         setupDisableMask()
-        if inICloud,
-           photoAsset.downloadStatus == .canceled {
+        if inICloud &&
+            (photoAsset.downloadStatus == .downloading ||
+             photoAsset.downloadStatus == .canceled) {
             syncICloud()
         }else {
             loaddingView.isHidden = true
@@ -118,6 +119,9 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
     
     /// 设置禁用遮罩
     open func setupDisableMask() {
+        if photoAsset.downloadStatus == .downloading {
+            return
+        }
         if inICloud {
             disableMaskLayer.isHidden = false
             return

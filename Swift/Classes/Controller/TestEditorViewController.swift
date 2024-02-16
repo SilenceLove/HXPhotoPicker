@@ -55,7 +55,8 @@ class TestEditorViewController: BaseViewController {
 //        view.setRoundMask(animated: false)
         return view
     }()
-    
+    var currentAngle: CGFloat = 0
+    var editedAngle: CGFloat = 0
     var audioPlayers: [TestPlayAuido] = []
     
     override func viewDidLoad() {
@@ -124,13 +125,17 @@ class TestEditorViewController: BaseViewController {
         if editorView.type != .unknown {
             alert.addAction(.init(title: "使用编辑器继续编辑", style: .default, handler: { [weak self] _ in
                 guard let self = self else { return }
+                var editConfig = EditorConfiguration()
                 let edtiorAsset: EditorAsset
                 if self.editorView.type == .image {
                     var result: EditedResult?
                     if self.editorView.isCropedImage {
-                        result = .image(.init(data: self.editorView.adjustmentData), .init(cropSize: .init(isFixedRatio: self.editorView.isFixedRatio, aspectRatio: self.editorView.aspectRatio, angle: 0)))
+                        result = .image(.init(data: self.editorView.adjustmentData), .init(cropSize: .init(isFixedRatio: self.editorView.isFixedRatio, aspectRatio: self.editorView.aspectRatio, angle: self.editorView.state == .edit ? self.currentAngle : self.editedAngle)))
                     }
                     edtiorAsset = .init(type: .image(self.image!), result: result)
+                    if self.editorView.state == .edit {
+                        editConfig.photo.defaultSelectedToolOption = .cropSize
+                    }
                 }else if self.editorView.type == .video {
                     var result: EditedResult?
                     if self.editorView.isCropedVideo {
@@ -145,13 +150,16 @@ class TestEditorViewController: BaseViewController {
                                 music: .init(audioURL: player.audio.url, lrc: player.audioLrc.lrc)
                             )
                         }
-                        result = .video(.init(data: self.editorView.adjustmentData), .init(music: music,cropSize: .init(isFixedRatio: self.editorView.isFixedRatio, aspectRatio: self.editorView.aspectRatio, angle: 0)))
+                        result = .video(.init(data: self.editorView.adjustmentData), .init(music: music,cropSize: .init(isFixedRatio: self.editorView.isFixedRatio, aspectRatio: self.editorView.aspectRatio, angle: self.editorView.state == .edit ? self.currentAngle : self.editedAngle)))
                     }
                     edtiorAsset = .init(type: .video(self.videoURL), result: result)
+                    if self.editorView.state == .edit {
+                        editConfig.video.defaultSelectedToolOption = .cropSize
+                    }
                 }else {
                     return
                 }
-                let vc = EditorViewController(edtiorAsset) { [weak self] editorAsset, _ in
+                let vc = EditorViewController(edtiorAsset, config: editConfig) { [weak self] editorAsset, _ in
                     guard let self = self, let result = editorAsset.result else {
                         return
                     }
@@ -273,6 +281,7 @@ class TestEditorViewController: BaseViewController {
         if editorView.state == .edit {
             if editorView.canReset {
                 alert.addAction(.init(title: "还原", style: .default, handler: { [weak self] _ in
+                    self?.currentAngle = 0
                     self?.editorView.reset(true)
                 }))
             }
@@ -288,6 +297,7 @@ class TestEditorViewController: BaseViewController {
                         let textFiled = textAlert.textFields?.first
                         let text = textFiled?.text ?? "0"
                         let angle = CGFloat(Int(text) ?? 0)
+                        self.currentAngle -= angle
                         self.editorView.rotate(angle, animated: true)
                     }))
                     textAlert.addAction(.init(title: "取消", style: .cancel))
@@ -438,10 +448,12 @@ class TestEditorViewController: BaseViewController {
                 self?.presendAlert(maskAlert)
             }))
             alert.addAction(.init(title: "确认编辑", style: .default, handler: { [weak self] _ in
-                self?.editorView.finishEdit(true)
-                self?.isShowVideoControl = false
-                self?.editorView.isStickerEnabled = true
-                self?.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+                guard let self else { return }
+                self.editedAngle = self.currentAngle
+                self.editorView.finishEdit(true)
+                self.isShowVideoControl = false
+                self.editorView.isStickerEnabled = true
+                self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
             }))
             alert.addAction(.init(title: "取消编辑", style: .default, handler: { [weak self] _ in
                 self?.editorView.cancelEdit(true)
@@ -667,6 +679,7 @@ class TestEditorViewController: BaseViewController {
             }
             alert.addAction(.init(title: "进入编辑模式", style: .default, handler: { [weak self] _ in
                 guard let self = self else { return }
+                self.currentAngle = self.editedAngle
                 if self.editorView.isRoundMask {
                     self.editorView.isResetIgnoreFixedRatio = false
                 }

@@ -96,6 +96,9 @@ class PickerResultViewController: UIViewController,
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if !selectedAssets.isEmpty, !isPublish {
+            config.photoList.cameraCell.cameraImageName = "hx_picker_photoList_photograph"
+        }
         loadFonts()
 //        config.editor.buttonType = .top
         collectionViewTopConstraint.constant = 20
@@ -411,9 +414,15 @@ class PickerResultViewController: UIViewController,
         presentPickerController()
     }
     func presentPickerController() {
-        if pickerStyleControl.selectedSegmentIndex == 0 {
+        switch pickerStyleControl.selectedSegmentIndex {
+        case 0:
             config.modalPresentationStyle = .fullScreen
-        }else {
+            config.pickerPresentStyle = .present()
+        case 1:
+            config.modalPresentationStyle = .fullScreen
+            config.pickerPresentStyle = .push()
+        default:
+            config.pickerPresentStyle = .present()
             if #available(iOS 13.0, *) {
                 config.modalPresentationStyle = .automatic
             }

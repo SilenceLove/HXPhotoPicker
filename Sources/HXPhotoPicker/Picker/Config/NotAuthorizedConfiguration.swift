@@ -64,7 +64,9 @@ public struct NotAuthorizedConfiguration {
     /// 暗黑风格下跳转按钮文字颜色
     public var jumpButtonTitleDarkColor: UIColor = "#333333".hx.color
     
-    public init() { }
+    public init() { 
+        HX.imageResource.picker.notAuthorized.close = "hx_picker_notAuthorized_close"
+    }
     
     public mutating func setThemeColor(_ color: UIColor) {
         closeButtonColor = color

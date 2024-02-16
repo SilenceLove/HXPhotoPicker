@@ -20,6 +20,13 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
         HX.TextManager.shared.picker
     }
     
+    /// 主题色
+    public var themeColor: UIColor = .systemBlue {
+        didSet {
+            setThemeColor(themeColor)
+        }
+    }
+    
     /// 获取 AssetCollection
     public var fetchAssetCollection: PhotoFetchAssetCollection.Type = DefaultPhotoFetchAssetCollection.self
     

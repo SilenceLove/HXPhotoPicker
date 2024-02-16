@@ -15,7 +15,7 @@ public class PickerCameraViewCell: UICollectionViewCell {
     private var captureView: CaptureVideoPreviewView!
     private var imageView: UIImageView!
     
-    var config: PhotoListConfiguration.CameraCell = .init() {
+    var config: PhotoListConfiguration.CameraCell! {
         didSet {
             configProperty()
         }
