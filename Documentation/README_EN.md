@@ -85,7 +85,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.1.5"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.1.6"))
 ]
 ```
 
@@ -225,6 +225,11 @@ extension ViewController: PhotoPickerControllerDelegate {
 // compression: if not passed, no compression 
 let image: UIImage = try await photoAsset.object(compression)
 
+/// Get the `UIImage` of the specified `Size`
+/// targetSize: specify imageSize
+/// targetMode: crop mode
+let image = try await photoAsset.image(targetSize: .init(width: 200, height: 200), targetMode: .fill)
+
 // compressionQuality: Compress parameters, if not passed, no compression 
 photoAsset.getImage(compressionQuality: compressionQuality) { image in
     print(image)
@@ -296,7 +301,7 @@ let livePhoto = try await photoAsset.requestLivePhoto()
   
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
-| [v4.1.5](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#415) | 2024-01-10 | 15.0.0 | 5.9.0 | 12.0+ |
+| [v4.1.6](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#416) | 2024-02-16 | 15.0.0 | 5.9.0 | 12.0+ |
 
 </details>
 
@@ -305,6 +310,7 @@ let livePhoto = try await photoAsset.requestLivePhoto()
   
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v4.1.5](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#415) | 2024-01-10 | 15.0.0 | 5.9.0 | 12.0+ |
 | [v4.1.4](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#414) | 2023-12-24 | 15.0.0 | 5.9.0 | 12.0+ |
 | [v4.1.3](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#413) | 2023-12-16 | 15.0.0 | 5.9.0 | 12.0+ |
 | [v4.1.2](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#412) | 2023-12-02 | 15.0.0 | 5.9.0 | 12.0+ |

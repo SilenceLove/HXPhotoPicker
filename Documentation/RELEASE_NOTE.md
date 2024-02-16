@@ -4,8 +4,17 @@
 
 ### Added
 
+- All icons can be customized with `HX.ImageResource`
+- All text content can be customized with `HX.TextManager`
+
 - Picker
-  - Set theme color with one click`config.setThemeColor(.systemBlue)`
+  - Set theme color with one click`config.themeColor = .systemBlue`[[620]](https://github.com/SilenceLove/HXPhotoPicker/issues/620)
+  - `PhotoAsset` adds `size` that can specify `UIImage`(https://github.com/SilenceLove/HXPhotoPicker/issues/624)
+  ```
+    /// targetSize: specify imageSize
+    /// targetMode: crop mode
+    let image = try await photoAsset.image(targetSize: .init(width: 200, height: 200), targetMode: .fill)
+  ```
   - `PhotoAsset`Added content for display
   ``` 
     let thumImage = try await photoAsset.requesthumbnailImage() 
@@ -17,6 +26,16 @@
 
 - Camera
   - Camera screen size can be customized`config.aspectRatio = ._9x16`
+  
+### Resolved
+
+- Editor
+  - After using the circular cropping box and rotating the crop, the content is offset when entering the editing interface again.
+  
+### Optimizer
+
+- Picker
+  - Quick slide display effect
 
 ## 4.1.5
 

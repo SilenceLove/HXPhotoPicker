@@ -4,8 +4,17 @@
 
 ### 新增
 
+- 所有图标可自定义`HX.ImageResource`
+- 所有文本内容可自定义`HX.TextManager`
+
 - Picker
-  - 一键设置主题色`config.setThemeColor(.systemBlue)`
+  - 一键设置主题色`config.themeColor = .systemBlue`[[620]](https://github.com/SilenceLove/HXPhotoPicker/issues/620)
+  - `PhotoAsset`新增可指定`UIImage`的`size`[[624]](https://github.com/SilenceLove/HXPhotoPicker/issues/624)
+  ```
+    /// targetSize: 指定imageSize
+    /// targetMode: 裁剪模式
+    let image = try await photoAsset.image(targetSize: .init(width: 200, height: 200), targetMode: .fill)
+  ```
   - `PhotoAsset`新增获取用于展示的内容
   ```
     /// 获取缩略图
@@ -26,6 +35,16 @@
 
 - Camera
   - 相机画面大小可以自定义`config.aspectRatio = ._9x16`
+  
+### 修复
+
+- Editor
+  - 使用圆形裁剪框并且旋转裁剪后，再次进入编辑界面内容偏移的问题
+  
+### 优化
+
+- Picker
+  - 快速滑动显示效果
 
 ## 4.1.5
 
