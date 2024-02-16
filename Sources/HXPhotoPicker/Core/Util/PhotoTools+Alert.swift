@@ -124,6 +124,7 @@ extension PhotoTools {
     }
     
     /// 显示没有相机权限弹窗
+    #if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_CAMERA
     static func showNotCameraAuthorizedAlert(
         viewController: UIViewController?,
         cancelHandler: (() -> Void)? = nil
@@ -141,4 +142,5 @@ extension PhotoTools {
             openSettingsURL()
         }
     }
+    #endif
 }

@@ -345,14 +345,4 @@ public enum PhotoPreviewType {
     case browser
 }
 
-public extension HX {
-    enum ImageTargetMode {
-        /// 与原图宽高比一致，高度会根据`targetSize`计算
-        case fill
-        /// 根据`targetSize`拉伸/缩放
-        case fit
-        /// 如果`targetSize`的比例与原图不一样则居中显示
-        case center
-    }
-}
 

@@ -66,12 +66,27 @@ class PhotoPreviewSelectedView: UIView,
         reloadSectionInset()
         addSubview(collectionView)
     }
+    
+    var leftMargin: CGFloat {
+        if let splitViewController = viewController?.splitViewController as? PhotoSplitViewController,
+           !UIDevice.isPortrait,
+           !UIDevice.isPad {
+            if !splitViewController.isSplitShowColumn {
+                return UIDevice.leftMargin
+            }else {
+                return 0
+            }
+        }else {
+            return UIDevice.leftMargin
+        }
+    }
+        
     func reloadSectionInset() {
         if x == 0 {
             collectionViewLayout.sectionInset.top = 10
             collectionViewLayout.sectionInset.bottom = 5
-            if UIDevice.leftMargin > 0 {
-                collectionViewLayout.sectionInset.left = UIDevice.leftMargin
+            if leftMargin > 0 {
+                collectionViewLayout.sectionInset.left = leftMargin
             }else {
                 collectionViewLayout.sectionInset.left = 12
             }
@@ -241,6 +256,9 @@ class PhotoPreviewSelectedView: UIView,
     }
     
     override func layoutSubviews() {
+        if !collectionView.frame.equalTo(bounds) {
+            reloadSectionInset()
+        }
         collectionView.frame = bounds
     }
     

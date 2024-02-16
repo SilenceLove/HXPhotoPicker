@@ -186,11 +186,13 @@ public struct PhotoListConfiguration {
         bottomView.setThemeColor(color)
         cell.setThemeColor(color)
         assetNumber.setThemeColor(color)
+        #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
         if var cameraConfig = cameraType.customConfig {
             cameraConfig.tintColor = color
             cameraType = .custom(cameraConfig)
         }
-        filterThemeColor = color 
+        #endif
+        filterThemeColor = color
         filterThemeDarkColor = color
     }
 }

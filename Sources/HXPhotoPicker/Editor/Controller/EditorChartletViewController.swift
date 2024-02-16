@@ -136,10 +136,10 @@ public class EditorChartletViewController: BaseViewController, EditorChartletLis
                 if let url = title.url {
                     titleChartlet = EditorChartletTitle(url: url)
                 }else {
-                    titleChartlet = .init(image: .imageResource.picker.albumList.emptyCover.image)
+                    titleChartlet = .init(image: .imageResource.editor.sticker.albumEmptyCover.image)
                 }
                 #else
-                titleChartlet = .init(image: .imageResource.picker.albumList.emptyCover.image)
+                titleChartlet = .init(image: .imageResource.editor.sticker.albumEmptyCover.image)
                 #endif
             }
             if index == 0 {

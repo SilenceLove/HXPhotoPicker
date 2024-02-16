@@ -184,8 +184,7 @@ extension PhotoAsset {
                         size: CGSize(
                             width: targetWidth,
                             height: targetWidth
-                        ),
-                        mode: .fill
+                        )
                     )
                     self.localImageAsset?.thumbnail = thumbnail
                     DispatchQueue.main.async {

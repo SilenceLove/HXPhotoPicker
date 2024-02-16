@@ -20,7 +20,7 @@ public extension HX {
         public var picker: Picker = .init()
         #endif
         
-        #if HXPICKER_ENABLE_EDITOR
+        #if HXPICKER_ENABLE_EDITOR || HXPICKER_ENABLE_EDITOR_VIEW
         /// 编辑器
         public var editor: Editor = .init()
         #endif
@@ -138,7 +138,7 @@ public extension HX.ImageResource {
     }
     #endif
 
-    #if HXPICKER_ENABLE_EDITOR
+    #if HXPICKER_ENABLE_EDITOR || HXPICKER_ENABLE_EDITOR_VIEW
     struct Editor {
         /// 工具栏
         public var tools: Tools = .init()
@@ -231,6 +231,8 @@ public extension HX.ImageResource {
             public var back: String = "hx_photo_edit_pull_down"
             /// 跳转相册按钮
             public var album: String = "hx_editor_tools_chartle_album"
+            /// 相册为空时的封面图片
+            public var albumEmptyCover: String = "hx_picker_album_empty"
             /// 贴纸删除按钮
             public var delete: String = "hx_editor_view_sticker_item_delete"
             /// 贴纸旋转按钮

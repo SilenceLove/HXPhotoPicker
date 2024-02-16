@@ -32,10 +32,13 @@ extension String: HXPickerCompatibleValue {
         .shared
     }
     
+    #if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_CAMERA
     static var textNotAuthorized: HX.TextManager.Picker.NotAuthorized {
         textManager.picker.notAuthorized
     }
+    #endif
     
+    #if HXPICKER_ENABLE_PICKER
     static var textPhotoList: HX.TextManager.Picker.PhotoList {
         textManager.picker.photoList
     }
@@ -43,6 +46,7 @@ extension String: HXPickerCompatibleValue {
     static var textPreview: HX.TextManager.Picker.Preview {
         textManager.picker.preview
     }
+    #endif
     
     var lrc: String? {
         var lrcString: String?

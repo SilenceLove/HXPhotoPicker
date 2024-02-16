@@ -47,46 +47,51 @@ extension UIImage {
         }
         return self.scaleToFillSize(size: imageSize)
     }
+    
     func scaleToFillSize(size: CGSize, mode: HX.ImageTargetMode = .fill, scale: CGFloat = 0) -> UIImage? {
         if __CGSizeEqualToSize(self.size, size) {
             return self
         }
-        let scale = scale == 0 ? self.scale : scale
-        let isEqualRatio = size.width / size.height != width / height
         let rect: CGRect
-        if !isEqualRatio && mode == .fill {
-            let scale = size.width / width
-            var scaleHeight = scale * height
-            var scaleWidth = size.width
-            if scaleHeight < size.height {
-                scaleWidth = size.height / scaleHeight * size.width
-                scaleHeight = size.height
+        let rendererSize: CGSize
+        if mode == .fill {
+            let isEqualRatio = size.width / size.height == width / height
+            if isEqualRatio {
+                rendererSize = size
+                rect = CGRect(origin: .zero, size: size)
+            }else {
+                let scale = size.width / width
+                var scaleHeight = scale * height
+                var scaleWidth = size.width
+                if scaleHeight < size.height {
+                    scaleWidth = size.height / scaleHeight * size.width
+                    scaleHeight = size.height
+                }
+                rendererSize = .init(width: scaleWidth, height: scaleHeight)
+                rect = .init(origin: .zero, size: rendererSize)
             }
-            rect = CGRect(
-                x: -(scaleWidth - size.height) * 0.5,
-                y: -(scaleHeight - size.height) * 0.5,
-                width: scaleWidth,
-                height: scaleHeight
-            )
         }else {
+            rendererSize = size
             if mode == .fit {
                 rect = CGRect(origin: .zero, size: size)
             }else {
                 let scale = size.width / width
-                let scaleHeight = scale * size.height
-                let scaleWidth = size.width
+                var scaleHeight = scale * height
+                if scaleHeight < size.height {
+                    scaleHeight = size.height
+                }
                 rect = CGRect(
-                    x: -(width - scaleWidth) * 0.5,
-                    y: -(height - scaleHeight) * 0.5,
-                    width: width,
-                    height: height
+                    x: 0,
+                    y: -(scaleHeight - size.height) / 2,
+                    width: size.width,
+                    height: scaleHeight
                 )
             }
         }
         let format = UIGraphicsImageRendererFormat()
         format.opaque = false
-        format.scale = scale
-        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        format.scale = scale == 0 ? self.scale : scale
+        let renderer = UIGraphicsImageRenderer(size: rendererSize, format: format)
         let image = renderer.image { context in
             draw(in: rect)
         }

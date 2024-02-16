@@ -220,7 +220,9 @@ extension EditorAdjusterView {
                 imageData,
                 compressionQuality: compressionQuality
             ) { [weak self] data in
-                guard let self = self, let data = data else {
+                guard let self = self,
+                      let data = data,
+                      let image = UIImage(data: data)?.normalizedImage() else {
                     DispatchQueue.main.async {
                         completion(.failure(EditorError.error(type: .compressionFailed, message: "图片压缩失败")))
                     }
@@ -239,26 +241,24 @@ extension EditorAdjusterView {
                     }
                     return
                 }
-                self.compressImageData(
-                    data,
-                    compressionQuality: 0.3
-                ) { thumbData in
-                    if let thumbData = thumbData,
-                       let thumbnailImage = UIImage(data: thumbData) {
-                        DispatchQueue.main.async {
-                            completion(
-                                .success(.init(
-                                    image: thumbnailImage,
-                                    urlConfig: urlConfig,
-                                    imageType: .normal,
-                                    data: self.getData()
-                                ))
-                            )
-                        }
+                let thumbImage: UIImage?
+                if image.width * image.height < 40000 {
+                    thumbImage = image
+                }else {
+                    thumbImage = image.scaleToFillSize(size: .init(width: 200, height: 200))
+                }
+                DispatchQueue.main.async {
+                    if let thumbImage {
+                        completion(
+                            .success(.init(
+                                image: thumbImage,
+                                urlConfig: urlConfig,
+                                imageType: .normal,
+                                data: self.getData()
+                            ))
+                        )
                     }else {
-                        DispatchQueue.main.async {
-                            completion(.failure(.error(type: .compressionFailed, message: "封面图片压缩失败")))
-                        }
+                        completion(.failure(.error(type: .compressionFailed, message: "封面图片压缩失败")))
                     }
                 }
             }

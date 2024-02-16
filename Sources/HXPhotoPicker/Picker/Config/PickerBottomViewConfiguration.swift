@@ -212,7 +212,9 @@ public struct PickerBottomViewConfiguration {
         finishButtonDarkBackgroundColor = color
         finishButtonDisableBackgroundColor = color.withAlphaComponent(0.4)
         finishButtonDisableDarkBackgroundColor = color.withAlphaComponent(0.4)
+        #if HXPICKER_ENABLE_EDITOR
         editButtonTitleColor = color
+        #endif
         promptIconColor = color
         promptIconDarkColor = color
         promptTitleColor = color

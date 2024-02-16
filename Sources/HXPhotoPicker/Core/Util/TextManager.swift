@@ -15,23 +15,17 @@ public extension HX {
     class TextManager {
         public static let shared = TextManager()
         
-        #if HXPICKER_ENABLE_PICKER
+        #if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_CAMERA
         /// 选择器
         public var picker: Picker = .init()
-        #endif
-        
-        #if HXPICKER_ENABLE_EDITOR
-        /// 编辑器
-        public var editor: Editor = .init()
-        #endif
-        
-        #if HXPICKER_ENABLE_CAMERA
         /// 相机
         public var camera: Camera = .init()
+        public var cameraNotAuthorized: CameraNotAuthorized = .init()
         #endif
         
-        #if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_CAMERA
-        public var cameraNotAuthorized: CameraNotAuthorized = .init()
+        #if HXPICKER_ENABLE_EDITOR || HXPICKER_ENABLE_EDITOR_VIEW
+        /// 编辑器
+        public var editor: Editor = .init()
         #endif
     }
 }
@@ -54,7 +48,7 @@ public extension HX.TextManager {
         }
     }
     
-    #if HXPICKER_ENABLE_PICKER
+    #if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_CAMERA
     struct Picker {
         /// 相册未授权
         public var notAuthorized: NotAuthorized = .init()
@@ -191,7 +185,7 @@ public extension HX.TextManager {
     }
     #endif
     
-    #if HXPICKER_ENABLE_EDITOR
+    #if HXPICKER_ENABLE_EDITOR || HXPICKER_ENABLE_EDITOR_VIEW
     struct Editor {
         public var tools: Tools = .init()
         public var brush: Tools = .init()
@@ -295,7 +289,7 @@ public extension HX.TextManager {
     }
     #endif
     
-    #if HXPICKER_ENABLE_CAMERA
+    #if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_CAMERA
     struct Camera {
         
         public var unavailableTitle: TextType = .localized("相机不可用!")
