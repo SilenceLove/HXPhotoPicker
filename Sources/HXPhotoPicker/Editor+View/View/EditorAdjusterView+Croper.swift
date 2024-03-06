@@ -215,7 +215,7 @@ extension EditorAdjusterView {
                 }
                 return
             }
-            let compressionQuality = self.getCompressionQuality(CGFloat(imageData.count))
+            let compressionQuality = cropFactor.isRound ? nil : self.getCompressionQuality(CGFloat(imageData.count), imageSize: image.size)
             self.compressImageData(
                 imageData,
                 compressionQuality: compressionQuality
@@ -372,7 +372,10 @@ extension EditorAdjusterView {
         return image.merge(images: [overlayImage], scale: exportScale)
     }
     
-    fileprivate func getCompressionQuality(_ dataCount: CGFloat) -> CGFloat? {
+    fileprivate func getCompressionQuality(_ dataCount: CGFloat, imageSize: CGSize) -> CGFloat? {
+        if imageSize.width * imageSize.height < 3840 * 3840 {
+            return nil
+        }
         if dataCount > 30000000 {
             return 25000000 / dataCount
         }else if dataCount > 15000000 {
@@ -506,7 +509,7 @@ extension EditorAdjusterView {
             && waterCenterRatio == .zero
             
             if isEmpty {
-                allowCroped = true
+                allowCroped = false
             }else {
                 allowCroped = !(!isCropImage &&
                                 !isRound &&
