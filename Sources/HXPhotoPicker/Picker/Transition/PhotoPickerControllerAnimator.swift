@@ -1,5 +1,5 @@
 //
-//  PickerControllerTransition.swift
+//  PhotoPickerControllerAnimator.swift
 //  HXPhotoPicker
 //
 //  Created by Slience on 2022/5/23.
@@ -7,15 +7,9 @@
 
 import UIKit
 
-class PickerControllerTransition: NSObject, UIViewControllerAnimatedTransitioning {
-    public enum TransitionType {
-        case push
-        case pop
-        case dismiss
-    }
-    private let type: TransitionType
-    
-    init(type: TransitionType) {
+public final class PhotoPickerControllerAnimator: NSObject, PhotoPickerControllerAnimationTransitioning {
+    private let type: PhotoPickerControllerTransitionType
+    public init(type: PhotoPickerControllerTransitionType) {
         self.type = type
         super.init()
     }
@@ -31,12 +25,9 @@ class PickerControllerTransition: NSObject, UIViewControllerAnimatedTransitionin
         return 0.25
     }
     
-    private var transitionContext: UIViewControllerContextTransitioning?
-    
     public func animateTransition(
         using transitionContext: UIViewControllerContextTransitioning
     ) {
-        self.transitionContext = transitionContext
         guard let fromVC = transitionContext.viewController(forKey: .from),
               let toVC = transitionContext.viewController(forKey: .to) else {
             transitionContext.completeTransition(transitionContext.transitionWasCancelled)

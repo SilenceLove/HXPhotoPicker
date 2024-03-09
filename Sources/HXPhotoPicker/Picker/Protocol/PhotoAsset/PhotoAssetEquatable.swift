@@ -64,7 +64,7 @@ public extension PhotoAssetEquatable {
         }
         if let networkVideoAsset = networkVideoAsset,
            let phNetworkVideoAsset = photoAsset.networkVideoAsset {
-            if networkVideoAsset.videoURL.absoluteString == phNetworkVideoAsset.videoURL.absoluteString {
+            if networkVideoAsset.videoURL?.absoluteString == phNetworkVideoAsset.videoURL?.absoluteString {
                 return true
             }
         }

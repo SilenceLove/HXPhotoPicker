@@ -43,7 +43,7 @@ public class AlbumViewController: PhotoBaseViewController, PhotoAlbumListDelegat
         updateColors()
     }
     
-    override func updateColors() {
+    public override func updateColors() {
         let isDark = PhotoManager.isDark
         if pickerController.splitType.isSplit {
             view.backgroundColor = isDark ? config.splitBackgroundDarkColor : config.splitBackgroundColor

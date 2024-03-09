@@ -32,7 +32,7 @@ public struct NetworkImageAsset: Codable {
     /// list cell display
     /// 缩略图，列表cell展示
     /// PhotoManager.shared.imageDownloader
-    public let thumbnailURL: URL
+    public let thumbnailURL: URL?
     public let thumbailCacheKey: String?
     
     /// Size set by DownsamplingImageProcessor when Kingfisher downloads thumbnails
@@ -44,7 +44,7 @@ public struct NetworkImageAsset: Codable {
     /// Preview large image display
     /// 原图，预览大图展示
     /// PhotoManager.shared.imageDownloader
-    public let originalURL: URL
+    public let originalURL: URL?
     public let originalCacheKey: String?
     
     /// The way the list Cell loads pictures
@@ -69,9 +69,10 @@ public struct NetworkImageAsset: Codable {
     /// 图片文件大小
     public var fileSize: Int
     
+    /// 初始化网络图片
     public init(
-        thumbnailURL: URL,
-        originalURL: URL,
+        thumbnailURL: URL?,
+        originalURL: URL?,
         thumbailCacheKey: String? = nil,
         originalCacheKey: String? = nil,
         thumbnailLoadMode: LoadMode = .alwaysThumbnail,
@@ -100,7 +101,7 @@ public struct NetworkImageAsset: Codable {
 public struct NetworkVideoAsset {
     
     /// 网络视频地址
-    public let videoURL: URL
+    public let videoURL: URL?
     
     /// AVURLAsset(url: videoURL, options: options)
     public var options: [String: Any]?
@@ -124,8 +125,32 @@ public struct NetworkVideoAsset {
     /// 视频封面网络地址
     public var coverImageURL: URL?
     
+    /// 初始化网络视频
     public init(
-        videoURL: URL,
+        networkVideo url: URL?,
+        options: [String: Any]? = nil,
+        duration: TimeInterval = 0,
+        fileSize: Int = 0,
+        coverImage: UIImage? = nil,
+        videoSize: CGSize = .zero,
+        coverImageURL: URL? = nil,
+        coverPlaceholder: String? = nil
+    ) {
+        self.init(
+            videoURL: url,
+            options: options,
+            duration: duration,
+            fileSize: fileSize,
+            coverImage: coverImage,
+            videoSize: videoSize,
+            coverImageURL: coverImageURL,
+            coverPlaceholder: coverPlaceholder
+        )
+    }
+    
+    /// 初始化网络视频
+    public init(
+        videoURL: URL?,
         options: [String: Any]? = nil,
         duration: TimeInterval = 0,
         fileSize: Int = 0,
@@ -144,6 +169,25 @@ public struct NetworkVideoAsset {
         self.coverPlaceholder = coverPlaceholder
     }
     #else
+    /// 初始化网络视频
+    public init(
+        networkVideo url: URL,
+        options: [String: Any]? = nil,
+        duration: TimeInterval = 0,
+        fileSize: Int = 0,
+        coverImage: UIImage? = nil,
+        videoSize: CGSize = .zero
+    ) {
+        self.init(
+            videoURL: url,
+            options: options,
+            duration: duration,
+            fileSize: fileSize,
+            coverImage: coverImage,
+            videoSize: videoSize
+        )
+    }
+    /// 初始化网络视频
     public init(
         videoURL: URL,
         options: [String: Any]? = nil,

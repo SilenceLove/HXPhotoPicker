@@ -23,7 +23,7 @@ public class PhotoBaseViewController: BaseViewController, PhotoPickerControllerF
         weakController = pickerController
     }
     
-    func updateColors() {
+    open func updateColors() {
         
     }
     

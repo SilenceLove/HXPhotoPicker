@@ -269,6 +269,8 @@ public extension HX.ImageResource {
         public struct Filter {
             /// 编辑
             public var edit: String = "hx_editor_tools_filter_edit"
+            /// 重置
+            public var reset: String = "hx_editor_tools_filter_reset"
         }
         
         public struct Mosaic {

@@ -1,5 +1,5 @@
 //
-//  PickerControllerInteractiveTransition.swift
+//  PhotoPickerControllerInteractiveAnimator.swift
 //  HXPhotoPicker
 //
 //  Created by Slience on 2022/5/23.
@@ -7,39 +7,30 @@
 
 import UIKit
 
-class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestureRecognizerDelegate {
-    enum TransitionType {
-        case pop
-        case dismiss
+public class PhotoPickerControllerInteractiveAnimator: PhotoPickerControllerInteractiveTransition, UIGestureRecognizerDelegate {
+    public override var gestureRecognizer: UIGestureRecognizer? {
+        panGestureRecognizer
     }
-    var panGestureRecognizer: UIPanGestureRecognizer!
+    private var panGestureRecognizer: UIPanGestureRecognizer!
     private weak var bgView: UIView?
+    private weak var shadowView: UIView?
     private var pickerControllerBackgroundColor: UIColor?
     private var beganPoint: CGPoint = .zero
-    private let triggerRange: CGFloat
     private weak var transitionContext: UIViewControllerContextTransitioning?
-    private weak var pickerController: PhotoPickerController?
-    private let type: TransitionType
-    
-    var canInteration: Bool = false
-    init(
-        panGestureRecognizerFor pickerController: PhotoPickerController,
-        type: TransitionType,
+    public required init(
+        type: PhotoPickerControllerInteractiveTransition.InteractiveTransitionType,
+        pickerController: PhotoPickerController,
         triggerRange: CGFloat
     ) {
-        self.pickerController = pickerController
-        self.type = type
-        self.triggerRange = triggerRange
-        super.init()
+        super.init(type: type, pickerController: pickerController, triggerRange: triggerRange)
         panGestureRecognizer = UIPanGestureRecognizer(
             target: self,
-            action: #selector(panGestureRecognizerAction(panGR:))
+            action: #selector(panGestureRecognizerClick(gestureRecognizer:))
         )
         panGestureRecognizer.delegate = self
         pickerController.view.addGestureRecognizer(panGestureRecognizer)
     }
-    
-    override func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
+    public override func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
         self.transitionContext = transitionContext
         let pickerController = transitionContext.viewController(forKey: .from) as! PhotoPickerController
         let toVC = transitionContext.viewController(forKey: .to)!
@@ -83,13 +74,21 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
         bgView.backgroundColor = .black.withAlphaComponent(0.1)
         containerView.addSubview(bgView)
         self.bgView = bgView
+        let shadowView = UIView(frame: pickerController.view.frame)
+        shadowView.backgroundColor = .white
+        shadowView.layer.shadowColor = UIColor.black.cgColor
+        shadowView.layer.shadowOffset = .init(width: 0, height: 0)
+        shadowView.layer.shadowOpacity = 0.3
+        shadowView.layer.shadowRadius = 40
+        containerView.addSubview(shadowView)
+        self.shadowView = shadowView
         containerView.addSubview(pickerController.view)
         if type == .pop {
             toVC.view.x = -(toVC.view.width * 0.3)
         }
     }
     
-    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         guard let pickerController = pickerController,
               let topViewController = pickerController.topViewController,
               topViewController is PhotoPickerViewController else {
@@ -103,14 +102,13 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
     }
     
     @objc
-    func panGestureRecognizerAction(panGR: UIPanGestureRecognizer) {
+    func panGestureRecognizerClick(gestureRecognizer: UIPanGestureRecognizer) {
         guard let pickerController = pickerController else {
             return
         }
-        let velocity = panGR.velocity(in: pickerController.view)
         let pickerWidth = pickerController.view.width
         let pickerHeight = pickerController.view.height
-        switch panGR.state {
+        switch gestureRecognizer.state {
         case .began:
             if canInteration {
                 return
@@ -122,32 +120,32 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
             if !canInteration {
                 return
             }
-            let point = panGR.translation(in: pickerController.view)
+            let point = gestureRecognizer.translation(in: pickerController.view)
             var scale = (point.x / pickerWidth)
             if scale < 0 {
                 scale = 0
             }
             if type == .pop {
-                if velocity.x < pickerWidth {
-                    if let transitionContext = transitionContext,
-                       let toVC = transitionContext.viewController(forKey: .to) {
-                        let toScale = toVC.view.width * 0.3 * scale
-                        toVC.view.x = -(toVC.view.width * 0.3) + toScale
-                    }
-                    pickerController.view.x = pickerWidth * scale
+                if let transitionContext = transitionContext,
+                   let toVC = transitionContext.viewController(forKey: .to) {
+                    let toScale = toVC.view.width * 0.3 * scale
+                    toVC.view.x = -(toVC.view.width * 0.3) + toScale
                 }
+                pickerController.view.x = pickerWidth * scale
             }else {
                 pickerController.view.y = beganPoint.y + scale * pickerHeight
                 if pickerController.view.y < 0 {
                     pickerController.view.y = 0
                 }
             }
+            shadowView?.frame = pickerController.view.frame
             bgView?.alpha = 1 - scale
             update(scale)
         case .ended, .cancelled, .failed:
             if !canInteration {
                 return
             }
+            let velocity = gestureRecognizer.velocity(in: pickerController.view)
             let isFinish: Bool
             if type == .pop {
                 if velocity.x > pickerWidth {
@@ -163,7 +161,7 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
                 var duration: TimeInterval = 0.3
                 if type == .pop {
                     if velocity.x > pickerWidth {
-                        duration *= pickerWidth / min(velocity.x, pickerWidth * 2)
+                        duration *= pickerWidth / min(velocity.x, pickerWidth * 2.5)
                     }
                 }
                 UIView.animate(
@@ -180,12 +178,15 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
                     }else {
                         pickerController.view.y = pickerHeight
                     }
+                    self.shadowView?.frame = pickerController.view.frame
                     self.bgView?.alpha = 0
                 } completion: { _ in
                     self.pickerController?.view.removeFromSuperview()
                     self.pickerController = nil
                     self.bgView?.removeFromSuperview()
                     self.bgView = nil
+                    self.shadowView?.removeFromSuperview()
+                    self.shadowView = nil
                     self.canInteration = false
                     self.transitionContext?.completeTransition(true)
                     self.transitionContext = nil
@@ -206,10 +207,13 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
                     }else {
                         pickerController.view.y = 0
                     }
+                    self.shadowView?.frame = pickerController.view.frame
                     self.bgView?.alpha = 1
                 } completion: { _ in
                     self.bgView?.removeFromSuperview()
                     self.bgView = nil
+                    self.shadowView?.removeFromSuperview()
+                    self.shadowView = nil
                     self.canInteration = false
                     self.transitionContext?.completeTransition(false)
                     self.transitionContext = nil

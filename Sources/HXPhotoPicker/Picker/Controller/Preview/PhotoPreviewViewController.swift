@@ -19,23 +19,25 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
     public var previewAssets: [PhotoAsset] = []
     public var previewType: PhotoPreviewType = .none
     public var collectionView: UICollectionView!
+    /// 是否处于转场动画过程中
+    public var isTransitioning: Bool = false
+    public var navBgView: UIToolbar?
+    public var photoToolbar: PhotoToolBar!
+    public var statusBarShouldBeHidden: Bool = false
     
     private var collectionViewLayout: UICollectionViewFlowLayout!
     var numberOfPages: PhotoBrowser.NumberOfPagesHandler?
     var cellForIndex: PhotoBrowser.CellReloadContext?
     var assetForIndex: PhotoBrowser.RequiredAsset?
     
-    var photoToolbar: PhotoToolBar!
     var selectBoxControl: SelectBoxView!
     var interactiveTransition: PickerInteractiveTransition?
     weak var beforeNavDelegate: UINavigationControllerDelegate?
     var isPreviewSelect: Bool = false
     var orientationDidChange: Bool = false
-    var statusBarShouldBeHidden: Bool = false
     var viewDidAppear: Bool = false
     var firstLayoutSubviews: Bool = true
     var requestPreviewTimer: Timer?
-    var isTransitioning: Bool = false
     var isShowToolbar: Bool = false
     var assetCount: Int {
         if previewAssets.isEmpty {
@@ -47,19 +49,11 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
         return previewAssets.count
     }
     
-    func photoAsset(for index: Int) -> PhotoAsset? {
-        if !previewAssets.isEmpty && index > 0 || index < previewAssets.count {
-            return previewAssets[index]
-        }
-        return assetForIndex?(index)
-    }
     
     override init(config: PickerConfiguration) {
         self.config = config.previewView
         super.init(config: config)
     }
-    
-    var navBgView: UIToolbar?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,7 +69,14 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
         initView()
     }
     
-    override func updateColors() {
+    public func photoAsset(for index: Int) -> PhotoAsset? {
+        if !previewAssets.isEmpty && index > 0 || index < previewAssets.count {
+            return previewAssets[index]
+        }
+        return assetForIndex?(index)
+    }
+    
+    public override func updateColors() {
         if isTransitioning {
             return
         }
@@ -427,7 +428,7 @@ extension PhotoPreviewViewController {
         }
         scrollToItem(index)
     }
-    func scrollToItem(_ item: Int) {
+    func scrollToItem(_ item: Int, animated: Bool = false) {
         if item == currentPreviewIndex {
             return
         }
@@ -435,11 +436,11 @@ extension PhotoPreviewViewController {
         collectionView.scrollToItem(
             at: IndexPath(item: item, section: 0),
             at: .centeredHorizontally,
-            animated: false
+            animated: animated
         )
         startRequestPreviewTimer()
     }
-    func setCurrentCellImage(image: UIImage?) {
+    public func setCurrentCellImage(image: UIImage?) {
         guard let image = image,
               let cell = getCell(for: currentPreviewIndex),
               !cell.scrollContentView.requestCompletion else {
@@ -684,5 +685,12 @@ extension PhotoPreviewViewController {
                 dismiss(animated: true, completion: nil)
             }
         }
+    }
+    
+    public var transitionCellView: PhotoPreviewViewCell? {
+        guard let cell = getCell(for: currentPreviewIndex) else {
+            return nil
+        }
+        return cell
     }
 }

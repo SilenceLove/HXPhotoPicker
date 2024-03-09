@@ -183,8 +183,8 @@ extension PhotoAsset {
                 if networkVideoAsset.fileSize > 0 {
                     fileSize = networkVideoAsset.fileSize
                 }else {
-                    let key = networkVideoAsset.videoURL.absoluteString
-                    if PhotoTools.isCached(forVideo: key) {
+                    if let key = networkVideoAsset.videoURL?.absoluteString,
+                       PhotoTools.isCached(forVideo: key) {
                         let videoURL = PhotoTools.getVideoCacheURL(for: key)
                         fileSize = videoURL.fileSize
                     }

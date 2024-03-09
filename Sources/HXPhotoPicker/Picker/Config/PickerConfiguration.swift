@@ -11,35 +11,13 @@ import UIKit
 public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     
     /// 图片资源
-    public var imageResource: HX.ImageResource.Picker {
-        HX.ImageResource.shared.picker
-    }
+    public var imageResource: HX.ImageResource.Picker { HX.ImageResource.shared.picker }
     
     /// 文本管理
-    public var textManager: HX.TextManager.Picker {
-        HX.TextManager.shared.picker
-    }
+    public var textManager: HX.TextManager.Picker { HX.TextManager.shared.picker }
     
     /// 主题色
-    public var themeColor: UIColor = .systemBlue {
-        didSet {
-            setThemeColor(themeColor)
-        }
-    }
-    
-    /// 获取 AssetCollection
-    public var fetchAssetCollection: PhotoFetchAssetCollection.Type = DefaultPhotoFetchAssetCollection.self
-    
-    /// 获取 Asset
-    public var fetchAsset: PhotoFetchAsset.Type = DefaultPhotoFetchAsset.self
-    
-    public var isFetchDeatilsAsset: Bool = false
-    
-    /// 获取数据
-    public var fetchdata: PhotoFetchData.Type = PhotoFetchData.self
-    
-    /// 选择数据
-    public var pickerData: PhotoPickerData.Type = PhotoPickerData.self
+    public var themeColor: UIColor = .systemBlue { didSet { setThemeColor(themeColor) } }
     
     /// 在相册权限受限时，移除授权的照片时是否移除对应选择的数据
     /// Whether to remove the corresponding selected data when removing authorized assets
@@ -191,6 +169,16 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     /// 跳转时允许自定义转场动画
     public var allowCustomTransitionAnimation: Bool = true
     
+    /// 选择器自定义转场动画实现
+    public var pickerTransitionAnimator: PhotoPickerControllerAnimationTransitioning.Type = PhotoPickerControllerAnimator.self
+    /// 选择器自定义手势转场动画实现
+    public var pickerInteractiveTransitionAnimator: PhotoPickerControllerInteractiveTransition.Type = PhotoPickerControllerInteractiveAnimator.self
+    
+    /// 外部预览自定义转场动画实现
+    public var browserTransitionAnimator: PhotoBrowserAnimationTransitioning.Type = PhotoBrowserAnimator.self
+    /// 外部预览自定义手势转场动画实现
+    public var browserInteractiveTransitionAnimator: PhotoBrowserInteractiveTransition.Type = PhotoBrowserInteractiveAnimator.self
+    
     /// Status bar style
     /// 状态栏样式
     public var statusBarStyle: UIStatusBarStyle = .default
@@ -276,6 +264,16 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     
     public var splitSeparatorLineColor: UIColor?
     public var splitSeparatorLineDarkColor: UIColor?
+    
+    /// 获取 AssetCollection
+    public var fetchAssetCollection: PhotoFetchAssetCollection.Type = DefaultPhotoFetchAssetCollection.self
+    /// 获取 Asset
+    public var fetchAsset: PhotoFetchAsset.Type = DefaultPhotoFetchAsset.self
+    public var isFetchDeatilsAsset: Bool = false
+    /// 获取数据
+    public var fetchdata: PhotoFetchData.Type = PhotoFetchData.self
+    /// 选择数据
+    public var pickerData: PhotoPickerData.Type = PhotoPickerData.self
     
     public init() {
         if #available(iOS 13.0, *) {

@@ -260,11 +260,12 @@ extension PhotoPreviewContentPhotoView {
         if photoAsset.mediaSubType != .networkVideo {
             var key: String = ""
             if let networkImage = photoAsset.networkImageAsset {
-                if networkImage.originalLoadMode == .alwaysThumbnail,
+                if let cacheKey = networkImage.thumbnailURL?.cacheKey,
+                   networkImage.originalLoadMode == .alwaysThumbnail,
                    !loadOriginal {
-                    key = networkImage.thumbnailURL.cacheKey
-                }else {
-                    key = networkImage.originalURL.cacheKey
+                    key = cacheKey
+                }else if let cacheKey = networkImage.originalURL?.cacheKey {
+                    key = cacheKey
                 }
             }else if let livePhoto = photoAsset.localLivePhoto,
                          !livePhoto.imageURL.isFileURL {

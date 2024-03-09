@@ -22,12 +22,12 @@ extension PhotoPickerController: UIViewControllerTransitioningDelegate {
             config.albumShowMode.isPop {
             switch config.pickerPresentStyle {
             case .push:
-                return PickerControllerTransition(type: .push)
+                return config.pickerTransitionAnimator.init(type: .push)
             default:
                 return nil
             }
         }
-        return PickerTransition(type: .present)
+        return config.browserTransitionAnimator.init(type: .present)
     }
     
     public func animationController(
@@ -40,9 +40,9 @@ extension PhotoPickerController: UIViewControllerTransitioningDelegate {
             config.albumShowMode.isPop {
             switch config.pickerPresentStyle {
             case .push:
-                return PickerControllerTransition(type: .pop)
+                return config.pickerTransitionAnimator.init(type: .pop)
             case .present:
-                return PickerControllerTransition(type: .dismiss)
+                return config.pickerTransitionAnimator.init(type: .dismiss)
             default:
                 return nil
             }
@@ -50,7 +50,7 @@ extension PhotoPickerController: UIViewControllerTransitioningDelegate {
         if disablesCustomDismiss {
             return nil
         }
-        return PickerTransition(type: .dismiss)
+        return config.browserTransitionAnimator.init(type: .dismiss)
     }
     
     public func interactionControllerForDismissal(

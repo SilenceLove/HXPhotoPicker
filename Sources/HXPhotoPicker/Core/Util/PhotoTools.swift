@@ -255,7 +255,7 @@ public struct PhotoTools {
         )
     }
     
-    static func transformImageSize(
+    public static func transformImageSize(
         _ imageSize: CGSize,
         toViewSize viewSize: CGSize,
         directions: [PhotoToolsTransformImageSizeDirections] = [.horizontal, .vertical]
@@ -557,7 +557,7 @@ public struct PhotoTools {
     private init() { }
 }
 
-enum PhotoToolsTransformImageSizeDirections {
+public enum PhotoToolsTransformImageSizeDirections {
     case horizontal
     case vertical
 }

@@ -226,8 +226,8 @@ extension PhotoAsset {
         }else {
             var videoURL: URL?
             if isNetworkAsset {
-                let key = networkVideoAsset!.videoURL.absoluteString
-                if PhotoTools.isCached(forVideo: key) {
+                if let key = networkVideoAsset?.videoURL?.absoluteString,
+                   PhotoTools.isCached(forVideo: key) {
                     videoURL = PhotoTools.getVideoCacheURL(for: key)
                 }
             }else {

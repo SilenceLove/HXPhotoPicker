@@ -241,7 +241,9 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
             }
             finishBtn.layer.cornerRadius = 3
             finishBtn.layer.masksToBounds = true
-            finishBtn.isEnabled = false
+            if config.selectMode == .multiple {
+                finishBtn.isEnabled = false
+            }
             finishBtn.addTarget(self, action: #selector(didFinishButtonClick), for: .touchUpInside)
             contentView.addSubview(finishBtn)
         }
@@ -862,7 +864,7 @@ extension PhotoToolBarView {
             )
         }else {
             if type == .preview {
-                if pickerConfig.maximumSelectedVideoCount == 1 {
+                if pickerConfig.maximumSelectedVideoCount == 1 || pickerConfig.selectMode == .single {
                     finishBtn.isEnabled = true
                 }else {
                     finishBtn.isEnabled = !pickerConfig.previewView.bottomView.disableFinishButtonWhenNotSelected

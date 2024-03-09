@@ -41,6 +41,28 @@ public enum Photo {
         _ config: PickerConfiguration,
         selectedAssets: [PhotoAsset] = [],
         delegate: PhotoPickerControllerDelegate? = nil,
+        targetSize: CGSize,
+        targetMode: HX.ImageTargetMode = .fill,
+        fromVC: UIViewController? = nil,
+        toFile fileConfig: PickerResult.FileConfigHandler? = nil
+    ) async throws -> [UIImage] {
+        try await PhotoPickerController.picker(
+            config,
+            selectedAssets: selectedAssets,
+            delegate: delegate,
+            targetSize: targetSize,
+            targetMode: targetMode,
+            fromVC: fromVC,
+            toFile: fileConfig
+        )
+    }
+    
+    @available(iOS 13.0, *)
+    @MainActor
+    public static func picker(
+        _ config: PickerConfiguration,
+        selectedAssets: [PhotoAsset] = [],
+        delegate: PhotoPickerControllerDelegate? = nil,
         fromVC: UIViewController? = nil
     ) async throws -> PickerResult {
         try await PhotoPickerController.picker(
@@ -177,6 +199,29 @@ public enum HX {
             toFile: fileConfig
         )
     }
+    
+    @available(iOS 13.0, *)
+    @MainActor
+    public func picker(
+        _ config: PickerConfiguration,
+        selectedAssets: [PhotoAsset] = [],
+        delegate: PhotoPickerControllerDelegate? = nil,
+        targetSize: CGSize,
+        targetMode: HX.ImageTargetMode = .fill,
+        fromVC: UIViewController? = nil,
+        toFile fileConfig: PickerResult.FileConfigHandler? = nil
+    ) async throws -> [UIImage] {
+        try await Photo.picker(
+            config,
+            selectedAssets: selectedAssets,
+            delegate: delegate,
+            targetSize: targetSize,
+            targetMode: targetMode,
+            fromVC: fromVC,
+            toFile: fileConfig
+        )
+    }
+    
     
     @available(iOS 13.0, *)
     @MainActor

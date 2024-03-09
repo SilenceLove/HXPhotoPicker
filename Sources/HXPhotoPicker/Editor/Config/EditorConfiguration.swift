@@ -503,7 +503,7 @@ public extension EditorConfiguration {
         
         #if HXPICKER_ENABLE_PICKER
         /// 是否允许添加 从相册选取
-        public var allowAddAlbum: Bool = true
+        public var allowAddAlbum: Bool = false
         /// 相册图标
         public var albumImageName: String {
             get { .imageResource.editor.sticker.album }

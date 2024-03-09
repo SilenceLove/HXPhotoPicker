@@ -105,8 +105,8 @@ extension PhotoTools {
                     completionHandler(photoAsset, coverImage)
                     return
                 }
-                let key = videoAsset.videoURL.absoluteString
-                if isCached(forVideo: key) {
+                if let key = videoAsset.videoURL?.absoluteString,
+                   isCached(forVideo: key) {
                     url = getVideoCacheURL(for: key)
                 }else {
                     url = videoAsset.videoURL
@@ -243,8 +243,8 @@ extension PhotoTools {
                     completionHandler(photoAsset, videoAsset.duration)
                     return nil
                 }
-                let key = videoAsset.videoURL.absoluteString
-                if isCached(forVideo: key) {
+                if let key = videoAsset.videoURL?.absoluteString,
+                   isCached(forVideo: key) {
                     url = getVideoCacheURL(for: key)
                 }else {
                     url = videoAsset.videoURL

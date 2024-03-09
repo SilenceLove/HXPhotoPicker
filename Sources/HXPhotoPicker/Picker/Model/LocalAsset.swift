@@ -12,22 +12,28 @@ public struct LocalImageAsset {
     public var imageData: Data?
     public var imageURL: URL?
     
+    /// 初始化本地图片
     public init(image: UIImage) {
         self.image = image
     }
+    /// 初始化本地图片
     public init(_ image: UIImage) {
         self.init(image: image)
     }
+    /// 初始化本地图片
     public init(imageData: Data) {
         self.imageData = imageData
         self.image = UIImage(data: imageData)
     }
+    /// 初始化本地图片
     public init(_ imageData: Data) {
         self.init(imageData: imageData)
     }
+    /// 初始化本地图片
     public init(imageURL: URL) {
         self.imageURL = imageURL
     }
+    /// 初始化本地图片
     public init(_ imageURL: URL) {
         self.init(imageURL: imageURL)
     }
@@ -49,6 +55,21 @@ public struct LocalVideoAsset {
     /// 视频尺寸
     public var videoSize: CGSize
     
+    /// 初始化本地视频
+    public init(
+        localVideo url: URL,
+        coverImage: UIImage? = nil,
+        duration: TimeInterval = 0,
+        videoSize: CGSize = .zero
+    ) {
+        self.init(
+            videoURL: url,
+            coverImage: coverImage,
+            duration: duration,
+            videoSize: videoSize
+        )
+    }
+    /// 初始化本地视频
     public init(
         videoURL: URL,
         coverImage: UIImage? = nil,
@@ -77,6 +98,7 @@ public struct LocalLivePhotoAsset {
     
     public var size: CGSize
     
+    /// 初始化`LivePhoto`
     public init(
         imageURL: URL,
         videoURL: URL,

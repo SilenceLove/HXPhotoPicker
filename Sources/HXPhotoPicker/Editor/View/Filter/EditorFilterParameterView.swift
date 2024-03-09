@@ -171,6 +171,7 @@ class EditorFilterParameterViewCell: UICollectionViewCell, ParameterSliderViewDe
     private var titleLb: UILabel!
     private var slider: ParameterSliderView!
     private var numberLb: UILabel!
+    private var resetBtn: ExpandButton!
     
     var sliderDidStart: (() -> Void)?
     var sliderDidEnded: (() -> Void)?
@@ -197,12 +198,22 @@ class EditorFilterParameterViewCell: UICollectionViewCell, ParameterSliderViewDe
             slider.trackColor = sliderColor
         }
     }
+    
+    var value: CGFloat {
+        get { slider.value }
+        set { 
+            slider.setValue(newValue, isAnimation: false)
+            sliderView(slider, didChangedValue: slider.value, state: .changed)
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .clear
         initViews()
         contentView.addSubview(titleLb)
         contentView.addSubview(slider)
+        contentView.addSubview(resetBtn)
         contentView.addSubview(numberLb)
     }
     private func initViews() {
@@ -211,6 +222,12 @@ class EditorFilterParameterViewCell: UICollectionViewCell, ParameterSliderViewDe
         titleLb.textAlignment = .center
         titleLb.font = .systemFont(ofSize: 15)
         titleLb.adjustsFontSizeToFitWidth = true
+        
+        resetBtn = ExpandButton(type: .system)
+        resetBtn.setImage(.imageResource.editor.filter.reset.image, for: .normal)
+        resetBtn.size = resetBtn.currentImage?.size ?? .zero
+        resetBtn.tintColor = .white
+        resetBtn.addTarget(self, action: #selector(didResetButtonClick), for: .touchUpInside)
         
         slider = ParameterSliderView()
         slider.value = 1
@@ -221,6 +238,11 @@ class EditorFilterParameterViewCell: UICollectionViewCell, ParameterSliderViewDe
         numberLb.textColor = .white
         numberLb.font = .systemFont(ofSize: 15)
         numberLb.textAlignment = .center
+    }
+    
+    @objc
+    func didResetButtonClick() {
+        value = CGFloat(model?.parameter.defaultValue ?? 0)
     }
     
     func sliderView(
@@ -254,24 +276,24 @@ class EditorFilterParameterViewCell: UICollectionViewCell, ParameterSliderViewDe
             titleLb.width = titleLb.textWidth
             titleLb.height = height
             
+            resetBtn.x = width - UIDevice.rightMargin - resetBtn.width - 15
+            numberLb.x = UIDevice.leftMargin + 10
+            numberLb.width = 40
+            numberLb.height = numberLb.textHeight
             if model?.parameter.title != nil {
-                numberLb.frame = .init(x: width - 10 - 40 - UIDevice.rightMargin, y: 0, width: 40, height: 20)
-                numberLb.centerY = titleLb.centerY
-                let sliderWidth: CGFloat = 200.0 / 375.0
-                slider.size = .init(width: UIDevice.screenSize.width * sliderWidth, height: 20)
-                slider.x = numberLb.x - 15 - slider.width
-                slider.centerY = titleLb.centerY
-                titleLb.width = slider.x - titleLb.x - 5
+                numberLb.centerY = titleLb.frame.maxY + 10
+                slider.x = UIDevice.leftMargin + 60
+                slider.size = .init(width: width - slider.x * 2, height: 20)
+                slider.centerY = numberLb.centerY
+                resetBtn.centerY = slider.centerY
             }else {
-                numberLb.y = 0
-                numberLb.width = 100
-                numberLb.height = numberLb.textHeight
-                numberLb.centerX = width * 0.5
+                numberLb.centerY = height / 2
                 
-                slider.x = 30 + UIDevice.leftMargin
-                slider.width = width - slider.x - 30 - UIDevice.rightMargin
+                slider.x = UIDevice.leftMargin + 60
+                slider.width = width - slider.x * 2
                 slider.height = 20
-                slider.y = numberLb.frame.maxY + 10
+                slider.centerY = numberLb.centerY
+                resetBtn.centerY = slider.centerY
             }
         }else {
             titleLb.x = 0
@@ -287,10 +309,13 @@ class EditorFilterParameterViewCell: UICollectionViewCell, ParameterSliderViewDe
             }else {
                 numberLb.y = 15
             }
-            slider.y = numberLb.frame.maxY + 15
+            resetBtn.y = height - UIDevice.bottomMargin - 15 - resetBtn.height
+            slider.y = numberLb.frame.maxY + 20
             slider.width = 20
-            slider.height = height - slider.y - 30 - UIDevice.bottomMargin
+            slider.height = resetBtn.y - slider.y - 20
             slider.centerX = numberLb.centerX
+            
+            resetBtn.centerX = slider.centerX
         }
     }
     

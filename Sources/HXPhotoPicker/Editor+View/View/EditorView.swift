@@ -10,7 +10,6 @@ import AVFoundation
 
 open class EditorView: UIScrollView {
     
-    // MARK: public
     public weak var editDelegate: EditorViewDelegate?
     
     /// The URL configuration after editing, the default is under tmp

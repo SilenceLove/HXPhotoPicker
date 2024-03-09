@@ -16,7 +16,11 @@ open class PhotoBrowser: PhotoPickerController {
     /// 当前页面
     public var pageIndex: Int {
         get { currentPreviewIndex }
-        set { previewViewController?.scrollToItem(newValue) }
+        set { setPageIndex(newValue, animated: false) }
+    }
+    
+    public func setPageIndex(_ page: Int, animated: Bool) {
+        previewViewController?.scrollToItem(page, animated: animated)
     }
     
     /// 页面数
@@ -284,6 +288,8 @@ open class PhotoBrowser: PhotoPickerController {
         previewConfig.prefersStatusBarHidden = true
         previewConfig.statusBarStyle = .lightContent
         previewConfig.adaptiveBarAppearance = false
+        previewConfig.browserTransitionAnimator = config.transitionAnimator
+        previewConfig.browserInteractiveTransitionAnimator = config.interactiveTransitionAnimator
         
         var pConfig = PreviewViewConfiguration()
         pConfig.singleClickCellAutoPlayVideo = false
@@ -293,7 +299,6 @@ open class PhotoBrowser: PhotoPickerController {
         pConfig.livePhotoMark.blurStyle = .dark
         pConfig.livePhotoMark.imageColor = "#ffffff".color
         pConfig.livePhotoMark.textColor = "#ffffff".color
-        
         
         pConfig.loadNetworkVideoMode = config.loadNetworkVideoMode
         pConfig.customVideoCellClass = config.customVideoCellClass
@@ -309,7 +314,7 @@ open class PhotoBrowser: PhotoPickerController {
         return previewConfig
     }
     
-    let hideSourceView: Bool
+    public let hideSourceView: Bool
     
     fileprivate var gradualShadowImageView: UIImageView!
     
@@ -333,7 +338,7 @@ open class PhotoBrowser: PhotoPickerController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        initViews()
+        setupViews()
         
         if previewAssets.isEmpty {
             assert(
@@ -380,7 +385,7 @@ open class PhotoBrowser: PhotoPickerController {
         )
     }
     
-    private func initViews() {
+    func setupViews() {
         pageIndicator?.pageControlChanged = { [weak self] index in
             self?.pageIndex = index
         }
@@ -493,6 +498,10 @@ extension PhotoBrowser {
         public var hideSourceView: Bool = true
         /// 跳转样式
         public var modalPresentationStyle: UIModalPresentationStyle = .custom
+        /// 自定义转场动画实现
+        public var transitionAnimator: PhotoBrowserAnimationTransitioning.Type = PhotoBrowserAnimator.self
+        /// 自定义手势转场动画实现
+        public var interactiveTransitionAnimator: PhotoBrowserInteractiveTransition.Type = PhotoBrowserInteractiveAnimator.self
         
         public init() { }
     }

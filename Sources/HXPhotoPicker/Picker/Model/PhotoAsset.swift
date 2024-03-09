@@ -197,7 +197,8 @@ open class PhotoAsset: Equatable, PhotoAssetEquatable {
     public init(networkImageAsset: NetworkImageAsset) {
         self.networkImageAsset = networkImageAsset
         mediaType = .photo
-        mediaSubType = .networkImage(networkImageAsset.originalURL.isGif)
+        let isGif = networkImageAsset.originalURL?.isGif ?? false
+        mediaSubType = .networkImage(isGif)
     }
     
     public convenience init(_ networkImageAsset: NetworkImageAsset) {
@@ -397,8 +398,8 @@ extension PhotoAsset {
                 }else if let image = networkVideo.coverImage {
                     size = image.size
                 }else {
-                    let key = networkVideo.videoURL.absoluteString
-                    if PhotoTools.isCached(forVideo: key) {
+                    if let key = networkVideo.videoURL?.absoluteString,
+                       PhotoTools.isCached(forVideo: key) {
                         let videoURL = PhotoTools.getVideoCacheURL(for: key)
                         if let image = PhotoTools.getVideoThumbnailImage(videoURL: videoURL, atTime: 0.1) {
                             networkVideoAsset?.coverImage = image

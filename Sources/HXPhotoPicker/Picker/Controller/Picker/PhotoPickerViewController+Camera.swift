@@ -160,7 +160,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
         guard let systemCamera = config.cameraType.systemConfig else {
             return
         }
-        let avAsset = AVAsset.init(url: videoURL)
+        let avAsset = AVAsset(url: videoURL)
         avAsset.loadValuesAsynchronously(forKeys: ["tracks"]) {
             if avAsset.statusOfValue(forKey: "tracks", error: nil) != .loaded {
                 DispatchQueue.main.async {

@@ -30,13 +30,17 @@ public extension PhotoAsset {
         #endif
         if let networkImage = networkImageAsset {
             if networkImage.originalLoadMode == .alwaysThumbnail {
-                if ImageCache.default.isCached(forKey: networkImage.originalURL.cacheKey) {
-                    resultHandler(.success(.init(url: networkImage.originalURL, urlType: .network, mediaType: .photo)))
-                }else {
-                    resultHandler(.success(.init(url: networkImage.thumbnailURL, urlType: .network, mediaType: .photo)))
+                if let originalURL = networkImage.originalURL,
+                   ImageCache.default.isCached(forKey: originalURL.cacheKey) {
+                    resultHandler(.success(.init(url: originalURL, urlType: .network, mediaType: .photo)))
+                    return
+                }else if let thumbnailURL = networkImage.thumbnailURL {
+                    resultHandler(.success(.init(url: thumbnailURL, urlType: .network, mediaType: .photo)))
+                    return
                 }
-            }else {
-                resultHandler(.success(.init(url: networkImage.originalURL, urlType: .network, mediaType: .photo)))
+            }else if let originalURL = networkImage.originalURL {
+                resultHandler(.success(.init(url: originalURL, urlType: .network, mediaType: .photo)))
+                return
             }
         }else {
             resultHandler(.failure(.networkURLIsEmpty))
@@ -65,25 +69,29 @@ public extension PhotoAsset {
         }
         #endif
         let isThumbnail = urlType == .thumbnail
-        let url: URL
+        var url: URL?
         if let networkImage = networkImageAsset {
             url = isThumbnail ? networkImage.thumbnailURL : networkImage.originalURL
         }else if let livePhoto = localLivePhoto, !livePhoto.imageURL.isFileURL {
             url = livePhoto.imageURL
         }else if let videoAsset = networkVideoAsset {
-            let videoURL: URL
+            let videoURL: URL?
             if let coverImage = videoAsset.coverImage {
                 resultHandler(coverImage)
                 return
             }else if let coverImageURL = videoAsset.coverImageURL {
                 videoURL = coverImageURL
             }else {
-                let key = videoAsset.videoURL.absoluteString
-                if PhotoTools.isCached(forVideo: key) {
+                if let key = videoAsset.videoURL?.absoluteString,
+                   PhotoTools.isCached(forVideo: key) {
                     videoURL = PhotoTools.getVideoCacheURL(for: key)
                 }else {
                     videoURL = videoAsset.videoURL
                 }
+            }
+            guard let videoURL else {
+                resultHandler(nil)
+                return
             }
             let provider = AVAssetImageDataProvider(assetURL: videoURL, seconds: 0.1)
             provider.assetImageGenerator.appliesPreferredTrackTransform = true
@@ -96,7 +104,8 @@ public extension PhotoAsset {
                 }
             }
             return
-        }else {
+        }
+        guard let url else {
             resultHandler(nil)
             return
         }

@@ -345,4 +345,9 @@ public enum PhotoPreviewType {
     case browser
 }
 
-
+public enum PickerTransitionType {
+    case push
+    case pop
+    case present
+    case dismiss
+}
