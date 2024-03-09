@@ -190,6 +190,7 @@ open class PhotoBrowserAnimator: NSObject, PhotoBrowserAnimationTransitioning {
         }
     }
     
+    #if canImport(Kingfisher)
     open func requestNetworkImage(_ networkImage: NetworkImageAsset) {
         if let cacheKey = networkImage.originalURL?.cacheKey,
            ImageCache.default.isCached(forKey: cacheKey) {
@@ -230,6 +231,7 @@ open class PhotoBrowserAnimator: NSObject, PhotoBrowserAnimationTransitioning {
             }
         }
     }
+    #endif
     
     open func dismissTransition(_ transitionContext: UIViewControllerContextTransitioning) {
         guard let fromVC = transitionContext.viewController(forKey: .from) as? PhotoPickerController else {

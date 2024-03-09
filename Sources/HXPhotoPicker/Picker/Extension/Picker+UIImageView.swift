@@ -269,8 +269,8 @@ extension UIImageView {
                 completionHandler?(coverImage, asset)
                 return nil
             }else {
-                let key = videoAsset.videoURL.absoluteString
-                if PhotoTools.isCached(forVideo: key) {
+                if let key = videoAsset.videoURL?.absoluteString,
+                   PhotoTools.isCached(forVideo: key) {
                     videoURL = PhotoTools.getVideoCacheURL(for: key)
                 }else {
                     videoURL = videoAsset.videoURL
