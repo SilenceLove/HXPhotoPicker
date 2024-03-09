@@ -65,15 +65,18 @@ class PickerConfigurationViewController: UITableViewController {
 //                            self.navigationController?.pushViewController(pickerResultVC, animated: true)
 //                        }
 //                        config.isSelectedOriginal = true
-                        let result = try await Photo.picker(self.config)
+                        config.isAutoBack = false
+                        let controller = try await PhotoPickerController.show(config)
+                        let result = try await controller.picker()
 //                        let images: [UIImage] = try await result.objects()
 //                        let urls: [URL] = try await result.objects()
 //                        let urlResults: [AssetURLResult] = try await result.objects()
                         let pickerResultVC = PickerResultViewController()
-                        pickerResultVC.config = self.config
+                        pickerResultVC.config = config
                         pickerResultVC.selectedAssets = result.photoAssets
                         pickerResultVC.isOriginal = result.isOriginal
-                        self.navigationController?.pushViewController(pickerResultVC, animated: true)
+                        navigationController?.pushViewController(pickerResultVC, animated: false)
+                        controller.dismiss(true)
                     } catch {
                         print(error)
                     }
