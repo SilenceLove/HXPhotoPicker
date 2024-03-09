@@ -1,5 +1,12 @@
 # Release Notes
 
+## 4.1.7
+
+### Resolved
+
+- [[632]](https://github.com/SilenceLove/HXPhotoPicker/issues/632)
+- [[598]](https://github.com/SilenceLove/HXPhotoPicker/issues/598)
+
 ## 4.1.6
 
 ### Added

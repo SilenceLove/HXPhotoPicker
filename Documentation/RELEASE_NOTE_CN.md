@@ -1,5 +1,12 @@
 # 更新日志 
 
+## 4.1.7
+
+### 修复
+
+- [[632]](https://github.com/SilenceLove/HXPhotoPicker/issues/632)
+- [[598]](https://github.com/SilenceLove/HXPhotoPicker/issues/598)
+
 ## 4.1.6
 
 ### 新增
