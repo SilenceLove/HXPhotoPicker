@@ -394,6 +394,9 @@ class PhotoPickerPageHeaderView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        if titles.isEmpty {
+            return
+        }
         let count = CGFloat(titles.count)
         let viewWidth = width / count
         for (index, view) in subviews.enumerated() {
