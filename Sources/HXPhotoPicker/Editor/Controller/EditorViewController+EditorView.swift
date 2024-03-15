@@ -199,6 +199,10 @@ extension EditorViewController: EditorViewDelegate {
     public func editorView(_ editorView: EditorView, videoDidPlayAt time: CMTime) {
         videoControlView.isPlaying = true
         startPlayVideo()
+        if videoCoverView != nil {
+            videoCoverView?.removeFromSuperview()
+            videoCoverView = nil
+        }
     }
     /// 视频暂停播放
     public func editorView(_ editorView: EditorView, videoDidPauseAt time: CMTime) {

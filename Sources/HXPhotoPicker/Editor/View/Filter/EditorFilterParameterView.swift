@@ -203,7 +203,9 @@ class EditorFilterParameterViewCell: UICollectionViewCell, ParameterSliderViewDe
         get { slider.value }
         set { 
             slider.setValue(newValue, isAnimation: false)
+            sliderView(slider, didChangedValue: slider.value, state: .touchDown)
             sliderView(slider, didChangedValue: slider.value, state: .changed)
+            sliderView(slider, didChangedValue: slider.value, state: .touchUpInSide)
         }
     }
     

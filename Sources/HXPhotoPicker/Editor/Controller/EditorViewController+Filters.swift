@@ -122,9 +122,12 @@ extension EditorViewController: EditorFiltersViewDelegate {
         case .video:
             if editorView.isVideoPlaying {
                 isStartFilterParameterTime = nil
+                videoCoverView?.removeFromSuperview()
+                videoCoverView = nil
             }else {
                 isStartFilterParameterTime = editorView.videoPlayTime
             }
+            adjustmentVideoFilterCover()
             if filter.isOriginal {
                 videoFilter = nil
                 videoFilterInfo = nil
@@ -177,11 +180,16 @@ extension EditorViewController: EditorFilterParameterViewDelegate {
         didEnded filterParameterView: EditorFilterParameterView
     ) {
         isStartFilterParameterTime = nil
+        videoCoverView?.removeFromSuperview()
+        videoCoverView = nil
     }
     func filterParameterView(
         _ filterParameterView: EditorFilterParameterView,
         didChanged model: PhotoEditorFilterParameterInfo
     ) {
+        if selectedAsset.contentType == .video {
+            adjustmentVideoFilterCover()
+        }
         let index = filtersView.currentSelectedIndex
         switch filterParameterView.type {
         case .filter:
@@ -394,17 +402,49 @@ extension EditorViewController: EditorFilterParameterViewDelegate {
         imageFilterQueue.addOperation(operation)
     }
     
+    func adjustmentVideoFilterCover() {
+        guard !editorView.isVideoPlaying,
+              let currentTime = isStartFilterParameterTime else {
+            return
+        }
+        var image: UIImage?
+        if #available(iOS 16.0, *) {
+            if let pixelBuffer = editorView.playerLayer?.displayedPixelBuffer() {
+                let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+                image = .init(ciImage: ciImage)
+            }
+        }
+        if image == nil {
+            image = editorView.getVideoDisplayedImage(at: currentTime.seconds)
+        }
+        if videoCoverView == nil {
+            videoCoverView = .init(frame: editorView.videoView!.bounds)
+            videoCoverView?.contentMode = .scaleAspectFill
+            videoCoverView?.clipsToBounds = true
+        }
+        videoCoverView?.image = image
+        if videoCoverView?.superview != editorView.videoView {
+            editorView.videoView?.addSubview(videoCoverView!)
+        }
+    }
+    
     func adjustmentVideoFilter() {
-        if !editorView.isVideoPlaying {
-            guard let currentTime = isStartFilterParameterTime else {
+        guard !editorView.isVideoPlaying,
+              let currentTime = isStartFilterParameterTime else {
+            return
+        }
+        
+        editorView.seekVideo(
+            to: .init(seconds: currentTime.seconds + 0.1, preferredTimescale: 1000)
+        ) { [weak self] in
+            if !$0 {
                 return
             }
-            editorView.seekVideo(
-                to: .init(seconds: currentTime.seconds + 0.1, preferredTimescale: 1000)
-            ) { [weak self] in
-                if $0 {
-                    self?.editorView.seekVideo(to: currentTime)
+            self?.editorView.seekVideo(to: currentTime) { [weak self] in
+                if !$0 {
+                    return
                 }
+                self?.videoCoverView?.removeFromSuperview()
             }
         }
     }

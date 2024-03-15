@@ -128,6 +128,7 @@ class EditorVideoPlayerView: VideoPlayerView {
         playerItem.videoComposition = videoComposition(avAsset)
         player.replaceCurrentItem(with: playerItem)
         playerLayer.player = player
+        playerLayer.videoGravity = .resizeAspectFill
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(appDidEnterBackground),
@@ -256,6 +257,10 @@ class EditorVideoPlayerView: VideoPlayerView {
         videoComposition.renderScale = 1
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
         return videoComposition
+    }
+    
+    func getDisplayedImage(at time: TimeInterval) -> UIImage? {
+        avAsset?.getImage(at: time, videoComposition: player.currentItem?.videoComposition)
     }
     
     var beforEnterIsPlaying: Bool = false

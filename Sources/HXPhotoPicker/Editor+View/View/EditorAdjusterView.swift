@@ -306,6 +306,25 @@ extension EditorAdjusterView {
         contentView.avAsset
     }
     
+    var avPlayer: AVPlayer? {
+        contentView.avPlayer
+    }
+    
+    var playerLayer: AVPlayerLayer? {
+        contentView.playerLayer
+    }
+    
+    var videoView: UIView? {
+        if contentType != .video {
+            return nil
+        }
+        return contentView.videoView
+    }
+    
+    func getVideoDisplayedImage(at time: TimeInterval) -> UIImage? {
+        contentView.getVideoDisplayerImage(at: time)
+    }
+    
     func updateVideoController() {
         if contentType == .video && state == .edit {
             frameView.showVideoSlider(true)

@@ -89,6 +89,18 @@ public extension EditorView {
         adjusterView.avAsset
     }
     
+    var avPlayer: AVPlayer? {
+        adjusterView.avPlayer
+    }
+    
+    var playerLayer: AVPlayerLayer? {
+        adjusterView.playerLayer
+    }
+    
+    var videoView: UIView? {
+        adjusterView.videoView
+    }
+    
     /// Get the current editing data
     /// 获取当前编辑数据
     var adjustmentData: EditAdjustmentData {
@@ -211,6 +223,13 @@ public extension EditorView {
     /// 隐藏视频控制条，编辑状态下无效
     func hideVideoControl(_ animated: Bool) {
         adjusterView.hideVideoControl(animated)
+    }
+    
+    /// 获取视频指定时间显示的画面，包含滤镜效果
+    /// - Parameter time: 指定时间
+    /// - Returns: 对应的 `UIImage`
+    func getVideoDisplayedImage(at time: TimeInterval) -> UIImage? {
+        adjusterView.getVideoDisplayedImage(at: time)
     }
     
     var finalView: UIView {

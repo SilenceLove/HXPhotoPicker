@@ -125,6 +125,24 @@ class EditorContentView: UIView {
         }
     }
     
+    var avPlayer: AVPlayer? {
+        if type != .video {
+            return nil
+        }
+        return videoView.player
+    }
+    
+    var playerLayer: AVPlayerLayer? {
+        if type != .video {
+            return nil
+        }
+        return videoView.playerLayer
+    }
+    
+    func getVideoDisplayerImage(at time: TimeInterval) -> UIImage? {
+        videoView.getDisplayedImage(at: time)
+    }
+    
     var isVideoPlayToEndTimeAutoPlay: Bool {
         get { videoView.isPlayToEndTimeAutoPlay}
         set { videoView.isPlayToEndTimeAutoPlay = newValue }

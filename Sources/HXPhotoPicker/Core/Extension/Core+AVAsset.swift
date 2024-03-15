@@ -9,9 +9,10 @@ import UIKit
 import AVFoundation
 
 extension AVAsset {
-    func getImage(at time: TimeInterval) -> UIImage? {
+    func getImage(at time: TimeInterval, videoComposition: AVVideoComposition? = nil) -> UIImage? {
         let assetImageGenerator = AVAssetImageGenerator(asset: self)
         assetImageGenerator.appliesPreferredTrackTransform = true
+        assetImageGenerator.videoComposition = videoComposition
         assetImageGenerator.apertureMode = .encodedPixels
         do {
             let thumbnailImageRef = try assetImageGenerator.copyCGImage(
@@ -29,6 +30,7 @@ extension AVAsset {
     }
     func getImage(
         at time: TimeInterval,
+        videoComposition: AVVideoComposition? = nil,
         imageGenerator: ((AVAssetImageGenerator) -> Void)? = nil,
         completion: @escaping (AVAsset, UIImage?, AVAssetImageGenerator.Result) -> Void
     ) {
@@ -47,6 +49,7 @@ extension AVAsset {
             }
             let generator = AVAssetImageGenerator(asset: self)
             generator.appliesPreferredTrackTransform = true
+            generator.videoComposition = videoComposition
             let time = CMTime(value: CMTimeValue(time), timescale: self.duration.timescale)
             let array = [NSValue(time: time)]
             generator.generateCGImagesAsynchronously(

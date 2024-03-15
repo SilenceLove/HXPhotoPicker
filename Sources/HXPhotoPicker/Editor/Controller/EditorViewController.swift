@@ -618,6 +618,7 @@ open class EditorViewController: BaseViewController {
     
     var isStartFilterParameterTime: CMTime?
     var lastMusicDownloadTask: URLSessionDownloadTask?
+    var videoCoverView: UIImageView?
     weak var videoTool: EditorVideoTool?
     
     public override func deviceOrientationWillChanged(notify: Notification) {
