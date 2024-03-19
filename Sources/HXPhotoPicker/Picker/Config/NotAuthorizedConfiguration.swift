@@ -21,14 +21,14 @@ public struct NotAuthorizedConfiguration {
     
     /// 关闭按钮图片名
     public var closeButtonImageName: String {
-        get { .imageResource.picker.notAuthorized.close }
-        set { HX.imageResource.picker.notAuthorized.close = newValue }
+        get { .imageResource.picker.notAuthorized.close.name }
+        set { HX.imageResource.picker.notAuthorized.close = .local(newValue) }
     }
     
     /// 暗黑风格下的关闭按钮图片名
     public var closeButtonDarkImageName: String {
-        get { .imageResource.picker.notAuthorized.closeDark }
-        set { HX.imageResource.picker.notAuthorized.closeDark = newValue }
+        get { .imageResource.picker.notAuthorized.closeDark.name }
+        set { HX.imageResource.picker.notAuthorized.closeDark = .local(newValue) }
     }
     
     /// 关闭按钮颜色
@@ -65,7 +65,7 @@ public struct NotAuthorizedConfiguration {
     public var jumpButtonTitleDarkColor: UIColor = "#333333".hx.color
     
     public init() { 
-        HX.imageResource.picker.notAuthorized.close = "hx_picker_notAuthorized_close"
+        HX.imageResource.picker.notAuthorized.close = .local("hx_picker_notAuthorized_close")
     }
     
     public mutating func setThemeColor(_ color: UIColor) {

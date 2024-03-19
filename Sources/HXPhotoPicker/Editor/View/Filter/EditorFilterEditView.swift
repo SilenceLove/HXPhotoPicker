@@ -43,26 +43,26 @@ class EditorFilterEditModel: Equatable {
             }
         }
         
-        var imageNamed: String {
+        var image: UIImage? {
             switch self {
             case .brightness:
-                return .imageResource.editor.adjustment.brightness
+                return .imageResource.editor.adjustment.brightness.image
             case .contrast:
-                return .imageResource.editor.adjustment.contrast
+                return .imageResource.editor.adjustment.contrast.image
             case .exposure:
-                return .imageResource.editor.adjustment.exposure
+                return .imageResource.editor.adjustment.exposure.image
             case .saturation:
-                return .imageResource.editor.adjustment.saturation
+                return .imageResource.editor.adjustment.saturation.image
             case .warmth:
-                return .imageResource.editor.adjustment.warmth
+                return .imageResource.editor.adjustment.warmth.image
             case .vignette:
-                return .imageResource.editor.adjustment.vignette
+                return .imageResource.editor.adjustment.vignette.image
             case .sharpen:
-                return .imageResource.editor.adjustment.sharpen
+                return .imageResource.editor.adjustment.sharpen.image
             case .highlights:
-                return .imageResource.editor.adjustment.highlights
+                return .imageResource.editor.adjustment.highlights.image
             case .shadows:
-                return .imageResource.editor.adjustment.shadows
+                return .imageResource.editor.adjustment.shadows.image
             }
         }
     }
@@ -251,7 +251,7 @@ class EditorFilterEditViewCell: UICollectionViewCell {
                 return
             }
             titleLb.text = model.type.title
-            imageView.image = model.type.imageNamed.image
+            imageView.image = model.type.image
             if let para = model.parameters.first, !para.isNormal {
                 parameterLb.isHidden = false
                 parameterLb.text = String(Int(para.value * 100))

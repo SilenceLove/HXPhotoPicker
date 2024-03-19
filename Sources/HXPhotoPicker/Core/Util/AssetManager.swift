@@ -28,6 +28,37 @@ public struct AssetManager {
     ///   - customAlbumName: 需要保存到自定义相册的名称，默认BundleName
     ///   - creationDate: 创建时间，默认当前时间
     ///   - location: 位置信息
+    @available(iOS 13.0.0, *)
+    @discardableResult
+    public static func save(
+        type: PhotoSaveType,
+        customAlbumName: String? = nil,
+        creationDate: Date = .init(),
+        location: CLLocation? = nil
+    ) async throws -> PHAsset {
+        try await withCheckedThrowingContinuation { continuation in
+            save(
+                type: type,
+                customAlbumName: customAlbumName,
+                creationDate: creationDate,
+                location: location
+            ) { result in
+                switch result {
+                case .success(let phAsset):
+                    continuation.resume(returning: phAsset)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
+    /// 保存资源到系统相册
+    /// - Parameters:
+    ///   - type: 保存类型
+    ///   - customAlbumName: 需要保存到自定义相册的名称，默认BundleName
+    ///   - creationDate: 创建时间，默认当前时间
+    ///   - location: 位置信息
     ///   - completion: 保存之后的结果
     public static func save(
         type: PhotoSaveType,
@@ -40,7 +71,7 @@ public struct AssetManager {
         if let customAlbumName = customAlbumName, customAlbumName.count > 0 {
             albumName = customAlbumName
         }else {
-            albumName = displayName()
+            albumName = displayName
         }
         AssetManager.requestAuthorization {
             switch $0 {
@@ -135,7 +166,7 @@ public struct AssetManager {
         return assetCollection
     }
     
-    private static func displayName() -> String {
+    private static var displayName: String {
         if let displayName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String {
             return displayName.count > 0 ? displayName : "PhotoPicker"
         }else if let bundleName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String {

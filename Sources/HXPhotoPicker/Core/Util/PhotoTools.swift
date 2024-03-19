@@ -352,8 +352,7 @@ public struct PhotoTools {
     
     static func imageCompress(
         _ data: Data,
-        compressionQuality: CGFloat,
-        isHEIC: Bool = false
+        compressionQuality: CGFloat
     ) -> Data? {
         guard var resultImage = UIImage(data: data)?.normalizedImage() else {
             return nil

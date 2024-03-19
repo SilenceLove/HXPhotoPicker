@@ -131,7 +131,6 @@ public extension PhotoAsset {
             }
             return nil
         }
-        let isHEIC = photoFormat == "heic"
         let options = PHImageRequestOptions.init()
         options.resizeMode = .fast
         options.deliveryMode = .highQualityFormat
@@ -146,8 +145,7 @@ public extension PhotoAsset {
                     DispatchQueue.global().async {
                         if let data = PhotoTools.imageCompress(
                             dataResult.imageData,
-                            compressionQuality: compressionScale,
-                            isHEIC: isHEIC
+                            compressionQuality: compressionScale
                         ), let image = UIImage(data: data)?.normalizedImage() {
                             DispatchQueue.main.async {
                                 completion?(image, self)
@@ -559,8 +557,7 @@ public extension PhotoAsset {
             }
             if let data = PhotoTools.imageCompress(
                 imageData,
-                compressionQuality: compressionQuality,
-                isHEIC: url.pathExtension.uppercased() == "HEIC"
+                compressionQuality: compressionQuality 
             ) {
                 return PhotoTools.write(toFile: url, imageData: data)
             }

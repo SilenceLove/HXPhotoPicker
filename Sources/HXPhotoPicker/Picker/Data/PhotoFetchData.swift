@@ -38,6 +38,8 @@ open class PhotoFetchData {
     let assetCollectionsQueue: OperationQueue
     let assetsQueue: OperationQueue
     
+    public var isFetchCamera: Bool = false
+    
     /// fetch Assets 时的选项配置
     public var options: PHFetchOptions = .init()
     
@@ -67,6 +69,10 @@ open class PhotoFetchData {
     
     /// 获取相机胶卷资源集合
     public func fetchCameraAssetCollection() {
+        if isFetchCamera {
+            return
+        }
+        isFetchCamera = true
         DispatchQueue.global().async {
             let fetchAssetCollection = self.config.fetchAssetCollection
             let assetCollection = fetchAssetCollection.fetchCameraAssetCollection(
@@ -89,6 +95,7 @@ open class PhotoFetchData {
             self.cameraAssetCollection = cameraAssetCollection
             DispatchQueue.main.async {
                 self.delegate?.fetchData(fetchCameraAssetCollectionCompletion: self)
+                self.isFetchCamera = false
             }
         }
     }

@@ -24,3 +24,4 @@ public protocol EditorChartletListProtocol: UIViewController {
     var delegate: EditorChartletListDelegate? { get set }
     init(config: EditorConfiguration, editorType: EditorContentViewType)
 }
+

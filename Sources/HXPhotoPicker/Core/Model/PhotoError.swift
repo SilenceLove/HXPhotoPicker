@@ -77,6 +77,8 @@ public enum AssetError: Error {
     case localLivePhotoWriteVideoFailed
     /// 本地livePhoto合成失败
     case localLivePhotoRequestFailed
+    /// 获取失败-未知原因
+    case failed
 }
 
 extension AssetError: LocalizedError, CustomStringConvertible {
@@ -134,6 +136,8 @@ extension AssetError: LocalizedError, CustomStringConvertible {
             return "本地livePhoto视频写入失败"
         case .localLivePhotoRequestFailed:
             return "本地livePhoto合成失败"
+        case .failed:
+            return "获取失败-未知原因"
         }
     }
     

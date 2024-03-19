@@ -42,7 +42,7 @@ protocol EditorMusicListViewControllerDelegate: AnyObject {
     func musicViewController(stopPlay musicViewController: EditorMusicListViewController)
 }
 
-class EditorMusicListViewController: BaseViewController {
+class EditorMusicListViewController: HXBaseViewController {
     weak var delegate: EditorMusicListViewControllerDelegate?
     private var loadBgView: UIView!
     private var loadingView: UIActivityIndicatorView!

@@ -14,7 +14,7 @@ extension EditorViewController {
     public typealias CancelHandler = (EditorViewController) -> Void
 }
 
-open class EditorViewController: BaseViewController {
+open class EditorViewController: HXBaseViewController {
     
     public weak var delegate: EditorViewControllerDelegate?
     public var config: EditorConfiguration

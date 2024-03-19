@@ -268,7 +268,8 @@ open class PhotoPickerController: UINavigationController {
     }
     
     open override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
-        if let viewController = presentedViewController as? PhotoPickerController, config.photoList.previewStyle == .present {
+        if let viewController = presentedViewController as? PhotoPickerController,
+           config.photoList.previewStyle == .present {
             #if HXPICKER_ENABLE_EDITOR
             if viewController.presentedViewController is EditorViewController {
                 if let splitVC = viewController.presentingViewController as? PhotoSplitViewController {
@@ -320,8 +321,8 @@ open class PhotoPickerController: UINavigationController {
     private var pickerTask: Any?
     private var isFirstAuthorization: Bool = false
     var isFetchAssetCollection: Bool = false
-    var isAsyncPicker: Bool = false
-    var isAsyncPickerAutoDismiss: Bool = false
+    private var isAsyncPicker: Bool = false
+    private var isAsyncPickerAutoDismiss: Bool = false
     
     init() {
         self.config = .init()
@@ -647,7 +648,7 @@ extension PhotoPickerController {
 }
 
 extension PhotoPickerController: UINavigationControllerDelegate, PhotoAlbumControllerDelegate {
-    public func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+    public func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
         if viewController is PhotoAlbumController {
             if fetchData.assetCollections.isEmpty, !isFetchAssetCollection {
                 isFetchAssetCollection = true
@@ -800,6 +801,11 @@ public extension PhotoPickerController {
                guard let self = self else { return }
                if isDimissed { return }
                isDimissed = true
+               if result.photoAssets.isEmpty {
+                   continuation.resume(with: .failure(PickerError.canceled))
+                   controller.dismiss(true)
+                   return
+               }
                ProgressHUD.showLoading(addedTo: self.view)
                self.pickerTask = Task {
                    do {
@@ -848,6 +854,11 @@ public extension PhotoPickerController {
                guard let self = self else { return }
                if isDimissed { return }
                isDimissed = true
+               if result.photoAssets.isEmpty {
+                   continuation.resume(with: .failure(PickerError.canceled))
+                   controller.dismiss(true)
+                   return
+               }
                ProgressHUD.showLoading(addedTo: self.view)
                self.pickerTask = Task {
                    do {

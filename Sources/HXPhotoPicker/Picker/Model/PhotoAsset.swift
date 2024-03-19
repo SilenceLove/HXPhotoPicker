@@ -357,18 +357,19 @@ extension PhotoAsset {
         return originalImage
     }
     func getImageSize() -> CGSize {
+        let defaultSize: CGSize = .init(width: 200, height: 200)
         #if HXPICKER_ENABLE_EDITOR
         if let photoEdit = photoEditedResult {
             return photoEdit.image.size
         }
         if let videoEdit = videoEditedResult {
-            return videoEdit.coverImage?.size ?? CGSize(width: 200, height: 200)
+            return videoEdit.coverImage?.size ?? defaultSize
         }
         #endif
         let size: CGSize
         if let phAsset = phAsset {
             if phAsset.pixelWidth == 0 || phAsset.pixelHeight == 0 {
-                size = CGSize(width: 200, height: 200)
+                size = defaultSize
             }else {
                 size = CGSize(width: phAsset.pixelWidth, height: phAsset.pixelHeight)
             }
@@ -390,7 +391,7 @@ extension PhotoAsset {
                 }else {
                     let image = PhotoTools.getVideoThumbnailImage(videoURL: localVideoAsset.videoURL, atTime: 0.1)
                     self.localVideoAsset?.image = image
-                    size = image?.size ?? .init(width: 200, height: 200)
+                    size = image?.size ?? defaultSize
                 }
             }else if let networkVideo = networkVideoAsset {
                 if !networkVideo.videoSize.equalTo(.zero) {
@@ -406,14 +407,14 @@ extension PhotoAsset {
                             return image.size
                         }
                     }
-                    size = CGSize(width: 200, height: 200)
+                    size = defaultSize
                 }
             }else {
                 if let localLivePhoto = localLivePhoto {
                     if localLivePhoto.size.equalTo(.zero) {
                         if localLivePhoto.imageURL.isFileURL {
                             let image = UIImage(contentsOfFile: localLivePhoto.imageURL.path)
-                            size = image?.size ?? .init(width: 200, height: 200)
+                            size = image?.size ?? defaultSize
                             self.localLivePhoto?.size = size
                         }else {
                             #if canImport(Kingfisher)
@@ -423,13 +424,13 @@ extension PhotoAsset {
                                     size = image.size
                                     self.localLivePhoto?.size = size
                                 }else {
-                                    size = .init(width: 200, height: 200)
+                                    size = defaultSize
                                 }
                             }else {
-                                size = .init(width: 200, height: 200)
+                                size = defaultSize
                             }
                             #else
-                            size = .init(width: 200, height: 200)
+                            size = defaultSize
                             #endif
                         }
                     }else {
@@ -440,10 +441,10 @@ extension PhotoAsset {
                     if let networkImageSize = networkImageAsset?.imageSize, !networkImageSize.equalTo(.zero) {
                         size = networkImageSize
                     } else {
-                        size = CGSize(width: 200, height: 200)
+                        size = defaultSize
                     }
                     #else
-                    size = CGSize(width: 200, height: 200)
+                    size = defaultSize
                     #endif
                 }
                 
@@ -610,8 +611,7 @@ extension PhotoAsset {
                     let toURL = converImageURL(imageURL)
                     if let data = PhotoTools.imageCompress(
                         imageData,
-                        compressionQuality: compressionQuality,
-                        isHEIC: imageURL.pathExtension.uppercased() == "HEIC"
+                        compressionQuality: compressionQuality
                     ),
                        let url = PhotoTools.write(
                         toFile: toURL,
@@ -655,8 +655,7 @@ extension PhotoAsset {
                     let toURL = converImageURL(imageURL)
                     if let data = PhotoTools.imageCompress(
                         imageData,
-                        compressionQuality: compressionQuality,
-                        isHEIC: imageURL.pathExtension.uppercased() == "HEIC"
+                        compressionQuality: compressionQuality
                     ),
                        let url = PhotoTools.write(
                         toFile: toURL,

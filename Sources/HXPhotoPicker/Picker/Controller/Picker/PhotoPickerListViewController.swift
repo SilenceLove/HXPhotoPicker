@@ -10,7 +10,7 @@ import UIKit
 import Photos
 
 open class PhotoPickerListViewController:
-    BaseViewController,
+    HXBaseViewController,
     PhotoPickerList,
     PhotopickerListRegisterClass,
     PhotoPickerListFectchCell,

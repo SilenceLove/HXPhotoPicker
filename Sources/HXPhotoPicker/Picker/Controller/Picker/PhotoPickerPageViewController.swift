@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class PhotoPickerPageViewController: BaseViewController, PhotoPickerList {
+public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerList {
     
     public weak var delegate: PhotoPickerListDelegate?
     

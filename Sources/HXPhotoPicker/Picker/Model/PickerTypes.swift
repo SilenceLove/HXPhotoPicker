@@ -314,6 +314,7 @@ public enum Sort: Equatable {
 
 public enum PickerError: Error, LocalizedError, CustomStringConvertible {
     case imageFetchFaild
+    case imageDataFetchFaild
     case urlFetchFaild(AssetError)
     case urlResultFetchFaild(AssetError)
     case objsFetchFaild(PhotoAsset, Int, Error)
@@ -321,8 +322,10 @@ public enum PickerError: Error, LocalizedError, CustomStringConvertible {
     
     public var errorDescription: String? {
         switch self {
-        case .imageFetchFaild:
+        case .imageDataFetchFaild:
             return "imageFetchFaild：获取 UIImage 失败"
+        case .imageFetchFaild:
+            return "imageDataFetchFaild：获取 UIImage Data 失败"
         case .urlFetchFaild(let error):
             return "urlFetchFaild：获取 URL 失败: \(error)"
         case .urlResultFetchFaild(let error):

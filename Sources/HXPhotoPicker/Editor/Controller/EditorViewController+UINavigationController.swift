@@ -164,7 +164,7 @@ extension EditorViewController {
                 ProgressHUD.showLoading(addedTo: view, animated: true)
             }
             bringViews()
-        case .successful(let type):
+        case .succeed(let type):
             initAssetType(type)
         case .failure:
             if selectedAsset.contentType == .video {

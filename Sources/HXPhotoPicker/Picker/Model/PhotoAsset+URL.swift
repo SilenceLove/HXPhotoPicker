@@ -94,6 +94,19 @@ public extension PhotoAsset {
         }
     }
     
+    /// 获取 imageData
+    /// - Parameter completion: 获取完成
+    func getImageData(completion: @escaping (Data?) -> Void) {
+        requestImageData { _, result in
+            switch result {
+            case .success(let dataResult):
+                completion(dataResult.imageData)
+            case .failure:
+                completion(nil)
+            }
+        }
+    }
+    
     /// 获取url
     /// - Parameters:
     ///   - fileConfig: 指定地址，若为heic格式的图片，可以设置图片地址为png / jpeg，内部会自动转换（如果为网络资源则忽略）
@@ -132,11 +145,19 @@ public extension PhotoAsset {
                 )
                 return
             }
-            getImageURL(
-                toFile: fileConfig?.imageURL,
-                compressionQuality: compression?.imageCompressionQuality,
-                completion: completion
-            )
+            if let imageTarget = compression?.imageTarget {
+                getImageURL(
+                    toFile: fileConfig?.imageURL,
+                    imageTarget: imageTarget,
+                    completion: completion
+                )
+            }else {
+                getImageURL(
+                    toFile: fileConfig?.imageURL,
+                    compressionQuality: compression?.imageCompressionQuality,
+                    completion: completion
+                )
+            }
         }else {
             getVideoURL(
                 toFile: fileConfig?.videoURL,
@@ -169,6 +190,43 @@ public extension PhotoAsset {
             compressionQuality: compressionQuality,
             resultHandler: completion
         )
+    }
+    
+    func getImageURL(
+        toFile fileURL: URL? = nil,
+        imageTarget: Compression.ImageTarget,
+        completion: @escaping AssetURLCompletion
+    ) {
+        getImage(targetSize: imageTarget.size, targetMode: imageTarget.mode) { image, _ in
+            guard let image else {
+                completion(.failure(.failed))
+                return
+            }
+            DispatchQueue.global().async {
+                let imageData = PhotoTools.getImageData(for: image)
+                if let imageData = imageData,
+                   let imageURL = PhotoTools.write(
+                    toFile: fileURL,
+                    imageData: imageData
+                   ) {
+                    DispatchQueue.main.async {
+                        completion(
+                            .success(
+                                .init(
+                                    url: imageURL,
+                                    urlType: .local,
+                                    mediaType: .photo
+                                )
+                            )
+                        )
+                    }
+                    return
+                }
+                DispatchQueue.main.async {
+                    completion(.failure(imageData == nil ? .invalidData : .fileWriteFailed))
+                }
+            }
+        }
     }
     
     /// 获取视频url
@@ -290,6 +348,7 @@ public extension PhotoAsset {
     /// 压缩参数
     struct Compression {
         let imageCompressionQuality: CGFloat?
+        let imageTarget: ImageTarget?
         let videoExportParameter: VideoExportParameter?
         
         /// 压缩图片
@@ -298,30 +357,66 @@ public extension PhotoAsset {
             imageCompressionQuality: CGFloat
         ) {
             self.imageCompressionQuality = imageCompressionQuality
+            self.imageTarget = nil
+            self.videoExportParameter = nil
+        }
+        
+        /// 压缩图片
+        /// - Parameter imageTarget: 指定图片大小、裁剪模式
+        public init(
+            imageTarget: ImageTarget
+        ) {
+            self.imageTarget = imageTarget
+            self.imageCompressionQuality = nil
             self.videoExportParameter = nil
         }
         
         /// 压缩视频
         /// - Parameters:
-        ///   - quality: 视频质量 [1-10]
+        ///   - videoExportParameter: 视频分辨率、视频质量 [1-10]
         public init(
             videoExportParameter: VideoExportParameter
         ) {
             self.imageCompressionQuality = nil
+            self.imageTarget = nil
             self.videoExportParameter = videoExportParameter
         }
         
         /// 压缩图片、视频
         /// - Parameters:
         ///   - imageCompressionQuality: 图片压缩质量 [0 - 1]
-        ///   - preset: 视频分辨率
-        ///   - quality: 视频质量 [1-10]
+        ///   - videoExportParameter: 视频分辨率、视频质量 [1-10]
         public init(
             imageCompressionQuality: CGFloat,
             videoExportParameter: VideoExportParameter
         ) {
             self.imageCompressionQuality = imageCompressionQuality
+            self.imageTarget = nil
             self.videoExportParameter = videoExportParameter
+        }
+        
+        
+        /// 压缩图片、视频
+        /// - Parameters:
+        ///   - imageTarget: 指定图片大小、裁剪模式
+        ///   - videoExportParameter: 视频分辨率、视频质量 [1-10]
+        public init(
+            imageTarget: ImageTarget,
+            videoExportParameter: VideoExportParameter
+        ) {
+            self.imageTarget = imageTarget
+            self.videoExportParameter = videoExportParameter
+            self.imageCompressionQuality = nil
+        }
+        
+        public struct ImageTarget {
+            let size: CGSize
+            let mode: HX.ImageTargetMode
+            
+            public init(size: CGSize, mode: HX.ImageTargetMode = .fill) {
+                self.size = size
+                self.mode = mode
+            }
         }
     }
 }
@@ -367,7 +462,30 @@ extension UIImage: PhotoAssetObject {
         toFile fileConfig: PhotoAsset.FileConfig?,
         compression: PhotoAsset.Compression?
     ) async throws -> Self {
-        try await photoAsset.image(compression?.imageCompressionQuality) as! Self
+        if let imageTarget = compression?.imageTarget {
+            return try await photoAsset.image(targetSize: imageTarget.size, targetMode: imageTarget.mode) as! Self
+        }
+        return try await photoAsset.image(compression?.imageCompressionQuality) as! Self
+    }
+}
+
+@available(iOS 13.0, *)
+extension Data: PhotoAssetObject {
+    
+    public static func fetchObject(
+        _ photoAsset: PhotoAsset,
+        toFile fileConfig: PhotoAsset.FileConfig?,
+        compression: PhotoAsset.Compression?
+    ) async throws -> Self {
+        try await withCheckedThrowingContinuation { continuation in
+                photoAsset.getImageData { data in
+                guard let data else {
+                    continuation.resume(with: .failure(PickerError.imageDataFetchFaild))
+                    return
+                }
+                continuation.resume(with: .success(data))
+            }
+        }
     }
 }
 
@@ -404,6 +522,13 @@ extension PhotoAsset {
         _ compression: PhotoAsset.Compression? = nil
     ) async throws -> UIImage {
         try await .fetchObject(self, toFile: nil, compression: compression)
+    }
+    
+    /// 获取 UIImage Data
+    /// - Parameter compression: 压缩参数
+    /// - Returns: 获取结果
+    public func imageData() async throws -> Data {
+        try await .fetchObject(self, toFile: nil, compression: nil)
     }
     
     /// 获取 URL

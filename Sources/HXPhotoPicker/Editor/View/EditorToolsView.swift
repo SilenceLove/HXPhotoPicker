@@ -302,7 +302,7 @@ class EditorToolViewCell: UICollectionViewCell {
     
     var model: EditorConfiguration.ToolsView.Options! {
         didSet {
-            let image = UIImage.image(for: model.imageName)?.withRenderingMode(.alwaysTemplate)
+            let image = model.imageType.image?.withRenderingMode(.alwaysTemplate)
             button.setImage(image, for: .normal)
         }
     }

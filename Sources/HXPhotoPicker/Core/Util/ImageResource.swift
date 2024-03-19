@@ -34,6 +34,38 @@ public extension HX {
 
 public extension HX.ImageResource {
     
+    enum ImageType {
+        case local(String)
+        /// iOS 13.0+
+        case system(String)
+        
+        var image: UIImage? {
+            switch self {
+            case .local(let name):
+                return name.image
+            case .system(let name):
+                if #available(iOS 13.0, *) {
+                    return .init(systemName: name)
+                } else {
+                    return name.image
+                }
+            }
+        }
+        
+        var name: String {
+            switch self {
+            case .local(let name):
+                return name
+            case .system(let name):
+                return name
+            }
+        }
+        
+        static var imageResource: HX.ImageResource {
+            HX.ImageResource.shared
+        }
+    }
+    
     #if HXPICKER_ENABLE_PICKER
     struct Picker {
         /// 相册列表
@@ -47,33 +79,38 @@ public extension HX.ImageResource {
         
         public struct NotAuthorized {
             /// 未授权界面的关闭按钮
-            public var close: String = "hx_picker_notAuthorized_close"
+            public var close: ImageType = .local("hx_picker_notAuthorized_close")
             /// 未授权界面暗黑模式下的关闭按钮
-            public var closeDark: String = "hx_picker_notAuthorized_close_dark"
+            public var closeDark: ImageType = .local("hx_picker_notAuthorized_close_dark")
         }
         
         public struct AlbumList {
             /// 相册为空时的封面图片
-            var emptyCover: String = "hx_picker_album_empty"
+            var emptyCover: ImageType = .local("hx_picker_album_empty")
             
             var cell: Cell = .init()
             
             struct Cell {
                 /// cell箭头
-                var arrow: String = "hx_picker_photolist_bottom_prompt_arrow"
+                var arrow: ImageType = {
+                    if #available(iOS 13.0, *) {
+                        return .system("chevron.right")
+                    }
+                    return .local("hx_picker_photolist_bottom_prompt_arrow")
+                }()
             }
         }
         
         public struct PhotoList {
             /// 取消按钮
-            public var cancel: String = "hx_picker_photolist_cancel"
+            public var cancel: ImageType = .local("hx_picker_photolist_cancel")
             /// 暗黑模式下的取消按钮
-            public var cancelDark: String = "hx_picker_photolist_cancel"
+            public var cancelDark: ImageType = .local("hx_picker_photolist_cancel")
             
             /// 筛选按钮正常状态
-            public var filterNormal: String = "hx_picker_photolist_nav_filter_normal"
+            public var filterNormal: ImageType = .local("hx_picker_photolist_nav_filter_normal")
             /// 筛选按钮选中状态
-            public var filterSelected: String = "hx_picker_photolist_nav_filter_selected"
+            public var filterSelected: ImageType = .local("hx_picker_photolist_nav_filter_selected")
             /// 筛选界面
             public var filter: Filter = .init()
             
@@ -83,57 +120,62 @@ public extension HX.ImageResource {
             
             public struct Cell {
                 /// 视频图标
-                public var video: String = "hx_picker_cell_video_icon"
+                public var video: ImageType = .local("hx_picker_cell_video_icon")
                 /// 已编辑照片图标
-                public var photoEdited: String = "hx_picker_cell_photo_edit_icon"
+                public var photoEdited: ImageType = .local("hx_picker_cell_photo_edit_icon")
                 /// 已编辑视频图标
-                public var videoEdited: String = "hx_picker_cell_video_edit_icon"
+                public var videoEdited: ImageType = .local("hx_picker_cell_video_edit_icon")
                 /// iCloud图标
-                public var iCloud: String = "hx_picker_photo_icloud_mark"
+                public var iCloud: ImageType = .local("hx_picker_photo_icloud_mark")
                 
                 /// 相机图标
-                public var camera: String = "hx_picker_photoList_photograph"
+                public var camera: ImageType = .local("hx_picker_photoList_photograph")
                 /// 暗黑模式下的相机图标
-                public var cameraDark: String = "hx_picker_photoList_photograph_white"
+                public var cameraDark: ImageType = .local("hx_picker_photoList_photograph_white")
             }
             
             public struct Filter {
                 /// 所有项目图标
-                public var any: String = "hx_photo_list_filter_any"
+                public var any: ImageType = .local("hx_photo_list_filter_any")
                 /// 已编辑图标
-                public var edited: String = "hx_photo_list_filter_edited"
+                public var edited: ImageType = .local("hx_photo_list_filter_edited")
                 /// 照片图标
-                public var photo: String = "hx_photo_list_filter_photo"
+                public var photo: ImageType = .local("hx_photo_list_filter_photo")
                 /// 动图图标
-                public var gif: String = "hx_photo_list_filter_gif"
+                public var gif: ImageType = .local("hx_photo_list_filter_gif")
                 /// 实况图标
-                public var livePhoto: String = "hx_photo_list_filter_livePhoto"
+                public var livePhoto: ImageType = .local("hx_photo_list_filter_livePhoto")
                 /// 视频图标
-                public var video: String = "hx_photo_list_filter_video"
+                public var video: ImageType = .local("hx_photo_list_filter_video")
             }
             
             public struct BottomView {
                 /// 相册权限提示图标
-                public var permissionsPrompt: String = "hx_picker_photolist_bottom_prompt"
+                public var permissionsPrompt: ImageType = .local("hx_picker_photolist_bottom_prompt")
                 /// 相册权限跳转箭头图标
-                public var permissionsArrow: String = "hx_picker_photolist_bottom_prompt_arrow"
+                public var permissionsArrow: ImageType = {
+                    if #available(iOS 13.0, *) {
+                        return .system("chevron.right")
+                    }
+                    return .local("hx_picker_photolist_bottom_prompt_arrow")
+                }()
                 
                 /// 已选列表删除图标
-                public var delete: String = "hx_picker_toolbar_select_cell_delete"
+                public var delete: ImageType = .local("hx_picker_toolbar_select_cell_delete")
             }
         }
         
         public struct Preview {
             /// 返回图标
-            public var back: String = "hx_picker_photolist_back"
+            public var back: ImageType = .local("hx_picker_photolist_back")
             /// 取消图标
-            public var cancel: String = "hx_picker_photolist_cancel"
+            public var cancel: ImageType = .local("hx_picker_photolist_cancel")
             /// 暗黑模式下的取消按钮
-            public var cancelDark: String = "hx_picker_photolist_cancel"
+            public var cancelDark: ImageType = .local("hx_picker_photolist_cancel")
             /// 播放视频图标
-            public var videoPlay: String = "hx_picker_cell_video_play"
+            public var videoPlay: ImageType = .local("hx_picker_cell_video_play")
             /// 实况图片标签图标
-            public var livePhoto: String = "hx_picker_livePhoto"
+            public var livePhoto: ImageType = .local("hx_picker_livePhoto")
         }
     }
     #endif
@@ -163,147 +205,147 @@ public extension HX.ImageResource {
         
         public struct Tools {
             /// 视频
-            public var video: String = "hx_editor_tools_play"
+            public var video: ImageType = .local("hx_editor_tools_play")
             /// 画笔绘制
-            public var graffiti: String = "hx_editor_tools_graffiti"
+            public var graffiti: ImageType = .local("hx_editor_tools_graffiti")
             /// 旋转、裁剪
-            public var cropSize: String = "hx_editor_photo_crop"
+            public var cropSize: ImageType = .local("hx_editor_photo_crop")
             /// 文本
-            public var text: String = "hx_editor_photo_tools_text"
+            public var text: ImageType = .local("hx_editor_photo_tools_text")
             /// 贴图
-            public var chartlet: String = "hx_editor_photo_tools_emoji"
+            public var chartlet: ImageType = .local("hx_editor_photo_tools_emoji")
             /// 马赛克-涂抹
-            public var mosaic: String = "hx_editor_tools_mosaic"
+            public var mosaic: ImageType = .local("hx_editor_tools_mosaic")
             /// 画面调整
-            public var adjustment: String = "hx_editor_tools_filter_change"
+            public var adjustment: ImageType = .local("hx_editor_tools_filter_change")
             /// 滤镜
-            public var filter: String = "hx_editor_tools_filter"
+            public var filter: ImageType = .local("hx_editor_tools_filter")
             /// 配乐
-            public var music: String = "hx_editor_tools_music"
+            public var music: ImageType = .local("hx_editor_tools_music")
         }
         
         public struct Brush {
             /// 画笔自定义颜色
-            public var customColor: String = "hx_editor_brush_color_custom"
+            public var customColor: ImageType = .local("hx_editor_brush_color_custom")
             /// 撤销
-            public var undo: String = "hx_editor_brush_repeal"
+            public var undo: ImageType = .local("hx_editor_brush_repeal")
             /// 画布-撤销
-            public var canvasUndo: String = "hx_editor_canvas_draw_undo"
+            public var canvasUndo: ImageType = .local("hx_editor_canvas_draw_undo")
             /// 画布-反撤销
-            public var canvasRedo: String = "hx_editor_canvas_draw_redo"
+            public var canvasRedo: ImageType = .local("hx_editor_canvas_draw_redo")
             /// 画布-清空
-            public var canvasUndoAll: String = "hx_editor_canvas_draw_undo_all"
+            public var canvasUndoAll: ImageType = .local("hx_editor_canvas_draw_undo_all")
         }
         
         public struct Crop {
             /// 选中原始比例时， 垂直比例-正常状态
-            public var ratioVerticalNormal: String = "hx_editor_crop_scale_switch_left"
+            public var ratioVerticalNormal: ImageType = .local("hx_editor_crop_scale_switch_left")
             /// 选中原始比例时， 垂直比例-选中状态
-            public var ratioVerticalSelected: String = "hx_editor_crop_scale_switch_left_selected"
+            public var ratioVerticalSelected: ImageType = .local("hx_editor_crop_scale_switch_left_selected")
             /// 选中原始比例时， 横向比例-正常状态
-            public var ratioHorizontalNormal: String = "hx_editor_crop_scale_switch_right"
+            public var ratioHorizontalNormal: ImageType = .local("hx_editor_crop_scale_switch_right")
             /// 选中原始比例时， 横向比例-选中状态
-            public var ratioHorizontalSelected: String = "hx_editor_crop_scale_switch_right_selected"
+            public var ratioHorizontalSelected: ImageType = .local("hx_editor_crop_scale_switch_right_selected")
             /// 水平镜像
-            public var mirrorHorizontally: String = "hx_editor_photo_mirror_horizontally"
+            public var mirrorHorizontally: ImageType = .local("hx_editor_photo_mirror_horizontally")
             /// 垂直镜像
-            public var mirrorVertically: String = "hx_editor_photo_mirror_vertically"
+            public var mirrorVertically: ImageType = .local("hx_editor_photo_mirror_vertically")
             /// 向左旋转
-            public var rotateLeft: String = "hx_editor_photo_rotate_left"
+            public var rotateLeft: ImageType = .local("hx_editor_photo_rotate_left")
             /// 向右旋转
-            public var rotateRight: String = "hx_editor_photo_rotate_right"
+            public var rotateRight: ImageType = .local("hx_editor_photo_rotate_right")
             
             /// 自定义蒙版
-            public var maskList: String = "hx_editor_crop_mask_list"
+            public var maskList: ImageType = .local("hx_editor_crop_mask_list")
         }
         
         public struct Text {
             /// 文字背景-正常状态
-            public var backgroundNormal: String = "hx_editor_photo_text_normal"
+            public var backgroundNormal: ImageType = .local("hx_editor_photo_text_normal")
             /// 文字背景-选中状态
-            public var backgroundSelected: String = "hx_editor_photo_text_selected"
+            public var backgroundSelected: ImageType = .local("hx_editor_photo_text_selected")
             /// 文本自定义颜色
-            public var customColor: String = "hx_editor_brush_color_custom"
+            public var customColor: ImageType = .local("hx_editor_brush_color_custom")
         }
         
         public struct Sticker {
             /// 返回按钮
-            public var back: String = "hx_photo_edit_pull_down"
+            public var back: ImageType = .local("hx_photo_edit_pull_down")
             /// 跳转相册按钮
-            public var album: String = "hx_editor_tools_chartle_album"
+            public var album: ImageType = .local("hx_editor_tools_chartle_album")
             /// 相册为空时的封面图片
-            public var albumEmptyCover: String = "hx_picker_album_empty"
+            public var albumEmptyCover: ImageType = .local("hx_picker_album_empty")
             /// 贴纸删除按钮
-            public var delete: String = "hx_editor_view_sticker_item_delete"
+            public var delete: ImageType = .local("hx_editor_view_sticker_item_delete")
             /// 贴纸旋转按钮
-            public var rotate: String = "hx_editor_view_sticker_item_rotate"
+            public var rotate: ImageType = .local("hx_editor_view_sticker_item_rotate")
             /// 贴纸缩放按钮
-            public var scale: String = "hx_editor_view_sticker_item_scale"
+            public var scale: ImageType = .local("hx_editor_view_sticker_item_scale")
             /// 拖拽底部删除垃圾桶打开状态
-            public var trashOpen: String = "hx_editor_photo_trash_open"
+            public var trashOpen: ImageType = .local("hx_editor_photo_trash_open")
             /// 拖拽底部删除垃圾桶关闭状态
-            public var trashClose: String = "hx_editor_photo_trash_close"
+            public var trashClose: ImageType = .local("hx_editor_photo_trash_close")
         }
         
         public struct Adjustment {
             /// 亮度
-            public var brightness: String = "hx_editor_filter_edit_brightness"
+            public var brightness: ImageType = .local("hx_editor_filter_edit_brightness")
             /// 对比度
-            public var contrast: String = "hx_editor_filter_edit_contrast"
+            public var contrast: ImageType = .local("hx_editor_filter_edit_contrast")
             /// 曝光度
-            public var exposure: String = "hx_editor_filter_edit_exposure"
+            public var exposure: ImageType = .local("hx_editor_filter_edit_exposure")
             /// 高光
-            public var highlights: String = "hx_editor_filter_edit_highlights"
+            public var highlights: ImageType = .local("hx_editor_filter_edit_highlights")
             /// 饱和度
-            public var saturation: String = "hx_editor_filter_edit_saturation"
+            public var saturation: ImageType = .local("hx_editor_filter_edit_saturation")
             /// 阴影
-            public var shadows: String = "hx_editor_filter_edit_shadows"
+            public var shadows: ImageType = .local("hx_editor_filter_edit_shadows")
             /// 锐化
-            public var sharpen: String = "hx_editor_filter_edit_sharpen"
+            public var sharpen: ImageType = .local("hx_editor_filter_edit_sharpen")
             /// 暗角
-            public var vignette: String = "hx_editor_filter_edit_vignette"
+            public var vignette: ImageType = .local("hx_editor_filter_edit_vignette")
             /// 色温
-            public var warmth: String = "hx_editor_filter_edit_warmth"
+            public var warmth: ImageType = .local("hx_editor_filter_edit_warmth")
         }
         
         public struct Filter {
             /// 编辑
-            public var edit: String = "hx_editor_tools_filter_edit"
+            public var edit: ImageType = .local("hx_editor_tools_filter_edit")
             /// 重置
-            public var reset: String = "hx_editor_tools_filter_reset"
+            public var reset: ImageType = .local("hx_editor_tools_filter_reset")
         }
         
         public struct Mosaic {
             /// 撤销
-            public var undo: String = "hx_editor_brush_repeal"
+            public var undo: ImageType = .local("hx_editor_brush_repeal")
             /// 马赛克
-            public var mosaic: String = "hx_editor_tool_mosaic_normal"
+            public var mosaic: ImageType = .local("hx_editor_tool_mosaic_normal")
             /// 涂抹
-            public var smear: String = "hx_editor_tool_mosaic_color"
+            public var smear: ImageType = .local("hx_editor_tool_mosaic_color")
             /// 每次涂抹的图片
-            public var smearMask: String = "hx_editor_mosaic_brush_image"
+            public var smearMask: ImageType = .local("hx_editor_mosaic_brush_image")
         }
         
         public struct Music {
             /// 搜索图标
-            public var search: String = "hx_editor_video_music_search"
+            public var search: ImageType = .local("hx_editor_video_music_search")
             /// 音量图标
-            public var volum: String = "hx_editor_video_music_volume"
+            public var volum: ImageType = .local("hx_editor_video_music_volume")
             /// 选择框-未选中
-            public var selectionBoxNormal: String = "hx_editor_box_normal"
+            public var selectionBoxNormal: ImageType = .local("hx_editor_box_normal")
             /// 选择框-选中
-            public var selectionBoxSelected: String = "hx_editor_box_selected"
+            public var selectionBoxSelected: ImageType = .local("hx_editor_box_selected")
         }
         
         public struct Video {
             /// 播放
-            public var play: String = "hx_editor_video_control_play"
+            public var play: ImageType = .local("hx_editor_video_control_play")
             /// 暂停
-            public var pause: String = "hx_editor_video_control_pause"
+            public var pause: ImageType = .local("hx_editor_video_control_pause")
             /// 左边箭头
-            public var leftArrow: String = "hx_editor_video_control_arrow_left"
+            public var leftArrow: ImageType = .local("hx_editor_video_control_arrow_left")
             /// 右边箭头
-            public var rightArrow: String = "hx_editor_video_control_arrow_right"
+            public var rightArrow: ImageType = .local("hx_editor_video_control_arrow_right")
         }
     }
     #endif
@@ -311,10 +353,10 @@ public extension HX.ImageResource {
     #if HXPICKER_ENABLE_CAMERA
     struct Camera {
         /// 底部返回
-        public var back: String = "hx_camera_down_back"
+        public var back: ImageType = .local("hx_camera_down_back")
         
         /// 相机切换
-        public var switchCamera: String = "hx_camera_overturn"
+        public var switchCamera: ImageType = .local("hx_camera_overturn")
     }
     #endif
 }

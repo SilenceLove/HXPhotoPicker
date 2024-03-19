@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class PhotoBaseViewController: BaseViewController, PhotoPickerControllerFectch {
+public class PhotoBaseViewController: HXBaseViewController, PhotoPickerControllerFectch {
     
     let pickerConfig: PickerConfiguration
     init(config: PickerConfiguration) {

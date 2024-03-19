@@ -333,6 +333,8 @@ public extension EditorConfiguration {
         /// false：重置到设置的默认宽高比`aspectRatio`，居中显示
         public var isResetToOriginal: Bool = false
         
+        public var maskListProtcol: EditorMaskListProtocol.Type = EditorMaskListViewController.self
+        
         /// Mask material list
         /// 蒙版素材列表
         public var maskList: [MaskType] = []
@@ -506,8 +508,8 @@ public extension EditorConfiguration {
         public var allowAddAlbum: Bool = false
         /// 相册图标
         public var albumImageName: String {
-            get { .imageResource.editor.sticker.album }
-            set { HX.imageResource.editor.sticker.album = newValue }
+            get { .imageResource.editor.sticker.album.name }
+            set { HX.imageResource.editor.sticker.album = .local(newValue) }
         }
         /// 相册配置
         public var albumPickerConfigHandler: (() -> PickerConfiguration)?
@@ -555,14 +557,14 @@ public extension EditorConfiguration {
         public struct Options {
             
             /// icon图标
-            public let imageName: String
+            public let imageType: HX.ImageResource.ImageType
             
             /// 类型
             public let type: `Type`
             
-            public init(imageName: String,
+            public init(imageType: HX.ImageResource.ImageType,
                         type: `Type`) {
-                self.imageName = imageName
+                self.imageType = imageType
                 self.type = type
             }
             
@@ -600,39 +602,39 @@ public extension EditorConfiguration {
         
         public static var `default`: ToolsView {
             let time = Options(
-                imageName: .imageResource.editor.tools.video,
+                imageType: .imageResource.editor.tools.video,
                 type: .time
             )
             let graffiti = Options(
-                imageName: .imageResource.editor.tools.graffiti,
+                imageType: .imageResource.editor.tools.graffiti,
                 type: .graffiti
             )
             let chartlet = Options(
-                imageName: .imageResource.editor.tools.chartlet,
+                imageType: .imageResource.editor.tools.chartlet,
                 type: .chartlet
             )
             let text = Options(
-                imageName: .imageResource.editor.tools.text,
+                imageType: .imageResource.editor.tools.text,
                 type: .text
             )
             let cropSize = Options(
-                imageName: .imageResource.editor.tools.cropSize,
+                imageType: .imageResource.editor.tools.cropSize,
                 type: .cropSize
             )
             let music = Options(
-                imageName:.imageResource.editor.tools.music,
+                imageType:.imageResource.editor.tools.music,
                 type: .music
             )
             let mosaic = Options(
-                imageName: .imageResource.editor.tools.mosaic,
+                imageType: .imageResource.editor.tools.mosaic,
                 type: .mosaic
             )
             let filterEdit = Options(
-                imageName: .imageResource.editor.tools.adjustment,
+                imageType: .imageResource.editor.tools.adjustment,
                 type: .filterEdit
             )
             let filter = Options(
-                imageName: .imageResource.editor.tools.filter,
+                imageType: .imageResource.editor.tools.filter,
                 type: .filter
             )
             return .init(toolOptions: [time, graffiti, chartlet, text, music, cropSize, mosaic, filterEdit, filter])

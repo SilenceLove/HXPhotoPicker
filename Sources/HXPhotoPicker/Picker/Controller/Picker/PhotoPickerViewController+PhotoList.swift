@@ -93,15 +93,11 @@ extension PhotoPickerViewController: PhotoPickerListDelegate {
                 ) {
                     pickerController.singleFinishCallback(for: photoAsset)
                 }
-            }else {
-                if let cell = listView.getCell(for: photoAsset) as? PhotoPickerViewCell {
-                    cell.selectedAction(false)
-                }
+                return
             }
-        }else {
-            if let cell = listView.getCell(for: photoAsset) as? PhotoPickerViewCell {
-                cell.selectedAction(true)
-            }
+        }
+        if let cell = listView.getCell(for: photoAsset) as? PhotoPickerViewCell {
+            cell.selectedAction(photoAsset.isSelected)
         }
     }
     
@@ -192,6 +188,7 @@ extension PhotoPickerViewController: PhotoPickerListDelegate {
         #endif
         return false
     }
+    
     @discardableResult
     func openVideoEditor(
         photoAsset: PhotoAsset,

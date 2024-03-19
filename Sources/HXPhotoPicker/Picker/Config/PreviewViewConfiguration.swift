@@ -68,14 +68,14 @@ public struct PreviewViewConfiguration {
     
     /// 取消按钮图片名
     public var cancelImageName: String {
-        get { .imageResource.picker.preview.cancel }
-        set { HX.imageResource.picker.preview.cancel = newValue }
+        get { .imageResource.picker.preview.cancel.name }
+        set { HX.imageResource.picker.preview.cancel = .local(newValue) }
     }
     
     /// 暗黑模式下取消按钮图片名
     public var cancelDarkImageName: String {
-        get { .imageResource.picker.preview.cancelDark }
-        set { HX.imageResource.picker.preview.cancelDark = newValue }
+        get { .imageResource.picker.preview.cancelDark.name }
+        set { HX.imageResource.picker.preview.cancelDark = .local(newValue) }
     }
     
     public init() {

@@ -23,7 +23,7 @@ protocol EditorChartletViewControllerDelegate: AnyObject {
     )
 }
 
-public class EditorChartletViewController: BaseViewController, EditorChartletListProtocol {
+public class EditorChartletViewController: HXBaseViewController, EditorChartletListProtocol {
     public weak var delegate: EditorChartletListDelegate?
     weak var chartletDelegate: EditorChartletViewControllerDelegate?
     private var loadingView: UIActivityIndicatorView!

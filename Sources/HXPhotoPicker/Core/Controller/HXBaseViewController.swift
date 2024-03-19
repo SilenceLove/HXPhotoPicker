@@ -1,5 +1,5 @@
 //
-//  BaseViewController.swift
+//  HXBaseViewController.swift
 //  HXPhotoPicker
 //
 //  Created by Slience on 2021/1/9.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-open class BaseViewController: UIViewController {
+open class HXBaseViewController: UIViewController {
     open override func viewDidLoad() {
         super.viewDidLoad()
         if #available(iOS 13.0, *) {

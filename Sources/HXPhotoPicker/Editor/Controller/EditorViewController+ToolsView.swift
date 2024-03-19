@@ -706,12 +706,8 @@ extension EditorViewController: EditorToolsViewDelegate {
     }
 }
 
-extension EditorViewController: EditorMaskListViewControllerDelegate {
-    
-    func editorMaskListViewController(
-        _ editorMaskListViewController: EditorMaskListViewController,
-        didSelected image: UIImage
-    ) {
+extension EditorViewController: EditorMaskListDelete {
+    public func editorMaskList(_ chartletList: EditorMaskListProtocol, didSelectedWith image: UIImage) {
         let imageAspectRatio = image.size
         editorView.isFixedRatio = true
         editorView.setMaskImage(image, animated: true)

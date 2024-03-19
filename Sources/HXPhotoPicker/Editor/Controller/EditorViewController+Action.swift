@@ -170,9 +170,10 @@ extension EditorViewController {
     
     @objc
     func didMaskListButtonClick(button: UIButton) {
-        let vc = EditorMaskListViewController(config: config.cropSize)
+        let vc = config.cropSize.maskListProtcol.init(config: config)
         vc.delegate = self
         let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = vc.modalPresentationStyle
         present(nav, animated: true)
     }
     

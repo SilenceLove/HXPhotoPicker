@@ -141,6 +141,10 @@ fileprivate extension PhotoAssetCollection {
             return .init(systemName: "livephoto")
         case .smartAlbumAnimated:
             return .init(systemName: "square.stack.3d.down.dottedline")
+        case .smartAlbumRAW:
+            return .init(systemName: "r.square.on.square")
+        case .smartAlbumCinematic:
+            return .init(systemName: "video.circle")
         default:
             return nil
         }

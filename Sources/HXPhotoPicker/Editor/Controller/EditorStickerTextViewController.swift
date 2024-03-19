@@ -24,7 +24,7 @@ class EditorStickerTextController: UINavigationController {
     }
 }
 
-final class EditorStickerTextViewController: BaseViewController {
+final class EditorStickerTextViewController: HXBaseViewController {
     weak var delegate: EditorStickerTextViewControllerDelegate?
     private let config: EditorConfiguration.Text
     private let stickerText: EditorStickerText?

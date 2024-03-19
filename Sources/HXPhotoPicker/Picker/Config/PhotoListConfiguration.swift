@@ -46,15 +46,15 @@ public struct PhotoListConfiguration {
     /// Cancel button image name
     /// 取消按钮图片名
     public var cancelImageName: String {
-        get { .imageResource.picker.photoList.cancel }
-        set { HX.imageResource.picker.photoList.cancel = newValue }
+        get { .imageResource.picker.photoList.cancel.name }
+        set { HX.imageResource.picker.photoList.cancel = .local(newValue) }
     }
     
     /// Cancel button image name in dark mode
     /// 暗黑模式下取消按钮图片名
     public var cancelDarkImageName: String {
-        get { .imageResource.picker.photoList.cancelDark }
-        set { HX.imageResource.picker.photoList.cancelDark = newValue }
+        get { .imageResource.picker.photoList.cancelDark.name }
+        set { HX.imageResource.picker.photoList.cancelDark = .local(newValue) }
     }
     
     /// 导航栏是否显示筛选按钮
@@ -251,19 +251,19 @@ extension PhotoListConfiguration {
         /// camera icon
         /// 相机图标
         public var cameraImageName: String {
-            get { .imageResource.picker.photoList.cell.camera }
-            set { HX.imageResource.picker.photoList.cell.camera = newValue }
+            get { .imageResource.picker.photoList.cell.camera.name }
+            set { HX.imageResource.picker.photoList.cell.camera = .local(newValue) }
         }
         
         /// Camera icon in dark style / icon after successful camera preview
         /// 暗黑风格下的相机图标 / 相机预览成功之后的图标
         public var cameraDarkImageName: String {
-            get { .imageResource.picker.photoList.cell.cameraDark }
-            set { HX.imageResource.picker.photoList.cell.cameraDark = newValue }
+            get { .imageResource.picker.photoList.cell.cameraDark.name }
+            set { HX.imageResource.picker.photoList.cell.cameraDark = .local(newValue) }
         }
         
         public init() {
-            HX.imageResource.picker.photoList.cell.camera = "hx_picker_photoList_photograph"
+            HX.imageResource.picker.photoList.cell.camera = .local("hx_picker_photoList_photograph")
         }
     }
 }
