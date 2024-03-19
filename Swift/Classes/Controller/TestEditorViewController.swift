@@ -12,7 +12,7 @@ import AVFoundation
 import GDPerformanceView_Swift
 #endif
 
-class TestEditorViewController: BaseViewController {
+class TestEditorViewController: HXBaseViewController {
     
     lazy var contentView: UIView = {
         let view = UIView()
