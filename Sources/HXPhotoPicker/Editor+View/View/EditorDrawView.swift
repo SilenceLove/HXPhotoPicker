@@ -35,6 +35,8 @@ class EditorDrawView: UIView {
     
     var isVideoMark: Bool = false
     
+    let drawPathQueue = DispatchQueue(label: "com.path.hxqueue")
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         clipsToBounds = true
@@ -78,10 +80,15 @@ class EditorDrawView: UIView {
                 delegate?.drawView(beginDraw: self)
                 isTouching = true
                 
-                path?.addLine(to: point)
                 points.append(CGPoint(x: point.x / width, y: point.y / height))
-                let shapeLayer = shapeLayers.last
-                shapeLayer?.path = path?.cgPath
+                
+                smoothedPath(points: points, curveSegmentCount: 10) { drawPath in
+                    DispatchQueue.main.async {
+                        path?.cgPath = drawPath.cgPath
+                        let shapeLayer = self.shapeLayers.last
+                        shapeLayer?.path = path?.cgPath
+                    }
+                }
             }
         case .failed, .cancelled, .ended:
             if isTouching {
@@ -155,19 +162,48 @@ class EditorDrawView: UIView {
             path.lineCapStyle = .round
             path.lineJoinStyle = .round
             path.points = brushData.points
-            for (index, point) in brushData.points.enumerated() {
-                let cPoint = CGPoint(x: point.x * viewSize.width, y: point.y * viewSize.height)
-                if index == 0 {
-                    path.move(to: cPoint)
-                }else {
-                    path.addLine(to: cPoint)
-                }
-            }
             path.color = brushData.color
             linePaths.append(path)
             let shapeLayer = createdShapeLayer(path: path)
             layer.addSublayer(shapeLayer)
             shapeLayers.append(shapeLayer)
+            
+            smoothedPath(points: points, curveSegmentCount: 10) { drawPath in
+                DispatchQueue.main.async {
+                    path.cgPath = drawPath.cgPath
+                    shapeLayer.path = path.cgPath
+                }
+            }
+            
+        }
+    }
+    
+    private func smoothedPath(points copyPoints:[CGPoint], curveSegmentCount: Int, completion: @escaping ((UIBezierPath) -> Void)) {
+        let points = copyPoints.map { poi in
+            CGPoint(x: poi.x*width, y: poi.y*height)
+        }
+        drawPathQueue.async {
+            // 创建路径对象
+            let smoothedPath = UIBezierPath();
+            guard points.count > 0 else {
+                completion(smoothedPath)
+                return
+            }
+            let first = points[0]
+            smoothedPath.move(to: first)
+            if points.count < 4 {
+                //简单地连接所有点，如果没有足够的点来形成一个样条曲线
+                for point in points {
+                    smoothedPath.addLine(to: point)
+                }
+                
+            } else {
+                let pointArray = EditorDrawTool.generatePoints(from: points, segmentsPerCurve: curveSegmentCount)
+                for point in pointArray {
+                    smoothedPath.addLine(to: point)
+                }
+            }
+            completion(smoothedPath)
         }
     }
 }
