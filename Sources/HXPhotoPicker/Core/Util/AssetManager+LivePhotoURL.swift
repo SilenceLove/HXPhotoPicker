@@ -15,124 +15,91 @@ public extension AssetManager {
         content asset: PHAsset,
         imageDataHandler: @escaping (Data?) -> Void,
         videoHandler: @escaping (URL?) -> Void,
-        completionHandler: @escaping (LivePhotoError?) -> Void
+        completionHandler: @escaping (Result<(imageData: Data, videoURL: URL), LivePhotoError>) -> Void
     ) {
-        if #available(iOS 9.1, *) {
-            requestLivePhoto(
-                for: asset,
-                targetSize: PHImageManagerMaximumSize
-            ) { livePhoto, _, _ in
-                guard let livePhoto = livePhoto else {
-                    completionHandler(
-                        .allError(
-                            PhotoError.error(
-                                    type: .imageEmpty,
-                                message: "livePhoto为nil，获取失败"
-                            ),
-                            PhotoError.error(
-                                type: .videoEmpty,
-                                message: "livePhoto为nil，获取失败"
-                            )
-                        )
-                    )
-                    return
+        requestLivePhoto(
+            for: asset,
+            targetSize: PHImageManagerMaximumSize
+        ) { livePhoto, info, _ in
+            guard let livePhoto = livePhoto else {
+                completionHandler(
+                    .failure(.allError(.requestFailed(info)))
+                )
+                return
+            }
+            let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto)
+            if assetResources.isEmpty {
+                completionHandler(
+                    .failure(.allError(.assetResourceIsEmpty))
+                )
+                return
+            }
+            let options: PHAssetResourceRequestOptions = .init()
+            options.isNetworkAccessAllowed = true
+            var imageCompletion = false
+            var imageError: Error?
+            var videoCompletion = false
+            var videoError: Error?
+            var imageData: Data?
+            let videoURL: URL = PhotoTools.getVideoTmpURL()
+            let callback = { (imageError: Error?, videoError: Error?) in
+                if let imageError, let videoError {
+                    completionHandler(.failure(.allError(.exportLivePhotoURLFailed(imageError, videoError))))
+                }else if let imageError {
+                    completionHandler(.failure(.imageError(.assetResourceWriteDataFailed(imageError))))
+                }else if let videoError {
+                    completionHandler(.failure(.videoError(.exportLivePhotoVideoURLFailed(videoError))))
+                }else if let imageData {
+                    completionHandler(.success((imageData: imageData, videoURL: videoURL)))
                 }
-                let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto)
-                if assetResources.isEmpty {
-                    completionHandler(
-                        .allError(
-                            PhotoError.error(
-                                type: .imageEmpty,
-                                message: "assetResources为nil，获取失败"
-                            ),
-                            PhotoError.error(
-                                type: .videoEmpty,
-                                message: "assetResources为nil，获取失败"
-                            )
-                        )
-                    )
-                    return
+            }
+            var hasAdjustmentData: Bool = false
+            for assetResource in assetResources where
+                assetResource.type == .adjustmentData {
+                hasAdjustmentData = true
+                break
+            }
+            for assetResource in assetResources {
+                var photoType: PHAssetResourceType = .photo
+                var videoType: PHAssetResourceType = .pairedVideo
+                if hasAdjustmentData {
+                    photoType = .fullSizePhoto
+                    videoType = .fullSizePairedVideo
                 }
-                let options: PHAssetResourceRequestOptions = .init()
-                options.isNetworkAccessAllowed = true
-                var imageCompletion = false
-                var imageError: Error?
-                var videoCompletion = false
-                var videoError: Error?
-                var imageData: Data?
-                let videoURL: URL = PhotoTools.getVideoTmpURL()
-                let callback = { (imageError: Error?, videoError: Error?) in
-                    if imageError != nil && videoError != nil {
-                        completionHandler(.allError(imageError, videoError))
-                    }else if imageError != nil {
-                        completionHandler(.imageError(imageError))
-                    }else if videoError != nil {
-                        completionHandler(.videoError(videoError))
-                    }else {
-                        completionHandler(nil)
-                    }
-                }
-                var hasAdjustmentData: Bool = false
-                for assetResource in assetResources where
-                    assetResource.type == .adjustmentData {
-                    hasAdjustmentData = true
-                    break
-                }
-                for assetResource in assetResources {
-                    var photoType: PHAssetResourceType = .photo
-                    var videoType: PHAssetResourceType = .pairedVideo
-                    if hasAdjustmentData {
-                        photoType = .fullSizePhoto
-                        videoType = .fullSizePairedVideo
-                    }
-                    if assetResource.type == photoType {
-                        PHAssetResourceManager.default().requestData(for: assetResource, options: options) { (data) in
-                            imageData = data
-                            DispatchQueue.main.async {
-                                imageDataHandler(imageData)
-                            }
-                        } completionHandler: { (error) in
-                            imageError = error
-                            DispatchQueue.main.async {
-                                if videoCompletion {
-                                    callback(imageError, videoError)
-                                }
-                                imageCompletion = true
-                            }
+                if assetResource.type == photoType {
+                    PHAssetResourceManager.default().requestData(for: assetResource, options: options) { (data) in
+                        imageData = data
+                        DispatchQueue.main.async {
+                            imageDataHandler(imageData)
                         }
-                    }else if assetResource.type == videoType {
-                        PHAssetResourceManager.default().writeData(
-                            for: assetResource,
-                            toFile: videoURL,
-                            options: options
-                        ) { (error) in
-                            DispatchQueue.main.async {
-                                if error == nil {
-                                    videoHandler(videoURL)
-                                }
-                                videoCompletion = true
-                                videoError = error
-                                if imageCompletion {
-                                    callback(imageError, videoError)
-                                }
+                    } completionHandler: { (error) in
+                        imageError = error
+                        DispatchQueue.main.async {
+                            if videoCompletion {
+                                callback(imageError, videoError)
+                            }
+                            imageCompletion = true
+                        }
+                    }
+                }else if assetResource.type == videoType {
+                    PHAssetResourceManager.default().writeData(
+                        for: assetResource,
+                        toFile: videoURL,
+                        options: options
+                    ) { (error) in
+                        DispatchQueue.main.async {
+                            if error == nil {
+                                videoHandler(videoURL)
+                            }
+                            videoCompletion = true
+                            videoError = error
+                            if imageCompletion {
+                                callback(imageError, videoError)
                             }
                         }
                     }
                 }
             }
-        } else {
-            completionHandler(
-                .allError(
-                    PhotoError.error(
-                        type: .imageEmpty,
-                        message: "系统版本低于9.1"
-                    ),
-                    PhotoError.error(
-                        type: .videoEmpty,
-                        message: "系统版本低于9.1"
-                    )
-                )
-            )
         }
     }
     
@@ -144,106 +111,63 @@ public extension AssetManager {
     static func requestLivePhoto(
         videoURL forAsset: PHAsset,
         toFile fileURL: URL,
-        completionHandler: @escaping (URL?, LivePhotoError?) -> Void
+        completionHandler: @escaping (Result<URL, LivePhotoError>) -> Void
     ) {
-        if #available(iOS 9.1, *) {
-            requestLivePhoto(
-                for: forAsset,
-                targetSize: PHImageManagerMaximumSize
-            ) { livePhoto, _, _ in
-                guard let livePhoto = livePhoto else {
-                    completionHandler(
-                        nil,
-                        .allError(
-                            PhotoError.error(
-                                type: .imageEmpty,
-                                message: "livePhoto为nil，获取失败"),
-                            PhotoError.error(
-                                type: .videoEmpty,
-                                message: "livePhoto为nil，获取失败"
-                            )
-                        )
+        requestLivePhoto(
+            for: forAsset,
+            targetSize: PHImageManagerMaximumSize
+        ) { livePhoto, info, _ in
+            guard let livePhoto = livePhoto else {
+                completionHandler(.failure(
+                    .allError(
+                        AssetError.requestFailed(info)
                     )
-                    return
+                ))
+                return
+            }
+            let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto)
+            if assetResources.isEmpty {
+                completionHandler(.failure(
+                    .allError(.assetResourceIsEmpty)
+                ))
+                return
+            }
+            if let error = PhotoTools.removeFile(fileURL: fileURL) {
+                completionHandler(.failure(
+                    .allError(.removeFileFailed(error))
+                ))
+                return
+            }
+            let videoURL: URL = fileURL
+            let options: PHAssetResourceRequestOptions = .init()
+            options.isNetworkAccessAllowed = true
+            var hasAdjustmentData: Bool = false
+            for assetResource in assetResources where
+                assetResource.type == .adjustmentData {
+                hasAdjustmentData = true
+                break
+            }
+            for assetResource in assetResources {
+                var videoType: PHAssetResourceType = .pairedVideo
+                if hasAdjustmentData {
+                    videoType = .fullSizePairedVideo
                 }
-                let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto)
-                if assetResources.isEmpty {
-                    completionHandler(
-                        nil,
-                        .allError(
-                            PhotoError.error(
-                                type: .imageEmpty,
-                                message: "assetResources为nil，获取失败"
-                            ),
-                            PhotoError.error(
-                                type: .videoEmpty,
-                                message: "assetResources为nil，获取失败"
-                            )
-                        )
-                    )
-                    return
-                }
-                if !PhotoTools.removeFile(fileURL: fileURL) {
-                    completionHandler(
-                        nil,
-                        .allError(
-                            PhotoError.error(
-                                type: .imageEmpty,
-                                message: "指定的地址已存在"
-                            ),
-                            PhotoError.error(
-                                type: .videoEmpty,
-                                message: "指定的地址已存在"
-                            )
-                        )
-                    )
-                    return
-                }
-                let videoURL: URL = fileURL
-                let options: PHAssetResourceRequestOptions = .init()
-                options.isNetworkAccessAllowed = true
-                var hasAdjustmentData: Bool = false
-                for assetResource in assetResources where
-                    assetResource.type == .adjustmentData {
-                    hasAdjustmentData = true
-                    break
-                }
-                for assetResource in assetResources {
-                    var videoType: PHAssetResourceType = .pairedVideo
-                    if hasAdjustmentData {
-                        videoType = .fullSizePairedVideo
-                    }
-                    if assetResource.type == videoType {
-                        PHAssetResourceManager.default().writeData(
-                            for: assetResource,
-                            toFile: videoURL,
-                            options: options
-                        ) { (error) in
-                            DispatchQueue.main.async {
-                                if error == nil {
-                                    completionHandler(videoURL, nil)
-                                }else {
-                                    completionHandler(nil, .videoError(error))
-                                }
+                if assetResource.type == videoType {
+                    PHAssetResourceManager.default().writeData(
+                        for: assetResource,
+                        toFile: videoURL,
+                        options: options
+                    ) { (error) in
+                        DispatchQueue.main.async {
+                            if let error {
+                                completionHandler(.failure(.videoError(.exportLivePhotoVideoURLFailed(error))))
+                            }else {
+                                completionHandler(.success(videoURL))
                             }
                         }
                     }
                 }
             }
-        } else {
-            completionHandler(
-                nil,
-                .allError(
-                    PhotoError.error(
-                        type: .imageEmpty,
-                        message: "系统版本低于9.1"
-                    ),
-                    PhotoError.error(
-                        type: .videoEmpty,
-                        message: "系统版本低于9.1"
-                    )
-                )
-            )
         }
     }
     
@@ -252,56 +176,26 @@ public extension AssetManager {
         contentURL asset: PHAsset,
         imageFileURL: URL? = nil,
         videoFileURL: URL? = nil,
-        imageURLHandler: @escaping (URL?) -> Void,
-        videoHandler: @escaping (URL?) -> Void,
-        completionHandler: @escaping (LivePhotoError?) -> Void
+        imageURLHandler: ((URL) -> Void)? = nil,
+        videoURLHandler: ((URL) -> Void)? = nil,
+        completionHandler: @escaping (Result<AssetURLResult.LivePhoto, LivePhotoError>) -> Void
     ) {
-        guard #available(iOS 9.1, *) else {
-            completionHandler(
-                .allError(
-                    PhotoError.error(
-                        type: .imageEmpty,
-                        message: "系统版本低于9.1"),
-                    PhotoError.error(
-                        type: .videoEmpty,
-                        message: "系统版本低于9.1"
-                    )
-                )
-            )
-            return
-        }
         requestLivePhoto(
             for: asset,
             targetSize: PHImageManagerMaximumSize
-        ) { livePhoto, _, _ in
+        ) { livePhoto, info, _ in
             guard let livePhoto = livePhoto else {
                 completionHandler(
-                    .allError(
-                        PhotoError.error(
-                            type: .imageEmpty,
-                            message: "livePhoto为nil，获取失败"
-                        ),
-                        PhotoError.error(
-                            type: .videoEmpty,
-                            message: "livePhoto为nil，获取失败"
-                        )
-                    )
+                    .failure(.allError(AssetError.requestFailed(info)))
                 )
                 return
             }
             let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto)
             if assetResources.isEmpty {
                 completionHandler(
-                    .allError(
-                        PhotoError.error(
-                            type: .imageEmpty,
-                            message: "assetResources为nil，获取失败"
-                        ),
-                        PhotoError.error(
-                            type: .videoEmpty,
-                            message: "assetResources为nil，获取失败"
-                        )
-                    )
+                    .failure(.allError(
+                        .assetResourceIsEmpty
+                    ))
                 )
                 return
             }
@@ -324,14 +218,14 @@ public extension AssetManager {
                 videoURL = PhotoTools.getVideoTmpURL()
             }
             let callback = {(imageError: Error?, videoError: Error?) in
-                if imageError != nil && videoError != nil {
-                    completionHandler(.allError(imageError, videoError))
-                }else if imageError != nil {
-                    completionHandler(.imageError(imageError))
-                }else if videoError != nil {
-                    completionHandler(.videoError(videoError))
+                if let imageError, let videoError {
+                    completionHandler(.failure(.allError(.exportLivePhotoURLFailed(imageError, videoError))))
+                }else if let imageError {
+                    completionHandler(.failure(.imageError(.exportLivePhotoImageURLFailed(imageError))))
+                }else if let videoError {
+                    completionHandler(.failure(.imageError(.exportLivePhotoVideoURLFailed(videoError))))
                 }else {
-                    completionHandler(nil)
+                    completionHandler(.success(.init(imageURL: imageURL, videoURL: videoURL)))
                 }
             }
             var hasAdjustmentData: Bool = false
@@ -378,7 +272,7 @@ public extension AssetManager {
                             do {
                                 try data.write(to: imageURL)
                                 DispatchQueue.main.async {
-                                    imageURLHandler(imageURL)
+                                    imageURLHandler?(imageURL)
                                 }
                             } catch {
                                 imageError = AssetError.assetResourceWriteDataFailed(AssetError.fileWriteFailed)
@@ -393,7 +287,7 @@ public extension AssetManager {
                         }
                         DispatchQueue.main.async {
                             if error == nil {
-                                imageURLHandler(_imageURL)
+                                imageURLHandler?(_imageURL)
                             }
                             imageCompletion = true
                             imageError = error
@@ -410,7 +304,7 @@ public extension AssetManager {
                     ) { (error) in
                         DispatchQueue.main.async {
                             if error == nil {
-                                videoHandler(videoURL)
+                                videoURLHandler?(videoURL)
                             }
                             videoCompletion = true
                             videoError = error

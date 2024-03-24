@@ -131,7 +131,7 @@ extension PhotoManager: URLSessionDownloadDelegate {
             return
         }
         if let url = downloadFileURLs[key] {
-            if !PhotoTools.removeFile(fileURL: url) {
+            if let _ = PhotoTools.removeFile(fileURL: url) {
                 DispatchQueue.main.async {
                     completionHandler?(nil, nil, ext)
                 }
@@ -155,7 +155,7 @@ extension PhotoManager: URLSessionDownloadDelegate {
             switch location.fileType {
             case .video:
                 let videoURL = PhotoTools.getVideoCacheURL(for: key)
-                if !PhotoTools.removeFile(fileURL: videoURL) {
+                if let _ = PhotoTools.removeFile(fileURL: videoURL) {
                     DispatchQueue.main.async {
                         completionHandler?(nil, nil, ext)
                     }
@@ -174,7 +174,7 @@ extension PhotoManager: URLSessionDownloadDelegate {
                 }
             case .auido:
                 let audioURL = PhotoTools.getAudioTmpURL(for: key)
-                if !PhotoTools.removeFile(fileURL: audioURL) {
+                if let _ = PhotoTools.removeFile(fileURL: audioURL) {
                     DispatchQueue.main.async {
                         completionHandler?(nil, nil, ext)
                     }

@@ -116,7 +116,7 @@ public extension AssetManager {
                             .failure(
                                 .init(
                                     info: info,
-                                    error: .needSyncICloud
+                                    error: .needSyncICloud(info)
                                 )
                             )
                         )

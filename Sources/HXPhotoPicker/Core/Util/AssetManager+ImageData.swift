@@ -9,18 +9,13 @@ import UIKit
 import Photos
 
 public extension AssetManager {
-    typealias ImageDataResultHandler = (Result<ImageDataResult, ImageDataError>) -> Void
+    typealias ImageDataResultHandler = (Result<ImageDataResult, AssetError>) -> Void
     
     struct ImageDataResult {
         public let imageData: Data
         public let dataUTI: String?
         public let imageOrientation: UIImage.Orientation
         public let info: [AnyHashable: Any]?
-    }
-    
-    struct ImageDataError: Error {
-        public let info: [AnyHashable: Any]?
-        public let error: AssetError
     }
 }
 
@@ -50,7 +45,7 @@ public extension AssetManager {
             DispatchQueue.main.async {
                 switch result {
                 case .failure(let error):
-                    switch error.error {
+                    switch error {
                     case .needSyncICloud:
                         let iCloudRequestID = self.requestImageData(
                             for: asset,
@@ -63,14 +58,7 @@ public extension AssetManager {
                                 case .success:
                                     resultHandler(result)
                                 case .failure(let error):
-                                    resultHandler(
-                                        .failure(
-                                            .init(
-                                                info: error.info,
-                                                error: .syncICloudFailed(error.info)
-                                            )
-                                        )
-                                    )
+                                    resultHandler(.failure(error))
                                 }
                             }
                         })
@@ -156,9 +144,9 @@ public extension AssetManager {
                 return
             }
             if let inICloud = info?.inICloud, inICloud {
-                resultHandler(.failure(.init(info: info, error: .needSyncICloud)))
+                resultHandler(.failure(.needSyncICloud(info)))
             }else {
-                resultHandler(.failure(.init(info: info, error: .requestFailed(info))))
+                resultHandler(.failure(.requestFailed(info)))
             }
         }
         if #available(iOS 13, *) {

@@ -48,27 +48,29 @@ public enum AssetError: Error {
     /// 从系统相册获取数据失败, [AnyHashable: Any]?: 系统获取失败的信息
     case requestFailed([AnyHashable: Any]?)
     /// 需要同步iCloud上的资源
-    case needSyncICloud
+    case needSyncICloud([AnyHashable: Any]?)
     /// 同步iCloud失败
     case syncICloudFailed([AnyHashable: Any]?)
     /// 指定地址存在其他文件，删除已存在的文件时发生错误
-    case removeFileFailed
+    case removeFileFailed(Error)
     /// PHAssetResource 为空
     case assetResourceIsEmpty
     /// PHAssetResource写入数据错误
     case assetResourceWriteDataFailed(Error)
     /// 导出livePhoto里的图片地址失败
-    case exportLivePhotoImageURLFailed(Error?)
+    case exportLivePhotoImageURLFailed(Error)
     /// 导出livePhoto里的视频地址失败
-    case exportLivePhotoVideoURLFailed(Error?)
+    case exportLivePhotoVideoURLFailed(Error)
     /// 导出livePhoto里的地址失败（图片失败信息,视频失败信息）
-    case exportLivePhotoURLFailed(Error?, Error?)
+    case exportLivePhotoURLFailed(Error, Error)
     /// 图片压缩失败
     case imageCompressionFailed
     /// 图片下载失败
     case imageDownloadFailed
     /// 视频下载失败
     case videoDownloadFailed
+    /// 视频压缩失败
+    case videoCompressionFailed
     /// 本地livePhoto取消写入
     case localLivePhotoCancelWrite
     /// 本地livePhoto图片写入失败
@@ -82,6 +84,19 @@ public enum AssetError: Error {
 }
 
 extension AssetError: LocalizedError, CustomStringConvertible {
+    public var info: [AnyHashable: Any]? {
+        switch self {
+        case .requestFailed(let info):
+            return info
+        case .needSyncICloud(let info):
+            return info
+        case .syncICloudFailed(let info):
+            return info
+        default:
+            return nil
+        }
+    }
+    
     public var errorDescription: String? {
         switch self {
         case .fileWriteFailed:
@@ -104,8 +119,8 @@ extension AssetError: LocalizedError, CustomStringConvertible {
             return "类型错误，例：本来是 .photo 却去获取 videoURL"
         case .requestFailed(let info):
             return "从系统相册获取数据失败, 系统获取失败的信息: \(String(describing: info))"
-        case .needSyncICloud:
-            return "需要同步iCloud上的资源"
+        case .needSyncICloud(let info):
+            return "需要同步iCloud上的资源: \(String(describing: info))"
         case .syncICloudFailed(let info):
             return "同步iCloud失败: \(String(describing: info))"
         case .removeFileFailed:
@@ -128,6 +143,8 @@ extension AssetError: LocalizedError, CustomStringConvertible {
             return "图片下载失败"
         case .videoDownloadFailed:
             return "视频下载失败"
+        case .videoCompressionFailed:
+            return "视频压缩失败"
         case .localLivePhotoCancelWrite:
             return "本地livePhoto取消写入"
         case .localLivePhotoWriteImageFailed:

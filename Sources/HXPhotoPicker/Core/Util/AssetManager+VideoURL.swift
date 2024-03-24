@@ -68,6 +68,7 @@ public extension AssetManager {
         for asset: PHAsset,
         toFile fileURL: URL,
         exportParameter: VideoExportParameter? = nil,
+        exportSession: ((AVAssetExportSession) -> Void)? = nil,
         resultHandler: @escaping VideoURLResultHandler
     ) {
         if let exportParameter = exportParameter {
@@ -78,35 +79,36 @@ public extension AssetManager {
                 case .success(let avResult):
                     let avAsset = avResult.avAsset
                     let presetName = exportParameter.preset.name
-                    guard let exportSession = AVAssetExportSession(
+                    guard let session = AVAssetExportSession(
                             asset: avAsset,
                             presetName: presetName
                     ) else {
                         resultHandler(.failure(.exportFailed(nil)))
                         return
                     }
-                    exportSession.outputURL = fileURL
-                    exportSession.shouldOptimizeForNetworkUse = true
-                    exportSession.outputFileType = .mp4
+                    session.outputURL = fileURL
+                    session.shouldOptimizeForNetworkUse = true
+                    session.outputFileType = .mp4
                     if exportParameter.quality > 0 {
                         var maxSize: Int?
                         if let urlAsset = avAsset as? AVURLAsset {
                             maxSize = urlAsset.url.fileSize
                         }
-                        exportSession.fileLengthLimit = PhotoTools.exportSessionFileLengthLimit(
+                        session.fileLengthLimit = PhotoTools.exportSessionFileLengthLimit(
                             seconds: avAsset.duration.seconds,
                             maxSize: maxSize,
                             exportPreset: exportParameter.preset,
                             videoQuality: exportParameter.quality
                         )
                     }
-                    exportSession.exportAsynchronously(completionHandler: {
+                    exportSession?(session)
+                    session.exportAsynchronously(completionHandler: {
                         DispatchQueue.main.async {
-                            switch exportSession.status {
+                            switch session.status {
                             case .completed:
                                 resultHandler(.success(fileURL))
                             case .failed, .cancelled:
-                                resultHandler(.failure(.exportFailed(exportSession.error)))
+                                resultHandler(.failure(.exportFailed(session.error)))
                             default: break
                             }
                         }
@@ -158,8 +160,8 @@ public extension AssetManager {
             resultHandler(.failure(.assetResourceIsEmpty))
             return
         }
-        if !PhotoTools.removeFile(fileURL: fileURL) {
-            resultHandler(.failure(.removeFileFailed))
+        if let error = PhotoTools.removeFile(fileURL: fileURL) {
+            resultHandler(.failure(.removeFileFailed(error)))
             return
         }
         let videoURL = fileURL

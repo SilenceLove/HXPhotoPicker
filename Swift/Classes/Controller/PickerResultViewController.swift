@@ -626,72 +626,12 @@ class PickerResultViewController: UIViewController,
                 style: .default,
                 handler: { alertAction in
             photoBrowser.view.hx.show(animated: true)
-            func saveAlbum(_ type: AssetManager.PhotoSaveType) {
-                AssetManager.save(type: type) { result in
-                    photoBrowser.view.hx.hide(animated: true)
-                    switch result {
-                    case .success:
-                        photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
-                    case .failure:
-                        photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
-                    }
-                }
-            }
-            if photoAsset.mediaSubType == .localLivePhoto {
-                photoAsset.requestLocalLivePhotoURL {
-                    switch $0 {
-                    case .success(let result):
-                        guard let livePhoto = result.livePhoto else {
-                            photoBrowser.view.hx.hide(animated: true)
-                            photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
-                            return
-                        }
-                        saveAlbum(.livePhoto(imageURL: livePhoto.imageURL, videoURL: livePhoto.videoURL))
-                    default:
-                        photoBrowser.view.hx.hide(animated: true)
-                        photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
-                    }
-                }
-                return
-            }
-            
-            photoAsset.getAssetURL { result in
+            photoAsset.saveToSystemAlbum { result in
+                photoBrowser.view.hx.hide(animated: true)
                 switch result {
-                case .success(let response):
-                    if response.mediaType == .photo {
-                        if response.urlType == .network {
-                            PhotoTools.downloadNetworkImage(
-                                with: response.url,
-                                options: [],
-                                completionHandler: { image in
-                                photoBrowser.view.hx.hide(animated: true)
-                                if let image = image {
-                                    saveAlbum(.image(image))
-                                }else {
-                                    photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
-                                }
-                            })
-                        }else {
-                            saveAlbum(.imageURL(response.url))
-                        }
-                    }else {
-                        if response.urlType == .network {
-                            PhotoManager.shared.downloadTask(
-                                with: response.url,
-                                progress: nil) { videoURL, error, _ in
-                                photoBrowser.view.hx.hide(animated: true)
-                                if let videoURL = videoURL {
-                                    saveAlbum(.videoURL(videoURL))
-                                }else {
-                                    photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
-                                }
-                            }
-                        }else {
-                            saveAlbum(.videoURL(response.url))
-                        }
-                    }
-                case .failure(_):
-                    photoBrowser.view.hx.hide(animated: true)
+                case .success:
+                    photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
+                case .failure:
                     photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
                 }
             }

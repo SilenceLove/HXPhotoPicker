@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 extension PhotoAsset {
     
@@ -299,7 +300,7 @@ extension PhotoAsset {
     }
     func requestlocalImageData(
         resultHandler: (
-            (PhotoAsset, Result<ImageDataResult, AssetManager.ImageDataError>) -> Void
+            (PhotoAsset, Result<AssetManager.ImageDataResult, AssetError>) -> Void
         )?
     ) {
         func resultSuccess(
@@ -313,6 +314,7 @@ extension PhotoAsset {
                     .success(
                         .init(
                             imageData: data,
+                            dataUTI: nil,
                             imageOrientation: orientation,
                             info: info
                         )
@@ -320,20 +322,9 @@ extension PhotoAsset {
                 )
             }
         }
-        func resultFailed(
-            info: [AnyHashable: Any]?,
-            error: AssetError
-        ) {
+        func resultFailed(error: AssetError) {
             DispatchQueue.main.async {
-                resultHandler?(
-                    self,
-                    .failure(
-                        .init(
-                            info: info,
-                            error: error
-                        )
-                    )
-                )
+                resultHandler?(self, .failure(error))
             }
         }
         #if HXPICKER_ENABLE_EDITOR
@@ -347,12 +338,12 @@ extension PhotoAsset {
                 )
                 return
             }
-            resultFailed(info: nil, error: .invalidData)
+            resultFailed(error: .invalidData)
             return
         }
         #endif
         guard phAsset == nil else {
-            resultFailed(info: nil, error: .invalidData)
+            resultFailed(error: .invalidData)
             return
         }
         DispatchQueue.global().async {
@@ -382,13 +373,13 @@ extension PhotoAsset {
                                 info: nil
                             )
                         }else {
-                            resultFailed(info: nil, error: .invalidData)
+                            resultFailed(error: .invalidData)
                         }
                     }
                     #endif
                     return
                 }
-                resultFailed(info: nil, error: .invalidData)
+                resultFailed(error: .invalidData)
             }
         }
     }

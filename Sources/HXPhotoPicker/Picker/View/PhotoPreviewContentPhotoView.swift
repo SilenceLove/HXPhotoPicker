@@ -457,7 +457,7 @@ extension PhotoPreviewContentPhotoView {
     
     func requestOriginalCompletion(
         asset: PhotoAsset,
-        result: Result<PhotoAsset.ImageDataResult, AssetManager.ImageDataError>
+        result: Result<AssetManager.ImageDataResult, AssetError>
     ) {
         if asset != photoAsset {
             return

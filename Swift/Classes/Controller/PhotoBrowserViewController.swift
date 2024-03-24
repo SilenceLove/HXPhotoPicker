@@ -196,12 +196,13 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
                 style: .default,
                 handler: { _ in
                     photoBrowser.view.hx.show(animated: true)
-                    photoAsset.saveToSystemAlbum { phAsset in
+                    photoAsset.saveToSystemAlbum { result in
                         photoBrowser.view.hx.hide(animated: true)
-                        if phAsset == nil {
-                            photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
-                        }else {
+                        switch result {
+                        case .success:
                             photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
+                        case .failure:
+                            photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
                         }
                     }
                 }

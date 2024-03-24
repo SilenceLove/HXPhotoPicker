@@ -106,24 +106,24 @@ public extension PhotoTools {
     
     /// 删除视频缓存
     @discardableResult
-    static func removeVideoCache() -> Bool {
+    static func removeVideoCache() -> Error?{
         return removeFile(filePath: getVideoCacheFolderPath())
     }
     
     /// 删除图片缓存
     @discardableResult
-    static func removeImageCache() -> Bool {
+    static func removeImageCache() -> Error? {
         return removeFile(filePath: getImageCacheFolderPath())
     }
     
     /// 删除音频临时缓存
     @discardableResult
-    static func removeAudioTmpCache() -> Bool {
+    static func removeAudioTmpCache() -> Error? {
         return removeFile(filePath: getAudioTmpFolderPath())
     }
     
     @discardableResult
-    static func removeAudioCache() -> Bool {
+    static func removeAudioCache() -> Error? {
         return removeFile(filePath: getAudioCacheFolderPath())
     }
     
@@ -289,19 +289,19 @@ public extension PhotoTools {
     }
     
     @discardableResult
-    static func removeFile(fileURL: URL) -> Bool {
+    static func removeFile(fileURL: URL) -> Error? {
         removeFile(filePath: fileURL.path)
     }
     
     @discardableResult
-    static func removeFile(filePath: String) -> Bool {
+    static func removeFile(filePath: String) -> Error? {
         do {
             if FileManager.default.fileExists(atPath: filePath) {
                 try FileManager.default.removeItem(atPath: filePath)
             }
-            return true
+            return nil
         } catch {
-            return false
+            return error
         }
     }
     

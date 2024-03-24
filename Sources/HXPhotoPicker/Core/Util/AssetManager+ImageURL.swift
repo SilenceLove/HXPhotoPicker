@@ -79,8 +79,8 @@ public extension AssetManager {
             resultHandler(.failure(.assetResourceIsEmpty))
             return
         }
-        if !PhotoTools.removeFile(fileURL: fileURL) {
-            resultHandler(.failure(.removeFileFailed))
+        if let error = PhotoTools.removeFile(fileURL: fileURL) {
+            resultHandler(.failure(.removeFileFailed(error)))
             return
         }
         let imageURL: URL

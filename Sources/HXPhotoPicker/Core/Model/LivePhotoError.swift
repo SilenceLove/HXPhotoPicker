@@ -7,8 +7,19 @@
 
 import Foundation
 
-public enum LivePhotoError {
-    case imageError(Error?)
-    case videoError(Error?)
-    case allError(Error?, Error?)
+public enum LivePhotoError: Error {
+    case imageError(AssetError)
+    case videoError(AssetError)
+    case allError(AssetError)
+    
+    var assetError: AssetError {
+        switch self {
+        case .imageError(let error):
+            return error
+        case .videoError(let error):
+            return error
+        case .allError(let error):
+            return error
+        }
+    }
 }

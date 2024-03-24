@@ -34,11 +34,12 @@ public extension AssetManager {
                         forVideo: avResult.avAsset,
                         toFile: fileURL,
                         exportParameter: exportParameter
-                    ) { videoURL, error in
-                        if let videoURL = videoURL {
+                    ) { result in
+                        switch result {
+                        case .success(let videoURL):
                             completionHandler?(.success(videoURL))
-                        }else {
-                            completionHandler?(.failure(.init(info: avResult.info, error: .exportFailed(error))))
+                        case .failure(let error):
+                            completionHandler?(.failure(.init(info: avResult.info, error: error)))
                         }
                     }
                     if let session = session {
@@ -58,7 +59,7 @@ public extension AssetManager {
         forVideo avAsset: AVAsset,
         toFile fileURL: URL,
         exportParameter: VideoExportParameter,
-        completionHandler: ((URL?, Error?) -> Void)?
+        completionHandler: ((Result<URL, AssetError>) -> Void)?
     ) -> AVAssetExportSession? {
         var presetName = exportParameter.preset.name
         let presets = AVAssetExportSession.exportPresets(compatibleWith: avAsset)
@@ -75,7 +76,7 @@ public extension AssetManager {
             asset: avAsset,
             presetName: presetName
         ) else {
-            completionHandler?(nil, AssetError.exportFailed(nil))
+            completionHandler?(.failure(AssetError.exportFailed(nil)))
             return nil
         }
         exportSession.outputURL = fileURL
@@ -97,9 +98,9 @@ public extension AssetManager {
             DispatchQueue.main.async {
                 switch exportSession.status {
                 case .completed:
-                    completionHandler?(fileURL, nil)
+                    completionHandler?(.success(fileURL))
                 case .failed, .cancelled:
-                    completionHandler?(nil, exportSession.error)
+                    completionHandler?(.failure(.exportFailed(exportSession.error)))
                 default: break
                 }
             }
@@ -189,7 +190,7 @@ public extension AssetManager {
                             .failure(
                                 .init(
                                     info: info,
-                                    error: .needSyncICloud
+                                    error: .needSyncICloud(info)
                                 )
                             )
                         )

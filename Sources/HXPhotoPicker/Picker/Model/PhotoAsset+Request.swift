@@ -14,12 +14,6 @@ import Kingfisher
 // MARK: Request Photo
 public extension PhotoAsset {
     
-    struct ImageDataResult {
-        let imageData: Data
-        let imageOrientation: UIImage.Orientation
-        let info: [AnyHashable: Any]?
-    }
-    
     @discardableResult
     func requestImage(
         filterEditor: Bool = false,
@@ -266,7 +260,7 @@ public extension PhotoAsset {
         iCloudHandler: PhotoAssetICloudHandler? = nil,
         progressHandler: PhotoAssetProgressHandler? = nil,
         resultHandler: (
-            (PhotoAsset, Result<ImageDataResult, AssetManager.ImageDataError>
+            (PhotoAsset, Result<AssetManager.ImageDataResult, AssetError>
         ) -> Void)?
     ) -> PHImageRequestID {
         #if HXPICKER_ENABLE_EDITOR
@@ -277,14 +271,15 @@ public extension PhotoAsset {
                     self,
                     .success(
                         .init(
-                            imageData: imageData,
+                            imageData: imageData, 
+                            dataUTI: nil,
                             imageOrientation: photoEdit.image.imageOrientation,
                             info: nil
                         )
                     )
                 )
             }catch {
-                resultHandler?(self, .failure(.init(info: nil, error: .invalidData)))
+                resultHandler?(self, .failure(.invalidData))
             }
             return 0
         }
@@ -296,13 +291,14 @@ public extension PhotoAsset {
                     .success(
                         .init(
                             imageData: imageData,
+                            dataUTI: nil,
                             imageOrientation: videoEdit.coverImage?.imageOrientation ?? .up,
                             info: nil
                         )
                     )
                 )
             }else {
-                resultHandler?(self, .failure(.init(info: nil, error: .invalidData)))
+                resultHandler?(self, .failure(.invalidData))
             }
             return 0
         }
@@ -316,6 +312,7 @@ public extension PhotoAsset {
                         .success(
                             .init(
                                 imageData: imageResult.imageData,
+                                dataUTI: nil,
                                 imageOrientation: imageResult.imageOrientation,
                                 info: nil
                             )
@@ -338,7 +335,7 @@ public extension PhotoAsset {
         return AssetManager.requestImageData(for: phAsset, version: version) { iCloudRequestID in
             iCloudHandler?(self, iCloudRequestID)
         } progressHandler: { progress, _, _, _ in
-            self.downloadProgress = progress
+            self.downloadProgress = Double(progress)
             DispatchQueue.main.async {
                 progressHandler?(self, progress)
             }
@@ -353,15 +350,7 @@ public extension PhotoAsset {
                        let data = PhotoTools.getImageData(for: image) {
                         imageData = data
                     }else {
-                        resultHandler?(
-                            self,
-                            .failure(
-                                .init(
-                                    info: nil,
-                                    error: .invalidData
-                                )
-                            )
-                        )
+                        resultHandler?(self, .failure(.invalidData))
                         return
                     }
                 }else {
@@ -372,6 +361,7 @@ public extension PhotoAsset {
                     .success(
                         .init(
                             imageData: imageData,
+                            dataUTI: dataResult.dataUTI,
                             imageOrientation: dataResult.imageOrientation,
                             info: dataResult.info
                         )
@@ -463,7 +453,6 @@ public extension PhotoAsset {
                 requestLocalLivePhotoURL(
                     imageFileURL: imageFileURL,
                     videoFileURL: videoFileURL,
-                    compression: compression,
                     completion: completion
                 )
                 return
@@ -481,40 +470,22 @@ public extension PhotoAsset {
                 toImageURL = PhotoTools.getImageTmpURL()
             }
         }
-        
-        var imageURL: URL?
-        var videoURL: URL?
         AssetManager.requestLivePhoto(
             contentURL: phAsset,
             imageFileURL: toImageURL,
             videoFileURL: videoFileURL
-        ) { url in
-            imageURL  = url
-        } videoHandler: { url in
-            videoURL  = url
-        } completionHandler: { error in
-            guard let imageURL = imageURL,
-                  let videoURL = videoURL else {
-                if let error = error {
-                    switch error {
-                    case .allError(let imageError, let videoError):
-                        completion(.failure(.exportLivePhotoURLFailed(imageError, videoError)))
-                    case .imageError(let error):
-                        completion(.failure(.exportLivePhotoImageURLFailed(error)))
-                    case .videoError(let error):
-                        completion(.failure(.exportLivePhotoVideoURLFailed(error)))
-                    }
-                }else {
-                    completion(.failure(.exportLivePhotoURLFailed(nil, nil)))
-                }
-                return
+        ) { result in
+            switch result {
+            case .success(let urlResult):
+                self.requestLivePhotoURLSuccess(
+                    imageURL: urlResult.imageURL,
+                    videoURL: urlResult.videoURL,
+                    compression: compression,
+                    completion: completion
+                )
+            case .failure(let error):
+                completion(.failure(error.assetError))
             }
-            self.requestLivePhotoURLSuccess(
-                imageURL: imageURL,
-                videoURL: videoURL,
-                compression: compression,
-                completion: completion
-            )
         }
     }
      
@@ -524,28 +495,12 @@ public extension PhotoAsset {
         compression: Compression?,
         completion: @escaping AssetURLCompletion
     ) {
-        func completionFunc(_ image_URL: URL?, _ video_URL: URL?) {
-            if let image_URL = image_URL,
-               let video_URL = video_URL {
-                completion(
-                    .success(
-                        .init(
-                            url: image_URL,
-                            urlType: .local,
-                            mediaType: .photo,
-                            livePhoto: .init(
-                                imageURL: image_URL,
-                                videoURL: video_URL
-                            )
-                        )
-                    )
-                )
-            }else if image_URL != nil {
-                completion(.failure(.exportLivePhotoVideoURLFailed(nil)))
-            }else if video_URL != nil {
-                completion(.failure(.exportLivePhotoImageURLFailed(nil)))
-            }else {
-                completion(.failure(.exportLivePhotoURLFailed(nil, nil)))
+        func completionFunc(_ result: Result<AssetURLResult.LivePhoto, AssetError>) {
+            switch result {
+            case .success(let urlResult):
+                completion(.success(.init(url: urlResult.imageURL, urlType: .local, mediaType: .photo, livePhoto: urlResult)))
+            case .failure(let error):
+                completion(.failure(error))
             }
         }
         func imageCompressor(_ url: URL, _ compressionQuality: CGFloat) -> URL? {
@@ -566,31 +521,33 @@ public extension PhotoAsset {
         func videoCompressor(
             _ url: URL,
             _ exportParameter: VideoExportParameter,
-            completionHandler: ((URL?, Error?) -> Void)?
+            completionHandler: ((Result<URL, AssetError>) -> Void)?
         ) {
             let avAsset = AVAsset(url: url)
             avAsset.loadValuesAsynchronously(forKeys: ["tracks"]) {
                 if avAsset.statusOfValue(forKey: "tracks", error: nil) != .loaded {
-                    completionHandler?(nil, nil)
+                    completionHandler?(.failure(.videoCompressionFailed))
                     return
                 }
                 AssetManager.exportVideoURL(
                     forVideo: avAsset,
                     toFile: PhotoTools.getVideoTmpURL(),
                     exportParameter: exportParameter
-                ) { video_URL, error in
-                    guard let video_URL = video_URL else {
-                        completionHandler?(nil, error)
-                        return
-                    }
-                    do {
-                        if FileManager.default.fileExists(atPath: url.path) {
-                            try FileManager.default.removeItem(at: url)
+                ) { result in
+                    switch result {
+                    case .success(let video_URL):
+                        do {
+                            if FileManager.default.fileExists(atPath: url.path) {
+                                try FileManager.default.removeItem(at: url)
+                            }
+                            try FileManager.default.moveItem(at: video_URL, to: url)
+                            completionHandler?(.success(url))
+                        } catch {
+                            completionHandler?(.failure(.fileWriteFailed))
                         }
-                        try FileManager.default.moveItem(at: video_URL, to: url)
-                        completionHandler?(url, error)
-                    } catch {
-                        completionHandler?(nil, error)
+                        completionHandler?(.success(url))
+                    case .failure(let error):
+                        completionHandler?(.failure(error))
                     }
                 }
             }
@@ -601,6 +558,7 @@ public extension PhotoAsset {
             let imageQueue = DispatchQueue(label: "HXPhotoPicker.request.livephoto.imageurl")
             var image_URL: URL?
             var video_URL: URL?
+            var videoError: Error?
             imageQueue.async(group: group, execute: DispatchWorkItem(block: {
                 image_URL = imageCompressor(imageURL, imageCompression)
             }))
@@ -610,20 +568,37 @@ public extension PhotoAsset {
                 videoCompressor(
                     videoURL,
                     videoExportParameter
-                ) { url, _ in
-                    video_URL = url
+                ) {
+                    switch $0 {
+                    case .success(let url):
+                        video_URL = url
+                    case .failure(let error):
+                        videoError = error
+                    }
                     semaphore.signal()
                 }
                 semaphore.wait()
             }))
             group.notify(queue: .main, work: DispatchWorkItem(block: {
-                completionFunc(image_URL, video_URL)
+                if let image_URL, let video_URL {
+                    completionFunc(.success(.init(imageURL: image_URL, videoURL: video_URL)))
+                }else {
+                    if let videoError {
+                        completionFunc(.failure(.exportLivePhotoVideoURLFailed(videoError)))
+                    }else {
+                        completionFunc(.failure(.imageCompressionFailed))
+                    }
+                }
             }))
         }else if let imageCompression = compression?.imageCompressionQuality {
             DispatchQueue.global().async {
                 let url = imageCompressor(imageURL, imageCompression)
                 DispatchQueue.main.async {
-                    completionFunc(url, videoURL)
+                    if let url {
+                        completionFunc(.success(.init(imageURL: url, videoURL: videoURL)))
+                    }else {
+                        completionFunc(.failure(.imageCompressionFailed))
+                    }
                 }
             }
         }else if let videoExportParameter = compression?.videoExportParameter {
@@ -631,14 +606,19 @@ public extension PhotoAsset {
                 videoCompressor(
                     videoURL,
                     videoExportParameter
-                ) { url, _ in
+                ) { result in
                     DispatchQueue.main.async {
-                        completionFunc(imageURL, url)
+                        switch result {
+                        case .success(let url):
+                            completionFunc(.success(.init(imageURL: imageURL, videoURL: url)))
+                        case .failure(let error):
+                            completionFunc(.failure(error))
+                        }
                     }
                 }
             }
         }else {
-            completionFunc(imageURL, videoURL)
+            completionFunc(.success(.init(imageURL: imageURL, videoURL: videoURL)))
         }
     }
     
@@ -899,17 +879,19 @@ public extension PhotoAsset {
         }
     }
     
+    /// 获取本地的`LivePhoto`里的`URL`，为网路地址时优先使用本地缓存地址
+    /// - Parameters:
+    ///   - imageFileURL: 指定获取的图片本地地址
+    ///   - videoFileURL: 指定获取的视频本地地址
     func requestLocalLivePhotoURL(
         imageFileURL: URL? = nil,
         videoFileURL: URL? = nil,
-        compression: Compression? = nil,
         completion: @escaping AssetURLCompletion
     ) {
         #if HXPICKER_ENABLE_EDITOR
         if photoEditedResult != nil {
             getEditedImageURL(
                 toFile: imageFileURL,
-                compressionQuality: compression?.imageCompressionQuality,
                 resultHandler: completion
             )
             return
@@ -936,7 +918,23 @@ public extension PhotoAsset {
                 }
             }
         }else {
-            imageURLType = .network
+            if localLivePhoto.isCache {
+                imageURLType = .local
+                imageURL = localLivePhoto.jpgURL
+                if let imageFileURL = imageFileURL {
+                    if PhotoTools.copyFile(
+                        at: imageURL,
+                        to: imageFileURL
+                    ) {
+                        imageURL = imageFileURL
+                    }else {
+                        completion(.failure(.fileWriteFailed))
+                        return
+                    }
+                }
+            }else {
+                imageURLType = .network
+            }
         }
         let videoURLType: AssetURLResult.URLType
         if videoURL.isFileURL {
@@ -953,7 +951,23 @@ public extension PhotoAsset {
                 }
             }
         }else {
-            videoURLType = .network
+            if localLivePhoto.isCache {
+                videoURLType = .local
+                videoURL = localLivePhoto.movURL
+                if let videoFileURL = videoFileURL {
+                    if PhotoTools.copyFile(
+                        at: videoURL,
+                        to: videoFileURL
+                    ) {
+                        videoURL = videoFileURL
+                    }else {
+                        completion(.failure(.fileWriteFailed))
+                        return
+                    }
+                }
+            }else {
+                videoURLType = .network
+            }
         }
         completion(
             .success(
@@ -976,11 +990,11 @@ public extension PhotoAsset {
 // MARK: Request Video
 public extension PhotoAsset {
     
-    /// 获取原始视频地址，系统相册里的视频需要自行压缩
+    /// 获取视频地址
     /// 网络视频如果在本地有缓存则会返回本地地址，如果没有缓存则为ni
     /// - Parameters:
     ///   - fileURL: 指定视频地址
-    ///   - exportParameter: 导出参数，nil 为原始视频
+    ///   - exportParameter: 系统相册里的视频导出参数，nil 为原始视频
     ///   - resultHandler: 获取结果
     func requestVideoURL(
         toFile fileURL: URL? = nil,

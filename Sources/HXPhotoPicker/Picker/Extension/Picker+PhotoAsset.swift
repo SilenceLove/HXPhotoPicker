@@ -12,14 +12,14 @@ public extension PhotoAsset {
     /// 保存到系统相册
     func saveToSystemAlbum(
         albumName: String? = nil,
-        _ completion: ((PHAsset?) -> Void)? = nil
+        _ completion: ((Result<PHAsset, Error>) -> Void)? = nil
     ) {
         if mediaSubType == .localLivePhoto {
             requestLocalLivePhotoURL {
                 switch $0 {
                 case .success(let result):
                     guard let livePhoto = result.livePhoto else {
-                        completion?(nil)
+                        completion?(.failure(AssetError.localLivePhotoIsEmpty))
                         return
                     }
                     AssetManager.save(
@@ -28,13 +28,13 @@ public extension PhotoAsset {
                     ) {
                         switch $0 {
                         case .success(let phAsset):
-                            completion?(phAsset)
-                        case .failure:
-                            completion?(nil)
+                            completion?(.success(phAsset))
+                        case .failure(let error):
+                            completion?(.failure(error))
                         }
                     }
-                default:
-                    completion?(nil)
+                case .failure(let error):
+                    completion?(.failure(error))
                 }
             }
             return
@@ -46,9 +46,9 @@ public extension PhotoAsset {
             ) {
                 switch $0 {
                 case .success(let phAsset):
-                    completion?(phAsset)
-                case .failure:
-                    completion?(nil)
+                    completion?(.success(phAsset))
+                case .failure(let error):
+                    completion?(.failure(error))
                 }
             }
         }
@@ -65,7 +65,7 @@ public extension PhotoAsset {
                             if let image = image {
                                 save(.image(image))
                             }else {
-                                completion?(nil)
+                                completion?(.failure(AssetError.imageDownloadFailed))
                             }
                         })
                         #endif
@@ -80,15 +80,15 @@ public extension PhotoAsset {
                             if let videoURL = videoURL {
                                 save(.videoURL(videoURL))
                             }else {
-                                completion?(nil)
+                                completion?(.failure(AssetError.videoDownloadFailed))
                             }
                         }
                     }else {
                         save(.videoURL(response.url))
                     }
                 }
-            case .failure:
-                completion?(nil)
+            case .failure(let error):
+                completion?(.failure(error))
             }
         }
     }

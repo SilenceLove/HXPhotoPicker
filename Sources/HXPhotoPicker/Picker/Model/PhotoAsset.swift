@@ -484,7 +484,7 @@ extension PhotoAsset {
                     }
                 }
             case .failure(let error):
-                resultHandler(.failure(error.error))
+                resultHandler(.failure(error))
             }
         }
     }
@@ -680,6 +680,7 @@ extension PhotoAsset {
         exportSession: ((AVAssetExportSession) -> Void)? = nil,
         resultHandler: @escaping AssetURLCompletion
     ) {
+        let toFile = fileURL == nil ? PhotoTools.getVideoTmpURL() : fileURL!
         #if HXPICKER_ENABLE_EDITOR
         if let videoEdit = videoEditedResult {
             if let fileURL = fileURL {
@@ -698,7 +699,6 @@ extension PhotoAsset {
             resultHandler(.failure(.invalidPHAsset))
             return
         }
-        let toFile = fileURL == nil ? PhotoTools.getVideoTmpURL() : fileURL!
         if mediaSubType == .livePhoto {
             if let exportParameter = exportParameter {
                 AssetManager.exportVideoURL(
@@ -716,18 +716,16 @@ extension PhotoAsset {
                 }
                 return
             }
-            let assetHandler: (URL?, Error?) -> Void = { videoURL, error in
-                if let videoURL = videoURL {
-                    resultHandler(.success(.init(url: videoURL, urlType: .local, mediaType: .video)))
-                }else {
-                    resultHandler(.failure(.exportFailed(error)))
-                }
-            }
             AssetManager.requestLivePhoto(
                 videoURL: phAsset,
                 toFile: toFile
-            ) { (videoURL, _) in
-                assetHandler(videoURL, nil)
+            ) {
+                switch $0 {
+                case .success(let videoURL):
+                    resultHandler(.success(.init(url: videoURL, urlType: .local, mediaType: .video)))
+                case .failure(let error):
+                    resultHandler(.failure(error.assetError))
+                }
             }
         }else {
             if mediaType == .photo {
@@ -737,7 +735,8 @@ extension PhotoAsset {
             AssetManager.requestVideoURL(
                 for: phAsset,
                 toFile: toFile,
-                exportParameter: exportParameter
+                exportParameter: exportParameter,
+                exportSession: exportSession
             ) { (result) in
                 switch result {
                 case .success(let videoURL):

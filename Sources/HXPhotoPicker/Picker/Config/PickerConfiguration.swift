@@ -300,5 +300,6 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
         albumController.setThemeColor(color)
         photoList.setThemeColor(color)
         previewView.setThemeColor(color)
+        notAuthorized.setThemeColor(color)
     }
 }

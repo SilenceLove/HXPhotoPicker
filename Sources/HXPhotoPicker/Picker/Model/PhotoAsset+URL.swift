@@ -96,14 +96,9 @@ public extension PhotoAsset {
     
     /// 获取 imageData
     /// - Parameter completion: 获取完成
-    func getImageData(completion: @escaping (Data?) -> Void) {
+    func getImageData(completion: @escaping (Result<AssetManager.ImageDataResult, AssetError>) -> Void) {
         requestImageData { _, result in
-            switch result {
-            case .success(let dataResult):
-                completion(dataResult.imageData)
-            case .failure:
-                completion(nil)
-            }
+            completion(result)
         }
     }
     
@@ -478,12 +473,13 @@ extension Data: PhotoAssetObject {
         compression: PhotoAsset.Compression?
     ) async throws -> Self {
         try await withCheckedThrowingContinuation { continuation in
-                photoAsset.getImageData { data in
-                guard let data else {
-                    continuation.resume(with: .failure(PickerError.imageDataFetchFaild))
-                    return
+            photoAsset.getImageData {
+                switch $0 {
+                case .success(let result):
+                    continuation.resume(with: .success(result.imageData))
+                case .failure(let error):
+                    continuation.resume(with: .failure(PickerError.imageDataFetchFaild(error)))
                 }
-                continuation.resume(with: .success(data))
             }
         }
     }
