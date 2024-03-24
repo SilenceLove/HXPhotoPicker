@@ -171,6 +171,7 @@ public extension AssetManager {
         }
     }
     
+    #if HXPICKER_ENABLE_PICKER
     // MARK: 获取LivePhoto里的图片地址和视频地址
     static func requestLivePhoto(
         contentURL asset: PHAsset,
@@ -317,4 +318,5 @@ public extension AssetManager {
             }
         }
     }
+    #endif
 }
