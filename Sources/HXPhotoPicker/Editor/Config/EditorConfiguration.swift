@@ -261,9 +261,9 @@ public extension EditorConfiguration {
         public var angleScaleColor: UIColor = "#FDCC00".hx.color
         
         /// round crop box
-        /// isResetToOriginal = true, which can avoid restoring the original width and height when resetting
+        /// isResetToOriginal = false, which can avoid restoring the original width and height when resetting
         /// 圆形裁剪框
-        /// isResetToOriginal = true，可以避免重置时恢复原始宽高
+        /// isResetToOriginal = false，可以避免重置时恢复原始宽高
         public var isRoundCrop: Bool = false
         
         /// default fixed ratio

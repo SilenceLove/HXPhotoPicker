@@ -10,6 +10,11 @@ import UIKit
 import Photos
 
 public protocol PhotoPickerDataDelegate: AnyObject {
+    /// 是否可以选择 Asset
+    func pickerData(
+        _ pickerData: PhotoPickerData,
+        canSelectAsset photoAsset: PhotoAsset
+    ) -> Bool
     
     /// 将要选择Asset
     func pickerData(
@@ -122,7 +127,7 @@ open class PhotoPickerData {
     
     /// 添加根据本地资源生成的PhotoAsset对象
     /// - Parameter photoAsset: 对应的PhotoAsset对象
-    public func addedLocalCamera(_ photoAsset: PhotoAsset) {
+    open func addedLocalCamera(_ photoAsset: PhotoAsset) {
         photoAsset.localIndex = localCameraAssets.count
         localCameraAssets.append(photoAsset)
     }
@@ -131,7 +136,7 @@ open class PhotoPickerData {
     /// - Parameter photoAsset: 对应的PhotoAsset对象
     /// - Returns: 添加结果
     @discardableResult
-    public func append(
+    open func append(
         _ photoAsset: PhotoAsset,
         isFilterEditor: Bool = false
     ) -> Bool {
@@ -140,6 +145,9 @@ open class PhotoPickerData {
         }
         if config.selectMode == .single {
             // 单选模式不可添加
+            return false
+        }
+        if let shouldSelect = delegate?.pickerData(self, shouldSelectedAsset: photoAsset, at: selectedAssets.count), !shouldSelect {
             return false
         }
         if selectedAssets.contains(photoAsset) {
@@ -166,7 +174,7 @@ open class PhotoPickerData {
         return canSelect
     }
     
-    public func canSelectPhoto(_ photoAsset: PhotoAsset) -> (Bool, String?) {
+    open func canSelectPhoto(_ photoAsset: PhotoAsset) -> (Bool, String?) {
         var canSelect = true
         var text: String?
         if photoAsset.mediaType == .photo {
@@ -195,7 +203,7 @@ open class PhotoPickerData {
         return (canSelect, text)
     }
     
-    public func canSelectVideo(
+    open func canSelectVideo(
         _ photoAsset: PhotoAsset,
         isFilterEditor: Bool
     ) -> (Bool, String?) {
@@ -269,11 +277,14 @@ open class PhotoPickerData {
     ///   - photoAsset: 对应的PhotoAsset
     ///   - isShowHUD: 是否显示HUD
     /// - Returns: 结果
-    public func canSelect(
+    open func canSelect(
         _ photoAsset: PhotoAsset,
         isShowHUD: Bool,
         isFilterEditor: Bool = false
     ) -> Bool {
+        if let shouldSelect = delegate?.pickerData(self, canSelectAsset: photoAsset), !shouldSelect {
+            return false
+        }
         var canSelect = true
         let text: String?
         if photoAsset.mediaType == .photo {
@@ -284,11 +295,6 @@ open class PhotoPickerData {
             let result = canSelectVideo(photoAsset, isFilterEditor: isFilterEditor)
             canSelect = result.0
             text = result.1
-        }
-        if let shouldSelect = delegate?.pickerData(self, shouldSelectedAsset: photoAsset, at: selectedAssets.count) {
-            if canSelect {
-                canSelect = shouldSelect
-            }
         }
         if let text = text, !canSelect, isShowHUD {
             DispatchQueue.main.async {
@@ -307,7 +313,7 @@ open class PhotoPickerData {
     /// - Parameter photoAsset: 对应PhotoAsset对象
     /// - Returns: 移除结果
     @discardableResult
-    public func remove(_ photoAsset: PhotoAsset) -> Bool {
+    open func remove(_ photoAsset: PhotoAsset) -> Bool {
         guard let index = selectedAssets.firstIndex(of: photoAsset) else {
             return false
         }
@@ -342,7 +348,7 @@ open class PhotoPickerData {
     
     /// 视频时长是否超过最大限制
     /// - Parameter photoAsset: 对应的PhotoAsset对象
-    public func videoDurationExceedsTheLimit(_ photoAsset: PhotoAsset) -> Bool {
+    open func videoDurationExceedsTheLimit(_ photoAsset: PhotoAsset) -> Bool {
         photoAsset.mediaType == .video &&
            config.maximumSelectedVideoDuration > 0 &&
            round(photoAsset.videoDuration) > Double(config.maximumSelectedVideoDuration)
