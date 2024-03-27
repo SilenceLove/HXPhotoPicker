@@ -103,6 +103,16 @@ extension PhotoPickerController {
         }
         return true
     }
+    func cellTapAction(
+        photoAsset: PhotoAsset,
+        index: Int
+    ) -> SelectionTapAction? {
+        pickerDelegate?.pickerController(
+            self,
+            cellTapAction: photoAsset,
+            at: index
+        )
+    }
     func shouldEditAsset(
         photoAsset: PhotoAsset,
         atIndex: Int

@@ -67,6 +67,27 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
         atIndex: Int
     ) -> Bool
     
+    /// 照片列表cell点击时的指定动作
+    /// - Parameters:
+    ///   - pickerController: 对应的 `PhotoPickerController`
+    ///   - photoAsset: 对应的 `PhotoAsset` 数据
+    ///   - index: `indexPath.item`
+    /// - Returns: 点击动作，如果为 nil 会根据配置的动作进行操作
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        cellTapAction photoAsset: PhotoAsset,
+        at index: Int
+    ) -> SelectionTapAction?
+    
+    /// 是否可以选择`PhotoAsset`
+    /// - Parameters:
+    ///   - pickerController: 对应的 `PhotoPickerController`
+    ///   - photoAsset: 对应的 `PhotoAsset` 数据
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        canSelectAsset photoAsset: PhotoAsset
+    ) -> Bool
+    
     /// 将要选择cell 不能选择时需要自己手动弹出提示框
     /// - Parameters:
     ///   - pickerController: 对应的 PhotoPickerController
@@ -483,6 +504,17 @@ public extension PhotoPickerControllerDelegate {
         _ pickerController: PhotoPickerController,
         shouldClickCell photoAsset: PhotoAsset,
         atIndex: Int
+    ) -> Bool { true }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        cellTapAction photoAsset: PhotoAsset,
+        at index: Int
+    ) -> SelectionTapAction? { nil }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        canSelectAsset photoAsset: PhotoAsset
     ) -> Bool { true }
     
     func pickerController(

@@ -68,7 +68,7 @@ open class PhotoFetchData {
     }
     
     /// 获取相机胶卷资源集合
-    public func fetchCameraAssetCollection() {
+    open func fetchCameraAssetCollection() {
         if isFetchCamera {
             return
         }
@@ -101,7 +101,7 @@ open class PhotoFetchData {
     }
     
     /// 获取相册集合
-    public func fetchAssetCollections() {
+    open func fetchAssetCollections() {
         cancelAssetCollectionsQueue()
         let localAssets = pickerData.localAssets
         let localCameraAssets = pickerData.localCameraAssets
@@ -179,7 +179,7 @@ open class PhotoFetchData {
         assetCollectionsQueue.addOperation(operation)
     }
     
-    public func fetchPhotoAssets(
+    open func fetchPhotoAssets(
         assetCollection: PhotoAssetCollection,
         completion: @escaping (PhotoFetchAssetResult) -> Void
     ) {
