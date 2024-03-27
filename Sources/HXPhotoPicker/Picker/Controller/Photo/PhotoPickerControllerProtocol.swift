@@ -56,15 +56,6 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
         didOriginalButton isOriginal: Bool
     )
     
-    /// 是否可以选择`PhotoAsset`
-    /// - Parameters:
-    ///   - pickerController: 对应的 `PhotoPickerController`
-    ///   - photoAsset: 对应的 `PhotoAsset` 数据
-    func pickerController(
-        _ pickerController: PhotoPickerController,
-        canSelectedAsset photoAsset: PhotoAsset
-    ) -> Bool
-    
     /// 将要点击cell，允许的话点击之后会根据配置的动作进行操作
     /// - Parameters:
     ///   - pickerController: 对应的 PhotoPickerController
@@ -87,6 +78,15 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
         cellTapAction photoAsset: PhotoAsset,
         at index: Int
     ) -> SelectionTapAction?
+    
+    /// 是否可以选择`PhotoAsset`
+    /// - Parameters:
+    ///   - pickerController: 对应的 `PhotoPickerController`
+    ///   - photoAsset: 对应的 `PhotoAsset` 数据
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        canSelectAsset photoAsset: PhotoAsset
+    ) -> Bool
     
     /// 将要选择cell 不能选择时需要自己手动弹出提示框
     /// - Parameters:
@@ -502,11 +502,6 @@ public extension PhotoPickerControllerDelegate {
     
     func pickerController(
         _ pickerController: PhotoPickerController,
-        canSelectedAsset photoAsset: PhotoAsset
-    ) -> Bool { true }
-    
-    func pickerController(
-        _ pickerController: PhotoPickerController,
         shouldClickCell photoAsset: PhotoAsset,
         atIndex: Int
     ) -> Bool { true }
@@ -516,6 +511,11 @@ public extension PhotoPickerControllerDelegate {
         cellTapAction photoAsset: PhotoAsset,
         at index: Int
     ) -> SelectionTapAction? { nil }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        canSelectAsset photoAsset: PhotoAsset
+    ) -> Bool { true }
     
     func pickerController(
         _ pickerController: PhotoPickerController,

@@ -9,8 +9,8 @@ import UIKit
 import Photos
 
 extension PhotoPickerController: PhotoPickerDataDelegate {
-    public func pickerData(_ pickerData: PhotoPickerData, canSelectedAsset photoAsset: PhotoAsset) -> Bool {
-        pickerDelegate?.pickerController(self, canSelectedAsset: photoAsset) ?? true
+    public func pickerData(_ pickerData: PhotoPickerData, canSelectAsset photoAsset: PhotoAsset) -> Bool {
+        pickerDelegate?.pickerController(self, canSelectAsset: photoAsset) ?? true
     }
     
     public func pickerData(_ pickerData: PhotoPickerData, shouldSelectedAsset photoAsset: PhotoAsset, at index: Int) -> Bool {

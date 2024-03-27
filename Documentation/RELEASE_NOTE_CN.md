@@ -4,6 +4,7 @@
 
 ### 修复
 
+- [[642]](https://github.com/SilenceLove/HXPhotoPicker/issues/642)
 - [[641]](https://github.com/SilenceLove/HXPhotoPicker/issues/641)
 - [[640]](https://github.com/SilenceLove/HXPhotoPicker/issues/640)
 - [[635]](https://github.com/SilenceLove/HXPhotoPicker/issues/635)

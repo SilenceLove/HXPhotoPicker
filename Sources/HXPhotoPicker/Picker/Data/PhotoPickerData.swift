@@ -13,7 +13,7 @@ public protocol PhotoPickerDataDelegate: AnyObject {
     /// 是否可以选择 Asset
     func pickerData(
         _ pickerData: PhotoPickerData,
-        canSelectedAsset photoAsset: PhotoAsset
+        canSelectAsset photoAsset: PhotoAsset
     ) -> Bool
     
     /// 将要选择Asset
@@ -282,7 +282,7 @@ open class PhotoPickerData {
         isShowHUD: Bool,
         isFilterEditor: Bool = false
     ) -> Bool {
-        if let shouldSelect = delegate?.pickerData(self, canSelectedAsset: photoAsset), !shouldSelect {
+        if let shouldSelect = delegate?.pickerData(self, canSelectAsset: photoAsset), !shouldSelect {
             return false
         }
         var canSelect = true
