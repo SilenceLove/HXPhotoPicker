@@ -181,10 +181,10 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
         )
     }
     func saveSystemAlbum(
-        type: AssetManager.PhotoSaveType,
+        type: AssetSaveUtil.SaveType,
         location: CLLocation? = nil
     ) {
-        AssetManager.save(
+        AssetSaveUtil.save(
             type: type,
             customAlbumName: config.customAlbumName,
             location: location
@@ -247,7 +247,7 @@ extension PhotoPickerView: CameraControllerDelegate {
             animated: true
         )
         DispatchQueue.global().async {
-            let saveType: AssetManager.PhotoSaveType
+            let saveType: AssetSaveUtil.SaveType
             let photoAsset: PhotoAsset
             switch result {
             case .image(let image):

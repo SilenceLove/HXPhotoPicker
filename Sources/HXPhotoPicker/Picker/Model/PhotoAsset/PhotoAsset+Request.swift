@@ -904,8 +904,9 @@ public extension PhotoAsset {
         var imageURL = localLivePhoto.imageURL
         var videoURL = localLivePhoto.videoURL
         let imageURLType: AssetURLResult.URLType
-        if imageURL.isFileURL {
+        if localLivePhoto.isCache {
             imageURLType = .local
+            imageURL = localLivePhoto.jpgURL
             if let imageFileURL = imageFileURL {
                 if PhotoTools.copyFile(
                     at: imageURL,
@@ -918,9 +919,8 @@ public extension PhotoAsset {
                 }
             }
         }else {
-            if localLivePhoto.isCache {
+            if imageURL.isFileURL {
                 imageURLType = .local
-                imageURL = localLivePhoto.jpgURL
                 if let imageFileURL = imageFileURL {
                     if PhotoTools.copyFile(
                         at: imageURL,
@@ -937,8 +937,9 @@ public extension PhotoAsset {
             }
         }
         let videoURLType: AssetURLResult.URLType
-        if videoURL.isFileURL {
+        if localLivePhoto.isCache {
             videoURLType = .local
+            videoURL = localLivePhoto.movURL
             if let videoFileURL = videoFileURL {
                 if PhotoTools.copyFile(
                     at: videoURL,
@@ -951,9 +952,8 @@ public extension PhotoAsset {
                 }
             }
         }else {
-            if localLivePhoto.isCache {
+            if videoURL.isFileURL {
                 videoURLType = .local
-                videoURL = localLivePhoto.movURL
                 if let videoFileURL = videoFileURL {
                     if PhotoTools.copyFile(
                         at: videoURL,

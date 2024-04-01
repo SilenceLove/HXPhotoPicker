@@ -46,7 +46,6 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     func initViews() {
         imageView = ImageView()
         imageView.size = size
-        imageView.imageView.size = size
         addSubview(imageView)
     }
     

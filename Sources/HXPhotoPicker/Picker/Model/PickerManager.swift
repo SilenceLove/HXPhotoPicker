@@ -106,7 +106,7 @@ extension PickerManager {
     func requestAuthorization(
         with handler: @escaping (PHAuthorizationStatus) -> Void
     ) {
-        AssetManager.requestAuthorization { status in
+        AssetPermissionsUtil.requestAuthorization { status in
             if status != .denied {
                 PHPhotoLibrary.shared().register(self)
             }
@@ -584,7 +584,7 @@ extension PickerManager {
 extension PickerManager: PHPhotoLibraryChangeObserver {
     
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
-        if !AssetManager.authorizationStatusIsLimited() || !config.allowLoadPhotoLibrary {
+        if !AssetPermissionsUtil.isLimitedAuthorizationStatus || !config.allowLoadPhotoLibrary {
             return
         }
         var needReload = false

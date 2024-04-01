@@ -63,7 +63,7 @@ extension PhotoPickerViewController {
             }else {
                 ProgressHUD.hide(forView: self.navigationController?.view, animated: false)
             }
-            if AssetManager.authorizationStatusIsLimited() {
+            if AssetPermissionsUtil.isLimitedAuthorizationStatus {
                 if self.pickerConfig.isRemoveSelectedAssetWhenRemovingAssets {
                     self.photoToolbar.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
                     self.photoToolbar.updateSelectedAssets(self.pickerController.selectedAssetArray)

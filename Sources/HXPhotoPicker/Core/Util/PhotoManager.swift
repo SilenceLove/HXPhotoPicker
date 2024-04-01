@@ -20,10 +20,6 @@ public final class PhotoManager: NSObject {
     /// 自定义语言
     public var customLanguages: [CustomLanguage] = []
     
-    /// 当配置的 languageType 都不匹配时才会判断自定义语言
-    /// 固定的自定义语言，不会受系统语言影响
-    public var fixedCustomLanguage: CustomLanguage?
-    
     /// 当前是否处于暗黑模式
     public class var isDark: Bool {
         if shared.appearanceStyle == .normal {
@@ -51,8 +47,6 @@ public final class PhotoManager: NSObject {
     
     /// 自带的bundle文件
     var bundle: Bundle?
-    /// 是否使用了自定义的语言
-    var isCustomLanguage: Bool = false
     /// 加载指示器类型
     var indicatorType: IndicatorType = .system
     

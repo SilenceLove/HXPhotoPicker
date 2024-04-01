@@ -118,7 +118,7 @@ extension PhotoPickerViewController: PhotoAlbumListDelegate {
     
     func getAlbumViewHeight() -> CGFloat {
         var albumViewHeight = CGFloat(albumView.assetCollections.count) * pickerConfig.albumList.cellHeight
-        if AssetManager.authorizationStatusIsLimited() &&
+        if AssetPermissionsUtil.isLimitedAuthorizationStatus &&
             pickerConfig.allowLoadPhotoLibrary {
             albumViewHeight += 40
         }

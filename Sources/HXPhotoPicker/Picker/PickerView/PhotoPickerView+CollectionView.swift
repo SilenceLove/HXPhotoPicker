@@ -211,7 +211,7 @@ extension PhotoPickerView: UICollectionViewDelegate {
                 )
                 return
             }
-            AssetManager.requestCameraAccess { (granted) in
+            AssetPermissionsUtil.requestCameraAccess { (granted) in
                 if granted {
                     self.presentCameraViewController()
                 }else {
@@ -378,7 +378,7 @@ extension PhotoPickerView: UICollectionViewDelegate {
         let isSourceTypeAvailable: Bool
         #if !targetEnvironment(macCatalyst)
         isCameraCell = sCell is PickerCameraViewCell
-        isAuthorized = AssetManager.cameraAuthorizationStatus() == .authorized
+        isAuthorized = AssetPermissionsUtil.cameraAuthorizationStatus == .authorized
         isSourceTypeAvailable = UIImagePickerController.isSourceTypeAvailable(.camera)
         #else
         isCameraCell = false

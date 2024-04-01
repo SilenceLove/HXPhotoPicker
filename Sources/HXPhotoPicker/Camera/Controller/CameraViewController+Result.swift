@@ -34,7 +34,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
         let result = CameraController.Result.image(image)
         if config.isSaveSystemAlbum {
             navigationController?.view.hx.show()
-            AssetManager.save(
+            AssetSaveUtil.save(
                 type: .image(image),
                 location: location
             ) {
@@ -63,7 +63,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
         let result = CameraController.Result.video(videoURL)
         if config.isSaveSystemAlbum {
             navigationController?.view.hx.show()
-            AssetManager.save(
+            AssetSaveUtil.save(
                 type: .videoURL(videoURL),
                 location: location
             ) {

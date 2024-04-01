@@ -23,6 +23,7 @@ public extension EditorViewController {
     }
     
     @MainActor
+    @discardableResult
     static func show(
         _ asset: EditorAsset,
         config: EditorConfiguration = .init(),

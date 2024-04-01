@@ -12,7 +12,7 @@ import Photos
 extension PhotoPickerController: PHPhotoLibraryChangeObserver {
     
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
-        if !AssetManager.authorizationStatusIsLimited() || !config.allowLoadPhotoLibrary {
+        if !AssetPermissionsUtil.isLimitedAuthorizationStatus || !config.allowLoadPhotoLibrary {
             return
         }
         var needReload = false

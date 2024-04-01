@@ -36,7 +36,7 @@ public class EditorDrawTool {
         var splinePoints: [CGPoint] = []
         
         guard controlPoints.count >= 4 else {
-            print("需要至少4个点来生成Catmull-Rom曲线")
+            HXLog("需要至少4个点来生成Catmull-Rom曲线")
             return splinePoints
         }
         

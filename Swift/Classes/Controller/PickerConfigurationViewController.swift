@@ -335,7 +335,7 @@ extension PickerConfigurationViewController {
         for title in titles {
             alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { [weak self] (action) in
                 guard let self = self else { return }
-                self.config.languageType = LanguageType(rawValue: titles.firstIndex(of: action.title!)!)!
+                self.config.languageType = LanguageType.type(for: titles.firstIndex(of: action.title!)!)
                 self.tableView.reloadRows(at: [indexPath], with: .fade)
             }))
         }
@@ -940,6 +940,8 @@ extension LanguageType {
             return "法语"
         case .arabic:
             return "阿拉伯"
+        case .custom:
+            return "自定义"
         }
     }
 }
@@ -1042,6 +1044,40 @@ extension PhotoPreviewViewController.PlayType {
             return "自动播放"
         case .once:
             return "自动播放一次"
+        }
+    }
+}
+
+extension LanguageType {
+    
+    static func type(for value: Int) -> LanguageType {
+        switch value {
+        case 1:
+            return .simplifiedChinese
+        case 2:
+            return .traditionalChinese
+        case 3:
+            return .japanese
+        case 4:
+            return .korean
+        case 5:
+            return .english
+        case 6:
+            return .thai
+        case 7:
+            return .indonesia
+        case 8:
+            return .vietnamese
+        case 9:
+            return .russian
+        case 10:
+            return .german
+        case 11:
+            return .french
+        case 12:
+            return .arabic
+        default:
+            return .system
         }
     }
 }

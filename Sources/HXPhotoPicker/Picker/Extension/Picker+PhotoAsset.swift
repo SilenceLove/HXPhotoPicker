@@ -22,7 +22,7 @@ public extension PhotoAsset {
                         completion?(.failure(AssetError.localLivePhotoIsEmpty))
                         return
                     }
-                    AssetManager.save(
+                    AssetSaveUtil.save(
                         type: .livePhoto(imageURL: livePhoto.imageURL, videoURL: livePhoto.videoURL),
                         customAlbumName: albumName
                     ) {
@@ -39,8 +39,8 @@ public extension PhotoAsset {
             }
             return
         }
-        func save(_ type: AssetManager.PhotoSaveType) {
-            AssetManager.save(
+        func save(_ type: AssetSaveUtil.SaveType) {
+            AssetSaveUtil.save(
                 type: type,
                 customAlbumName: albumName
             ) {
@@ -133,6 +133,7 @@ public extension PhotoAsset {
     /// 获取iCloud状态
     /// - Parameter completion: 是否在iCloud上
     /// - Returns: 请求ID
+    @discardableResult
     func requestICloudState(completion: @escaping (PhotoAsset, Bool) -> Void) -> PHImageRequestID? {
         guard let phAsset = phAsset,
               downloadStatus != .succeed else {
@@ -247,6 +248,33 @@ public extension PhotoAsset {
             }
             loadingView = nil
             completion?(photoAsset, isSuccess)
+        }
+    }
+}
+
+@available(iOS 13.0, *)
+public extension PhotoAsset {
+    
+    /// 保存到系统相册
+    @discardableResult
+    func saveAlbum(_ albumName: String? = nil) async throws -> PHAsset {
+        try await withCheckedThrowingContinuation { continuation in
+            saveToSystemAlbum(albumName: albumName) { result in
+                switch result {
+                case .success(let phAsset):
+                    continuation.resume(returning: phAsset)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
+    func inIClound() async -> Bool {
+        await withCheckedContinuation { continuation in
+            requestICloudState { _, inIClound in
+                continuation.resume(returning: inIClound)
+            }
         }
     }
 }

@@ -48,7 +48,7 @@ public extension PhotoFetchAsset {
         var photoCount = 0
         var videoCount = 0
         var phAssetResult: [PHAsset] = []
-        let isLimited = AssetManager.authorizationStatusIsLimited() && config.isRemoveSelectedAssetWhenRemovingAssets
+        let isLimited = AssetPermissionsUtil.isLimitedAuthorizationStatus && config.isRemoveSelectedAssetWhenRemovingAssets
         assetCollection.enumerateAssets { photoAsset, index, stop in
             guard let phAsset = photoAsset.phAsset else {
                 return

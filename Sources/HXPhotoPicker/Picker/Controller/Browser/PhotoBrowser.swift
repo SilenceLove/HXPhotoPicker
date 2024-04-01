@@ -308,6 +308,7 @@ open class PhotoBrowser: PhotoPickerController {
         
         previewConfig.previewView = pConfig
         previewConfig.languageType = config.languageType
+        previewConfig.customLanguages = config.customLanguages
         previewConfig.navigationTintColor = config.tintColor
         previewConfig.modalPresentationStyle = config.modalPresentationStyle
         
@@ -473,13 +474,15 @@ extension PhotoBrowser {
     public struct Configuration {
         
         /// If the built-in language is not enough, you can add a custom language text
-        /// PhotoManager.shared.customLanguages - custom language array
-        /// PhotoManager.shared.fixedCustomLanguage - If there are multiple custom languages, one can be fixed to display
+        /// customLanguages - custom language array
         /// 如果自带的语言不够，可以添加自定义的语言文字
         /// PhotoManager.shared.customLanguages - 自定义语言数组
-        /// PhotoManager.shared.fixedCustomLanguage - 如果有多种自定义语言，可以固定显示某一种
         public var languageType: LanguageType = .system
-        
+        /// 自定义语言
+        public var customLanguages: [CustomLanguage] {
+            get { PhotoManager.shared.customLanguages }
+            set { PhotoManager.shared.customLanguages = newValue }
+        }
         /// 导航栏 删除、取消 按钮颜色
         public var tintColor: UIColor = .white
         /// 网络视频加载方式

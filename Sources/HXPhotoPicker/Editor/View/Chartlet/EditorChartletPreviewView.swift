@@ -45,7 +45,7 @@ class EditorChartletPreviewView: UIView {
         super.init(frame: .zero)
         setupFrame(imageSize: CGSize(width: 200, height: 200))
         initViews()
-        imageView.my.kf.indicatorType = .activity
+        imageView.kf.indicatorType = .activity
         let options: KingfisherOptionsInfo
         if imageURL.isGif && editorType == .video {
             options = []
@@ -61,7 +61,7 @@ class EditorChartletPreviewView: UIView {
                 .backgroundDecode
             ]
         }
-        imageView.my.kf.setImage(
+        imageView.kf.setImage(
             with: imageURL,
             options: options
         ) { [weak self] result in

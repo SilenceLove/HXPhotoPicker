@@ -86,7 +86,7 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     
     private var isShowPrompt: Bool {
         type == .picker &&
-        AssetManager.authorizationStatusIsLimited() &&
+        AssetPermissionsUtil.isLimitedAuthorizationStatus &&
         pickerConfig.photoList.bottomView.isShowPrompt &&
         pickerConfig.allowLoadPhotoLibrary
     }

@@ -99,6 +99,9 @@ class PickerResultViewController: UIViewController,
         if !selectedAssets.isEmpty, !isPublish {
             config.photoList.cameraCell.cameraImageName = "hx_picker_photoList_photograph"
         }
+//        let bundle = Bundle(path: Bundle.main.path(forResource: "custom", ofType: "lproj")!)!
+//        PhotoManager.shared.customLanguages = [.init(language: "en", bundle: bundle)]
+//        config.languageType = .custom()
         loadFonts()
 //        config.editor.buttonType = .top
         collectionViewTopConstraint.constant = 20

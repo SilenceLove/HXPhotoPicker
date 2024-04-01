@@ -63,7 +63,7 @@ public class PickerCameraViewCell: UICollectionViewCell {
     }
     func canPreview() -> Bool {
         if !UIImagePickerController.isSourceTypeAvailable(.camera) ||
-            AssetManager.cameraAuthorizationStatus() == .denied {
+            AssetPermissionsUtil.cameraAuthorizationStatus == .denied {
             return false
         }
         return true
@@ -76,7 +76,7 @@ public class PickerCameraViewCell: UICollectionViewCell {
         if captureView.sessionCompletion || !allowPreview {
             return
         }
-        AssetManager.requestCameraAccess { (granted) in
+        AssetPermissionsUtil.requestCameraAccess { (granted) in
             if granted {
                 self.startSession()
             }else {

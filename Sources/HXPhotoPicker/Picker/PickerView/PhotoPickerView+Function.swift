@@ -65,7 +65,7 @@ extension PhotoPickerView {
             )
             #endif
         }
-        if config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
+        if config.allowAddLimit && AssetPermissionsUtil.isLimitedAuthorizationStatus {
             collectionView.register(
                 PhotoPickerLimitCell.self,
                 forCellWithReuseIdentifier:
@@ -121,7 +121,7 @@ extension PhotoPickerView {
     }
     
     func setupEmptyView() {
-        if config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
+        if config.allowAddLimit && AssetPermissionsUtil.isLimitedAuthorizationStatus {
             emptyView.removeFromSuperview()
             return
         }
@@ -134,7 +134,7 @@ extension PhotoPickerView {
     
     func setupDeniedView() {
         emptyView.removeFromSuperview()
-        if AssetManager.authorizationStatus() == .denied {
+        if AssetPermissionsUtil.authorizationStatus == .denied {
             collectionView.addSubview(deniedView)
         }else {
             deniedView.removeFromSuperview()

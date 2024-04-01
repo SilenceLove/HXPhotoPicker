@@ -18,7 +18,7 @@ public typealias VideoEditorFilterHandler = (CIImage, [PhotoEditorFilterParamete
 public struct PhotoEditorFilterInfo {
     
     /// 滤镜名称
-    public let filterName: String
+    public let filterName: HX.TextManager.TextType
     
     /// 滤镜处理器，内部会传入未添加滤镜的图片，返回添加滤镜之后的图片
     /// 如果为视频编辑器时，处理的是底部滤镜预览的数据
@@ -31,7 +31,7 @@ public struct PhotoEditorFilterInfo {
     public let parameters: [PhotoEditorFilterParameter]
     
     public init(
-        filterName: String,
+        filterName: HX.TextManager.TextType,
         parameters: [PhotoEditorFilterParameter] = [],
         filterHandler: @escaping PhotoEditorFilterHandler,
         videoFilterHandler: VideoEditorFilterHandler? = nil
@@ -65,7 +65,7 @@ public struct PhotoEditorFilterParameter: Codable {
 public class PhotoEditorFilter: Equatable, Codable {
     
     /// 滤镜名称
-    public let filterName: String
+    public let filterName: HX.TextManager.TextType
     /// 滤镜列表的下标
     public var sourceIndex: Int = 0
     /// 标识符
@@ -74,7 +74,7 @@ public class PhotoEditorFilter: Equatable, Codable {
     public let parameters: [PhotoEditorFilterParameterInfo]
     
     public init(
-        filterName: String,
+        filterName: HX.TextManager.TextType,
         identifier: String = "hx_editor_default",
         parameters: [PhotoEditorFilterParameterInfo] = []
     ) {

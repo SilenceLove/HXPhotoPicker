@@ -22,7 +22,7 @@ extension PhotoPickerView {
                 allowPreview = true
             }
         }
-        if AssetManager.authorizationStatus() != .denied {
+        if AssetPermissionsUtil.authorizationStatus != .denied {
             showLoading()
         }
         manager.fetchPhotoAssets(assetCollection: assetCollection)
@@ -33,7 +33,7 @@ extension PhotoPickerView {
         if config.allowAddCamera {
             allowPreview = true
         }
-        if AssetManager.authorizationStatus() != .denied {
+        if AssetPermissionsUtil.authorizationStatus != .denied {
             showLoading()
         }else {
             if config.allowAddCamera {

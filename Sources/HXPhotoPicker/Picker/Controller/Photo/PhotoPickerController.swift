@@ -106,7 +106,7 @@ open class PhotoPickerController: UINavigationController {
     public func getCurrentPreviewImageView() -> UIImageView? {
         if let previewVC = previewViewController,
            let cell = previewVC.getCell(for: previewVC.currentPreviewIndex) {
-            return cell.scrollContentView.imageView.imageView
+            return cell.scrollContentView.imageView
         }
         return nil
     }
@@ -236,7 +236,7 @@ open class PhotoPickerController: UINavigationController {
     
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        let status = AssetManager.authorizationStatus()
+        let status = AssetPermissionsUtil.authorizationStatus
         if status.rawValue >= 1 && status.rawValue < 3 {
             if let view = splitViewController?.view {
                 deniedView.frame = view.bounds
@@ -583,7 +583,7 @@ extension PhotoPickerController {
             fetchData.fetchCameraAssetCollection()
             return
         }
-        let status = AssetManager.authorizationStatus()
+        let status = AssetPermissionsUtil.authorizationStatus
         if status.rawValue >= 3 {
             // 有权限
             PHPhotoLibrary.shared().register(self)
@@ -606,7 +606,7 @@ extension PhotoPickerController {
         }else {
             // 用户还没做出选择，请求权限
             isFirstAuthorization = true
-            AssetManager.requestAuthorization { _ in
+            AssetPermissionsUtil.requestAuthorization { _ in
                 self.requestAuthorization()
                 if self.config.albumShowMode.isPop {
                     self.pickerViewController?.initToolbar()

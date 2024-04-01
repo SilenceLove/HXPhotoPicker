@@ -13,7 +13,7 @@ import PhotosUI
 extension PhotoManager {
     
     func registerPhotoChangeObserver() {
-        let status = AssetManager.authorizationStatus()
+        let status = AssetPermissionsUtil.authorizationStatus
         if status == .notDetermined || status == .denied {
             return
         }

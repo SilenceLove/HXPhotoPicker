@@ -159,14 +159,14 @@ open class AlbumListView: UIView, PhotoAlbumList, UITableViewDataSource, UITable
     }
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if config.allowLoadPhotoLibrary, AssetManager.authorizationStatusIsLimited() {
+        if config.allowLoadPhotoLibrary, AssetPermissionsUtil.isLimitedAuthorizationStatus {
             return 40
         }
         return 0
     }
     
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if config.allowLoadPhotoLibrary, AssetManager.authorizationStatusIsLimited() {
+        if config.allowLoadPhotoLibrary, AssetPermissionsUtil.isLimitedAuthorizationStatus {
             let config = config.albumList
             let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: AlbumSectionHeaderView.className) as! AlbumSectionHeaderView
             view.titleColor = config.limitedStatusPromptColor

@@ -92,7 +92,7 @@ open class CameraViewController: HXBaseViewController {
             }
             return
         }
-        AssetManager.requestCameraAccess { isGranted in
+        AssetPermissionsUtil.requestCameraAccess { isGranted in
             if isGranted {
                 self.setupCamera()
             }else {
@@ -286,7 +286,7 @@ open class CameraViewController: HXBaseViewController {
             )
         }
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
-            if !didLayoutPreview && AssetManager.cameraAuthorizationStatus() == .authorized {
+            if !didLayoutPreview && AssetPermissionsUtil.cameraAuthorizationStatus == .authorized {
                 if config.cameraType == .metal {
                     previewView.frame = previewRect
                 }else {
