@@ -226,6 +226,8 @@ public extension HX.TextManager {
         public var adjustment: Adjustment = .init()
         public var filter: Filter = .init()
         
+        public var photoLoadTitle: TextType = .localized("图片下载中")
+        public var videoLoadTitle: TextType = .localized("视频下载中")
         public var iCloudSyncHudTitle: TextType = .localized("正在同步iCloud")
         public var loadFailedAlertTitle: TextType = .localized("提示")
         public var photoLoadFailedAlertMessage: TextType = .localized("图片获取失败!")

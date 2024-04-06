@@ -213,7 +213,7 @@ open class PhotoPickerView: UIView {
     var allowPreview: Bool = true
     var orientationDidChange: Bool = false
     var beforeOrientationIndexPath: IndexPath?
-    var loadingView: ProgressHUD?
+    var loadingView: PhotoHUDProtocol?
     var isFirst = true
     var scrollIndexPath: IndexPath?
     

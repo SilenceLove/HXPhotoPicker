@@ -537,10 +537,7 @@ extension PickerManager {
             }
         }
         if let text = text, !canSelect, showHUD {
-            ProgressHUD.showWarning(
-                addedTo: UIApplication.shared.keyWindow,
-                text: text, animated: true, delayHide: 1.5
-            )
+            PhotoManager.HUDView.showInfo(with: text, delay: 1.5, animated: true, addedTo: UIApplication.shared.keyWindow)
         }
         return canSelect
     }

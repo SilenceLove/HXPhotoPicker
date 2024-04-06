@@ -171,7 +171,7 @@ extension PhotoPreviewContentVideoView {
                 return
             }
             if loadingView == nil {
-                ProgressHUD.hide(forView: hudSuperview, animated: false)
+                PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: hudSuperview)
                 showLoadingView(text: nil)
             }else {
                 loadingView?.isHidden = false

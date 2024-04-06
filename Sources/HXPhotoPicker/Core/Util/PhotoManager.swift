@@ -21,7 +21,7 @@ public final class PhotoManager: NSObject {
     public var customLanguages: [CustomLanguage] = []
     
     /// 当前是否处于暗黑模式
-    public class var isDark: Bool {
+    public static var isDark: Bool {
         if shared.appearanceStyle == .normal {
             return false
         }
@@ -35,6 +35,7 @@ public final class PhotoManager: NSObject {
         }
         return false
     }
+    public static var HUDView: PhotoHUDProtocol.Type = ProgressHUD.self
     
     public var isDebugLogsEnabled: Bool = false
     

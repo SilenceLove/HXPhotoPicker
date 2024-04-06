@@ -298,11 +298,11 @@ open class PhotoPickerData {
         }
         if let text = text, !canSelect, isShowHUD {
             DispatchQueue.main.async {
-                ProgressHUD.showWarning(
-                    addedTo: UIViewController.topViewController?.navigationController?.view,
-                    text: text,
+                PhotoManager.HUDView.showInfo(
+                    with: text,
+                    delay: 1.5,
                     animated: true,
-                    delayHide: 1.5
+                    addedTo: UIViewController.topViewController?.navigationController?.view
                 )
             }
         }

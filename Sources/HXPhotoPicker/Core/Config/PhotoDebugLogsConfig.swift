@@ -1,5 +1,5 @@
 //
-//  PickerDebugLogsConfig.swift
+//  PhotoDebugLogsConfig.swift
 //  HXPhotoPicker
 //
 //  Created by Silence on 2023/10/21.
@@ -8,13 +8,16 @@
 
 import Foundation
 
-public protocol PickerDebugLogsConfig {
+public protocol PhotoDebugLogsConfig {
     var isDebugLogsEnabled: Bool { get set }
 }
 
-public extension PickerDebugLogsConfig {
+public extension PhotoDebugLogsConfig {
     var isDebugLogsEnabled: Bool {
         get { PhotoManager.shared.isDebugLogsEnabled }
         set { PhotoManager.shared.isDebugLogsEnabled = newValue }
     }
 }
+
+
+

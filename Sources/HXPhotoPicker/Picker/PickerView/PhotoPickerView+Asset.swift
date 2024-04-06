@@ -101,15 +101,11 @@ extension PhotoPickerView {
     }
     
     private func showLoading() {
-        loadingView = ProgressHUD.showLoading(
-            addedTo: self,
-            afterDelay: 0.15,
-            animated: true
-        )
+        loadingView = PhotoManager.HUDView.show(with: nil, delay: 0.15, animated: true, addedTo: self)
     }
     private func hideLoading() {
         loadingView = nil
-        ProgressHUD.hide(forView: self, animated: false)
+        PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: self)
     }
     private func fetchAssetCompletion(
         _ photoAssets: [PhotoAsset],

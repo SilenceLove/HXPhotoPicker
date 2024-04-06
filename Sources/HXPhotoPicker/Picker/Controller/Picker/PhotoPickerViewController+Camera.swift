@@ -15,12 +15,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
     
     func presentCameraViewController() {
         if !UIImagePickerController.isSourceTypeAvailable(.camera) {
-            ProgressHUD.showWarning(
-                addedTo: pickerController.view,
-                text: .textPhotoList.cameraUnavailableHudTitle.text,
-                animated: true,
-                delayHide: 1.5
-            )
+            PhotoManager.HUDView.showInfo(with: .textPhotoList.cameraUnavailableHudTitle.text, delay: 1.5, animated: true, addedTo: pickerController.view)
             return
         }
         if !pickerController.shouldPresentCamera() {
@@ -82,10 +77,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
         _ picker: UIImagePickerController,
         didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
     ) {
-        ProgressHUD.showLoading(
-            addedTo: self.navigationController?.view,
-            animated: true
-        )
+        PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: navigationController?.view)
         picker.dismiss(animated: true, completion: nil)
         DispatchQueue.global().async {
             let mediaType = info[.mediaType] as! String
@@ -117,10 +109,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
             return
         }
         DispatchQueue.main.async {
-            ProgressHUD.hide(
-                forView: self.navigationController?.view,
-                animated: false
-            )
+            PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: self.navigationController?.view)
         }
     }
     func pickingVideo(info: [UIImagePickerController.InfoKey: Any]) {
@@ -137,10 +126,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
         let videoURL: URL? = info[.mediaURL] as? URL
         guard let videoURL = videoURL else {
             DispatchQueue.main.async {
-                ProgressHUD.hide(
-                    forView: self.navigationController?.view,
-                    animated: false
-                )
+                PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: self.navigationController?.view)
             }
             return
         }
@@ -189,13 +175,8 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
         }
     }
     func showExportFailed() {
-        ProgressHUD.hide(forView: navigationController?.view, animated: false)
-        ProgressHUD.showWarning(
-            addedTo: navigationController?.view,
-            text: .textPhotoList.videoExportFailedHudTitle.text,
-            animated: true,
-            delayHide: 1.5
-        )
+        PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: navigationController?.view)
+        PhotoManager.HUDView.showInfo(with: .textPhotoList.videoExportFailedHudTitle.text, delay: 1.5, animated: true, addedTo: navigationController?.view)
     }
     func saveSystemAlbum(
         type: AssetSaveUtil.SaveType,
@@ -217,16 +198,8 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
                 )
             case .failure:
                 DispatchQueue.main.async {
-                    ProgressHUD.hide(
-                        forView: self.navigationController?.view,
-                        animated: true
-                    )
-                    ProgressHUD.showWarning(
-                        addedTo: self.navigationController?.view,
-                        text: .textPhotoList.saveSystemAlbumFailedHudTitle.text,
-                        animated: true,
-                        delayHide: 1.5
-                    )
+                    PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.navigationController?.view)
+                    PhotoManager.HUDView.showInfo(with: .textPhotoList.saveSystemAlbumFailedHudTitle.text, delay: 1.5, animated: true, addedTo: self.navigationController?.view)
                     completion?()
                 }
             }
@@ -243,7 +216,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
             }
             return
         }
-        ProgressHUD.hide(forView: navigationController?.view, animated: true)
+        PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: navigationController?.view)
         if config.takePictureCompletionToSelected {
             if pickerController.pickerData.append(
                 photoAsset,
@@ -285,15 +258,12 @@ extension PhotoPickerViewController: CameraControllerDelegate {
         if pickerConfig.selectMode == .single &&
            config.finishSelectionAfterTakingPhoto {
             didDismiss = false
-            ProgressHUD.showLoading(addedTo: cameraController.view, animated: true)
+            PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: cameraController.view)
         }else {
             didDismiss = true
             cameraController.dismiss(animated: true)
         }
-        ProgressHUD.showLoading(
-            addedTo: self.navigationController?.view,
-            animated: true
-        )
+        PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: self.navigationController?.view)
         let pickerController = pickerController
         DispatchQueue.global().async {
             let saveType: AssetSaveUtil.SaveType

@@ -133,7 +133,10 @@ extension PhotoPreviewContentLivePhotoView {
         }
         #endif
         if let livePhoto = photoAsset.localLivePhoto, !livePhoto.isCache {
-            loadingView = ProgressHUD.showLoading(addedTo: hudSuperview, animated: true)
+            if loadingView?.superview == nil {
+                loadingView?.removeFromSuperview()
+                loadingView = PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: hudSuperview)
+            }
         }
         localLivePhotoRequest = photoAsset.requestLocalLivePhoto(success: { [weak self] photoAsset, livePhoto in
             guard let self = self else { return }

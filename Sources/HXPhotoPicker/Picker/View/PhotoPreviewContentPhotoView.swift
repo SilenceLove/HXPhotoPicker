@@ -36,7 +36,8 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     private var isAnimatedCompletion: Bool = false
     private var imageTask: Any?
     
-    var loadingView: ProgressHUD?
+    var loadingView: PhotoHUDProtocol?
+    var isProgressHUD: Bool = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -107,11 +108,8 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
             if loadingView == nil {
                 let text: String = .textPreview.iCloudSyncHudTitle.text + "(" + String(Int(photoAsset.downloadProgress * 100)) + "%)"
                 let toView = hudSuperview
-                loadingView = ProgressHUD.showLoading(
-                    addedTo: toView,
-                    text: text,
-                    animated: true
-                )
+                loadingView = PhotoManager.HUDView.show(with: text, delay: 0, animated: true, addedTo: toView)
+                isProgressHUD = false
             }
         }else {
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
@@ -168,7 +166,7 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
             requestID = nil
         }
         stopAnimated()
-        ProgressHUD.hide(forView: hudSuperview, animated: false)
+        PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: hudSuperview)
         requestCompletion = false
     }
     
@@ -198,11 +196,8 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     }
     
     func showLoadingView(text: String?) {
-        loadingView = ProgressHUD.showProgress(
-            addedTo: hudSuperview,
-            text: text?.localized,
-            animated: true
-        )
+        loadingView = PhotoManager.HUDView.showProgress(with: text?.localized, progress: 0, animated: true, addedTo: hudSuperview)
+        isProgressHUD = true
     }
     
     func showOtherSubview() {
@@ -213,7 +208,7 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     func hiddenOtherSubview() {
         if requestNetworkCompletion {
             loadingView = nil
-            ProgressHUD.hide(forView: hudSuperview, animated: false)
+            PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: hudSuperview)
         }else {
             loadingView?.isHidden = true
         }
@@ -446,11 +441,11 @@ extension PhotoPreviewContentPhotoView {
         guard let loadingView = loadingView else {
             return
         }
-        if loadingView.mode == .circleProgress {
-            loadingView.progress = CGFloat(progress)
+        if isProgressHUD {
+            loadingView.setProgress(CGFloat(progress))
         }else {
             let text: String = .textPreview.iCloudSyncHudTitle.text + "(" + String(Int(photoAsset.downloadProgress * 100)) + "%)"
-            loadingView.text = text
+            loadingView.setText(text)
         }
     }
     
@@ -515,7 +510,7 @@ extension PhotoPreviewContentPhotoView {
     }
     func requestSucceed() {
         resetLoadingState()
-        ProgressHUD.hide(forView: hudSuperview, animated: true)
+        PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: hudSuperview)
         delegate?.contentView(requestSucceed: self)
     }
     func requestFailed(
@@ -527,10 +522,10 @@ extension PhotoPreviewContentPhotoView {
         resetLoadingState()
         if let info = info, !info.isCancel {
             delegate?.contentView(requestFailed: self)
-            ProgressHUD.hide(forView: hudSuperview, animated: false)
+            PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: hudSuperview)
             if showWarning {
                 let text: String = (info.inICloud && isICloud) ? .textPreview.iCloudSyncFailedHudTitle.text : .textPreview.downloadFailedHudTitle.text
-                ProgressHUD.showWarning(addedTo: hudSuperview, text: text.localized, animated: true, delayHide: 2)
+                PhotoManager.HUDView.showInfo(with: text.localized, delay: 2, animated: true, addedTo: hudSuperview)
             }
         }
     }

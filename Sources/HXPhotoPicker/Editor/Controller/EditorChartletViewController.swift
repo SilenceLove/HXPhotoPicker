@@ -408,7 +408,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
                     pickerConfig
                 ) { [weak self] pickerResult, pickerController in
                     guard let self = self else { return }
-                    ProgressHUD.showLoading(addedTo: pickerController.view)
+                    PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: pickerController.view)
                     var completionCount = 0
                     for photoAsset in pickerResult.photoAssets {
                         if photoAsset.isGifAsset {
@@ -424,7 +424,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
                                 }
                                 completionCount += 1
                                 if completionCount == pickerResult.photoAssets.count {
-                                    ProgressHUD.hide(forView: pickerController.view)
+                                    PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: pickerController.view)
                                     self.presentingViewController?.dismiss(animated: true)
                                 }
                             }
@@ -436,7 +436,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
                                 }
                                 completionCount += 1
                                 if completionCount == pickerResult.photoAssets.count {
-                                    ProgressHUD.hide(forView: pickerController.view)
+                                    PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: pickerController.view)
                                     self.presentingViewController?.dismiss(animated: true)
                                 }
                             }

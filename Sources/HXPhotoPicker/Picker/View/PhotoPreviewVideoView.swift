@@ -54,7 +54,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
             delegate?.videoView(showPlayButton: self)
             if isNetwork && PhotoManager.shared.loadNetworkVideoMode == .play {
                 delegate?.videoView(self, isPlaybackLikelyToKeepUp: false)
-                loadingView = ProgressHUD.showLoading(addedTo: loadingSuperview(), animated: true)
+                loadingView = PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: loadingSuperview())
             }
             delegate?.videoView(resetPlay: self)
             let playerItem = AVPlayerItem(asset: avAsset)
@@ -68,7 +68,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
     var isNetwork: Bool = false
     var playerTime: CGFloat = 0
     
-    private var loadingView: ProgressHUD?
+    private var loadingView: PhotoHUDProtocol?
     private var isPlaying: Bool = false
     private var didEnterBackground: Bool = false
     private var enterPlayGroundShouldPlay: Bool = false
@@ -158,7 +158,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
            status != .readyToPlay {
             if isNetwork && PhotoManager.shared.loadNetworkVideoMode == .play && loadingView == nil {
                 delegate?.videoView(self, isPlaybackLikelyToKeepUp: false)
-                loadingView = ProgressHUD.showLoading(addedTo: loadingSuperview(), animated: true)
+                loadingView = PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: loadingSuperview())
             }
         }
     }
@@ -182,10 +182,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
         return self
     }
     func hideLoading() {
-        ProgressHUD.hide(
-            forView: loadingSuperview() ?? loadingView?.superview,
-            animated: true
-        )
+        PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: loadingSuperview() ?? loadingView?.superview)
     }
     func cancelPlayer() {
         if player.currentItem != nil {
@@ -280,7 +277,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
             case AVPlayerItem.Status.failed:
                 // 初始化失败
                 self.cancelPlayer()
-                ProgressHUD.showWarning(addedTo: self, text: .textPreview.videoLoadFailedHudTitle.text, animated: true, delayHide: 1.5)
+                PhotoManager.HUDView.showInfo(with: .textPreview.videoLoadFailedHudTitle.text, delay: 1.5, animated: true, addedTo: self)
             default:
                 break
             }
@@ -312,7 +309,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
             if !isPlaybackLikelyToKeepUp {
                 // 缓冲中
                 if self.loadingView == nil {
-                    self.loadingView = ProgressHUD.showLoading(addedTo: self.loadingSuperview(), animated: true)
+                    self.loadingView = PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: self.loadingSuperview())
                 }else {
                     self.loadingView?.isHidden = false
                 }

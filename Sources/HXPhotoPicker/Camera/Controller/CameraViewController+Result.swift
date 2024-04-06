@@ -43,12 +43,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
                 case .success(let phAsset):
                     self.didFinish(result, phAsset: phAsset, location: location)
                 case .failure:
-                    ProgressHUD.showWarning(
-                        addedTo: self.navigationController?.view,
-                        text: .textManager.camera.saveSystemAlbumFailedHudTitle.text,
-                        animated: true,
-                        delayHide: 1.5
-                    )
+                    PhotoManager.HUDView.showInfo(with: .textManager.camera.saveSystemAlbumFailedHudTitle.text, delay: 1.5, animated: true, addedTo: self.navigationController?.view)
                 }
             }
             return
@@ -72,12 +67,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
                 case .success(let phAsset):
                     self.didFinish(result, phAsset: phAsset, location: location)
                 case .failure:
-                    ProgressHUD.showWarning(
-                        addedTo: self.navigationController?.view,
-                        text: .textManager.camera.saveSystemAlbumFailedHudTitle.text,
-                        animated: true,
-                        delayHide: 1.5
-                    )
+                    PhotoManager.HUDView.showInfo(with: .textManager.camera.saveSystemAlbumFailedHudTitle.text, delay: 1.5, animated: true, addedTo: self.navigationController?.view)
                 }
             }
             return

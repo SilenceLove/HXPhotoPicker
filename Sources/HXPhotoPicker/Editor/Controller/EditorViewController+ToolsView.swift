@@ -501,12 +501,7 @@ extension EditorViewController: EditorToolsViewDelegate {
                 }else {
                     let infos = PhotoTools.defaultMusicInfos()
                     if infos.isEmpty {
-                        ProgressHUD.showWarning(
-                            addedTo: view,
-                            text: .textManager.editor.music.emptyHudTitle.text,
-                            animated: true,
-                            delayHide: 1.5
-                        )
+                        PhotoManager.HUDView.showInfo(with: .textManager.editor.music.emptyHudTitle.text, delay: 1.5, animated: true, addedTo: view)
                         return
                     }else {
                         musicView.reloadData(infos: infos)

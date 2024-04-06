@@ -203,12 +203,7 @@ extension PhotoPickerView: UICollectionViewDelegate {
         if isCameraCell {
             #if !targetEnvironment(macCatalyst)
             if !UIImagePickerController.isSourceTypeAvailable(.camera) {
-                ProgressHUD.showWarning(
-                    addedTo: UIApplication.shared.keyWindow,
-                    text: .textPhotoList.cameraUnavailableHudTitle.text,
-                    animated: true,
-                    delayHide: 1.5
-                )
+                PhotoManager.HUDView.showInfo(with: .textPhotoList.cameraUnavailableHudTitle.text, delay: 1.5, animated: true, addedTo: UIApplication.shared.keyWindow)
                 return
             }
             AssetPermissionsUtil.requestCameraAccess { (granted) in

@@ -10,7 +10,7 @@ import AVFoundation
 
 // MARK: 相机配置类
 #if !targetEnvironment(macCatalyst)
-public struct CameraConfiguration: IndicatorTypeConfig {
+public struct CameraConfiguration: IndicatorTypeConfig, PhotoHUDConfig {
     
     /// 图片资源
     public var imageResource: HX.ImageResource.Camera {

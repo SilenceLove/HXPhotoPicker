@@ -67,10 +67,7 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
         _ picker: UIImagePickerController,
         didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
     ) {
-        ProgressHUD.showLoading(
-            addedTo: self,
-            animated: true
-        )
+        PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: self)
         picker.dismiss(animated: true)
         DispatchQueue.global().async {
             let mediaType = info[.mediaType] as! String
@@ -100,10 +97,7 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
             return
         }
         DispatchQueue.main.async {
-            ProgressHUD.hide(
-                forView: self,
-                animated: false
-            )
+            PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: self)
         }
     }
     func pickingVideo(info: [UIImagePickerController.InfoKey: Any]) {
@@ -120,10 +114,7 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
         let videoURL: URL? = info[.mediaURL] as? URL
         guard let videoURL = videoURL else {
             DispatchQueue.main.async {
-                ProgressHUD.hide(
-                    forView: self,
-                    animated: false
-                )
+                PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: self)
             }
             return
         }
@@ -172,13 +163,8 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
         }
     }
     func showExportFailed() {
-        ProgressHUD.hide(forView: self, animated: false)
-        ProgressHUD.showWarning(
-            addedTo: self,
-            text: .textPhotoList.videoExportFailedHudTitle.text,
-            animated: true,
-            delayHide: 1.5
-        )
+        PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: self)
+        PhotoManager.HUDView.showInfo(with: .textPhotoList.videoExportFailedHudTitle.text, delay: 1.5, animated: true, addedTo: self)
     }
     func saveSystemAlbum(
         type: AssetSaveUtil.SaveType,
@@ -194,16 +180,8 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
                 self.addedCameraPhotoAsset(PhotoAsset(asset: phAsset))
             case .failure:
                 DispatchQueue.main.async {
-                    ProgressHUD.hide(
-                        forView: self,
-                        animated: true
-                    )
-                    ProgressHUD.showWarning(
-                        addedTo: self,
-                        text: .textPhotoList.saveSystemAlbumFailedHudTitle.text,
-                        animated: true,
-                        delayHide: 1.5
-                    )
+                    PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self)
+                    PhotoManager.HUDView.showInfo(with: .textPhotoList.saveSystemAlbumFailedHudTitle.text, delay: 1.5, animated: true, addedTo: self)
                 }
             }
         }
@@ -212,7 +190,7 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
         _ photoAsset: PhotoAsset
     ) {
         DispatchQueue.main.async {
-            ProgressHUD.hide(forView: self, animated: true)
+            PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self)
             if self.config.takePictureCompletionToSelected {
                 if self.manager.config.selectMode == .multiple &&
                     (photoAsset.mediaType == .photo ||
@@ -242,10 +220,7 @@ extension PhotoPickerView: CameraControllerDelegate {
         location: CLLocation?
     ) {
         cameraController.dismiss(animated: true)
-        ProgressHUD.showLoading(
-            addedTo: self,
-            animated: true
-        )
+        PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: self)
         DispatchQueue.global().async {
             let saveType: AssetSaveUtil.SaveType
             let photoAsset: PhotoAsset

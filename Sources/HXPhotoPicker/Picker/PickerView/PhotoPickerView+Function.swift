@@ -364,12 +364,7 @@ extension PhotoPickerView {
             }
         }
         if manager.selectArrayIsFull() && showHUD {
-            ProgressHUD.showWarning(
-                addedTo: UIApplication.shared.keyWindow,
-                text: .textManager.picker.maximumSelectedHudTitle.text,
-                animated: true,
-                delayHide: 1.5
-            )
+            PhotoManager.HUDView.showInfo(with: .textManager.picker.maximumSelectedHudTitle.text, delay: 1.5, animated: true, addedTo: UIApplication.shared.keyWindow)
         }
     }
     

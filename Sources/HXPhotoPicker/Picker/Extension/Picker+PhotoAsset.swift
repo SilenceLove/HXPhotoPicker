@@ -227,24 +227,15 @@ public extension PhotoAsset {
         hudAddedTo view: UIView? = UIApplication.shared.keyWindow,
         completion: ((PhotoAsset, Bool) -> Void)? = nil
     ) {
-        var loadingView: ProgressHUD?
+        var loadingView: PhotoHUDProtocol?
         syncICloud { _, _ in
-            loadingView = ProgressHUD.showProgress(
-                addedTo: view,
-                text: .textPhotoList.iCloudSyncHudTitle.text + "...",
-                animated: true
-            )
+            loadingView = PhotoManager.HUDView.showProgress(with: .textPhotoList.iCloudSyncHudTitle.text + "...", progress: 0, animated: true, addedTo: view)
         } progressHandler: { _, progress in
-            loadingView?.progress = CGFloat(progress)
+            loadingView?.setProgress(CGFloat(progress))
         } completionHandler: { photoAsset, isSuccess in
-            ProgressHUD.hide(forView: view, animated: isSuccess)
+            PhotoManager.HUDView.dismiss(delay: 0, animated: isSuccess, for: view)
             if !isSuccess {
-                ProgressHUD.showWarning(
-                    addedTo: view,
-                    text: .textPhotoList.iCloudSyncFailedHudTitle.text,
-                    animated: true,
-                    delayHide: 1.5
-                )
+                PhotoManager.HUDView.showInfo(with: .textPhotoList.iCloudSyncFailedHudTitle.text, delay: 1.5, animated: true, addedTo: view)
             }
             loadingView = nil
             completion?(photoAsset, isSuccess)

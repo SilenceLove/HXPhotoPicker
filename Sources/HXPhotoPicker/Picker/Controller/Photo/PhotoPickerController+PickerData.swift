@@ -53,7 +53,7 @@ extension PhotoPickerController: PhotoFetchDataDelegate {
     }
     
     public func fetchData(fetchCameraAssetCollectionCompletion fetchData: PhotoFetchData) {
-        ProgressHUD.hide(forView: view)
+        PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: view)
         switch config.albumShowMode {
         case .normal:
             photoAlbumViewController?.selectedAssetCollection = fetchData.cameraAssetCollection
@@ -80,10 +80,10 @@ extension PhotoPickerController: PhotoFetchDataDelegate {
     
     public func fetchData(fetchAssetCollectionsCompletion fetchData: PhotoFetchData) {
         isFetchAssetCollection = false
-        ProgressHUD.hide(forView: view)
+        PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: view)
         switch config.albumShowMode {
         case .normal:
-            ProgressHUD.hide(forView: photoAlbumViewController?.view)
+            PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: photoAlbumViewController?.view)
             photoAlbumViewController?.assetCollections = fetchData.assetCollections
             photoAlbumViewController?.reloadData()
         default:

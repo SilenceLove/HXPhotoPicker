@@ -13,6 +13,10 @@ public class CustomLanguage {
     /// 会与 Locale.preferredLanguages 进行匹配，匹配成功的才会使用。请确保正确性
     public let language: String
     /// 语言Bundle
+    /// ```
+    /// - xxx.lproj
+    ///   - Localizable.strings
+    /// ```
     public let bundle: Bundle
     
     public init(

@@ -401,12 +401,7 @@ extension CameraViewController {
     }
     
     func switchCameraFailed() {
-        ProgressHUD.showWarning(
-            addedTo: view,
-            text: .textManager.camera.switchCameraFailedTitle.text,
-            animated: true,
-            delayHide: 1.5
-        )
+        PhotoManager.HUDView.showInfo(with: .textManager.camera.switchCameraFailedTitle.text, delay: 1.5, animated: true, addedTo: view)
     }
     
     func resetZoom() {
@@ -497,12 +492,7 @@ extension CameraViewController {
     }
     
     func addAudioInputFailed() {
-        ProgressHUD.showWarning(
-            addedTo: self.view,
-            text: .textManager.camera.audioInputFailedTitle.text,
-            animated: true,
-            delayHide: 1.5
-        )
+        PhotoManager.HUDView.showInfo(with: .textManager.camera.audioInputFailedTitle.text, delay: 1.5, animated: true, addedTo: view)
     }
     
     func addOutputCompletion() {
