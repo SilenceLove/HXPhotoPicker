@@ -83,9 +83,9 @@ extension WeChatViewController: UITableViewDataSource, UITableViewDelegate {
                 self.photoAssets.count
             } assetForIndex: {
                 self.photoAssets[$0]
-            } transitionAnimator: {
+            } transitionAnimator: { index, _ in
                 let indexPath = IndexPath(
-                    row: $0,
+                    row: index,
                     section: 0
                 )
                 let cell = self.tableView.cellForRow(

@@ -42,13 +42,13 @@ struct PhotoBrowser {
             pageIndex: pageIndex,
             config: config,
             transitionalImage: image
-        ) { index in
+        ) { index, _ in
             transitionTypes[index] = .start
             let point = pointHandler(index)
             let view = UIView(frame: .init(x: point.x, y: point.y, width: itemSize.width, height: itemSize.height))
             view.layer.cornerRadius = 5
             return view
-        } transitionCompletion: { index in
+        } transitionCompletion: { index, _ in
             transitionTypes[index] = .end
         } deleteAssetHandler: { index, _, browser in
             PhotoTools.showAlert(

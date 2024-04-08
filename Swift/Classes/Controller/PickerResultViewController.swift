@@ -588,7 +588,7 @@ class PickerResultViewController: UIViewController,
             config: config,
             // 转场动画初始的 UIImage
             transitionalImage: cell?.photoView.image
-        ) { index in
+        ) { index, _ in
             // 转场过渡时起始/结束时 对应的 UIView
             self.collectionView.cellForItem(
                 at: IndexPath(
