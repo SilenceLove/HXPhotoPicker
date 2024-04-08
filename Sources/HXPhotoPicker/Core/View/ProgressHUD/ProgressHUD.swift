@@ -450,11 +450,8 @@ final class ProgressHUD: UIView {
         afterDelay: TimeInterval
     ) {
         guard let view = view else { return }
-        for subView in view.subviews {
-            guard let hud = subView as? ProgressHUD else {
-                continue
-            }
-            hud.hide(
+        for case let subView as ProgressHUD in view.subviews {
+            subView.hide(
                 withAnimated: animated,
                 afterDelay: afterDelay
             )

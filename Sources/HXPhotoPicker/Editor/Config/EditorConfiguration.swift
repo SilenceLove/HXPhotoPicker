@@ -7,7 +7,7 @@
 
 import UIKit
 
-public struct EditorConfiguration: IndicatorTypeConfig {
+public struct EditorConfiguration: IndicatorTypeConfig, PhotoHUDConfig {
     
     /// 图片资源
     public var imageResource: HX.ImageResource.Editor {
@@ -22,12 +22,16 @@ public struct EditorConfiguration: IndicatorTypeConfig {
     public var modalPresentationStyle: UIModalPresentationStyle
     
     /// If the built-in language is not enough, you can add a custom language text
-    /// PhotoManager.shared.customLanguages - custom language array
-    /// PhotoManager.shared.fixedCustomLanguage - If there are multiple custom languages, one can be fixed to display
+    /// customLanguages - custom language array
     /// 如果自带的语言不够，可以添加自定义的语言文字
-    /// PhotoManager.shared.customLanguages - 自定义语言数组
-    /// PhotoManager.shared.fixedCustomLanguage - 如果有多种自定义语言，可以固定显示某一种
+    /// customLanguages - 自定义语言数组
     public var languageType: LanguageType = .system
+    
+    /// 自定义语言
+    public var customLanguages: [CustomLanguage] {
+        get { PhotoManager.shared.customLanguages }
+        set { PhotoManager.shared.customLanguages = newValue }
+    }
     
     /// hide status bar
     /// 隐藏状态栏
@@ -268,7 +272,7 @@ public extension EditorConfiguration {
         
         /// default fixed ratio
         /// 默认固定比例
-        /// ```
+        /// ```swift
         /// /// Leave `aspectRatios` empty if you don't want other ratios at the bottom
         /// /// 如果不想要底部其他的比例请将`aspectRatios`置空
         /// aspectRatios = []
@@ -292,7 +296,7 @@ public extension EditorConfiguration {
         /// 宽高比数组默认选择的下标
         /// 选中不代表默认就是对应的宽高比
         /// isRoundCrop = true 时无效
-        /// ```
+        /// ```swift
         /// // If you want the default corresponding aspect ratio also set `aspectRatio`
         /// // 如果想要默认对应的宽高比也要设置 `aspectRatio`
         /// var cropSize = CropSize()
@@ -408,6 +412,9 @@ public extension EditorConfiguration {
         /// width of smear
         /// 涂抹的宽度
         public var smearWidth: CGFloat = 30
+        
+        /// 当滤镜发生改变时更改马赛克背景
+        public var isFilterApply: Bool = true
         
         /// Hide texture view while drawing
         /// 绘制时隐藏贴图视图

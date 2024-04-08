@@ -357,20 +357,18 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
     }
     
     func removeSticker(at itemView: EditorStickersItemBaseView) {
-        for subView in subviews where subView is EditorStickersItemView {
-            if subView == itemView {
-                if subView == selectView {
-                    deselectedSticker()
-                }
-                subView.removeFromSuperview()
-                break
+        for case let subView as EditorStickersItemView in subviews where subView == itemView {
+            if subView == selectView {
+                deselectedSticker()
             }
+            subView.removeFromSuperview()
+            break
         }
     }
     
     func removeAllSticker() {
         deselectedSticker()
-        for subView in subviews where subView is EditorStickersItemView {
+        for case let subView as EditorStickersItemView in subviews {
             subView.removeFromSuperview()
         }
     }

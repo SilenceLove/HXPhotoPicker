@@ -356,11 +356,11 @@ public extension PhotoPickerListSwipeSelect {
         }
         if pickerController.pickerData.isFull && showHUD {
             swipeSelectPanGR?.isEnabled = false
-            ProgressHUD.showWarning(
-                addedTo: navigationController?.view,
-                text: .textManager.picker.maximumSelectedHudTitle.text,
+            PhotoManager.HUDView.showInfo(
+                with: .textManager.picker.maximumSelectedHudTitle.text,
+                delay: 1.5,
                 animated: true,
-                delayHide: 1.5
+                addedTo: navigationController?.view
             )
             endedPanGestureRecognizer()
             swipeSelectPanGR?.isEnabled = true

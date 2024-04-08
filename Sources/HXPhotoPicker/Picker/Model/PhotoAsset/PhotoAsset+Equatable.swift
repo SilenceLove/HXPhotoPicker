@@ -1,5 +1,5 @@
 //
-//  PhotoAssetEquatable.swift
+//  PhotoAsset+Equatable.swift
 //  HXPhotoPicker
 //
 //  Created by Silence on 2023/10/14.
@@ -8,11 +8,7 @@
 
 import Foundation
 
-public protocol PhotoAssetEquatable: PhotoAsset {
-    func isEqual(_ photoAsset: PhotoAsset?) -> Bool
-}
-
-public extension PhotoAssetEquatable {
+public extension PhotoAsset {
     func isEqual(_ photoAsset: PhotoAsset?) -> Bool {
         guard let photoAsset = photoAsset else {
             return false

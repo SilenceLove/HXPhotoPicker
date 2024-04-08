@@ -20,6 +20,7 @@ public extension HX {
         public var picker: Picker = .init()
         /// 相机
         public var camera: Camera = .init()
+        
         public var cameraNotAuthorized: CameraNotAuthorized = .init()
         #endif
         
@@ -56,6 +57,35 @@ public extension HX.TextManager {
         /// 相册列表、照片列表界面导航栏的取消按钮
         public var navigationCancelTitle: TextType = .localized("取消")
         public var navigationCancelTitleFont: UIFont = HXPickerWrapper<UIFont>.mediumPingFang(ofSize: 17)
+        
+        /// 所有相册
+        public var albumCameraRollTitle: TextType = .localized("HXAlbumCameraRoll")
+        /// 全景照片
+        public var albumPanoramasTitle: TextType = .localized("HXAlbumPanoramas")
+        /// 视频
+        public var albumVideosTitle: TextType = .localized("HXAlbumVideos")
+        /// 个人收藏
+        public var albumFavoritesTitle: TextType = .localized("HXAlbumFavorites")
+        /// 延时摄影
+        public var albumTimelapsesTitle: TextType = .localized("HXAlbumTimelapses")
+        /// 最近项目
+        public var albumRecentsTitle: TextType = .localized("HXAlbumRecents")
+        /// 最近添加
+        public var albumRecentlyAddedTitle: TextType = .localized("HXAlbumRecentlyAdded")
+        /// 连拍快照
+        public var albumBurstsTitle: TextType = .localized("HXAlbumBursts")
+        /// 慢动作
+        public var albumSlomoVideosTitle: TextType = .localized("HXAlbumSlomoVideos")
+        /// 自拍
+        public var albumSelfPortraitsTitle: TextType = .localized("HXAlbumSelfPortraits")
+        /// 屏幕快照
+        public var albumScreenshotsTitle: TextType = .localized("HXAlbumScreenshots")
+        /// 人像
+        public var albumDepthEffectTitle: TextType = .localized("HXAlbumDepthEffect")
+        /// 实况照片
+        public var albumLivePhotosTitle: TextType = .localized("HXAlbumLivePhotos")
+        /// 动图
+        public var albumAnimatedTitle: TextType = .localized("HXAlbumAnimated")
         
         public var photoTogetherSelectHudTitle: TextType = .localized("照片和视频不能同时选择")
         public var videoTogetherSelectHudTitle: TextType = .localized("视频和照片不能同时选择")
@@ -196,6 +226,8 @@ public extension HX.TextManager {
         public var adjustment: Adjustment = .init()
         public var filter: Filter = .init()
         
+        public var photoLoadTitle: TextType = .localized("图片下载中")
+        public var videoLoadTitle: TextType = .localized("视频下载中")
         public var iCloudSyncHudTitle: TextType = .localized("正在同步iCloud")
         public var loadFailedAlertTitle: TextType = .localized("提示")
         public var photoLoadFailedAlertMessage: TextType = .localized("图片获取失败!")
@@ -334,5 +366,39 @@ public extension HX.TextManager {
         public var rightTitle: TextType = .localized("前往系统设置")
     }
     #endif
+}
+
+extension HX.TextManager.TextType: Codable {
+    enum CodingKeys: CodingKey {
+        case localized
+        case custom
+        case error
+    }
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let text = try? container.decode(String.self, forKey: .localized) {
+            self = .localized(text)
+            return
+        }
+        if let text = try? container.decode(String.self, forKey: .custom) {
+            self = .custom(text)
+            return
+        }
+        throw DecodingError.dataCorruptedError(
+            forKey: CodingKeys.error,
+            in: container,
+            debugDescription: "Invalid type"
+        )
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .localized(let text):
+            try container.encode(text, forKey: .localized)
+        case .custom(let text):
+            try container.encode(text, forKey: .custom)
+        }
+    }
 }
 

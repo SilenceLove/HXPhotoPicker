@@ -1,23 +1,24 @@
 //
-//  AssetManager.swift
-//  照片选择器-Swift
+//  AssetSaveUtil.swift
+//  HXPhotoPicker
 //
-//  Created by Silence on 2020/11/9.
-//  Copyright © 2020 Silence. All rights reserved.
+//  Created by Silence on 2024/3/25.
+//  Copyright © 2024 Silence. All rights reserved.
 //
 
 import UIKit
 import Photos
-public struct AssetManager {
+
+public struct AssetSaveUtil {
     
-    public enum PhotoSaveType {
+    public enum SaveType {
         case image(UIImage)
         case imageURL(URL)
         case videoURL(URL)
         case livePhoto(imageURL: URL, videoURL: URL)
     }
 
-    public enum PhotoSaveError: Error {
+    public enum SaveError: Error {
         case notDetermined
         case phAssetIsNull
     }
@@ -31,7 +32,7 @@ public struct AssetManager {
     @available(iOS 13.0.0, *)
     @discardableResult
     public static func save(
-        type: PhotoSaveType,
+        type: SaveType,
         customAlbumName: String? = nil,
         creationDate: Date = .init(),
         location: CLLocation? = nil
@@ -61,7 +62,7 @@ public struct AssetManager {
     ///   - location: 位置信息
     ///   - completion: 保存之后的结果
     public static func save(
-        type: PhotoSaveType,
+        type: SaveType,
         customAlbumName: String? = nil,
         creationDate: Date = .init(),
         location: CLLocation? = nil,
@@ -73,10 +74,10 @@ public struct AssetManager {
         }else {
             albumName = displayName
         }
-        AssetManager.requestAuthorization {
+        AssetPermissionsUtil.requestAuthorization {
             switch $0 {
             case .denied, .notDetermined, .restricted:
-                completion(.failure(PhotoSaveError.notDetermined))
+                completion(.failure(SaveError.notDetermined))
                 return
             default:
                 break
@@ -108,10 +109,12 @@ public struct AssetManager {
                         creationRequest?.location = location
                         placeholder = creationRequest?.placeholderForCreatedAsset
                     }
+                    
                     if let placeholder = placeholder,
-                       let phAsset = AssetManager.fetchAsset(
-                        with: placeholder.localIdentifier
-                       ) {
+                       let phAsset = PHAsset.fetchAssets(
+                        withLocalIdentifiers: [placeholder.localIdentifier],
+                        options: nil
+                       ).firstObject {
                         DispatchQueue.main.async {
                             completion(.success(phAsset))
                         }
@@ -120,7 +123,7 @@ public struct AssetManager {
                         }
                     }else {
                         DispatchQueue.main.async {
-                            completion(.failure(PhotoSaveError.phAssetIsNull))
+                            completion(.failure(SaveError.phAssetIsNull))
                         }
                     }
                 } catch {

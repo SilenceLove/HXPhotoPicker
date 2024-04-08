@@ -73,7 +73,7 @@ public protocol PhotoToolBar: UIView, PhotoPickerDataStatus {
     func updateOriginalState(_ isSelected: Bool)
     
     /// 内部主动请求原图大小
-    /// ```
+    /// ```swift
     /// if !originalButton.isSelected {
     ///     return
     /// }
@@ -127,8 +127,8 @@ public extension PhotoToolBar {
     static func isShow(_ config: PickerConfiguration,  type: PhotoToolBarType) -> Bool {
         if type == .picker, config.selectMode == .single {
             return config.photoList.bottomView.isShowPrompt &&
-                   config.allowLoadPhotoLibrary &&
-                   AssetManager.authorizationStatusIsLimited()
+            config.allowLoadPhotoLibrary &&
+            AssetPermissionsUtil.isLimitedAuthorizationStatus
         }
         return true
     }

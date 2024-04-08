@@ -18,11 +18,10 @@ extension PhotoManager {
         if bundle == nil {
             createBundle()
         }
-        if self.languageType != languageType || isCustomLanguage {
+        if self.languageType != languageType {
             // 与上次语言不一致，重新创建
             languageBundle = nil
         }
-        isCustomLanguage = false
         if languageBundle == nil {
             let language: String
             switch languageType {
@@ -50,21 +49,19 @@ extension PhotoManager {
                 language = "fr"
             case .arabic:
                 language = "ar"
+            case .custom(let bundle):
+                language = ""
+                languageBundle = bundle
             default:
-                if let fixedLanguage = fixedCustomLanguage {
-                    isCustomLanguage = true
-                    languageBundle = Bundle(path: fixedLanguage.path)
-                    return languageBundle
-                }
-                for customLanguage in customLanguages
-                where Locale.preferredLanguages.contains(customLanguage.language) {
-                    isCustomLanguage = true
-                    languageBundle = Bundle(path: customLanguage.path)
-                    return languageBundle
+            out: for customLanguage in customLanguages {
+                    for preferredLanguage in Locale.preferredLanguages where preferredLanguage.hasPrefix(customLanguage.language) {
+                        languageBundle = customLanguage.bundle
+                        break out
+                    }
                 }
                 language = languageStr
             }
-            if let path = bundle?.path(forResource: language, ofType: "lproj") {
+            if languageBundle == nil, let path = bundle?.path(forResource: language, ofType: "lproj") {
                 languageBundle = Bundle(path: path)
             }
             self.languageType = languageType

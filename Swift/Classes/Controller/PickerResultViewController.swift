@@ -99,6 +99,9 @@ class PickerResultViewController: UIViewController,
         if !selectedAssets.isEmpty, !isPublish {
             config.photoList.cameraCell.cameraImageName = "hx_picker_photoList_photograph"
         }
+//        let bundle = Bundle(path: Bundle.main.path(forResource: "custom", ofType: "lproj")!)!
+//        PhotoManager.shared.customLanguages = [.init(language: "en", bundle: bundle)]
+//        config.languageType = .custom()
         loadFonts()
 //        config.editor.buttonType = .top
         collectionViewTopConstraint.constant = 20
@@ -585,7 +588,7 @@ class PickerResultViewController: UIViewController,
             config: config,
             // 转场动画初始的 UIImage
             transitionalImage: cell?.photoView.image
-        ) { index in
+        ) { index, _ in
             // 转场过渡时起始/结束时 对应的 UIView
             self.collectionView.cellForItem(
                 at: IndexPath(

@@ -30,6 +30,7 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
     }
     public var scrollView: UIScrollView!
     public var scrollContainerView: UIView! { scrollContentView }
+    public var imageView: UIImageView { scrollContentView.imageView }
     public func showScrollContainerSubview() { scrollContentView.showOtherSubview() }
     public func hideScrollContainerSubview() { scrollContentView.hiddenOtherSubview() }
     

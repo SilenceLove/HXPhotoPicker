@@ -329,6 +329,8 @@ public extension HX.ImageResource {
         public struct Music {
             /// 搜索图标
             public var search: ImageType = .local("hx_editor_video_music_search")
+            /// cell 上的音乐图标
+            public var music: ImageType = .local("hx_editor_tools_music")
             /// 音量图标
             public var volum: ImageType = .local("hx_editor_video_music_volume")
             /// 选择框-未选中

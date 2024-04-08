@@ -8,7 +8,7 @@
 
 import UIKit
 
-public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
+public struct PickerConfiguration: IndicatorTypeConfig, PhotoDebugLogsConfig, PhotoHUDConfig {
     
     /// 图片资源
     public var imageResource: HX.ImageResource.Picker { HX.ImageResource.shared.picker }
@@ -28,15 +28,23 @@ public struct PickerConfiguration: IndicatorTypeConfig, PickerDebugLogsConfig {
     /// Selector display style, effective when albumShowMode = .popup and fullscreen popup
     /// 选择器展示样式，当 albumShowMode = .popup 并且全屏弹出时有效
     /// rightSwipe: 是否允许右滑手势返回。与微信右滑手势返回一致
+    /// ```swift
+    /// /// 如果返回过程中没有显示背景视图，请将fromVC传入
+    /// config.pickerPresentStyle = .present(rightSwipe: .init(50, viewControlls: [FromVC.self]))
+    /// ```
     public var pickerPresentStyle: PickerPresentStyle = .present()
     
     /// If the built-in language is not enough, you can add a custom language text
-    /// PhotoManager.shared.customLanguages - custom language array
-    /// PhotoManager.shared.fixedCustomLanguage - If there are multiple custom languages, one can be fixed to display
+    /// customLanguages - custom language array
     /// 如果自带的语言不够，可以添加自定义的语言文字
-    /// PhotoManager.shared.customLanguages - 自定义语言数组
-    /// PhotoManager.shared.fixedCustomLanguage - 如果有多种自定义语言，可以固定显示某一种
+    /// customLanguages - 自定义语言数组
     public var languageType: LanguageType = .system
+    
+    /// 自定义语言
+    public var customLanguages: [CustomLanguage] {
+        get { PhotoManager.shared.customLanguages }
+        set { PhotoManager.shared.customLanguages = newValue }
+    }
     
     /// Appearance style
     /// 外观风格

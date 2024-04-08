@@ -133,7 +133,7 @@ open class PhotoFetchData {
                     localCount += 1
                 }
             }
-            let assetCollections = self.config.fetchAssetCollection.fetchAssetCollections(
+            var assetCollections = self.config.fetchAssetCollection.fetchAssetCollections(
                 self.config,
                 localCount: localCount,
                 coverImage: coverImage,
@@ -151,18 +151,31 @@ open class PhotoFetchData {
             }
             self.assetCollections = []
             if var collection = assetCollections.first {
-                if let cameraAssetCollection = self.cameraAssetCollection {
-                    collection = cameraAssetCollection
+                if let cameraAssetCollection = self.cameraAssetCollection,
+                   !cameraAssetCollection.isCameraRoll {
+                    var needReplace: Bool = false
+                    for (index, assetCollection) in assetCollections.enumerated() where assetCollection.collection?.localIdentifier == cameraAssetCollection.collection?.localIdentifier {
+                        assetCollections[index] = cameraAssetCollection
+                        needReplace = true
+                        break
+                    }
+                    if !needReplace {
+                        assetCollections.insert(collection, at: 0)
+                    }
                 }else {
-                    collection.isSelected = true
-                    self.cameraAssetCollection = collection
+                    if let cameraAssetCollection = self.cameraAssetCollection {
+                        collection = cameraAssetCollection
+                    }else {
+                        collection.isSelected = true
+                        self.cameraAssetCollection = collection
+                    }
+                    assetCollections[0] = collection
                 }
                 collection.count += localCount
                 if let coverImage = coverImage {
                     collection.realCoverImage = coverImage
                 }
                 self.assetCollections = assetCollections
-                self.assetCollections[0] = collection
             }else {
                 if let cameraAssetCollection = self.cameraAssetCollection {
                     cameraAssetCollection.count += localCount

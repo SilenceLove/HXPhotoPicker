@@ -8,33 +8,6 @@
 import Foundation
 
 public struct AssetURLResult {
-    
-    public enum URLType {
-        case local
-        case network
-    }
-    
-    /// Contents of LivePhoto
-    /// LivePhoto包含的内容
-    public struct LivePhoto {
-        
-        public let imageURL: URL
-        public let imageURLType: URLType
-        public let videoURL: URL
-        public let videoURLType: URLType
-        
-        init(
-            imageURL: URL,
-            imageURLType: URLType = .local,
-            videoURL: URL,
-            videoURLType: URLType = .local
-        ) {
-            self.imageURL = imageURL
-            self.imageURLType = imageURLType
-            self.videoURL = videoURL
-            self.videoURLType = videoURLType
-        }
-    }
     public let url: URL
     public let urlType: URLType
     public let mediaType: PhotoAsset.MediaType
@@ -55,5 +28,34 @@ public struct AssetURLResult {
         self.urlType = urlType
         self.mediaType = mediaType
         self.livePhoto = livePhoto
+    }
+}
+
+public extension AssetURLResult {
+    /// Contents of LivePhoto
+    /// LivePhoto包含的内容
+    struct LivePhoto {
+        
+        public let imageURL: URL
+        public let imageURLType: URLType
+        public let videoURL: URL
+        public let videoURLType: URLType
+        
+        public init(
+            imageURL: URL,
+            imageURLType: URLType = .local,
+            videoURL: URL,
+            videoURLType: URLType = .local
+        ) {
+            self.imageURL = imageURL
+            self.imageURLType = imageURLType
+            self.videoURL = videoURL
+            self.videoURLType = videoURLType
+        }
+    }
+    
+    enum URLType {
+        case local
+        case network
     }
 }

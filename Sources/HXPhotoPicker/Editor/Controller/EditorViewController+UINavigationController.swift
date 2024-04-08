@@ -156,12 +156,12 @@ extension EditorViewController {
             if isProgress {
                 switch selectedAsset.type {
                 case .networkVideo:
-                    assetLoadingView = ProgressHUD.showLoading(addedTo: view, text: "视频下载中".localized, animated: true)
+                    assetLoadingView = PhotoManager.HUDView.show(with: .textManager.editor.videoLoadTitle.text, delay: 0, animated: true, addedTo: view)
                 default:
-                    assetLoadingView = ProgressHUD.showLoading(addedTo: view, animated: true)
+                    assetLoadingView = PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: view)
                 }
             }else {
-                ProgressHUD.showLoading(addedTo: view, animated: true)
+                PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: view)
             }
             bringViews()
         case .succeed(let type):

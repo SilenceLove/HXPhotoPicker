@@ -39,7 +39,9 @@ public extension PhotoPickerListCondition {
         #if targetEnvironment(macCatalyst)
         return false
         #else
-        if didFetchAsset && config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
+        if didFetchAsset,
+           config.allowAddLimit,
+           AssetPermissionsUtil.isLimitedAuthorizationStatus {
             return true
         }
         return false

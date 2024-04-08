@@ -12,96 +12,6 @@ public extension PhotoAsset {
     
     typealias AssetURLCompletion = (Result<AssetURLResult, AssetError>) -> Void
     
-    /// 获取image，视频为封面图片
-    /// - Parameters:
-    ///   - compressionQuality: 压缩参数 0-1
-    ///   - resolution: 缩小到指定分辨率，优先级小于`compressionQuality`
-    ///   - completion: 获取完成
-    func getImage(
-        compressionQuality: CGFloat? = nil,
-        completion: @escaping (UIImage?) -> Void
-    ) {
-        #if canImport(Kingfisher)
-        let hasEdited: Bool
-        #if HXPICKER_ENABLE_EDITOR
-        hasEdited = editedResult != nil
-        #else
-        hasEdited = false
-        #endif
-        if isNetworkAsset && !hasEdited {
-            getNetworkImage { image in
-                guard let compressionQuality = compressionQuality else {
-                    completion(image)
-                    return
-                }
-                DispatchQueue.global().async {
-                    guard let imageData = PhotoTools.getImageData(for: image),
-                          let data = PhotoTools.imageCompress(
-                            imageData,
-                              compressionQuality: compressionQuality
-                          ),
-                          let image = UIImage(data: data)?.normalizedImage()
-                    else {
-                        DispatchQueue.main.async {
-                            completion(nil)
-                        }
-                        return
-                    }
-                    DispatchQueue.main.async {
-                        completion(image)
-                    }
-                }
-            }
-            return
-        }
-        #endif
-        requestImage(compressionScale: compressionQuality) { image, _ in
-            completion(image)
-        }
-    }
-    
-    /// 获取image，视频为封面图片
-    /// - Parameters:
-    ///   - targetSize: 指定`imageSize`
-    ///   - targetMode: 裁剪模式
-    ///   - completion: 获取完成
-    func getImage(
-        targetSize: CGSize,
-        targetMode: HX.ImageTargetMode = .fill,
-        completion: @escaping (UIImage?, PhotoAsset) -> Void
-    ) {
-        #if canImport(Kingfisher)
-        let hasEdited: Bool
-        #if HXPICKER_ENABLE_EDITOR
-        hasEdited = editedResult != nil
-        #else
-        hasEdited = false
-        #endif
-        if isNetworkAsset && !hasEdited {
-            getNetworkImage { image in
-                DispatchQueue.global().async {
-                    let image = image?.scaleToFillSize(size: targetSize, mode: targetMode)
-                    DispatchQueue.main.async {
-                        completion(image, self)
-                    }
-                }
-            }
-            return
-        }
-        #endif
-        requestImage(targetSize: targetSize, targetMode: targetMode) {
-            completion($0, $1)
-        }
-    }
-    
-    /// 获取 imageData
-    /// - Parameter completion: 获取完成
-    func getImageData(completion: @escaping (Result<AssetManager.ImageDataResult, AssetError>) -> Void) {
-        requestImageData { _, result in
-            completion(result)
-        }
-    }
-    
     /// 获取url
     /// - Parameters:
     ///   - fileConfig: 指定地址，若为heic格式的图片，可以设置图片地址为png / jpeg，内部会自动转换（如果为网络资源则忽略）
@@ -270,26 +180,6 @@ public extension PhotoAsset {
         )
     }
     
-    struct FileConfig {
-        public let imageURL: URL?
-        public let videoURL: URL?
-        
-        public init(imageURL: URL, videoURL: URL? = nil) {
-            self.imageURL = imageURL
-            self.videoURL = videoURL
-        }
-        
-        public init(imageURL: URL? = nil, videoURL: URL) {
-            self.imageURL = imageURL
-            self.videoURL = videoURL
-        }
-        
-        public init(imageURL: URL, videoURL: URL) {
-            self.imageURL = imageURL
-            self.videoURL = videoURL
-        }
-    }
-    
     func getAssetResult(
         toFile fileConfig: PhotoAsset.FileConfig?,
         compression: PhotoAsset.Compression?,
@@ -412,6 +302,26 @@ public extension PhotoAsset {
                 self.size = size
                 self.mode = mode
             }
+        }
+    }
+    
+    struct FileConfig {
+        public let imageURL: URL?
+        public let videoURL: URL?
+        
+        public init(imageURL: URL, videoURL: URL? = nil) {
+            self.imageURL = imageURL
+            self.videoURL = videoURL
+        }
+        
+        public init(imageURL: URL? = nil, videoURL: URL) {
+            self.imageURL = imageURL
+            self.videoURL = videoURL
+        }
+        
+        public init(imageURL: URL, videoURL: URL) {
+            self.imageURL = imageURL
+            self.videoURL = videoURL
         }
     }
 }

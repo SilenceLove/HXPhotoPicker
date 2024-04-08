@@ -212,7 +212,7 @@ class TestEditorViewController: HXBaseViewController {
                             HXPhotoPicker.PhotoBrowser.show(
                                 [.init(.init(videoURL: result.url))],
                                 transitionalImage: PhotoTools.getVideoThumbnailImage(videoURL: result.url, atTime: 0.1)
-                            ) { _ in
+                            ) { _, _ in
                                 self.editorView.finalView
                             } longPressHandler: { _, photoAsset, photoBrowser in
                                 photoBrowser.view.hx.show()
@@ -252,7 +252,7 @@ class TestEditorViewController: HXBaseViewController {
                         HXPhotoPicker.PhotoBrowser.show(
                             [.init(.init(result.url))],
                             transitionalImage: result.image
-                        ) { _ in
+                        ) { _, _ in
                             self.editorView.finalView
                         } longPressHandler: { _, photoAsset, photoBrowser in
                             photoBrowser.view.hx.show()

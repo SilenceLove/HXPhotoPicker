@@ -150,10 +150,10 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
             previewAssets,
             pageIndex: indexPath.item,
             transitionalImage: cell?.photoView.image
-        ) {
+        ) { index, _ in
             self.collectionView.cellForItem(
                 at: IndexPath(
-                    item: $0,
+                    item: index,
                     section: 0
                 )
             )
@@ -279,7 +279,7 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
                 self.previewAssets,
                 pageIndex: indexPath.item,
                 transitionalImage: cell?.photoView.image
-            ) { index in
+            ) { index, _ in
                 self.collectionView.cellForItem(
                     at: IndexPath(
                         item: index,

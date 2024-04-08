@@ -1,30 +1,12 @@
 //
-//  PhotoError.swift
+//  AssetError.swift
 //  HXPhotoPicker
 //
-//  Created by Slience on 2021/1/7.
+//  Created by Silence on 2024/4/6.
+//  Copyright © 2024 Silence. All rights reserved.
 //
 
 import Foundation
-
-public enum PhotoError: LocalizedError {
-    
-    public enum `Type` {
-        case imageEmpty
-        case videoEmpty
-        case exportFailed
-    }
-    case error(type: Type, message: String)
-}
-
-extension PhotoError {
-    public var errorDescription: String? {
-        switch self {
-        case let .error(_, message):
-            return message
-        }
-    }
-}
 
 public enum AssetError: Error {
     /// 写入文件失败

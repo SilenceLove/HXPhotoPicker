@@ -464,7 +464,8 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             )
         }
     }
-
+    
+    #if HXPICKER_ENABLE_PICKER
     func requestAssetImage(for asset: PHAsset) {
         let options = PHImageRequestOptions()
         options.resizeMode = .fast
@@ -481,6 +482,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             }
         }
     }
+    #endif
     
     func getTransitionFrame(with imageSize: CGSize, viewSize: CGSize) -> CGRect {
         let imageScale = imageSize.width / imageSize.height

@@ -57,7 +57,7 @@ extension EditorViewController: EditorFiltersViewDelegate {
                     checkFinishButtonState()
                     return
                 }
-                if let image = originalImage {
+                if let image = originalImage, config.mosaic.isFilterApply {
                     editorView.updateImage(image)
                     if let mosaicImage = selectedMosaicImage {
                         editorView.mosaicCGImage = mosaicImage
@@ -102,6 +102,9 @@ extension EditorViewController: EditorFiltersViewDelegate {
                         if operation.isCancelled { return }
                         DispatchQueue.main.async {
                             self.editorView.updateImage(image)
+                        }
+                        if !self.config.mosaic.isFilterApply {
+                            return
                         }
                         if let mosaicImage = newImage.applyMosaic(level: self.config.mosaic.mosaicWidth) {
                             let mosaicResultImage = self.imageFilterContext.createCGImage(
@@ -150,7 +153,7 @@ extension EditorViewController: EditorFiltersViewDelegate {
     
     func filterView(_ filterView: EditorFiltersView, didSelectedParameter filter: PhotoEditorFilter, at index: Int) {
         filterParameterView.type = .filter
-        filterParameterView.title = filter.filterName.localized
+        filterParameterView.title = filter.filterName.text
         filterParameterView.models = filter.parameters
         showFilterParameterView()
     }
@@ -223,6 +226,9 @@ extension EditorViewController: EditorFilterParameterViewDelegate {
                             if operation.isCancelled { return }
                             DispatchQueue.main.async {
                                 self.editorView.updateImage(resultImage)
+                            }
+                            if !self.config.mosaic.isFilterApply {
+                                return
                             }
                             var mosaicImage: CIImage?
                             if self.mosaicToolView.canUndo {
@@ -351,6 +357,9 @@ extension EditorViewController: EditorFilterParameterViewDelegate {
                     DispatchQueue.main.async {
                         self.editorView.updateImage(resultImage)
                     }
+                    if !self.config.mosaic.isFilterApply {
+                        return
+                    }
                     var mosaicImage: CGImage?
                     if self.mosaicToolView.canUndo {
                         if let mosaic_Image = newImage.applyMosaic(level: self.config.mosaic.mosaicWidth) {
@@ -368,33 +377,41 @@ extension EditorViewController: EditorFilterParameterViewDelegate {
                     }
                 }
             }else {
-                if !self.filterEditFator.isApply {
+                guard let ciImage = ciImage else {
                     DispatchQueue.main.async {
                         self.editorView.updateImage(self.selectedOriginalImage)
                     }
                     return
                 }
-                if let ciImage = ciImage,
-                   let cgImage = self.imageFilterContext.createCGImage(ciImage, from: ciImage.extent) {
-                    let resultImage = UIImage(cgImage: cgImage)
-                    if operation.isCancelled { return }
-                    DispatchQueue.main.async {
-                        self.editorView.updateImage(resultImage)
-                    }
-                    var mosaicImage: CGImage?
-                    if self.mosaicToolView.canUndo {
-                        if let mosaic_Image = ciImage.applyMosaic(level: self.config.mosaic.mosaicWidth) {
-                            mosaicImage = self.imageFilterContext.createCGImage(
-                                mosaic_Image,
-                                from: mosaic_Image.extent
-                            )
-                        }
-                    }
-                    if let mosaicImage = mosaicImage {
+                if self.filterEditFator.isApply {
+                    if let cgImage = self.imageFilterContext.createCGImage(ciImage, from: ciImage.extent) {
+                        let resultImage = UIImage(cgImage: cgImage)
                         if operation.isCancelled { return }
                         DispatchQueue.main.async {
-                            self.editorView.mosaicCGImage = mosaicImage
+                            self.editorView.updateImage(resultImage)
                         }
+                    }
+                }else {
+                    DispatchQueue.main.async {
+                        self.editorView.updateImage(self.selectedOriginalImage)
+                    }
+                }
+                if !self.config.mosaic.isFilterApply {
+                    return
+                }
+                var mosaicImage: CGImage?
+                if self.mosaicToolView.canUndo {
+                    if let mosaic_Image = ciImage.applyMosaic(level: self.config.mosaic.mosaicWidth) {
+                        mosaicImage = self.imageFilterContext.createCGImage(
+                            mosaic_Image,
+                            from: mosaic_Image.extent
+                        )
+                    }
+                }
+                if let mosaicImage = mosaicImage {
+                    if operation.isCancelled { return }
+                    DispatchQueue.main.async {
+                        self.editorView.mosaicCGImage = mosaicImage
                     }
                 }
             }

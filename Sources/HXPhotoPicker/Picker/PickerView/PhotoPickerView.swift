@@ -184,7 +184,7 @@ open class PhotoPickerView: UIView {
         #if targetEnvironment(macCatalyst)
         return false
         #else
-        if didFetchAsset && config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
+        if didFetchAsset && config.allowAddLimit && AssetPermissionsUtil.isLimitedAuthorizationStatus {
             return true
         }
         return false
@@ -213,7 +213,7 @@ open class PhotoPickerView: UIView {
     var allowPreview: Bool = true
     var orientationDidChange: Bool = false
     var beforeOrientationIndexPath: IndexPath?
-    var loadingView: ProgressHUD?
+    var loadingView: PhotoHUDProtocol?
     var isFirst = true
     var scrollIndexPath: IndexPath?
     
@@ -244,7 +244,7 @@ open class PhotoPickerView: UIView {
         }else {
             emptyView.centerX = collectionView.width * 0.5
         }
-        if AssetManager.authorizationStatus() == .denied {
+        if AssetPermissionsUtil.authorizationStatus == .denied {
             deniedView.frame = bounds
         }
     }

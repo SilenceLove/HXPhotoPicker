@@ -48,12 +48,7 @@ extension CameraViewController: CameraBottomViewDelegate {
             #endif
         }else {
             bottomView.isGestureEnable = true
-            ProgressHUD.showWarning(
-                addedTo: self.view,
-                text: .textManager.camera.captureFailedHudTitle.text,
-                animated: true,
-                delayHide: 1.5
-            )
+            PhotoManager.HUDView.showInfo(with: .textManager.camera.captureFailedHudTitle.text, delay: 1.5, animated: true, addedTo: view)
         }
     }
     func bottomView(beganRecording bottomView: CameraBottomView) {
@@ -99,12 +94,7 @@ extension CameraViewController: CameraBottomViewDelegate {
             }else {
                 text = .textManager.camera.captureFailedHudTitle.text
             }
-            ProgressHUD.showWarning(
-                addedTo: view,
-                text: text,
-                animated: true,
-                delayHide: 1.5
-            )
+            PhotoManager.HUDView.showInfo(with: text, delay: 1.5, animated: true, addedTo: view)
         }
     }
     func bottomView(endRecording bottomView: CameraBottomView) {

@@ -65,7 +65,7 @@ extension PhotoPickerView {
             )
             #endif
         }
-        if config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
+        if config.allowAddLimit && AssetPermissionsUtil.isLimitedAuthorizationStatus {
             collectionView.register(
                 PhotoPickerLimitCell.self,
                 forCellWithReuseIdentifier:
@@ -121,7 +121,7 @@ extension PhotoPickerView {
     }
     
     func setupEmptyView() {
-        if config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
+        if config.allowAddLimit && AssetPermissionsUtil.isLimitedAuthorizationStatus {
             emptyView.removeFromSuperview()
             return
         }
@@ -134,7 +134,7 @@ extension PhotoPickerView {
     
     func setupDeniedView() {
         emptyView.removeFromSuperview()
-        if AssetManager.authorizationStatus() == .denied {
+        if AssetPermissionsUtil.authorizationStatus == .denied {
             collectionView.addSubview(deniedView)
         }else {
             deniedView.removeFromSuperview()
@@ -364,12 +364,7 @@ extension PhotoPickerView {
             }
         }
         if manager.selectArrayIsFull() && showHUD {
-            ProgressHUD.showWarning(
-                addedTo: UIApplication.shared.keyWindow,
-                text: .textManager.picker.maximumSelectedHudTitle.text,
-                animated: true,
-                delayHide: 1.5
-            )
+            PhotoManager.HUDView.showInfo(with: .textManager.picker.maximumSelectedHudTitle.text, delay: 1.5, animated: true, addedTo: UIApplication.shared.keyWindow)
         }
     }
     

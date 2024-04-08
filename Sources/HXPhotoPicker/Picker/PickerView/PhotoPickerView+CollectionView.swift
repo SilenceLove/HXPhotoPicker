@@ -203,15 +203,10 @@ extension PhotoPickerView: UICollectionViewDelegate {
         if isCameraCell {
             #if !targetEnvironment(macCatalyst)
             if !UIImagePickerController.isSourceTypeAvailable(.camera) {
-                ProgressHUD.showWarning(
-                    addedTo: UIApplication.shared.keyWindow,
-                    text: .textPhotoList.cameraUnavailableHudTitle.text,
-                    animated: true,
-                    delayHide: 1.5
-                )
+                PhotoManager.HUDView.showInfo(with: .textPhotoList.cameraUnavailableHudTitle.text, delay: 1.5, animated: true, addedTo: UIApplication.shared.keyWindow)
                 return
             }
-            AssetManager.requestCameraAccess { (granted) in
+            AssetPermissionsUtil.requestCameraAccess { (granted) in
                 if granted {
                     self.presentCameraViewController()
                 }else {
@@ -378,7 +373,7 @@ extension PhotoPickerView: UICollectionViewDelegate {
         let isSourceTypeAvailable: Bool
         #if !targetEnvironment(macCatalyst)
         isCameraCell = sCell is PickerCameraViewCell
-        isAuthorized = AssetManager.cameraAuthorizationStatus() == .authorized
+        isAuthorized = AssetPermissionsUtil.cameraAuthorizationStatus == .authorized
         isSourceTypeAvailable = UIImagePickerController.isSourceTypeAvailable(.camera)
         #else
         isCameraCell = false

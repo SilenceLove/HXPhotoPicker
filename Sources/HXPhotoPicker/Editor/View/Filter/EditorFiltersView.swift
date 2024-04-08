@@ -122,7 +122,7 @@ class EditorFiltersView: UIView {
         let filterInfos = filterConfig.infos
         filters = []
         let originalFilter = PhotoEditorFilter(
-            filterName: isVideo ? .textManager.editor.filter.originalVideoTitle.text : .textManager.editor.filter.originalPhotoTitle.text
+            filterName: isVideo ? HX.textManager.editor.filter.originalVideoTitle : HX.textManager.editor.filter.originalPhotoTitle
         )
         originalFilter.isOriginal = true
         if selectedIndex == 0 {
@@ -374,7 +374,7 @@ class EditorFiltersViewCell: UICollectionViewCell {
     }
     
     func updateFilter() {
-        filterNameLb.text = filter.filterName.localized
+        filterNameLb.text = filter.filterName.text
         if !filter.isOriginal {
             imageView.image = delegate?.filterViewCell(fetchFilter: self)
         }

@@ -109,8 +109,8 @@ open class PhotoPickerData {
     
     public let config: PickerConfiguration
     
-    let requestAssetBytesQueue: OperationQueue
-    let previewRequestAssetBytesQueue: OperationQueue
+    public let requestAssetBytesQueue: OperationQueue
+    public let previewRequestAssetBytesQueue: OperationQueue
     
     public required init(config: PickerConfiguration) {
         self.config = config
@@ -298,11 +298,11 @@ open class PhotoPickerData {
         }
         if let text = text, !canSelect, isShowHUD {
             DispatchQueue.main.async {
-                ProgressHUD.showWarning(
-                    addedTo: UIViewController.topViewController?.navigationController?.view,
-                    text: text,
+                PhotoManager.HUDView.showInfo(
+                    with: text,
+                    delay: 1.5,
                     animated: true,
-                    delayHide: 1.5
+                    addedTo: UIViewController.topViewController?.navigationController?.view
                 )
             }
         }

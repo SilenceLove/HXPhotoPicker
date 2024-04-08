@@ -7,31 +7,33 @@
 
 import Foundation
 
-public enum LanguageType: Int {
+public enum LanguageType: Equatable {
     /// 跟随系统语言
-    case system = 0
+    case system
     /// 中文简体
-    case simplifiedChinese = 1
+    case simplifiedChinese
     /// 中文繁体
-    case traditionalChinese = 2
+    case traditionalChinese
     /// 日文
-    case japanese = 3
+    case japanese
     /// 韩文
-    case korean = 4
+    case korean
     /// 英文
-    case english = 5
+    case english
     /// 泰语
-    case thai = 6
+    case thai
     /// 印尼语
-    case indonesia = 7
+    case indonesia
     /// 越南语
-    case vietnamese = 8
+    case vietnamese
     /// 俄语
-    case russian = 9
+    case russian
     /// 德语
-    case german = 10
+    case german
     /// 法语
-    case french = 11
+    case french
     /// 阿拉伯
-    case arabic = 12
+    case arabic
+    
+    case custom(Bundle)
 }

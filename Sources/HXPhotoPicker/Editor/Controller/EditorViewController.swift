@@ -558,7 +558,7 @@ open class EditorViewController: HXBaseViewController {
     var isPopTransition: Bool = false
     var isTransitionCompletion: Bool = true
     var loadAssetStatus: LoadAssetStatus = .loadding()
-    weak var assetLoadingView: ProgressHUD?
+    weak var assetLoadingView: PhotoHUDProtocol?
     
     var selectedOriginalImage: UIImage?
     var selectedThumbnailImage: UIImage?

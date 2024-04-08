@@ -60,8 +60,8 @@ class EditorChartletViewCell: UICollectionViewCell {
             imageView.image = image
             downloadCompletion = true
         }else if let url = url {
-            imageView.my.kf.indicatorType = .activity
-            (imageView.my.kf.indicator?.view as? UIActivityIndicatorView)?.color = .white
+            imageView.kf.indicatorType = .activity
+            (imageView.kf.indicator?.view as? UIActivityIndicatorView)?.color = .white
             let processor = DownsamplingImageProcessor(
                 size: CGSize(
                     width: width * 2,
@@ -78,7 +78,7 @@ class EditorChartletViewCell: UICollectionViewCell {
                     .backgroundDecode
                 ]
             }
-            imageView.my.kf.setImage(
+            imageView.kf.setImage(
                 with: url,
                 options: options
             ) { [weak self] result in
@@ -106,7 +106,7 @@ class EditorChartletViewCell: UICollectionViewCell {
         selectedBgView.layer.masksToBounds = true
         contentView.addSubview(selectedBgView)
         imageView = ImageView()
-        imageView.imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFit
         contentView.addSubview(imageView)
     }
     override func layoutSubviews() {

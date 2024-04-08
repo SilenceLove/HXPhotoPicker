@@ -134,10 +134,10 @@ extension EditorMaskListViewController: UICollectionViewDataSource, UICollection
                 delegate?.editorMaskList(self, didSelectedWith: image)
                 dismiss(animated: true)
             }else {
-                ProgressHUD.showWarning(addedTo: view, text: .textManager.editor.processingFailedHUDTitle.text, animated: true, delayHide: 1.5)
+                PhotoManager.HUDView.showInfo(with: .textManager.editor.processingFailedHUDTitle.text, delay: 1.5, animated: true, addedTo: view)
             }
         case .text(let text, let font):
-            ProgressHUD.showLoading(addedTo: self.view)
+            PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: view)
             let viewSize = view.size
             DispatchQueue.global(qos: .userInitiated).async {
                 let newFont = UIFont(name: font.fontName, size: min(viewSize.width, viewSize.height)) ?? font
@@ -157,7 +157,7 @@ extension EditorMaskListViewController: UICollectionViewDataSource, UICollection
                     string.draw(in: rect, withAttributes: attDic)
                 }
                 DispatchQueue.main.async {
-                    ProgressHUD.hide(forView: self.view)
+                    PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
                     self.delegate?.editorMaskList(self, didSelectedWith: image)
                     self.dismiss(animated: true)
                 }

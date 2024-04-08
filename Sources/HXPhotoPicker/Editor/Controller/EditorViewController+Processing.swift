@@ -63,21 +63,16 @@ extension EditorViewController {
     
     func imageProcessing() {
         if editorView.isCropedImage || imageFilter != nil || filterEditFator.isApply {
-            ProgressHUD.showLoading(addedTo: view, text: .textManager.editor.processingHUDTitle.text, animated: true)
+            PhotoManager.HUDView.show(with: .textManager.editor.processingHUDTitle.text, delay: 0, animated: true, addedTo: view)
             if editorView.isCropedImage {
                 editorView.cropImage { [weak self] result in
                     guard let self = self else { return }
-                    ProgressHUD.hide(forView: self.view)
+                    PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
                     switch result {
                     case .success(let imageResult):
                         self.imageProcessCompletion(imageResult)
                     case .failure:
-                        ProgressHUD.showWarning(
-                            addedTo: self.view,
-                            text: .textManager.editor.processingFailedHUDTitle.text,
-                            animated: true,
-                            delayHide: 1.5
-                        )
+                        PhotoManager.HUDView.showInfo(with: .textManager.editor.processingFailedHUDTitle.text, delay: 1.5, animated: true, addedTo: self.view)
                     }
                 }
             }else {
@@ -85,14 +80,9 @@ extension EditorViewController {
                     guard let self = self else {
                         return
                     }
-                    ProgressHUD.hide(forView: self.view)
+                    PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
                     guard let result = $0 else {
-                        ProgressHUD.showWarning(
-                            addedTo: self.view,
-                            text: .textManager.editor.processingFailedHUDTitle.text,
-                            animated: true,
-                            delayHide: 1.5
-                        )
+                        PhotoManager.HUDView.showInfo(with: .textManager.editor.processingFailedHUDTitle.text, delay: 1.5, animated: true, addedTo: self.view)
                         return
                     }
                     self.imageProcessCompletion(result)
@@ -247,11 +237,7 @@ extension EditorViewController {
                 quality: config.video.quality
             )
             if editorView.isCropedVideo {
-                let progressView = ProgressHUD.showProgress(
-                    addedTo: view,
-                    text: .textManager.editor.processingHUDTitle.text,
-                    animated: true
-                )
+                let progressView = PhotoManager.HUDView.showProgress(with: .textManager.editor.processingHUDTitle.text, progress: 0, animated: true, addedTo: view)
                 editorView.cropVideo(
                     factor: factor
                 ) { [weak self] in
@@ -260,7 +246,7 @@ extension EditorViewController {
                     }
                     return self.videoFilterHandler($0, at: $1)
                 } progress: {
-                    progressView?.progress = $0
+                    progressView?.setProgress($0)
                 } completion: { [weak self] result in
                     guard let self = self else {
                         return
@@ -269,21 +255,16 @@ extension EditorViewController {
                     case .success(let videoResult):
                         DispatchQueue.global(qos: .userInteractive).async {
                             DispatchQueue.main.async {
-                                ProgressHUD.hide(forView: self.view)
+                                PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
                                 self.videoProcessCompletion(videoResult)
                             }
                         }
                     case .failure(let error):
-                        ProgressHUD.hide(forView: self.view, animated: true)
+                        PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
                         if error.isCancel {
                             return
                         }
-                        ProgressHUD.showWarning(
-                            addedTo: self.view,
-                            text: .textManager.editor.processingFailedHUDTitle.text,
-                            animated: true,
-                            delayHide: 1.5
-                        )
+                        PhotoManager.HUDView.showInfo(with: .textManager.editor.processingFailedHUDTitle.text, delay: 1.5, animated: true, addedTo: self.view)
                     }
                 }
             }else {
@@ -341,15 +322,11 @@ extension EditorViewController {
     
     func videoFilterProcessing(_ factor: EditorVideoFactor) {
         guard let avAsset = editorView.avAsset else {
-            ProgressHUD.hide(forView: self.view, animated: true)
-            ProgressHUD.showWarning(addedTo: self.view, text: .textManager.editor.processingFailedHUDTitle.text, animated: true, delayHide: 1.5)
+            PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
+            PhotoManager.HUDView.showInfo(with: .textManager.editor.processingFailedHUDTitle.text, delay: 1.5, animated: true, addedTo: self.view)
             return
         }
-        let progressView = ProgressHUD.showProgress(
-            addedTo: view,
-            text: .textManager.editor.processingHUDTitle.text,
-            animated: true
-        )
+        let progressView = PhotoManager.HUDView.showProgress(with: .textManager.editor.processingHUDTitle.text, progress: 0, animated: true, addedTo: view)
         let urlConfig: EditorURLConfig
         if let _urlConfig = config.urlConfig {
             urlConfig = _urlConfig
@@ -369,7 +346,7 @@ extension EditorViewController {
             return self.videoFilterHandler($0, at: $1)
         }
         videoTool.export {
-            progressView?.progress = $0
+            progressView?.setProgress($0)
         } completionHandler: { [weak self] result in
             guard let self = self else {
                 return
@@ -382,7 +359,7 @@ extension EditorViewController {
                     let coverImage = PhotoTools.getVideoThumbnailImage(videoURL: url, atTime: 0.1)
                     let videoTime = PhotoTools.transformVideoDurationToString(duration: videoDuration)
                     DispatchQueue.main.async {
-                        ProgressHUD.hide(forView: self.view)
+                        PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
                         self.videoProcessCompletion(
                             .init(
                                 urlConfig: urlConfig,
@@ -396,11 +373,11 @@ extension EditorViewController {
                     }
                 }
             case .failure(let error):
-                ProgressHUD.hide(forView: self.view, animated: true)
+                PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
                 if error.isCancel {
                     return
                 }
-                ProgressHUD.showWarning(addedTo: self.view, text: .textManager.editor.processingFailedHUDTitle.text, animated: true, delayHide: 1.5)
+                PhotoManager.HUDView.showInfo(with: .textManager.editor.processingFailedHUDTitle.text, delay: 1.5, animated: true, addedTo: self.view)
             }
         }
         self.videoTool = videoTool
@@ -473,7 +450,7 @@ extension EditorViewController {
         default:
             break
         }
-        ProgressHUD.hide(forView: view)
+        PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: view)
         removeVideo()
         if isCancel {
             isDismissed = true

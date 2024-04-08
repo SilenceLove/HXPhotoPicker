@@ -58,8 +58,6 @@ extension PhotoPickerViewController: PhotoAlbumListDelegate {
         if titleView.isSelected {
             // 展开
             if albumView.assetCollections.isEmpty {
-//                ProgressHUD.showLoading(addedTo: view, animated: true)
-//                ProgressHUD.hide(forView: weakSelf?.navigationController?.view, animated: true)
                 titleView.isSelected = false
                 return
             }
@@ -118,7 +116,7 @@ extension PhotoPickerViewController: PhotoAlbumListDelegate {
     
     func getAlbumViewHeight() -> CGFloat {
         var albumViewHeight = CGFloat(albumView.assetCollections.count) * pickerConfig.albumList.cellHeight
-        if AssetManager.authorizationStatusIsLimited() &&
+        if AssetPermissionsUtil.isLimitedAuthorizationStatus &&
             pickerConfig.allowLoadPhotoLibrary {
             albumViewHeight += 40
         }
@@ -139,10 +137,7 @@ extension PhotoPickerViewController: PhotoAlbumListDelegate {
         }
         titleView.title = assetCollection.albumName
         self.assetCollection = assetCollection
-        ProgressHUD.showLoading(
-            addedTo: navigationController?.view,
-            animated: true
-        )
+        PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: navigationController?.view)
         fetchPhotoAssets()
         albumList.reloadData()
     }
@@ -156,10 +151,7 @@ extension PhotoPickerViewController: PhotoAlbumControllerDelegate {
         }
         titleView.title = assetCollection.albumName
         self.assetCollection = assetCollection
-        ProgressHUD.showLoading(
-            addedTo: navigationController?.view,
-            animated: true
-        )
+        PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: navigationController?.view)
         fetchPhotoAssets()
     }
     public func albumController(willAppear viewController: PhotoAlbumController) {

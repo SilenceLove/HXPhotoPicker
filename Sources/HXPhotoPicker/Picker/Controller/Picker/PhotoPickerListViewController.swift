@@ -531,7 +531,7 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
         isCameraCell = sCell is PickerCameraViewCell
         if isCameraCell {
             if !UIImagePickerController.isSourceTypeAvailable(.camera) ||
-                AssetManager.cameraAuthorizationStatus() != .authorized {
+                AssetPermissionsUtil.cameraAuthorizationStatus != .authorized {
                 return nil
             }
         }

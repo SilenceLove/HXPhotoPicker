@@ -250,12 +250,7 @@ extension PhotoPreviewViewController: PhotoToolBarDelegate {
             return
         }
         if assetCount == 0 {
-            ProgressHUD.showWarning(
-                addedTo: view,
-                text: .textPreview.emptyAssetHudTitle.text,
-                animated: true,
-                delayHide: 1.5
-            )
+            PhotoManager.HUDView.showInfo(with: .textPreview.emptyAssetHudTitle.text, delay: 1.5, animated: true, addedTo: view)
             return
         }
         guard let photoAsset = photoAsset(for: currentPreviewIndex) else {

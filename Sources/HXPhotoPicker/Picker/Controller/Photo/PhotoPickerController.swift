@@ -106,7 +106,7 @@ open class PhotoPickerController: UINavigationController {
     public func getCurrentPreviewImageView() -> UIImageView? {
         if let previewVC = previewViewController,
            let cell = previewVC.getCell(for: previewVC.currentPreviewIndex) {
-            return cell.scrollContentView.imageView.imageView
+            return cell.scrollContentView.imageView
         }
         return nil
     }
@@ -236,7 +236,7 @@ open class PhotoPickerController: UINavigationController {
     
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        let status = AssetManager.authorizationStatus()
+        let status = AssetPermissionsUtil.authorizationStatus
         if status.rawValue >= 1 && status.rawValue < 3 {
             if let view = splitViewController?.view {
                 deniedView.frame = view.bounds
@@ -583,14 +583,14 @@ extension PhotoPickerController {
             fetchData.fetchCameraAssetCollection()
             return
         }
-        let status = AssetManager.authorizationStatus()
+        let status = AssetPermissionsUtil.authorizationStatus
         if status.rawValue >= 3 {
             // 有权限
             PHPhotoLibrary.shared().register(self)
             if !PhotoManager.shared.didRegisterObserver {
-                ProgressHUD.showLoading(addedTo: view, animated: true)
+                PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: view)
             }else {
-                ProgressHUD.showLoading(addedTo: view, afterDelay: 0.15, animated: true)
+                PhotoManager.HUDView.show(with: nil, delay: 0.15, animated: true, addedTo: view)
             }
             fetchData.fetchCameraAssetCollection()
             if config.albumShowMode.isPop {
@@ -606,7 +606,7 @@ extension PhotoPickerController {
         }else {
             // 用户还没做出选择，请求权限
             isFirstAuthorization = true
-            AssetManager.requestAuthorization { _ in
+            AssetPermissionsUtil.requestAuthorization { _ in
                 self.requestAuthorization()
                 if self.config.albumShowMode.isPop {
                     self.pickerViewController?.initToolbar()
@@ -652,7 +652,7 @@ extension PhotoPickerController: UINavigationControllerDelegate, PhotoAlbumContr
         if viewController is PhotoAlbumController {
             if fetchData.assetCollections.isEmpty, !isFetchAssetCollection {
                 isFetchAssetCollection = true
-                ProgressHUD.showLoading(addedTo: viewController.view)
+                PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: viewController.view)
                 fetchData.fetchAssetCollections()
             }
         }
@@ -806,7 +806,7 @@ public extension PhotoPickerController {
                    controller.dismiss(true)
                    return
                }
-               ProgressHUD.showLoading(addedTo: self.view)
+               PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: self.view)
                self.pickerTask = Task {
                    do {
                        let objects: [T] = try await result.objects(compression, toFile: fileConfig)
@@ -821,7 +821,7 @@ public extension PhotoPickerController {
                        continuation.resume(with: .failure(error))
                    }
                    self.pickerTask = nil
-                   ProgressHUD.hide(forView: self.view)
+                   PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
                    if isAsyncPicker || isAsyncPickerAutoDismiss {
                        controller.dismiss(true)
                    }
@@ -859,7 +859,7 @@ public extension PhotoPickerController {
                    controller.dismiss(true)
                    return
                }
-               ProgressHUD.showLoading(addedTo: self.view)
+               PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: self.view)
                self.pickerTask = Task {
                    do {
                        let images: [UIImage] = try await result.images(targetSize: targetSize, targetMode: targetMode)
@@ -874,7 +874,7 @@ public extension PhotoPickerController {
                        continuation.resume(with: .failure(error))
                    }
                    self.pickerTask = nil
-                   ProgressHUD.hide(forView: self.view)
+                   PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
                    if isAsyncPicker || isAsyncPickerAutoDismiss {
                        controller.dismiss(true)
                    }

@@ -123,14 +123,14 @@ class EditorChartletViewListCell: UICollectionViewCell,
             #if canImport(Kingfisher)
             if let url = cell.chartlet.url, cell.downloadCompletion {
                 let options: KingfisherOptionsInfo = []
-                ProgressHUD.showLoading(addedTo: superview)
+                PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: superview)
                 PhotoTools.downloadNetworkImage(
                     with: url,
                     cancelOrigianl: true,
                     options: options,
                     completionHandler: { [weak self] (image) in
                     guard let self = self else { return }
-                    ProgressHUD.hide(forView: self.superview)
+                    PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.superview)
                     if let image = image {
                         if self.editorType == .image {
                             if let data = image.kf.gifRepresentation(),
