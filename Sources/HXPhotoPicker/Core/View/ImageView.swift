@@ -16,11 +16,19 @@ typealias HXImageView = GIFImageView
 
 final class ImageView: HXImageView {
     
+    #if canImport(Kingfisher)
     init() {
         super.init(frame: .zero)
         contentMode = .scaleAspectFill
         clipsToBounds = true
     }
+    #else
+    override init() {
+        super.init(frame: .zero)
+        contentMode = .scaleAspectFill
+        clipsToBounds = true
+    }
+    #endif
     
     func setImage(_ image: UIImage?, animated: Bool) {
         if let image = image {

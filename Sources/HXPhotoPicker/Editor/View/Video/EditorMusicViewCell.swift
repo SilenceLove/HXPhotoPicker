@@ -74,7 +74,7 @@ class EditorMusicViewCell: UICollectionViewCell {
         maskLayer.endPoint = CGPoint(x: 1, y: 1)
         maskLayer.locations = [0.0, 0.1, 0.9, 1.0]
         
-        musicIconView = UIImageView.init(image: "hx_editor_tools_music".image?.withRenderingMode(.alwaysTemplate))
+        musicIconView = UIImageView.init(image: .imageResource.editor.music.music.image?.withRenderingMode(.alwaysTemplate))
         musicIconView.tintColor = .white
         musicIconView.size = musicIconView.image?.size ?? .zero
         

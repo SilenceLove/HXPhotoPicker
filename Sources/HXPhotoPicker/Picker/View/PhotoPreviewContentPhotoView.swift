@@ -131,9 +131,8 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
             }
         }
         #else
-        let gifImageView = imageView.my
-        if photoAsset.mediaSubType.isGif && gifImageView.gifImage != nil {
-            gifImageView.startAnimating()
+        if photoAsset.mediaSubType.isGif && imageView.gifImage != nil {
+            imageView.startAnimating()
         }else {
             if canRequest {
                 requestOriginalImage()

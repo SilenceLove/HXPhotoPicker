@@ -109,10 +109,12 @@ public struct AssetSaveUtil {
                         creationRequest?.location = location
                         placeholder = creationRequest?.placeholderForCreatedAsset
                     }
+                    
                     if let placeholder = placeholder,
-                       let phAsset = AssetManager.fetchAsset(
-                        with: placeholder.localIdentifier
-                       ) {
+                       let phAsset = PHAsset.fetchAssets(
+                        withLocalIdentifiers: [placeholder.localIdentifier],
+                        options: nil
+                       ).firstObject {
                         DispatchQueue.main.async {
                             completion(.success(phAsset))
                         }
