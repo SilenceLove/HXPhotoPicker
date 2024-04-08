@@ -109,8 +109,8 @@ open class PhotoPickerData {
     
     public let config: PickerConfiguration
     
-    let requestAssetBytesQueue: OperationQueue
-    let previewRequestAssetBytesQueue: OperationQueue
+    public let requestAssetBytesQueue: OperationQueue
+    public let previewRequestAssetBytesQueue: OperationQueue
     
     public required init(config: PickerConfiguration) {
         self.config = config

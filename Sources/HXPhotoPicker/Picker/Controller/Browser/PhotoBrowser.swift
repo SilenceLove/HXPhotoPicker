@@ -92,6 +92,12 @@ open class PhotoBrowser: PhotoPickerController {
     /// cell已经消失
     public var cellDidEndDisplaying: ContextUpdate?
     
+    /// cell准备点击
+    public var cellShouldSingleClick: SingleClickHandler?
+    
+    /// cell点击事件
+    public var cellSingleClick: SingleClickHandler?
+    
     /// 界面发生滚动时触发
     public var viewDidScroll: ContextUpdate?
     
@@ -294,6 +300,7 @@ open class PhotoBrowser: PhotoPickerController {
         var pConfig = PreviewViewConfiguration()
         pConfig.singleClickCellAutoPlayVideo = false
         pConfig.isShowBottomView = false
+        pConfig.bottomView.isShowPreviewList = false
         pConfig.cancelType = .image
         pConfig.cancelPosition = .left
         pConfig.livePhotoMark.blurStyle = .dark
@@ -463,15 +470,17 @@ extension PhotoBrowser {
     public typealias NumberOfPagesHandler = () -> Int
     /// (当前界面显示的Cell，当前界面显示的index)
     public typealias ContextUpdate = (PhotoPreviewViewCell, Int, PhotoBrowser) -> Void
-    /// (当前转场动画对应的index) -> 动画开始/结束位置对应的View，用于获取坐标
-    public typealias TransitionAnimator = (Int) -> UIView?
-    public typealias TransitionCompletion = (Int) -> Void
+    /// (当前转场动画对应的index，转场类型) -> 动画开始/结束位置对应的View，用于获取坐标
+    public typealias TransitionAnimator = (Int, TransitionType) -> UIView?
+    public typealias TransitionCompletion = (Int, TransitionType) -> Void
     /// (当前界面显示的index，对应的 PhotoAsset 对象，照片浏览器对象)
     public typealias AssetHandler = (Int, PhotoAsset, PhotoBrowser) -> Void
-    /// (当前界面显示的index，照片浏览器对象)
+    /// (当前界面显示的index，对应的 PhotoAsset 对象，照片浏览器对象)  -> true：按照内部逻辑处理，false：内部不做处理
+    public typealias SingleClickHandler = (Int, PhotoAsset, PhotoBrowser) -> Bool
+    /// (照片浏览器对象)
     public typealias ViewLifeCycleHandler = (PhotoBrowser) -> Void
     
-    public struct Configuration {
+    public struct Configuration: PhotoHUDConfig {
         
         /// If the built-in language is not enough, you can add a custom language text
         /// customLanguages - custom language array
@@ -513,6 +522,11 @@ extension PhotoBrowser {
         case titleView
         case bottom
     }
+    
+    public enum TransitionType {
+        case present
+        case dismiss
+    }
 }
 
 extension PhotoBrowser: PhotoPickerControllerDelegate {
@@ -551,9 +565,25 @@ extension PhotoBrowser: PhotoPickerControllerDelegate {
     
     public func pickerController(
         _ pickerController: PhotoPickerController,
+        previewShouldSingleClick photoAsset: PhotoAsset,
+        at index: Int
+    ) -> Bool {
+        if let cellShouldSingleClick,
+           !cellShouldSingleClick(index, photoAsset, self) {
+            return false
+        }
+        return true
+    }
+    
+    public func pickerController(
+        _ pickerController: PhotoPickerController,
         previewSingleClick photoAsset: PhotoAsset,
         atIndex: Int
     ) {
+        if let cellSingleClick,
+           !cellSingleClick(atIndex, photoAsset, self) {
+            return
+        }
         if photoAsset.mediaType == .photo {
             pickerController.dismiss(animated: true, completion: nil)
         }else {
@@ -642,7 +672,7 @@ extension PhotoBrowser: PhotoPickerControllerDelegate {
         _ pickerController: PhotoPickerController,
         presentPreviewViewForIndexAt index: Int
     ) -> UIView? {
-        transitionAnimator?(index)
+        transitionAnimator?(index, .present)
     }
     
     /// dismiss 结束时对应的视图，用于获取位置大小。与 dismissPreviewFrameForIndexAt 一样
@@ -650,7 +680,7 @@ extension PhotoBrowser: PhotoPickerControllerDelegate {
         _ pickerController: PhotoPickerController,
         dismissPreviewViewForIndexAt index: Int
     ) -> UIView? {
-        transitionAnimator?(index)
+        transitionAnimator?(index, .dismiss)
     }
     
     public func pickerController(
@@ -690,11 +720,11 @@ extension PhotoBrowser: PhotoPickerControllerDelegate {
     }
     
     public func pickerController(_ pickerController: PhotoPickerController, previewPresentComplete atIndex: Int) {
-        transitionCompletion?(atIndex)
+        transitionCompletion?(atIndex, .present)
     }
     
     public func pickerController(_ pickerController: PhotoPickerController, previewDismissComplete atIndex: Int) {
-        transitionCompletion?(atIndex)
+        transitionCompletion?(atIndex, .dismiss)
     }
 }
 
