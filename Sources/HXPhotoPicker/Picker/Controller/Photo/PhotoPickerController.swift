@@ -593,9 +593,6 @@ extension PhotoPickerController {
                 PhotoManager.HUDView.show(with: nil, delay: 0.15, animated: true, addedTo: view)
             }
             fetchData.fetchCameraAssetCollection()
-            if config.albumShowMode.isPop {
-                fetchData.fetchAssetCollections()
-            }
         }else if status.rawValue >= 1 {
             // 无权限
             if splitType.isSplit {

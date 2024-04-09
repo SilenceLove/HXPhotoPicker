@@ -324,9 +324,11 @@ open class PhotoBrowser: PhotoPickerController {
     
     public let hideSourceView: Bool
     
-    fileprivate var gradualShadowImageView: UIImageView!
+    /// 导航栏阴影背景
+    public var gradualShadowImageView: UIImageView!
     
-    fileprivate var didHidden: Bool = false
+    /// 点击 cell 之后导航栏、页面指示器是否隐藏
+    public var didHidden: Bool = false
     
     @objc func deletePreviewAsset() {
         if pageCount == 0 {

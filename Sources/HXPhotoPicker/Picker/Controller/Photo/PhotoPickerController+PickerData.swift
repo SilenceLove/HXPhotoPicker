@@ -63,7 +63,13 @@ extension PhotoPickerController: PhotoFetchDataDelegate {
             vc.showLoading = false
             pushViewController(vc, animated: false)
         default:
+            if config.albumShowMode.isPop {
+                fetchData.fetchAssetCollections()
+            }
             pickerViewController?.updateAssetCollection(fetchData.cameraAssetCollection, isShow: false)
+            if let assetCollection = fetchData.cameraAssetCollection {
+                pickerViewController?.updateAssetCollections([assetCollection])
+            }
         }
         if let splitViewController = splitViewController as? PhotoSplitViewController,
            let collection = fetchData.cameraAssetCollection {
