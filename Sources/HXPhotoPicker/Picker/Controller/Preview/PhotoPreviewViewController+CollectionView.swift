@@ -170,16 +170,9 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
            !pickerDelegate.pickerController(
             pickerController,
             previewShouldSingleClick: cell.photoAsset,
-            at: currentPreviewIndex
-           )
-        {
+            at: currentPreviewIndex) {
             return
         }
-        pickerController.pickerDelegate?.pickerController(
-            pickerController,
-            previewSingleClick: cell.photoAsset,
-            atIndex: currentPreviewIndex
-        )
         let isHidden = navigationController.navigationBar.isHidden
         statusBarShouldBeHidden = !isHidden
         if self.modalPresentationStyle == .fullScreen ||
