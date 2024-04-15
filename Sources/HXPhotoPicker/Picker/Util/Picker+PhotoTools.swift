@@ -272,6 +272,22 @@ extension PhotoTools {
                 }
                 return avAsset
             }
+            if let phAsset = photoAsset.phAsset {
+                let options = PHVideoRequestOptions()
+                options.deliveryMode = .fastFormat
+                options.version = .current
+                AssetManager.requestPlayerItem(for: phAsset, options: options) { result in
+                    switch result {
+                    case .success(let playerItem):
+                        photoAsset.updateVideoDuration(playerItem.duration.seconds)
+                        DispatchQueue.main.async {
+                            completionHandler(photoAsset, playerItem.duration.seconds)
+                        }
+                    default:
+                        break
+                    }
+                }
+            }
         }
         return nil
     }

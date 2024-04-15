@@ -288,7 +288,9 @@ extension PhotoAsset {
             mediaType = .video
             mediaSubType = .video
             pVideoDuration = phAsset.duration
-            pVideoTime = PhotoTools.transformVideoDurationToString(duration: TimeInterval(round(phAsset.duration)))
+            if !phAsset.mediaSubtypes.contains(.videoHighFrameRate) {
+                pVideoTime = PhotoTools.transformVideoDurationToString(duration: TimeInterval(round(phAsset.duration)))
+            }
         }
     }
     
