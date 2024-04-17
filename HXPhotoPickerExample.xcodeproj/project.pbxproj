@@ -3066,7 +3066,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.1.9;
+				MARKETING_VERSION = 4.1.9.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -3130,7 +3130,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.1.9;
+				MARKETING_VERSION = 4.1.9.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-framework",
