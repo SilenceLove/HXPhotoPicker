@@ -4,6 +4,8 @@
 
 ### Resolved
 
+- [[654]](https://github.com/SilenceLove/HXPhotoPicker/issues/654)
+- [[653]](https://github.com/SilenceLove/HXPhotoPicker/issues/653)
 - [[649]](https://github.com/SilenceLove/HXPhotoPicker/issues/649)
 - [[647]](https://github.com/SilenceLove/HXPhotoPicker/issues/647)
 - [[646]](https://github.com/SilenceLove/HXPhotoPicker/issues/646)
