@@ -107,7 +107,14 @@ public struct CameraConfiguration: IndicatorTypeConfig, PhotoHUDConfig {
     public var takePhotoMode: TakePhotoMode = .press
     
     /// 主题色
-    public var tintColor: UIColor = .systemBlue
+    public var tintColor: UIColor = .systemBlue {
+        didSet {
+            focusColor = tintColor
+        }
+    }
+    
+    /// 聚焦框的颜色
+    public var focusColor: UIColor = .systemBlue
     
     /// 摄像头最大缩放比例
     public var videoMaxZoomScale: CGFloat = 6

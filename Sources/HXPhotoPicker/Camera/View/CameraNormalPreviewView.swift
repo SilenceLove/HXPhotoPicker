@@ -78,7 +78,7 @@ class CameraNormalPreviewView: UIView {
         
         focusView = CameraFocusView(
             size: CGSize(width: 80, height: 80),
-            color: config.tintColor
+            color: config.focusColor
         )
         focusView.layer.opacity = 0
         focusView.isUserInteractionEnabled = false
