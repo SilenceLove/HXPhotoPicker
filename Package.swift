@@ -19,7 +19,8 @@ let package = Package(
             name: "HXPhotoPicker",
             dependencies: ["Kingfisher"],
             resources: [
-                .process("Resources")
+                .process("Resources/HXPhotoPicker.bundle"),
+                .copy("Resources/PrivacyInfo.xcprivacy")
             ],
             swiftSettings: [
                 .define("HXPICKER_ENABLE_SPM"),

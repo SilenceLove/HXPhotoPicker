@@ -444,6 +444,7 @@
 		D373DADC2BB1101D0028EBD2 /* AssetSaveUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D373DADB2BB1101D0028EBD2 /* AssetSaveUtil.swift */; };
 		D373DADE2BB111B00028EBD2 /* AssetPermissionsUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D373DADD2BB111B00028EBD2 /* AssetPermissionsUtil.swift */; };
 		D373DAE52BB118C90028EBD2 /* PhotoAsset+Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = D373DAE42BB118C90028EBD2 /* PhotoAsset+Image.swift */; };
+		D37E5D2A2BD108FF005E4C87 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D37E5D292BD108FF005E4C87 /* PrivacyInfo.xcprivacy */; };
 		D3837B2E2AA4312400F4D64E /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3837B2D2AA4312400F4D64E /* Extension.swift */; };
 		D3899BAB2AE621AB0052BAC7 /* PhotoPickerPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3899BAA2AE621AB0052BAC7 /* PhotoPickerPageViewController.swift */; };
 		D38AF2022BB660560094BBF6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D38AF2012BB660560094BBF6 /* Localizable.strings */; };
@@ -928,6 +929,7 @@
 		D373DADB2BB1101D0028EBD2 /* AssetSaveUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetSaveUtil.swift; sourceTree = "<group>"; };
 		D373DADD2BB111B00028EBD2 /* AssetPermissionsUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetPermissionsUtil.swift; sourceTree = "<group>"; };
 		D373DAE42BB118C90028EBD2 /* PhotoAsset+Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhotoAsset+Image.swift"; sourceTree = "<group>"; };
+		D37E5D292BD108FF005E4C87 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		D3837B2D2AA4312400F4D64E /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		D3899BAA2AE621AB0052BAC7 /* PhotoPickerPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerPageViewController.swift; sourceTree = "<group>"; };
 		D38AF2012BB660560094BBF6 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
@@ -1675,6 +1677,7 @@
 		D368793A2A399B8C00E70910 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D37E5D292BD108FF005E4C87 /* PrivacyInfo.xcprivacy */,
 				D368793B2A399B8C00E70910 /* HXPhotoPicker.bundle */,
 			);
 			path = Resources;
@@ -2361,6 +2364,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D37E5D2A2BD108FF005E4C87 /* PrivacyInfo.xcprivacy in Resources */,
 				D360E6FB2A6B723C00740B6B /* HXPhotoPicker.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

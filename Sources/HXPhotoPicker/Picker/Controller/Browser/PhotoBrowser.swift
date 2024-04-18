@@ -861,7 +861,7 @@ open class PhotoBrowserVideoCell: PreviewVideoControlViewCell {
             x: 0,
             y: height - 50 - UIDevice.bottomMargin - 30,
             width: width,
-            height: 50 + UIDevice.bottomMargin
+            height: 50 + (UIDevice.bottomMargin == 0 ? 20 : UIDevice.bottomMargin)
         )
         maskBackgroundView.frame = sliderView.frame
         maskLayer.frame = maskBackgroundView.bounds

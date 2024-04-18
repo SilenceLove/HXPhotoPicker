@@ -17,7 +17,7 @@ Pod::Spec.new do |spec|
     
     spec.subspec 'Core' do |core|
         core.source_files   = "Sources/HXPhotoPicker/Core/**/*.{swift}"
-        core.resources      = "Sources/HXPhotoPicker/Resources/*.{bundle}"
+        core.resources      = "Sources/HXPhotoPicker/Resources/*.{bundle,xcprivacy}"
     end
     
     spec.subspec 'Picker' do |picker|

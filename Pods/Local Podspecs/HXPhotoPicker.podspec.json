@@ -31,7 +31,7 @@
     {
       "name": "Core",
       "source_files": "Sources/HXPhotoPicker/Core/**/*.{swift}",
-      "resources": "Sources/HXPhotoPicker/Resources/*.{bundle}"
+      "resources": "Sources/HXPhotoPicker/Resources/*.{bundle,xcprivacy}"
     },
     {
       "name": "Picker",
