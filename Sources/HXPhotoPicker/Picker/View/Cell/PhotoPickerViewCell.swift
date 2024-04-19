@@ -183,6 +183,14 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
             }
             if $1 {
                 self.requestICloudState()
+                if self.photoAsset.mediaType == .video, self.photoAsset.videoTime == nil {
+                    self.videoDurationAsset = self.photoAsset.getVideoDuration { [weak self] (asset, _) in
+                        guard let self = self, self.photoAsset == asset else { return }
+                        self.assetTypeLb.text = asset.videoTime
+                        self.videoDurationAsset = nil
+                        self.delegate?.pickerCell(videoRequestDurationCompletion: self)
+                    }
+                }
             }else {
                 if $0.downloadStatus != .canceled {
                     self.loaddingView.isHidden = true
@@ -300,14 +308,11 @@ extension PhotoPickerViewCell {
                 assetTypeLb.text = videoTime
             }else {
                 assetTypeLb.text = nil
-                videoDurationAsset = PhotoTools.getVideoDuration(
-                    for: photoAsset
-                ) { [weak self] (asset, _) in
-                    guard let self = self else { return }
-                    if self.photoAsset == asset {
-                        self.assetTypeLb.text = asset.videoTime
-                        self.videoDurationAsset = nil
-                    }
+                videoDurationAsset = photoAsset.getVideoDuration { [weak self] (asset, _) in
+                    guard let self = self, self.photoAsset == asset else { return }
+                    self.assetTypeLb.text = asset.videoTime
+                    self.videoDurationAsset = nil
+                    self.delegate?.pickerCell(videoRequestDurationCompletion: self)
                 }
             }
             assetTypeMaskView.isHidden = false

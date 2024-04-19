@@ -245,6 +245,7 @@ open class PhotoAsset: Equatable {
     var pVideoDuration: TimeInterval = 0
     var playerTime: CGFloat = 0
     var isScrolling = false
+    var requestVideoDurationId: PHImageRequestID?
     
     var identifie: String {
         if let phAsset = phAsset {
@@ -287,9 +288,21 @@ extension PhotoAsset {
         }else if phAsset.mediaType == .video {
             mediaType = .video
             mediaSubType = .video
-            pVideoDuration = phAsset.duration
             if !phAsset.mediaSubtypes.contains(.videoHighFrameRate) {
+                pVideoDuration = phAsset.duration
                 pVideoTime = PhotoTools.transformVideoDurationToString(duration: TimeInterval(round(phAsset.duration)))
+            }else {
+                let options = PHVideoRequestOptions()
+                options.deliveryMode = .fastFormat
+                options.version = .current
+                requestVideoDurationId = AssetManager.requestPlayerItem(for: phAsset, options: options) { result in
+                    switch result {
+                    case .success(let playerItem):
+                        self.updateVideoDuration(playerItem.duration.seconds)
+                    default:
+                        break
+                    }
+                }
             }
         }
     }

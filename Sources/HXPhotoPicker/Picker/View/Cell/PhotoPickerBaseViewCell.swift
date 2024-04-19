@@ -14,10 +14,12 @@ import Kingfisher
 
 public protocol PhotoPickerViewCellDelegate: AnyObject {
     func pickerCell(_ cell: PhotoPickerBaseViewCell, didSelectControl isSelected: Bool)
+    func pickerCell(videoRequestDurationCompletion cell: PhotoPickerBaseViewCell)
 }
 
 public extension PhotoPickerViewCellDelegate {
     func pickerCell(_ cell: PhotoPickerBaseViewCell, didSelectControl isSelected: Bool) { }
+    func pickerCell(videoRequestDurationCompletion cell: PhotoPickerBaseViewCell) { }
 }
 
 open class PhotoPickerBaseViewCell: UICollectionViewCell {
