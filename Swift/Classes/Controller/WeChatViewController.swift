@@ -206,7 +206,7 @@ class WeChatViewCell: UITableViewCell {
                         stateLb.text = videoTime
                     }else {
                         stateLb.text = nil
-                        avAsset = PhotoTools.getVideoDuration(for: photoAsset) { [weak self] (asset, duration) in
+                        avAsset = photoAsset.getVideoDuration { [weak self] (asset, duration) in
                             guard let self = self else { return }
                             if self.photoAsset == asset {
                                 self.stateLb.text = asset.videoTime

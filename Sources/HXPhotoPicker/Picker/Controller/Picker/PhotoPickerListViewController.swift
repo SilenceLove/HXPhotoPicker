@@ -884,6 +884,19 @@ extension PhotoPickerListViewController: PhotoPickerViewCellDelegate {
         delegate?.photoList(selectedAssetDidChanged: self)
     }
     
+    public func pickerCell(videoRequestDurationCompletion cell: PhotoPickerBaseViewCell) {
+        if !cell.photoAsset.isSelected &&
+            config.cell.isShowDisableMask &&
+            pickerConfig.maximumSelectedVideoFileSize == 0 &&
+            pickerConfig.maximumSelectedPhotoFileSize == 0 {
+            cell.canSelect = pickerController.pickerData.canSelect(
+                cell.photoAsset,
+                isShowHUD: false
+            )
+        }else {
+            cell.canSelect = true
+        }
+    }
 }
 
 extension PhotoPickerListViewController: PhotoPeekViewControllerDelegate {
