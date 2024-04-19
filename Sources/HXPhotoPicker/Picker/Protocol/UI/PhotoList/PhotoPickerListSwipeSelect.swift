@@ -218,8 +218,14 @@ public extension PhotoPickerListSwipeSelect {
         swipeSelectedIndexArray = nil
     }
     private func panGRChangedUpdateState(index: Int, state: PhotoPickerListSwipeSelectState) {
-        if index >= assets.count && !needOffset {
-            return
+        if needOffset {
+            if index < offsetIndex {
+                return
+            }
+        }else {
+            if index >= assets.count {
+                return
+            }
         }
         let photoAsset = getAsset(for: index)
         if swipeSelectState == .select {
