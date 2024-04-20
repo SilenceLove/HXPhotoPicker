@@ -13,11 +13,12 @@ Pod::Spec.new do |spec|
 
     spec.framework          = 'UIKit','Photos','PhotosUI'
     spec.requires_arc       = true
+    spec.resources      = "Sources/HXPhotoPicker/Resources/*.{bundle}"
+    spec.resource_bundle = { 'HXPhotoPicker_Privacy' => ['Sources/HXPhotoPicker/Resources/PrivacyInfo.xcprivacy']}
     spec.default_subspec    = 'Full'
     
     spec.subspec 'Core' do |core|
         core.source_files   = "Sources/HXPhotoPicker/Core/**/*.{swift}"
-        core.resources      = "Sources/HXPhotoPicker/Resources/*.{bundle,xcprivacy}"
     end
     
     spec.subspec 'Picker' do |picker|
