@@ -43,6 +43,10 @@ public extension PhotoPickerListSwipeSelect {
     ) {
         if let indexPath = collectionView.indexPathForItem(at: localPoint),
            let photoAsset = getCell(for: indexPath.item)?.photoAsset {
+            if photoAsset.mediaType == .video &&
+                pickerController.pickerData.videoDurationExceedsTheLimit(photoAsset) {
+                return
+            }
             if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: false) && !photoAsset.isSelected {
                 return
             }
@@ -144,6 +148,10 @@ public extension PhotoPickerListSwipeSelect {
                 updateCellSelectedTitle()
             }else {
                 if let photoAsset = getCell(for: lastIndex)?.photoAsset {
+                    if photoAsset.mediaType == .video &&
+                        pickerController.pickerData.videoDurationExceedsTheLimit(photoAsset) {
+                        return
+                    }
                     if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: false) && !photoAsset.isSelected {
                         return
                     }
@@ -228,6 +236,10 @@ public extension PhotoPickerListSwipeSelect {
             }
         }
         let photoAsset = getAsset(for: index)
+        if photoAsset.mediaType == .video &&
+            pickerController.pickerData.videoDurationExceedsTheLimit(photoAsset) {
+            return
+        }
         if swipeSelectState == .select {
             if let array = swipeSelectedIndexArray,
                !photoAsset.isSelected,
