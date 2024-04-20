@@ -35,7 +35,7 @@ PODS:
     - Kingfisher (~> 7.0)
   - HXPhotoPicker/Picker/Lite (4.1.9.2):
     - HXPhotoPicker/Core
-  - Kingfisher (7.9.1)
+  - Kingfisher (7.11.0)
 
 DEPENDENCIES:
   - HXPhotoPicker (from `./`)
@@ -50,7 +50,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   HXPhotoPicker: a3a25281807713e6a22f31f3e2d426ef4cad3177
-  Kingfisher: 1d14e9f59cbe19389f591c929000332bf70efd32
+  Kingfisher: b9c985d864d43515f404f1ef4a8ce7d802ace3ac
 
 PODFILE CHECKSUM: 21b9e041ba4e451b12f1e956e5cd813bc50684be
 
