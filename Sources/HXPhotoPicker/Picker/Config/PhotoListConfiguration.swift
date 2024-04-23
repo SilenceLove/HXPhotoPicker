@@ -146,7 +146,26 @@ public struct PhotoListConfiguration {
     
     /// The name saved in the custom album, or BundleName when it is empty
     /// 保存在自定义相册的名字，为空时则取 BundleName
-    public var customAlbumName: String?
+    public var customAlbumName: String? {
+        get {
+            switch saveSystemAlbumType {
+            case .custom(let name):
+                return name
+            default:
+                return nil
+            }
+        }
+        set {
+            if let name = newValue {
+                saveSystemAlbumType = .custom(name)
+            }else {
+                saveSystemAlbumType = .displayName
+            }
+        }
+    }
+    
+    /// 保存到自定义相册的类型
+    public var saveSystemAlbumType: AssetSaveUtil.AlbumType = .displayName
     
     /// When the album permission is the selected photo, it is allowed to add more cells and select more photos/videos
     /// 当相册权限为选中的照片时，允许添加更多cell，选择更多照片/视频

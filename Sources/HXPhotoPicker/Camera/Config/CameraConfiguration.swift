@@ -69,6 +69,9 @@ public struct CameraConfiguration: IndicatorTypeConfig, PhotoHUDConfig {
     /// 拍照完成后保存到系统相册
     public var isSaveSystemAlbum: Bool = false
     
+    /// 保存到自定义相册的类型
+    public var saveSystemAlbumType: AssetSaveUtil.AlbumType = .displayName
+    
     /// 相机类型
     public var cameraType: CameraController.CameraType = .normal
     

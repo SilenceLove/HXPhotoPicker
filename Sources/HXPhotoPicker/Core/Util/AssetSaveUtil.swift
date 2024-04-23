@@ -21,26 +21,38 @@ public struct AssetSaveUtil {
     public enum SaveError: Error {
         case notDetermined
         case phAssetIsNull
+        case systemError(Error)
+    }
+    
+    public enum AlbumType {
+        /// 只保存到`所有相册`，不创建新相册
+        case none
+        
+        // 保存到指定名称的相册，如果相册不存在会先创建
+        /// 项目名称
+        case displayName
+        /// 指定相册名称
+        case custom(String)
     }
     
     /// 保存资源到系统相册
     /// - Parameters:
     ///   - type: 保存类型
-    ///   - customAlbumName: 需要保存到自定义相册的名称，默认BundleName
+    ///   - albumType: 需要保存到自定义相册的类型
     ///   - creationDate: 创建时间，默认当前时间
     ///   - location: 位置信息
     @available(iOS 13.0.0, *)
     @discardableResult
     public static func save(
         type: SaveType,
-        customAlbumName: String? = nil,
+        albumType: AlbumType = .displayName,
         creationDate: Date = .init(),
         location: CLLocation? = nil
     ) async throws -> PHAsset {
         try await withCheckedThrowingContinuation { continuation in
             save(
                 type: type,
-                customAlbumName: customAlbumName,
+                albumType: albumType,
                 creationDate: creationDate,
                 location: location
             ) { result in
@@ -57,23 +69,17 @@ public struct AssetSaveUtil {
     /// 保存资源到系统相册
     /// - Parameters:
     ///   - type: 保存类型
-    ///   - customAlbumName: 需要保存到自定义相册的名称，默认BundleName
+    ///   - albumType: 需要保存到自定义相册的类型   
     ///   - creationDate: 创建时间，默认当前时间
     ///   - location: 位置信息
     ///   - completion: 保存之后的结果
     public static func save(
         type: SaveType,
-        customAlbumName: String? = nil,
+        albumType: AlbumType = .displayName,
         creationDate: Date = .init(),
         location: CLLocation? = nil,
-        completion: @escaping (Result<PHAsset, Error>) -> Void
+        completion: @escaping (Result<PHAsset, SaveError>) -> Void
     ) {
-        var albumName: String?
-        if let customAlbumName = customAlbumName, customAlbumName.count > 0 {
-            albumName = customAlbumName
-        }else {
-            albumName = displayName
-        }
         AssetPermissionsUtil.requestAuthorization {
             switch $0 {
             case .denied, .notDetermined, .restricted:
@@ -118,7 +124,12 @@ public struct AssetSaveUtil {
                         DispatchQueue.main.async {
                             completion(.success(phAsset))
                         }
-                        if let albumName = albumName, !albumName.isEmpty {
+                        switch albumType {
+                        case .none:
+                            break
+                        case .displayName:
+                            saveCustomAlbum(for: phAsset, albumName: displayName)
+                        case .custom(let albumName):
                             saveCustomAlbum(for: phAsset, albumName: albumName)
                         }
                     }else {
@@ -128,7 +139,7 @@ public struct AssetSaveUtil {
                     }
                 } catch {
                     DispatchQueue.main.async {
-                        completion(.failure(error))
+                        completion(.failure(SaveError.systemError(error)))
                     }
                 }
             }

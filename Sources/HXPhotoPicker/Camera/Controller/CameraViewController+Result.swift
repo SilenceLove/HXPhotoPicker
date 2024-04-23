@@ -36,6 +36,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
             navigationController?.view.hx.show()
             AssetSaveUtil.save(
                 type: .image(image),
+                albumType: config.saveSystemAlbumType,
                 location: location
             ) {
                 self.navigationController?.view.hx.hide()
@@ -60,6 +61,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
             navigationController?.view.hx.show()
             AssetSaveUtil.save(
                 type: .videoURL(videoURL),
+                albumType: config.saveSystemAlbumType,
                 location: location
             ) {
                 self.navigationController?.view.hx.hide()

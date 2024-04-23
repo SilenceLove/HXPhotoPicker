@@ -186,7 +186,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
     ) {
         AssetSaveUtil.save(
             type: type,
-            customAlbumName: config.customAlbumName,
+            albumType: config.saveSystemAlbumType,
             location: location
         ) {
             switch $0 {
