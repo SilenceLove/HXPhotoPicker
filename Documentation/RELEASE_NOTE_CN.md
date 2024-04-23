@@ -1,5 +1,17 @@
 # 更新日志 
 
+## 4.2.0
+
+### 新增
+
+- 隐私 api 添加 .xcprivacy 文件
+
+### 修复
+
+- [[663]](https://github.com/SilenceLove/HXPhotoPicker/issues/663)
+- [[660]](https://github.com/SilenceLove/HXPhotoPicker/issues/660)
+- [[659]](https://github.com/SilenceLove/HXPhotoPicker/issues/659)
+
 ## 4.1.9
 
 ### 修复
