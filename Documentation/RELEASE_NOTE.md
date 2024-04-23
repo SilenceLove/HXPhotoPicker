@@ -1,9 +1,24 @@
 # Release Notes
 
+## 4.2.0
+
+### Add
+
+- add .xcprivacy file for privacy api's
+
+### Resolved
+
+- [[663]](https://github.com/SilenceLove/HXPhotoPicker/issues/663)
+- [[660]](https://github.com/SilenceLove/HXPhotoPicker/issues/660)
+- [[659]](https://github.com/SilenceLove/HXPhotoPicker/issues/659)
+
 ## 4.1.9
 
 ### Resolved
 
+- [[663]](https://github.com/SilenceLove/HXPhotoPicker/issues/663)
+- [[660]](https://github.com/SilenceLove/HXPhotoPicker/issues/660)
+- [[659]](https://github.com/SilenceLove/HXPhotoPicker/issues/659)
 - [[654]](https://github.com/SilenceLove/HXPhotoPicker/issues/654)
 - [[653]](https://github.com/SilenceLove/HXPhotoPicker/issues/653)
 - [[649]](https://github.com/SilenceLove/HXPhotoPicker/issues/649)
