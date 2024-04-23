@@ -11,7 +11,7 @@ import Photos
 public extension PhotoAsset {
     /// 保存到系统相册
     func saveToSystemAlbum(
-        albumName: String? = nil,
+        albumType: AssetSaveUtil.AlbumType = .displayName,
         _ completion: ((Result<PHAsset, Error>) -> Void)? = nil
     ) {
         if mediaSubType == .localLivePhoto {
@@ -24,7 +24,7 @@ public extension PhotoAsset {
                     }
                     AssetSaveUtil.save(
                         type: .livePhoto(imageURL: livePhoto.imageURL, videoURL: livePhoto.videoURL),
-                        customAlbumName: albumName
+                        albumType: albumType
                     ) {
                         switch $0 {
                         case .success(let phAsset):
@@ -42,7 +42,7 @@ public extension PhotoAsset {
         func save(_ type: AssetSaveUtil.SaveType) {
             AssetSaveUtil.save(
                 type: type,
-                customAlbumName: albumName
+                albumType: albumType
             ) {
                 switch $0 {
                 case .success(let phAsset):
@@ -248,9 +248,9 @@ public extension PhotoAsset {
     
     /// 保存到系统相册
     @discardableResult
-    func saveAlbum(_ albumName: String? = nil) async throws -> PHAsset {
+    func saveAlbum(_  albumType: AssetSaveUtil.AlbumType = .displayName) async throws -> PHAsset {
         try await withCheckedThrowingContinuation { continuation in
-            saveToSystemAlbum(albumName: albumName) { result in
+            saveToSystemAlbum(albumType: albumType) { result in
                 switch result {
                 case .success(let phAsset):
                     continuation.resume(returning: phAsset)
