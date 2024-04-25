@@ -13,14 +13,10 @@ import AVFoundation
 public struct CameraConfiguration: IndicatorTypeConfig, PhotoHUDConfig {
     
     /// 图片资源
-    public var imageResource: HX.ImageResource.Camera {
-        HX.ImageResource.shared.camera
-    }
+    public var imageResource: HX.ImageResource { HX.ImageResource.shared }
     
     /// 文本管理
-    public var textManager: HX.TextManager.Camera {
-        HX.TextManager.shared.camera
-    }
+    public var textManager: HX.TextManager { HX.TextManager.shared }
     
     public var modalPresentationStyle: UIModalPresentationStyle
     
