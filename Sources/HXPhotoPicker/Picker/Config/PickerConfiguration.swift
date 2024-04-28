@@ -11,10 +11,10 @@ import UIKit
 public struct PickerConfiguration: IndicatorTypeConfig, PhotoDebugLogsConfig, PhotoHUDConfig {
     
     /// 图片资源
-    public var imageResource: HX.ImageResource.Picker { HX.ImageResource.shared.picker }
+    public var imageResource: HX.ImageResource { HX.ImageResource.shared }
     
     /// 文本管理
-    public var textManager: HX.TextManager.Picker { HX.TextManager.shared.picker }
+    public var textManager: HX.TextManager { HX.TextManager.shared }
     
     /// 主题色
     public var themeColor: UIColor = .systemBlue { didSet { setThemeColor(themeColor) } }

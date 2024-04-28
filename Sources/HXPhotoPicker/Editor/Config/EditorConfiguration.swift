@@ -10,14 +10,10 @@ import UIKit
 public struct EditorConfiguration: IndicatorTypeConfig, PhotoHUDConfig {
     
     /// 图片资源
-    public var imageResource: HX.ImageResource.Editor {
-        HX.ImageResource.shared.editor
-    }
+    public var imageResource: HX.ImageResource { HX.ImageResource.shared }
     
     /// 文本管理
-    public var textManager: HX.TextManager.Editor {
-        HX.TextManager.shared.editor
-    }
+    public var textManager: HX.TextManager { HX.TextManager.shared }
     
     public var modalPresentationStyle: UIModalPresentationStyle
     
