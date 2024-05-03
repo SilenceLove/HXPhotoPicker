@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                   = "HXPhotoPicker-Lite"
-    spec.version                = "4.2.0"
+    spec.version                = "4.2.0.1"
     spec.summary                = "Photo selector - Support LivePhoto, GIF selection"
     spec.homepage               = "https://github.com/SilenceLove/HXPhotoPicker"
     spec.license                = { :type => "MIT", :file => "LICENSE" }
@@ -10,12 +10,16 @@ Pod::Spec.new do |spec|
     spec.source                 = { :git => "https://github.com/SilenceLove/HXPhotoPicker.git", :tag => "#{spec.version}" }
     spec.framework              = 'UIKit','Photos','PhotosUI'
     spec.requires_arc           = true
-    spec.resources              = "Sources/HXPhotoPicker/Resources/*.{bundle}"
-    spec.resource_bundle        = { 'HXPhotoPicker_Privacy' => ['Sources/HXPhotoPicker/Resources/PrivacyInfo.xcprivacy']}
     spec.default_subspec        = 'Full'
   
     spec.subspec 'Core' do |core|
         core.source_files   = "Sources/HXPhotoPicker/Core/**/*.{swift}"
+        core.dependency 'HXPhotoPicker/Resources'
+    end
+    
+    spec.subspec 'Resources' do |resources|
+        resources.resources          = "Sources/HXPhotoPicker/Resources/*.{bundle}"
+        resources.resource_bundle    = { 'HXPhotoPicker_Privacy' => ['Sources/HXPhotoPicker/Resources/PrivacyInfo.xcprivacy']}
     end
   
     spec.subspec 'Picker' do |picker|
