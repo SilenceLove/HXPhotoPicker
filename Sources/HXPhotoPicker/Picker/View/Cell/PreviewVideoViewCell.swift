@@ -31,7 +31,9 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell {
         playButton.setImage(.imageResource.picker.preview.videoPlay.image, for: UIControl.State.normal)
         playButton.setImage(UIImage.init(), for: UIControl.State.selected)
         playButton.addTarget(self, action: #selector(didPlayButtonClick(button:)), for: UIControl.Event.touchUpInside)
-        playButton.size = playButton.currentImage!.size
+        if let imageSize = playButton.image(for: .normal)?.size {
+            playButton.size = imageSize
+        }
         playButton.alpha = 0
         addSubview(playButton)
     }
