@@ -14,7 +14,7 @@ Pod::Spec.new do |spec|
   
     spec.subspec 'Core' do |core|
         core.source_files   = "Sources/HXPhotoPicker/Core/**/*.{swift}"
-        core.dependency 'HXPhotoPicker/Resources'
+        core.dependency 'HXPhotoPicker-Lite/Resources'
     end
     
     spec.subspec 'Resources' do |resources|
