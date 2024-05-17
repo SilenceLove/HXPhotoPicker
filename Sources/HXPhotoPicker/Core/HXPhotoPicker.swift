@@ -254,7 +254,7 @@ public enum HX {
     }
     #endif
     
-    #if HXPICKER_ENABLE_CAMERA
+    #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
     @available(iOS 13.0, *)
     @MainActor
     public static func capture(
