@@ -43,6 +43,9 @@ class CameraNormalPreviewView: UIView {
                     connection.isVideoMirrored = true
                 }
             }
+            DispatchQueue.main.async {
+                self.resetOrientation()
+            }
         }
     }
     
