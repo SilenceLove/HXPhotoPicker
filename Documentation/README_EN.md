@@ -85,7 +85,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.2.0"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.2.1"))
 ]
 ```
 
@@ -279,7 +279,7 @@ photoAsset.getURL(compression: compression) { result in
 
 ```swift
 /// Get thumbnail
-let thumImage = try await photoAsset.requesthumbnailImage()
+let thumImage = try await photoAsset.requesThumbnailImage()
 
 /// Get preview
 let previewImage = try await photoAsset.requestPreviewImage()
@@ -301,7 +301,7 @@ let livePhoto = try await photoAsset.requestLivePhoto()
   
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
-| [v4.2.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#420) | 2024-04-23 | 15.0.0 | 5.9.0 | 12.0+ |
+| [v4.2.1](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#421) | 2024-05-18 | 15.0.0 | 5.9.0 | 12.0+ |
 
 </details>
 
@@ -310,6 +310,7 @@ let livePhoto = try await photoAsset.requestLivePhoto()
   
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v4.2.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#420) | 2024-04-23 | 15.0.0 | 5.9.0 | 12.0+ |
 | [v4.1.9](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#419) | 2024-04-09 | 15.0.0 | 5.9.0 | 12.0+ |
 | [v4.1.8](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#418) | 2024-03-24 | 15.0.0 | 5.9.0 | 12.0+ |
 | [v4.1.7](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#417) | 2024-03-09 | 15.0.0 | 5.9.0 | 12.0+ |
