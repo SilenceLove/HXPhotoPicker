@@ -1140,7 +1140,7 @@ public extension PhotoAsset {
 @available(iOS 13.0, *)
 public extension PhotoAsset {
     
-    func requesthumbnailImage(
+    func requesThumbnailImage(
         targetWidth: CGFloat = 180,
         didRequestHandler: ((PhotoAsset, PHImageRequestID) -> Void)? = nil
     ) async throws -> UIImage {

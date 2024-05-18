@@ -1,5 +1,14 @@
 # Release Notes
 
+## 4.2.1
+
+### Resolved
+
+- [[691]](https://github.com/SilenceLove/HXPhotoPicker/issues/691)
+- [[690]](https://github.com/SilenceLove/HXPhotoPicker/issues/690)
+- [[686]](https://github.com/SilenceLove/HXPhotoPicker/issues/686)
+- [[681]](https://github.com/SilenceLove/HXPhotoPicker/issues/681)
+
 ## 4.2.0
 
 ### Add
@@ -61,7 +70,7 @@
   ```
   - `PhotoAsset`Added content for display
   ``` 
-    let thumImage = try await photoAsset.requesthumbnailImage() 
+    let thumImage = try await photoAsset.requesThumbnailImage() 
     let previewImage = try await photoAsset.requestPreviewImage() 
     let avAsset = try await photoAsset.requestAVAsset() 
     let playerItem = try await photoAsset.requestPlayerItem() 

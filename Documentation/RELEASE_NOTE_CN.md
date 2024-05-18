@@ -1,5 +1,14 @@
 # 更新日志 
 
+## 4.2.1
+
+### 修复
+
+- [[691]](https://github.com/SilenceLove/HXPhotoPicker/issues/691)
+- [[690]](https://github.com/SilenceLove/HXPhotoPicker/issues/690)
+- [[686]](https://github.com/SilenceLove/HXPhotoPicker/issues/686)
+- [[681]](https://github.com/SilenceLove/HXPhotoPicker/issues/681)
+
 ## 4.2.0
 
 ### 新增
@@ -59,7 +68,7 @@
   - `PhotoAsset`新增获取用于展示的内容
   ```
     /// 获取缩略图
-    let thumImage = try await photoAsset.requesthumbnailImage()
+    let thumImage = try await photoAsset.requesThumbnailImage()
 
     /// 获取预览图
     let previewImage = try await photoAsset.requestPreviewImage()
