@@ -96,7 +96,7 @@ public final class PhotoManager: NSObject {
     }
     #endif
     
-    #if HXPICKER_ENABLE_CAMERA
+    #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
     var cameraType: CameraController.CameraType = .normal
     #endif
     

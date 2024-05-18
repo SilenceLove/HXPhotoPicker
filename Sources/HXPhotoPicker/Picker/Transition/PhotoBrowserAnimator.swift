@@ -103,11 +103,6 @@ open class PhotoBrowserAnimator: NSObject, PhotoBrowserAnimationTransitioning {
                     animatedImageView.image = image
                 }
             }
-            #if canImport(Kingfisher)
-            if let networkImage = photoAsset.networkImageAsset {
-                requestNetworkImage(networkImage)
-            }
-            #endif
             if UIDevice.isPad {
                 toRect = PhotoTools.transformImageSize(
                     photoAsset.imageSize,
@@ -125,48 +120,76 @@ open class PhotoBrowserAnimator: NSObject, PhotoBrowserAnimationTransitioning {
         }else {
             previewView?.isHidden = true
         }
-        let duration = transitionDuration(using: transitionContext)
-        let colorDuration = duration - 0.15
-        let colorDelay: TimeInterval = 0.05
-        UIView.animate(withDuration: colorDuration, delay: colorDelay, options: [ .curveLinear]) {
-            toVC.previewViewController?.photoToolbar.alpha = 1
-            toVC.previewViewController?.navBgView?.alpha = 1
-            contentView.backgroundColor = backgroundColor.withAlphaComponent(1)
-        }
-        UIView.animate(
-            withDuration: duration,
-            delay: 0,
-            usingSpringWithDamping: 0.8,
-            initialSpringVelocity: 0,
-            options: [.layoutSubviews, .curveEaseOut]
-        ) {
-            toVC.navigationBar.alpha = 1
-            if self.animatedImageView.layer.cornerRadius > 0 {
-                self.animatedImageView.layer.cornerRadius = 0
+        func animateHandler() {
+            let duration = transitionDuration(using: transitionContext)
+            let colorDuration = duration - 0.15
+            let colorDelay: TimeInterval = 0.05
+            UIView.animate(withDuration: colorDuration, delay: colorDelay, options: [ .curveLinear]) {
+                toVC.previewViewController?.photoToolbar.alpha = 1
+                toVC.previewViewController?.navBgView?.alpha = 1
+                contentView.backgroundColor = backgroundColor.withAlphaComponent(1)
             }
-            self.animatedImageView.frame = toRect
-            toVC.pickerDelegate?
-                .pickerController(toVC, animateTransition: .present)
-        } completion: { _ in
-            previewView?.isHidden = false
-            toVC.isBrowserTransitioning = false
-            if let requestID = self.requestID {
-                PHImageManager.default().cancelImageRequest(requestID)
-                self.requestID = nil
+            UIView.animate(
+                withDuration: duration,
+                delay: 0,
+                usingSpringWithDamping: 0.8,
+                initialSpringVelocity: 0,
+                options: [.layoutSubviews, .curveEaseOut]
+            ) {
+                toVC.navigationBar.alpha = 1
+                if self.animatedImageView.layer.cornerRadius > 0 {
+                    self.animatedImageView.layer.cornerRadius = 0
+                }
+                self.animatedImageView.frame = toRect
+                toVC.pickerDelegate?
+                    .pickerController(toVC, animateTransition: .present)
+            } completion: { _ in
+                previewView?.isHidden = false
+                toVC.isBrowserTransitioning = false
+                if let requestID = self.requestID {
+                    PHImageManager.default().cancelImageRequest(requestID)
+                    self.requestID = nil
+                }
+                toVC.pickerDelegate?.pickerController(
+                    toVC,
+                    previewPresentComplete: previewIndex
+                )
+                toVC.previewViewController?.view.backgroundColor = backgroundColor.withAlphaComponent(1)
+                toVC.previewViewController?.setCurrentCellImage(image: self.animatedImageView.image)
+                toVC.previewViewController?.collectionView.isHidden = false
+                toVC.previewViewController?.updateColors()
+                toVC.setupBackgroundColor()
+                self.animatedImageView.removeFromSuperview()
+                contentView.removeFromSuperview()
+                transitionContext.completeTransition(true)
             }
-            toVC.pickerDelegate?.pickerController(
-                toVC,
-                previewPresentComplete: previewIndex
-            )
-            toVC.previewViewController?.view.backgroundColor = backgroundColor.withAlphaComponent(1)
-            toVC.previewViewController?.setCurrentCellImage(image: self.animatedImageView.image)
-            toVC.previewViewController?.collectionView.isHidden = false
-            toVC.previewViewController?.updateColors()
-            toVC.setupBackgroundColor()
-            self.animatedImageView.removeFromSuperview()
-            contentView.removeFromSuperview()
-            transitionContext.completeTransition(true)
         }
+        #if canImport(Kingfisher)
+        if let networkImage = photoAsset?.networkImageAsset, networkImage.imageSize.equalTo(.zero) {
+            requestNetworkImage(networkImage) { [weak self] image in
+                guard let self, let image else {
+                    animateHandler()
+                    return
+                }
+                if self.animatedImageView.image == nil {
+                    self.animatedImageView.image = image
+                }
+                photoAsset?.networkImageAsset?.imageSize = image.size
+                if UIDevice.isPad {
+                    toRect = PhotoTools.transformImageSize(
+                        image.size,
+                        toViewSize: toVC.view.size,
+                        directions: [.horizontal]
+                    )
+                }else {
+                    toRect = PhotoTools.transformImageSize(image.size, to: toVC.view)
+                }
+                animateHandler()
+            }
+            return
+        }
+        #endif
+        animateHandler()
     }
     
     open func requestAssetImage(for asset: PHAsset) {
@@ -191,22 +214,19 @@ open class PhotoBrowserAnimator: NSObject, PhotoBrowserAnimationTransitioning {
     }
     
     #if canImport(Kingfisher)
-    open func requestNetworkImage(_ networkImage: NetworkImageAsset) {
+    open func requestNetworkImage(_ networkImage: NetworkImageAsset, completion: @escaping(UIImage?) -> Void) {
         if let cacheKey = networkImage.originalURL?.cacheKey,
            ImageCache.default.isCached(forKey: cacheKey) {
             ImageCache.default.retrieveImage(
                 forKey: cacheKey,
                 options: [],
                 callbackQueue: .mainAsync
-            ) { [weak self] in
-                guard let self = self else { return }
+            ) {
                 switch $0 {
                 case .success(let value):
-                    if let image = value.image, self.animatedImageView.superview != nil {
-                        self.animatedImageView.setImage(image, duration: 0.4, animated: true)
-                    }
+                    completion(value.image)
                 default:
-                    break
+                    completion(nil)
                 }
             }
             return
@@ -217,19 +237,17 @@ open class PhotoBrowserAnimator: NSObject, PhotoBrowserAnimationTransitioning {
                 forKey: cacheKey,
                 options: [],
                 callbackQueue: .mainAsync
-            ) { [weak self] in
-                guard let self = self else { return }
+            ) {
                 switch $0 {
                 case .success(let value):
-                    if let image = value.image,
-                       self.animatedImageView.superview != nil {
-                        self.animatedImageView.setImage(image, duration: 0.4, animated: true)
-                    }
+                    completion(value.image)
                 default:
-                    break
+                    completion(nil)
                 }
             }
+            return
         }
+        completion(nil)
     }
     #endif
     
