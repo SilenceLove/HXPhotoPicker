@@ -50,6 +50,7 @@ extension PhotoPreviewViewController: UICollectionViewDataSource {
             videoCell.videoPlayType = config.videoPlayType
             videoCell.statusBarShouldBeHidden = statusBarShouldBeHidden
         }
+        cell.contentMaximumZoomScale = config.maximumZoomScale
         cell.delegate = self
         cell.photoAsset = photoAsset
         cellForIndex?(cell, indexPath.item, currentPreviewIndex)
