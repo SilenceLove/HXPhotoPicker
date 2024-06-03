@@ -50,6 +50,9 @@ public struct PreviewViewConfiguration {
     /// 单击cell隐藏/显示导航栏时是否播放/暂停视频
     public var singleClickCellAutoPlayVideo: Bool = true
     
+    /// 缩放最大比例
+    public var maximumZoomScale: CGFloat = 0
+    
     /// 显示底部视图
     public var isShowBottomView: Bool = true
     

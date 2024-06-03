@@ -37,7 +37,7 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
     weak var delegate: PhotoPreviewViewCellDelegate?
     
     var scrollContentView: PhotoPreviewContentViewProtocol!
-    
+    var contentMaximumZoomScale: CGFloat = 0
     var statusBarShouldBeHidden = false
     var allowInteration: Bool = true
     
@@ -82,7 +82,7 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
         if !UIDevice.isPortrait {
             return
         }
-        if scrollContentView.width != width {
+        if scrollContentView.width / scrollView.zoomScale != width {
             if UIDevice.isPad  {
                 setupLandscapeContentSize()
             }else {
@@ -103,9 +103,17 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
         let contentWidth = width
         let contentHeight = photoAsset.imageSize.height * aspectRatio
         if contentWidth < contentHeight {
-            scrollView.maximumZoomScale = width * 2.5 / contentWidth
+            if contentMaximumZoomScale >= 1 {
+                scrollView.maximumZoomScale = contentMaximumZoomScale
+            }else {
+                scrollView.maximumZoomScale = width * 2.5 / contentWidth
+            }
         }else {
-            scrollView.maximumZoomScale = height * 2.5 / contentHeight
+            if contentMaximumZoomScale >= 1 {
+                scrollView.maximumZoomScale = contentMaximumZoomScale
+            }else {
+                scrollView.maximumZoomScale = height * 2.5 / contentHeight
+            }
         }
         scrollContentView.frame = CGRect(x: 0, y: 0, width: contentWidth, height: contentHeight)
         if contentHeight < height {
@@ -122,11 +130,19 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
         if contentWidth > width {
             contentHeight = width / contentWidth * contentHeight
             contentWidth = width
-            scrollView.maximumZoomScale = height / contentHeight + 0.5
+            if contentMaximumZoomScale >= 1 {
+                scrollView.maximumZoomScale = contentMaximumZoomScale
+            }else {
+                scrollView.maximumZoomScale = height / contentHeight + 0.5
+            }
             scrollContentView.frame = CGRect(x: 0, y: 0, width: contentWidth, height: contentHeight)
             scrollView.contentSize = scrollContentView.size
         }else {
-            scrollView.maximumZoomScale = width / contentWidth + 0.5
+            if contentMaximumZoomScale >= 1 {
+                scrollView.maximumZoomScale = contentMaximumZoomScale
+            }else {
+                scrollView.maximumZoomScale = width / contentWidth + 0.5
+            }
             scrollContentView.frame = CGRect(x: 0, y: 0, width: contentWidth, height: contentHeight)
             scrollView.contentSize = size
         }
