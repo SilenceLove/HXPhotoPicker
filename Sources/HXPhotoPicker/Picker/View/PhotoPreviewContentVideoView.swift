@@ -91,6 +91,7 @@ class PhotoPreviewContentVideoView: PhotoPreviewContentPhotoView {
     }
     
     override func cancelRequest() {
+        guard let photoAsset = photoAsset else { return }
         super.cancelRequest()
         videoView.cancelPlayer()
         videoView.alpha = 0
