@@ -651,8 +651,14 @@ open class EditorViewController: HXBaseViewController {
     var isFullScreen: Bool {
         let isFull = splitViewController?.modalPresentationStyle == .fullScreen
         if let nav = navigationController {
+            if nav.presentingViewController == nil {
+                return true
+            }
             return nav.modalPresentationStyle == .fullScreen || nav.modalPresentationStyle == .custom || isFull
         }else {
+            if presentingViewController == nil {
+                return true
+            }
             if let navModalStyle {
                 return navModalStyle == .fullScreen || navModalStyle == .custom || isFull
             }
