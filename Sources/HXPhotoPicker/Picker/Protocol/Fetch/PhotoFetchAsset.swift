@@ -48,7 +48,7 @@ public extension PhotoFetchAsset {
         var photoCount = 0
         var videoCount = 0
         var phAssetResult: [PHAsset] = []
-        let isLimited = AssetPermissionsUtil.isLimitedAuthorizationStatus && config.isRemoveSelectedAssetWhenRemovingAssets
+        let isRemoveSelectedAsset = config.isRemoveSelectedAssetWhenRemovingAssets
         assetCollection.enumerateAssets { photoAsset, index, stop in
             guard let phAsset = photoAsset.phAsset else {
                 return
@@ -85,7 +85,7 @@ public extension PhotoFetchAsset {
                 asset = selectPhotoAsset
                 selectedAsset = selectPhotoAsset
             }
-            if isLimited {
+            if isRemoveSelectedAsset {
                 phAssetResult.append(phAsset)
             }
             photoAssets.append(asset)
@@ -104,7 +104,7 @@ public extension PhotoFetchAsset {
                 }
             }
         }
-        if isLimited {
+        if isRemoveSelectedAsset {
             var removedAssets: [PhotoAsset] = []
             for (index, selectedPHAsset) in selectedPHAssets.enumerated() where !phAssetResult.contains(selectedPHAsset) {
                 let resultCount = PHAsset.fetchAssets(withLocalIdentifiers: [selectedPHAsset.localIdentifier], options: nil).count

@@ -42,6 +42,7 @@ class PhotoPreviewSelectedView: UIView,
     
     var photoAssetArray: [PhotoAsset] = []
     private var currentSelectedIndexPath: IndexPath?
+    private let lock = NSLock()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -117,11 +118,17 @@ class PhotoPreviewSelectedView: UIView,
         photoAsset: PhotoAsset,
         animations: (() -> Void)? = nil
     ) {
+        lock.lock()
+        defer { lock.unlock() }
         let beforeIsEmpty = photoAssetArray.isEmpty
         let item = photoAssetArray.count
         let indexPath = IndexPath(item: item, section: 0)
         photoAssetArray.append(photoAsset)
-        collectionView.insertItems(at: [indexPath])
+        if beforeIsEmpty {
+            collectionView.reloadData()
+        }else {
+            collectionView.insertItems(at: [indexPath])
+        }
         collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
         currentSelectedIndexPath = indexPath
         if beforeIsEmpty {
@@ -157,7 +164,11 @@ class PhotoPreviewSelectedView: UIView,
             }
             
         }
-        collectionView.deleteItems(at: indexPaths)
+        if !indexPaths.isEmpty {
+            collectionView.deleteItems(at: indexPaths)
+        }else {
+            collectionView.reloadData()
+        }
         if !beforeIsEmpty && photoAssetArray.isEmpty {
             UIView.animate(withDuration: 0.25) {
                 self.alpha = 0

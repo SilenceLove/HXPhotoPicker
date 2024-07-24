@@ -294,6 +294,16 @@ public extension PhotoAsset {
             self.imageCompressionQuality = nil
         }
         
+        public static var `default`: Compression {
+            .init(
+                imageCompressionQuality: 0.5,
+                videoExportParameter: .init(
+                    preset: .ratio_960x540,
+                    quality: 6
+                )
+            )
+        }
+        
         public struct ImageTarget {
             let size: CGSize
             let mode: HX.ImageTargetMode
