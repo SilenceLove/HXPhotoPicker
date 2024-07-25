@@ -52,7 +52,7 @@ public final class PhotoManager: NSObject {
     var indicatorType: IndicatorType = .system
     
     #if HXPICKER_ENABLE_PICKER
-    
+    public var pickerResultCompression: PhotoAsset.Compression? = nil
     #if canImport(Kingfisher)
     public var imageDownloader: Kingfisher.ImageDownloader?
     #endif

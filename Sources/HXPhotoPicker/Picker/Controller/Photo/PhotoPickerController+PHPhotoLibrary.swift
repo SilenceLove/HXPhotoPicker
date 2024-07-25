@@ -12,7 +12,7 @@ import Photos
 extension PhotoPickerController: PHPhotoLibraryChangeObserver {
     
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
-        if !AssetPermissionsUtil.isLimitedAuthorizationStatus || !config.allowLoadPhotoLibrary {
+        if !config.allowLoadPhotoLibrary || !isDidEnterBackground {
             return
         }
         var needReload = false
@@ -39,6 +39,9 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
         }
         if needReload {
             DispatchQueue.main.async {
+                if !self.isDidEnterBackground {
+                    return
+                }
                 if self.fetchData.cameraAssetCollection?.result == nil {
                     self.fetchData.fetchCameraAssetCollection()
                 }else {
@@ -52,25 +55,27 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
         for changeInstance: PHChange,
         assetCollection: PhotoAssetCollection
     ) -> Bool {
-        if assetCollection.result == nil {
+        guard let result = assetCollection.result else {
             if assetCollection == self.fetchData.cameraAssetCollection {
                 return true
             }
             return false
         }
         let changeResult: PHFetchResultChangeDetails? = changeInstance.changeDetails(
-            for: assetCollection.result!
+            for: result
         )
-        if let changeResult = changeResult, !changeResult.hasIncrementalChanges {
-            let result = changeResult.fetchResultAfterChanges
-            assetCollection.updateResult(for: result)
-            if assetCollection == self.fetchData.cameraAssetCollection && result.count == 0 {
-                assetCollection.update(
-                    albumName: .textManager.picker.albumList.emptyAlbumName.text,
-                    coverImage: self.config.emptyCoverImageName.image
-                )
+        if let changeResult = changeResult {
+            if changeResult.hasIncrementalChanges || !changeResult.removedObjects.isEmpty {
+                let result = changeResult.fetchResultAfterChanges
+                assetCollection.updateResult(for: result)
+                if assetCollection == self.fetchData.cameraAssetCollection && result.count == 0 {
+                    assetCollection.update(
+                        albumName: .textManager.picker.albumList.emptyAlbumName.text,
+                        coverImage: self.config.emptyCoverImageName.image
+                    )
+                }
+                return true
             }
-            return true
         }
         return false
     }

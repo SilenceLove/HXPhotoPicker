@@ -21,14 +21,11 @@ public struct PickerResult {
     
     /// isOriginal = false
     /// The original image does not select the compression parameter when getting the URL
-    /// 原图未选中获取 URL 时的压缩参数
-    public var compression: PhotoAsset.Compression? = .init(
-        imageCompressionQuality: 0.5,
-        videoExportParameter: .init(
-            preset: .ratio_960x540,
-            quality: 6
-        )
-    )
+    /// 原图未选中获取 URL 时的压缩参数，默认为空
+    public var compression: PhotoAsset.Compression? {
+        get { PhotoManager.shared.pickerResultCompression }
+        set { PhotoManager.shared.pickerResultCompression = newValue }
+    }
     
     /// 初始化 / init
     /// - Parameters:

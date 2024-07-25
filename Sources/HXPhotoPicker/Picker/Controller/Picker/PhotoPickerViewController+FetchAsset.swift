@@ -63,19 +63,17 @@ extension PhotoPickerViewController {
             }else {
                 PhotoManager.HUDView.dismiss(delay: 0, animated: false, for: self.navigationController?.view)
             }
-            if AssetPermissionsUtil.isLimitedAuthorizationStatus {
-                if self.pickerConfig.isRemoveSelectedAssetWhenRemovingAssets {
-                    self.photoToolbar.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
-                    self.photoToolbar.updateSelectedAssets(self.pickerController.selectedAssetArray)
-                    self.finishItem?.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
-                    self.requestSelectedAssetFileSize()
-                }
-                if let previewViewController = self.navigationController?.topViewController as? PhotoPreviewViewController {
-                    previewViewController.updateAsstes(for: result.assets)
-                }else if let presentedViewController = self.presentedViewController as? PhotoPickerController,
-                         let previewViewController = presentedViewController.previewViewController {
-                    previewViewController.updateAsstes(for: result.assets)
-                }
+            if self.pickerConfig.isRemoveSelectedAssetWhenRemovingAssets {
+                self.photoToolbar.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
+                self.photoToolbar.updateSelectedAssets(self.pickerController.selectedAssetArray)
+                self.finishItem?.selectedAssetDidChanged(self.pickerController.selectedAssetArray)
+                self.requestSelectedAssetFileSize()
+            }
+            if let previewViewController = self.navigationController?.topViewController as? PhotoPreviewViewController {
+                previewViewController.updateAsstes(for: result.assets)
+            }else if let presentedViewController = self.presentedViewController as? PhotoPickerController,
+                     let previewViewController = presentedViewController.previewViewController {
+                previewViewController.updateAsstes(for: result.assets)
             }
         }
     }
