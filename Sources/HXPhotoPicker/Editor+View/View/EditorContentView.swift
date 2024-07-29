@@ -65,7 +65,7 @@ class EditorContentView: UIView {
         }
         set {
             type = .image
-            imageView.setImage(newValue)
+            imageView.setImage(newValue, animated: false)
         }
     }
     
