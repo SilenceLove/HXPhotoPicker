@@ -131,7 +131,7 @@ extension CameraViewController: CameraBottomViewDelegate {
         _ bottomView: CameraBottomView,
         didChangeTakeType takeType: CameraBottomViewTakeType
     ) {
-        delegate?.cameraViewController(self, didChangeTakeType: takeType)
+        
     }
     func openPhotoResult(_ image: UIImage) {
         let vc = CameraResultViewController(

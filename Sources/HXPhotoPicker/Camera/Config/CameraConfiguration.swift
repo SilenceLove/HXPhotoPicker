@@ -61,6 +61,9 @@ public struct CameraConfiguration: IndicatorTypeConfig, PhotoHUDConfig {
         }
     }
     
+    /// 自定义相机控制器
+    public var cameraViewController: CameraViewControllerProtocol.Type = CameraViewController.self
+    
     /// After the photo is completed, save it to the system album
     /// 拍照完成后保存到系统相册
     public var isSaveSystemAlbum: Bool = false

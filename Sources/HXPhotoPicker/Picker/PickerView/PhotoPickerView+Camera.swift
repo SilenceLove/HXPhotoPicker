@@ -26,12 +26,12 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
                 type = .video
             }
             camerConfig.languageType = manager.config.languageType
+            camerConfig.isAutoBack = false
             let vc = CameraController(
                 config: camerConfig,
                 type: type,
                 delegate: self
             )
-            vc.autoDismiss = false
             viewController?.present(vc, animated: true)
             return
         default:
@@ -217,6 +217,7 @@ extension PhotoPickerView: CameraControllerDelegate {
     public func cameraController(
         _ cameraController: CameraController,
         didFinishWithResult result: CameraController.Result,
+        phAsset: PHAsset?,
         location: CLLocation?
     ) {
         cameraController.dismiss(animated: true)
