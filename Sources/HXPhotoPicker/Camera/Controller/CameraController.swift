@@ -38,14 +38,6 @@ open class CameraController: UINavigationController {
     
     public weak var cameraDelegate: CameraControllerDelegate?
     
-    /// 自动dismiss
-    public var autoDismiss: Bool = true {
-        didSet {
-            let vc = viewControllers.first as? CameraViewController
-            vc?.autoDismiss = autoDismiss
-        }
-    }
-    
     /// 相机配置
     public let config: CameraConfiguration
     
@@ -63,16 +55,16 @@ open class CameraController: UINavigationController {
         cameraDelegate = delegate
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = config.modalPresentationStyle
-        let cameraVC = CameraViewController(
-            config: config,
-            type: type,
-            delegate: self
-        )
+        let cameraVC = config.cameraViewController.init(config: config, type: type)
+        cameraVC.delegate = self
         viewControllers = [cameraVC]
     }
     
-    public typealias CaptureCompletion = (Result, CLLocation?) -> Void
-    public typealias CapturePHAssetCompletion = (Result, PHAsset, CLLocation?) -> Void
+    public typealias CaptureCompletion = (Result, PHAsset?, CLLocation?) -> Void
+    
+    public var completion: CaptureCompletion?
+    
+    public var cancelHandler: ((CameraController) -> Void)?
     
     /// 跳转相机
     /// - Parameters:
@@ -92,34 +84,6 @@ open class CameraController: UINavigationController {
             type: type
         )
         controller.completion = completion
-        (fromVC ?? UIViewController.topViewController)?.present(controller, animated: true)
-        return controller
-    }
-    
-    public var completion: CaptureCompletion?
-    
-    public var phAssetcompletion: CapturePHAssetCompletion?
-    
-    public var cancelHandler: ((CameraController) -> Void)?
-    
-    /// 跳转相机 config.isSaveSystemAlbum = true 时才会触发闭包
-    /// - Parameters:
-    ///   - config: 相机配置
-    ///   - type: 相机类型
-    ///   - completion: 拍摄完成
-    /// - Returns: 相机对应的 CameraController
-    @discardableResult
-    public static func captureAsset(
-        config: CameraConfiguration,
-        type: CaptureType = .all,
-        fromVC: UIViewController? = nil,
-        completion: @escaping CapturePHAssetCompletion
-    ) -> CameraController {
-        let controller = CameraController(
-            config: config,
-            type: type
-        )
-        controller.phAssetcompletion = completion
         (fromVC ?? UIViewController.topViewController)?.present(controller, animated: true)
         return controller
     }
@@ -155,27 +119,9 @@ open class CameraController: UINavigationController {
 }
 
 extension CameraController: CameraViewControllerDelegate {
-    public func cameraViewController(
-        _ cameraViewController: CameraViewController,
-        didFinishWithResult result: CameraController.Result,
-        location: CLLocation?
-    ) {
+    public func cameraViewController(_ cameraViewController: any CameraViewControllerProtocol, didFinishWithResult result: Result, phAsset: PHAsset?, location: CLLocation?) {
         isDismissed = true
-        completion?(result, location)
-        cameraDelegate?.cameraController(
-            self,
-            didFinishWithResult: result,
-            location: location
-        )
-    }
-    public func cameraViewController(
-        _ cameraViewController: CameraViewController,
-        didFinishWithResult result: Result,
-        phAsset: PHAsset,
-        location: CLLocation?
-    ) {
-        isDismissed = true
-        phAssetcompletion?(result, phAsset, location)
+        completion?(result, phAsset, location)
         cameraDelegate?.cameraController(
             self,
             didFinishWithResult: result,
@@ -183,28 +129,11 @@ extension CameraController: CameraViewControllerDelegate {
             location: location
         )
     }
-    public func cameraViewController(didCancel cameraViewController: CameraViewController) {
+    
+    public func cameraViewController(didCancel cameraViewController: any CameraViewControllerProtocol) {
         isDismissed = true
         cancelHandler?(self)
         cameraDelegate?.cameraController(didCancel: self)
-    }
-    public func cameraViewController(
-        _ cameraViewController: CameraViewController,
-        flashModeDidChanged flashMode: AVCaptureDevice.FlashMode
-    ) {
-        cameraDelegate?.cameraController(self, flashModeDidChanged: flashMode)
-    }
-    public func cameraViewController(
-        _ cameraViewController: CameraViewController,
-        didSwitchCameraCompletion position: AVCaptureDevice.Position
-    ) {
-        cameraDelegate?.cameraController(self, didSwitchCameraCompletion: position)
-    }
-    public func cameraViewController(
-        _ cameraViewController: CameraViewController,
-        didChangeTakeType takeType: CameraBottomViewTakeType
-    ) {
-        cameraDelegate?.cameraController(self, didChangeTakeType: takeType)
     }
 }
 
@@ -249,11 +178,6 @@ public extension CameraController {
         try await withCheckedThrowingContinuation { continuation in
             var isDimissed: Bool = false
             completion = {
-                if isDimissed { return }
-                isDimissed = true
-                continuation.resume(with: .success(CaptureResult(result: $0, phAsset: nil, localtion: $1)))
-            }
-            phAssetcompletion = {
                 if isDimissed { return }
                 isDimissed = true
                 continuation.resume(with: .success(CaptureResult(result: $0, phAsset: $1, localtion: $2)))

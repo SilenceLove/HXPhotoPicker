@@ -13,45 +13,24 @@ import AVFoundation
 
 /// 需要有导航栏
 #if !targetEnvironment(macCatalyst)
-open class CameraViewController: HXBaseViewController {
+open class CameraViewController: HXBaseViewController, CameraViewControllerProtocol {
     public weak var delegate: CameraViewControllerDelegate?
     
     /// 相机配置
-    public var config: CameraConfiguration
+    public let config: CameraConfiguration
     /// 相机类型
     public let type: CameraController.CaptureType
-    /// 内部自动dismiss
-    public var autoDismiss: Bool = true
     
-    /// takePhotoMode = .click 拍照类型
-    public var takeType: CameraBottomViewTakeType {
-        bottomView.takeType
-    }
-    
-    /// 闪光灯模式
-    public var flashMode: AVCaptureDevice.FlashMode {
-        cameraManager.flashMode
-    }
-    
-    /// 设置闪光灯模式
-    @discardableResult
-    public func setFlashMode(_ flashMode: AVCaptureDevice.FlashMode) -> Bool {
-        cameraManager.setFlashMode(flashMode)
-    }
-    
-    public init(
+    public required init(
         config: CameraConfiguration,
-        type: CameraController.CaptureType,
-        delegate: CameraViewControllerDelegate? = nil
+        type: CameraController.CaptureType
     ) {
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
-        PhotoManager.shared.cameraType = config.cameraType
         self.config = config
         self.type = type
-        self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
-        self.autoDismiss = config.isAutoBack
     }
+    
     private var didLayoutPreview = false
     
     var previewView: CameraPreviewView!
@@ -122,10 +101,6 @@ open class CameraViewController: HXBaseViewController {
     private func initViews() {
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
             cameraManager = CameraManager(config: config)
-            cameraManager.flashModeDidChanged = { [weak self] in
-                guard let self = self else { return }
-                self.delegate?.cameraViewController(self, flashModeDidChanged: $0)
-            }
             if config.cameraType == .metal {
                 cameraManager.captureDidOutput = { [weak self] pixelBuffer in
                     guard let self = self else { return }
@@ -163,7 +138,7 @@ open class CameraViewController: HXBaseViewController {
         if isCancel {
             delegate?.cameraViewController(didCancel: self)
         }
-        if autoDismiss {
+        if config.isAutoBack {
             dismiss(animated: true, completion: nil)
         }
     }
@@ -375,10 +350,6 @@ extension CameraViewController {
             HXLog("相机前后摄像头切换失败: \(error)")
             switchCameraFailed()
         }
-        delegate?.cameraViewController(
-            self,
-            didSwitchCameraCompletion: cameraManager.activeCamera?.position ?? .unspecified
-        )
         if !cameraManager.setFlashMode(config.flashMode) {
             cameraManager.setFlashMode(.off)
         }

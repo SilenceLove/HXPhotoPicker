@@ -32,7 +32,6 @@ extension CameraViewController: EditorViewControllerDelegate {
 
 extension CameraViewController {
     func openPhotoEditor(_ image: UIImage) {
-        config.editor.isAutoBack = autoDismiss
         let vc = EditorViewController(
             .init(type: .image(image)),
             config: config.editor,
@@ -44,7 +43,6 @@ extension CameraViewController {
 
 extension CameraViewController {
     func openVideoEditor(_ videoURL: URL) {
-        config.editor.isAutoBack = autoDismiss
         let vc = EditorViewController(
             .init(type: .video(videoURL)),
             config: config.editor,
