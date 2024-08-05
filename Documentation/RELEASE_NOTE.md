@@ -1,5 +1,20 @@
 # Release Notes
 
+## 4.2.3
+
+### Add
+
+- Camera
+  - The camera interface supports customization`CameraViewControllerProtocol`
+
+### Resolved
+
+- picker
+  - The system album may not be synchronized after deleting photos
+
+- Editor
+  - May not work when rotating or mirroring
+
 ## 4.2.2
 
 ### Resolved
