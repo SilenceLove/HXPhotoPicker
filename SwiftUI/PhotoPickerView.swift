@@ -32,6 +32,7 @@ struct PhotoPickerView: UIViewControllerRepresentable {
                 let assetResults: [AssetResult] = try await controller.pickerAsset()
                 self.assetResults = assetResults
                 photoAssets = controller.selectedAssetArray
+                controller.dismiss(true)
             } catch {
                 let pickerError = error as! PickerError
                 print(pickerError)
