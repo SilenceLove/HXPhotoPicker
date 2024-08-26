@@ -18,6 +18,8 @@ public protocol PhotoPickerListDelegate: PhotoControllerEvent {
         animated: Bool
     )
     
+    func photoList(didLimitCell photoList: PhotoPickerList)
+    
     /// 数据发生改变
     func photoList(selectedAssetDidChanged photoList: PhotoPickerList)
     

@@ -232,18 +232,6 @@ open class PhotoPickerController: UINavigationController {
             requestAuthorization()
         }
         setupInteractiveTransition()
-        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackgroundNotification), name: UIApplication.didEnterBackgroundNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActiveNotification), name: UIApplication.didBecomeActiveNotification, object: nil)
-    }
-    
-    @objc
-    func didEnterBackgroundNotification() {
-        isDidEnterBackground = true
-    }
-    
-    @objc
-    func didBecomeActiveNotification() {
-        isDidEnterBackground = false
     }
     
     public override func viewDidLayoutSubviews() {
@@ -335,7 +323,6 @@ open class PhotoPickerController: UINavigationController {
     var isFetchAssetCollection: Bool = false
     private var isAsyncPicker: Bool = false
     private var isAsyncPickerAutoDismiss: Bool = false
-    var isDidEnterBackground: Bool = false
     
     init() {
         self.config = .init()

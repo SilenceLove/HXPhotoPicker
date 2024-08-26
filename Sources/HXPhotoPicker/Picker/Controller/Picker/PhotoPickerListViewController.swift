@@ -480,9 +480,7 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
         }
         #endif
         if cell is PhotoPickerLimitCell {
-            if #available(iOS 14, *) {
-                PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: pickerController)
-            }
+            delegate?.photoList(didLimitCell: self)
             return
         }
         if let myCell = cell as? PhotoPickerBaseViewCell,
