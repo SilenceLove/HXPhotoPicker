@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Photos
 
 
 extension PhotoPickerViewController: PhotoPickerListDelegate {
@@ -41,6 +42,12 @@ extension PhotoPickerViewController: PhotoPickerListDelegate {
             asset.playerTime = 0
             let cell = listView.getCell(for: asset)
             openEditor(asset, image: cell?.photoView.image, animated: animated)
+        }
+    }
+    
+    public func photoList(didLimitCell photoList: PhotoPickerList) {
+        if #available(iOS 14, *) {
+            PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: pickerController)
         }
     }
     

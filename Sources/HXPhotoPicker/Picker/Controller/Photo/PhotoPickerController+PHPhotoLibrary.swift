@@ -12,7 +12,7 @@ import Photos
 extension PhotoPickerController: PHPhotoLibraryChangeObserver {
     
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
-        if !config.allowLoadPhotoLibrary || !isDidEnterBackground {
+        if !config.allowLoadPhotoLibrary {
             return
         }
         var needReload = false
@@ -39,10 +39,7 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
         }
         if needReload {
             DispatchQueue.main.async {
-                if !self.isDidEnterBackground {
-                    return
-                }
-                if self.fetchData.cameraAssetCollection?.result == nil {
+                if self.fetchData.cameraAssetCollection?.collection == nil {
                     self.fetchData.fetchCameraAssetCollection()
                 }else {
                     self.reloadData(assetCollection: nil)
@@ -51,31 +48,29 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
             }
         }
     }
+    
     private func resultHasChanges(
         for changeInstance: PHChange,
         assetCollection: PhotoAssetCollection
     ) -> Bool {
-        guard let result = assetCollection.result else {
+        guard let resultCollection = assetCollection.collection else {
             if assetCollection == self.fetchData.cameraAssetCollection {
                 return true
             }
             return false
         }
-        let changeResult: PHFetchResultChangeDetails? = changeInstance.changeDetails(
-            for: result
-        )
-        if let changeResult = changeResult {
-            if changeResult.hasIncrementalChanges || !changeResult.removedObjects.isEmpty {
-                let result = changeResult.fetchResultAfterChanges
-                assetCollection.updateResult(for: result)
-                if assetCollection == self.fetchData.cameraAssetCollection && result.count == 0 {
-                    assetCollection.update(
-                        albumName: .textManager.picker.albumList.emptyAlbumName.text,
-                        coverImage: self.config.emptyCoverImageName.image
-                    )
-                }
-                return true
+        
+        if let changeResult: PHObjectChangeDetails = changeInstance.changeDetails(for: resultCollection),
+           let collection = changeResult.objectAfterChanges {
+            assetCollection.collection = collection
+            assetCollection.fetchResult()
+            if assetCollection.count == 0 {
+                assetCollection.update(
+                    albumName: .textManager.picker.albumList.emptyAlbumName.text,
+                    coverImage: config.emptyCoverImageName.image
+                )
             }
+            return true
         }
         return false
     }

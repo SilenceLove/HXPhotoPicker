@@ -265,6 +265,10 @@ extension PhotoPickerPageViewController: PhotoPickerListDelegate {
         delegate?.photoList(self, didSelectCell: asset, at: index, animated: animated)
     }
     
+    public func photoList(didLimitCell photoList: PhotoPickerList) {
+        delegate?.photoList(didLimitCell: photoList)
+    }
+    
     public func photoList(selectedAssetDidChanged photoList: PhotoPickerList) {
         delegate?.photoList(selectedAssetDidChanged: self)
     }
