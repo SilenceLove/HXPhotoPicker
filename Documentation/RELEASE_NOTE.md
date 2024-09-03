@@ -1,5 +1,12 @@
 # Release Notes
 
+## 4.2.3.1
+
+### Resolved
+
+- picker
+  - System photo album not synced after update when permissions are restricted
+
 ## 4.2.3
 
 ### Add
