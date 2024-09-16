@@ -120,11 +120,13 @@ open class CameraViewController: HXBaseViewController, CameraViewControllerProto
             topMaskLayer = PhotoTools.getGradientShadowLayer(true)
             
             #if HXPICKER_ENABLE_CAMERA_LOCATION
-            locationManager = CLLocationManager()
-            locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager.distanceFilter = kCLDistanceFilterNone
-            locationManager.requestWhenInUseAuthorization()
+            if allowLocation {
+                locationManager = CLLocationManager()
+                locationManager.delegate = self
+                locationManager.desiredAccuracy = kCLLocationAccuracyBest
+                locationManager.distanceFilter = kCLDistanceFilterNone
+                locationManager.requestWhenInUseAuthorization()
+            }
             #endif
         }
         
