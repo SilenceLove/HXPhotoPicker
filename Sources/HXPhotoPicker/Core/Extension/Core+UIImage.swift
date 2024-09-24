@@ -75,15 +75,25 @@ extension UIImage {
             if mode == .fit {
                 rect = CGRect(origin: .zero, size: size)
             }else {
+                var x: CGFloat = 0
+                var y: CGFloat = 0
                 let scale = size.width / width
+                var scaleWidth = size.width
                 var scaleHeight = scale * height
                 if scaleHeight < size.height {
+                    scaleWidth = size.height / scaleHeight * scaleWidth
                     scaleHeight = size.height
                 }
+                if scaleWidth < size.width {
+                    scaleHeight = size.width / scaleWidth * scaleHeight
+                    scaleWidth = size.width
+                }
+                x = -(scaleWidth - size.width) / 2
+                y = -(scaleHeight - size.height) / 2
                 rect = CGRect(
-                    x: 0,
-                    y: -(scaleHeight - size.height) / 2,
-                    width: size.width,
+                    x: x,
+                    y: y,
+                    width: scaleWidth,
                     height: scaleHeight
                 )
             }
