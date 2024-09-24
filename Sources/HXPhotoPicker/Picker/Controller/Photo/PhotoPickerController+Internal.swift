@@ -27,6 +27,7 @@ extension PhotoPickerController {
         if previewType == .picker {
             disablesCustomDismiss = true
         }
+        isDismissed = true
         if autoDismiss {
             dismiss(true)
         }
@@ -47,6 +48,7 @@ extension PhotoPickerController {
         if previewType == .picker {
             disablesCustomDismiss = true
         }
+        isDismissed = true
         if autoDismiss {
             dismiss(true)
         }
