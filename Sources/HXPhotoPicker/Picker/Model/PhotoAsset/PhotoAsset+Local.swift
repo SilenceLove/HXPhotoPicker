@@ -167,15 +167,15 @@ extension PhotoAsset {
                 return
             }
             var image: UIImage?
-            if let img = localImageAsset?.image {
+            if let img = localImageAsset?.image?.normalizedImage() {
                 image = img
             }else  if let imageURL = localImageAsset?.imageURL,
-               let img = UIImage(contentsOfFile: imageURL.path) {
+                      let img = UIImage(contentsOfFile: imageURL.path)?.normalizedImage() {
                 localImageAsset?.image = img
                 image = img
             }else if let imageURL = localLivePhoto?.imageURL,
                      imageURL.isFileURL,
-                     let img = UIImage(contentsOfFile: imageURL.path) {
+                     let img = UIImage(contentsOfFile: imageURL.path)?.normalizedImage() {
                 image = img
            }
             if let image = image, urlType == .thumbnail {
