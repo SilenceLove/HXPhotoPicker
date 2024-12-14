@@ -1,14 +1,14 @@
 Pod::Spec.new do |spec|
     spec.name               = "HXPhotoPicker"
-    spec.version            = "4.2.3.2"
+    spec.version            = "4.2.4"
     spec.summary            = "照片/视频选择器 - 支持LivePhoto、GIF图片选择、自定义编辑照片/视频、3DTouch预览、浏览网络图片/网络视频 功能 - Imitation weibo photo/image picker - support for LivePhoto, GIF image selection, 3DTouch preview, browse the web image function"
     spec.homepage           = "https://github.com/SilenceLove/HXPhotoPicker"
     spec.license            = { :type => "MIT", :file => "LICENSE" }
     spec.author             = { "SilenceLove" => "294005139@qq.com" }
     
     spec.swift_versions     = ['5.0']
-    spec.platform           = :ios, "12.0"
-    spec.ios.deployment_target = "12.0"
+    spec.platform           = :ios, "13.0"
+    spec.ios.deployment_target = "13.0"
     spec.source             = { :git => "https://github.com/SilenceLove/HXPhotoPicker.git", :tag => "#{spec.version}" }
 
     spec.framework          = 'UIKit','Photos','PhotosUI'
@@ -33,7 +33,7 @@ Pod::Spec.new do |spec|
         end
         picker.subspec 'KF' do |kf|
             kf.dependency 'HXPhotoPicker/Picker/Lite'
-            kf.dependency 'Kingfisher', '~> 7.0'
+            kf.dependency 'Kingfisher', '~> 8.0'
         end
     end
   
@@ -46,7 +46,7 @@ Pod::Spec.new do |spec|
         editor.subspec 'KF' do |kf|
             kf.dependency 'HXPhotoPicker/EditorView/KF'
             kf.dependency 'HXPhotoPicker/Editor/Lite'
-            kf.dependency 'Kingfisher', '~> 7.0'
+            kf.dependency 'Kingfisher', '~> 8.0'
         end
     end
     
@@ -58,7 +58,7 @@ Pod::Spec.new do |spec|
         end
         editor_view.subspec 'KF' do |kf|
             kf.dependency 'HXPhotoPicker/EditorView/Lite'
-            kf.dependency 'Kingfisher', '~> 7.0'
+            kf.dependency 'Kingfisher', '~> 8.0'
         end
     end
     
