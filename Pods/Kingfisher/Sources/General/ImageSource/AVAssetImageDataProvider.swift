@@ -35,21 +35,28 @@ import MobileCoreServices
 import CoreServices
 #endif
 
+#if compiler(>=6)
+extension AVAssetImageGenerator: @unchecked @retroactive Sendable { }
+#else
+extension AVAssetImageGenerator: @unchecked Sendable { }
+#endif
+
 /// A data provider to provide thumbnail data from a given AVKit asset.
 public struct AVAssetImageDataProvider: ImageDataProvider {
 
-    /// The possible error might be caused by the `AVAssetImageDataProvider`.
-    /// - userCancelled: The data provider process is cancelled.
-    /// - invalidImage: The retrieved image is invalid.
+    /// The possible error might be caused by the ``AVAssetImageDataProvider``.
     public enum AVAssetImageDataProviderError: Error {
+        /// The data provider process is cancelled.
         case userCancelled
+        /// The retrieved image is invalid.
+        /// - Parameter image: The image object that is not recognized as valid.
         case invalidImage(_ image: CGImage?)
     }
 
     /// The asset image generator bound to `self`.
     public let assetImageGenerator: AVAssetImageGenerator
 
-    /// The time at which the image should be generate in the asset.
+    /// The time at which the image should be generated in the asset.
     public let time: CMTime
 
     private var internalKey: String {
@@ -66,8 +73,8 @@ public struct AVAssetImageDataProvider: ImageDataProvider {
 
     /// Creates an asset image data provider.
     /// - Parameters:
-    ///   - assetImageGenerator: The asset image generator controls data providing behaviors.
-    ///   - time: At which time in the asset the image should be generated.
+    ///   - assetImageGenerator: The asset image generator that controls data providing behaviors.
+    ///   - time: The time at which the image should be generated in the asset.
     public init(assetImageGenerator: AVAssetImageGenerator, time: CMTime) {
         self.assetImageGenerator = assetImageGenerator
         self.time = time
@@ -78,9 +85,8 @@ public struct AVAssetImageDataProvider: ImageDataProvider {
     ///   - assetURL: The URL of asset for providing image data.
     ///   - time: At which time in the asset the image should be generated.
     ///
-    /// This method uses `assetURL` to create an `AVAssetImageGenerator` object and calls
-    /// the `init(assetImageGenerator:time:)` initializer.
-    ///
+    /// This method uses the `assetURL` parameter to create an `AVAssetImageGenerator` object, then calls
+    /// the ``init(assetImageGenerator:time:)`` initializer.
     public init(assetURL: URL, time: CMTime) {
         let asset = AVAsset(url: assetURL)
         let generator = AVAssetImageGenerator(asset: asset)
@@ -94,15 +100,15 @@ public struct AVAssetImageDataProvider: ImageDataProvider {
     ///   - assetURL: The URL of asset for providing image data.
     ///   - seconds: At which time in seconds in the asset the image should be generated.
     ///
-    /// This method uses `assetURL` to create an `AVAssetImageGenerator` object, uses `seconds` to create a `CMTime`,
-    /// and calls the `init(assetImageGenerator:time:)` initializer.
+    /// This method uses the `assetURL` parameter to create an `AVAssetImageGenerator` object, uses the `seconds`
+    /// parameter to create a `CMTime`, then calls the ``init(assetImageGenerator:time:)`` initializer.
     ///
     public init(assetURL: URL, seconds: TimeInterval) {
         let time = CMTime(seconds: seconds, preferredTimescale: 600)
         self.init(assetURL: assetURL, time: time)
     }
 
-    public func data(handler: @escaping (Result<Data, Error>) -> Void) {
+    public func data(handler: @Sendable @escaping (Result<Data, any Error>) -> Void) {
         assetImageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) {
             (requestedTime, image, imageTime, result, error) in
             if let error = error {
