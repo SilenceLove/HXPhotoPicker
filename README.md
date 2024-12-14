@@ -5,7 +5,7 @@
 </p>
 <p align="center">
     <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://travis-ci.org/SilenceLove/HXPhotoPicker.svg?branch=master"></a>
-    <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://badgen.net/badge/icon/iOS%2012.0%2B?color=cyan&icon=apple&label"></a>
+    <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://badgen.net/badge/icon/iOS%2013.0%2B?color=cyan&icon=apple&label"></a>
     <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="http://img.shields.io/cocoapods/v/HXPhotoPicker.svg?logo=cocoapods&logoColor=ffffff"></a>
     <a href="https://developer.apple.com/Swift"><img src="http://img.shields.io/badge/language-Swift-orange.svg?logo=common-workflow-language"></a>
     <a href="http://mit-license.org"><img src="http://img.shields.io/badge/license-MIT-333333.svg?logo=letterboxd&logoColor=ffffff"></a>
@@ -90,7 +90,7 @@
 
 ## <a id="要求"></a> 要求
 
-- iOS 12.0+
+- iOS 13.0+
 - Xcode 12.5+
 - Swift 5.4+
 
@@ -98,11 +98,11 @@
 
 ### [Swift Package Manager](https://swift.org/package-manager/)
 
-⚠️ 需要 Xcode 12.0 及以上版本来支持资源文件/本地化文件的添加。
+⚠️ 需要 Xcode 13.0 及以上版本来支持资源文件/本地化文件的添加。
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.2.3"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.2.4"))
 ]
 ```
 
@@ -112,7 +112,7 @@ dependencies: [
 
 ```swift
 
-iOS 12.0+
+iOS 13.0+
 pod 'HXPhotoPicker'
 
 /// 不包含 Kingfisher，相机不包含定位功能
@@ -333,7 +333,7 @@ let livePhoto = try await photoAsset.requestLivePhoto()
   
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
-| [v4.2.3](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#423) | 2024-08-05 | 16.0.0 | 6.0.0 | 12.0+ | 
+| [v4.2.4](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#424) | 2024-12-14 | 16.0.0 | 6.0.0 | 13.0+ | 
 
 </details>
 
@@ -342,6 +342,7 @@ let livePhoto = try await photoAsset.requestLivePhoto()
   
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v4.2.3](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#423) | 2024-08-05 | 16.0.0 | 6.0.0 | 12.0+ | 
 | [v4.2.2](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#422) | 2024-07-08 | 15.0.0 | 5.9.0 | 12.0+ | 
 | [v4.2.1](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#421) | 2024-05-18 | 15.0.0 | 5.9.0 | 12.0+ | 
 | [v4.2.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#420) | 2024-04-23 | 15.0.0 | 5.9.0 | 12.0+ | 

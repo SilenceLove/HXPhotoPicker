@@ -1,5 +1,12 @@
 # Release Notes
 
+## 4.2.4
+
+### Add
+
+- Minimum system version upgraded to `iOS 13`
+- `Kingfisher` upgraded to `8.0`
+
 ## 4.2.3.2
 
 ### Resolved
