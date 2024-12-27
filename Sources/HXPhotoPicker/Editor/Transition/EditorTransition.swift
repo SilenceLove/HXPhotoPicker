@@ -29,6 +29,9 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
         previewView = UIImageView()
         previewView.contentMode = .scaleAspectFill
         previewView.clipsToBounds = true
+        if #available(iOS 17, *) {
+            previewView.preferredImageDynamicRange = .high
+        }
     }
 
     func transitionDuration(
@@ -209,6 +212,9 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 let imageView = UIImageView()
                 imageView.contentMode = .scaleAspectFill
                 imageView.clipsToBounds = true
+                if #available(iOS 17, *) {
+                    imageView.preferredImageDynamicRange = .high
+                }
                 if let image = editorVC.editedResult?.image {
                     imageView.image = image
                 }else {
