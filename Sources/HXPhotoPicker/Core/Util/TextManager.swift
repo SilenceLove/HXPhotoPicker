@@ -187,6 +187,7 @@ public extension HX.TextManager {
             public struct Cell {
                 public var gifTitle: TextType = .custom("GIF")
                 public var LivePhotoTitle: TextType = .custom("Live")
+                public var hdrPhotoTitle: TextType = .custom("HDR")
             }
         }
         

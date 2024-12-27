@@ -66,6 +66,11 @@ public extension PhotoFetchAsset {
                     photoAsset.mediaSubType = .livePhoto
                 }
             }
+            if config.selectOptions.contains(.hdrPhoto) {
+                if phAsset.isHdrPhoto {
+                    photoAsset.mediaSubType = .hdrPhoto
+                }
+            }
             
             switch photoAsset.mediaType {
             case .photo:

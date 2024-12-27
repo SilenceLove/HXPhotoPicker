@@ -37,6 +37,10 @@ extension PHAsset {
         return isLivePhoto
     }
     
+    var isHdrPhoto: Bool {
+        return mediaSubtypes.contains(.photoHDR) || mediaSubtypes == .init(rawValue: 512)
+    }
+    
     /// 如果在获取到PHAsset之前还未下载的iCloud，之后下载了还是会返回存在
     var inICloud: Bool {
         if let isCloud = isCloudPlaceholder, isCloud {

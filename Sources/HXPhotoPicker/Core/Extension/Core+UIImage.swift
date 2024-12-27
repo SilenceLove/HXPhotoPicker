@@ -366,4 +366,35 @@ extension UIImage {
         }
         return image
     }
+    
+    static func hdrDecoded(_ data: Data) -> UIImage? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
+            return nil
+        }
+        let exifOrientation = {
+            let defaultOrientation = CGImagePropertyOrientation.up
+            guard let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any] else {
+                return defaultOrientation
+            }
+            guard let exifOrientationValue = properties[kCGImagePropertyOrientation as String] as? NSNumber else {
+                return defaultOrientation
+            }
+            return CGImagePropertyOrientation(rawValue: exifOrientationValue.uint32Value) ?? defaultOrientation
+        }()
+        
+        var decodingOptions: [CFString: Any] = [
+            kCGImageSourceShouldCacheImmediately: false
+        ]
+        if #available(macOS 14, iOS 17, tvOS 17, watchOS 10, *) {
+            decodingOptions[kCGImageSourceDecodeRequest] = kCGImageSourceDecodeToHDR as CFString
+        }
+        guard let imageRef = CGImageSourceCreateImageAtIndex(source, 0, decodingOptions as CFDictionary) else {
+            return nil
+        }
+        
+        let imageOrientation = AssetManager.transformImageOrientation(orientation: exifOrientation)
+        let image = UIImage(cgImage: imageRef, scale: 1.0, orientation: imageOrientation)
+        return image
+    }
+    
 }
