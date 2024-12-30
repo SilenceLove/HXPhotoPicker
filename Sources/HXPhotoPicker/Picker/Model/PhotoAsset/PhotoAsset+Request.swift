@@ -153,8 +153,8 @@ public extension PhotoAsset {
                     return
                 }
                 let image = {
-                    if phAsset.isHdrPhoto {
-                        return UIImage.hdrDecoded(dataResult.imageData)
+                    if phAsset.isHDRPhoto {
+                        return UIImage.HDRDecoded(dataResult.imageData)
                     } else {
                         return UIImage(data: dataResult.imageData)?.normalizedImage()
                     }

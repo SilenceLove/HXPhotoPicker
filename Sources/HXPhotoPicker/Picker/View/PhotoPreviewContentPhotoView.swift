@@ -374,7 +374,7 @@ extension PhotoPreviewContentPhotoView {
                 guard let self = self, self.photoAsset == asset else {
                     return
                 }
-                if inICloud || asset.isHdrAsset {
+                if inICloud || asset.isHDRAsset {
                     self.requestPreviewImageData()
                 }else {
                     self.requestPreviewImage()
@@ -482,8 +482,8 @@ extension PhotoPreviewContentPhotoView {
                             }
                         }
                     }
-                    if asset.isHdrAsset {
-                        handler(UIImage.hdrDecoded(dataResult.imageData))
+                    if asset.isHDRAsset {
+                        handler(UIImage.HDRDecoded(dataResult.imageData))
                     } else {
                         let dataCount = CGFloat(dataResult.imageData.count)
                         if dataCount > 3000000 {

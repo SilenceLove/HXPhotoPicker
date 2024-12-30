@@ -327,8 +327,8 @@ extension PhotoPickerViewCell {
                     photoAsset.mediaSubType == .localLivePhoto {
             assetTypeLb.text = .textPhotoList.cell.LivePhotoTitle.text
             assetTypeMaskView.isHidden = false
-        }else if photoAsset.mediaSubType == .hdrPhoto {
-            assetTypeLb.text = .textPhotoList.cell.hdrPhotoTitle.text
+        }else if photoAsset.mediaSubType == .HDRPhoto {
+            assetTypeLb.text = .textPhotoList.cell.HDRPhotoTitle.text
             assetTypeMaskView.isHidden = false
         }else {
             assetTypeLb.text = nil

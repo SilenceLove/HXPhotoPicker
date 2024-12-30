@@ -37,7 +37,7 @@ extension PHAsset {
         return isLivePhoto
     }
     
-    var isHdrPhoto: Bool {
+    var isHDRPhoto: Bool {
         return mediaSubtypes.contains(.photoHDR) || mediaSubtypes == .init(rawValue: 512)
     }
     

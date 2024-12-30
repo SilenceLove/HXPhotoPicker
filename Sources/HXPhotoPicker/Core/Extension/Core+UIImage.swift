@@ -382,7 +382,7 @@ extension UIImage {
         return image
     }
     
-    static func hdrDecoded(_ data: Data) -> UIImage? {
+    static func HDRDecoded(_ data: Data) -> UIImage? {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
             return nil
         }
