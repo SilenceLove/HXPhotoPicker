@@ -18,9 +18,11 @@ public struct PickerAssetOptions: OptionSet {
     public static let gifPhoto = PickerAssetOptions(rawValue: 1 << 2)
     /// LivePhoto 实况照片
     public static let livePhoto = PickerAssetOptions(rawValue: 1 << 3)
+    /// HDR 照片
+    public static let hdrPhoto = PickerAssetOptions(rawValue: 1 << 4)
     
     public var isPhoto: Bool {
-        contains(.photo) || contains(.gifPhoto) || contains(.livePhoto)
+        contains(.photo) || contains(.gifPhoto) || contains(.livePhoto) || contains(.hdrPhoto)
     }
     public var isVideo: Bool {
         contains(.video)
@@ -120,6 +122,8 @@ public extension PhotoAsset {
         case imageAnimated
         /// 手机相册里的LivePhoto
         case livePhoto
+        /// 手机相册里的hdrPhoto
+        case hdrPhoto
         /// 手机相册里的视频
         case video
         /// 本地图片
@@ -146,7 +150,7 @@ public extension PhotoAsset {
         
         public var isPhoto: Bool {
             switch self {
-            case .image, .imageAnimated, .livePhoto, .localImage, .localLivePhoto, .localGifImage, .networkImage:
+            case .image, .imageAnimated, .livePhoto, .localImage, .localLivePhoto, .localGifImage, .networkImage, .hdrPhoto:
                 return true
             default:
                 return false
@@ -187,6 +191,15 @@ public extension PhotoAsset {
         public var isLivePhoto: Bool {
             switch self {
             case .livePhoto, .localLivePhoto:
+                return true
+            default:
+                return false
+            }
+        }
+        
+        public var isHdrPhoto: Bool {
+            switch self {
+            case .hdrPhoto:
                 return true
             default:
                 return false

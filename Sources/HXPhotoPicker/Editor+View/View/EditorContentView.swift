@@ -374,6 +374,9 @@ class EditorContentView: UIView {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.isHidden = true
+        if #available(iOS 17, *) {
+            imageView.preferredImageDynamicRange = .high
+        }
         addSubview(imageView)
         
         mosaicView = EditorMosaicView()

@@ -106,6 +106,7 @@ open class PhotoAsset: Equatable {
     public var isGifAsset: Bool { mediaSubType.isGif }
     public var isLocalAsset: Bool { mediaSubType.isLocal }
     public var isNetworkAsset: Bool { mediaSubType.isNetwork }
+    public var isHdrAsset: Bool { mediaSubType.isHdrPhoto }
     
     /// 根据系统相册里对应的 PHAsset 数据初始化
     /// - Parameter asset: 系统相册里对应的 PHAsset 数据
