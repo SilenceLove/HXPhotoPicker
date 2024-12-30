@@ -156,6 +156,21 @@ extension UIImage {
         return repaintImage()
     }
     func repaintImage() -> UIImage? {
+        if #available(iOS 17.0, *) {
+            if self.isHighDynamicRange, let cgImage = self.cgImage {
+                let ciImage = CIImage(cgImage: cgImage)
+                let ciContext = CIContext()
+                if let result = ciContext.createCGImage(
+                    ciImage,
+                    from: ciImage.extent,
+                    format: .RGB10,
+                    colorSpace: cgImage.colorSpace,
+                    deferred: true
+                ) {
+                    return UIImage(cgImage: result, scale: self.scale, orientation: self.imageOrientation)
+                }
+            }
+        }
         let format = UIGraphicsImageRendererFormat()
         format.opaque = false
         format.scale = scale
