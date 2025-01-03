@@ -756,8 +756,8 @@ extension EditorViewController {
                     case .success(let dataResult):
                         if AssetManager.assetDownloadFinined(for: dataResult.info) || AssetManager.assetCancelDownload(for: dataResult.info) {
                             let image = {
-                                if asset.isHdrAsset {
-                                    return UIImage.hdrDecoded(dataResult.imageData)
+                                if asset.isHDRAsset {
+                                    return UIImage.HDRDecoded(dataResult.imageData)
                                 } else {
                                     return UIImage(data: dataResult.imageData)
                                 }
