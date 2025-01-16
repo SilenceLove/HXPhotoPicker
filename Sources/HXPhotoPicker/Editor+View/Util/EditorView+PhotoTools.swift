@@ -97,7 +97,7 @@ extension PhotoTools {
         _ inputImage: UIImage?,
         cropFactor: EditorAdjusterView.CropFactor
     ) -> UIImage? {
-        guard let imageRef = inputImage?.cgImage else {
+        guard let inputImage = inputImage?.normalizedImage(), let imageRef = inputImage.cgImage else {
             return nil
         }
         if cropFactor.sizeRatio.equalTo(.init(x: 1, y: 1)),
