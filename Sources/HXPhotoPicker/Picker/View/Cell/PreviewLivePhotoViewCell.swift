@@ -89,7 +89,7 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         imageView.x = 5
         liveMarkView.contentView.addSubview(imageView)
         let label = UILabel()
-        label.text = "Live"
+        label.text = .textManager.picker.preview.livePhotoTitle.text
         label.textColor = "#666666".color
         label.textAlignment = .center
         label.font = .regularPingFang(ofSize: 15)
