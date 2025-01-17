@@ -49,7 +49,7 @@ extension UIImage {
     }
     
     func scaleToFillSize(size: CGSize, mode: HX.ImageTargetMode = .fill, scale: CGFloat = 0) -> UIImage? {
-        if __CGSizeEqualToSize(self.size, size) {
+        if self.size == size {
             return self
         }
         let rect: CGRect
@@ -156,21 +156,6 @@ extension UIImage {
         return repaintImage()
     }
     func repaintImage() -> UIImage? {
-        if #available(iOS 17.0, *) {
-            if self.isHighDynamicRange, let cgImage = self.cgImage {
-                let ciImage = CIImage(cgImage: cgImage)
-                let ciContext = CIContext()
-                if let result = ciContext.createCGImage(
-                    ciImage,
-                    from: ciImage.extent,
-                    format: .RGB10,
-                    colorSpace: cgImage.colorSpace,
-                    deferred: true
-                ) {
-                    return UIImage(cgImage: result, scale: self.scale, orientation: self.imageOrientation)
-                }
-            }
-        }
         let format = UIGraphicsImageRendererFormat()
         format.opaque = false
         format.scale = scale
@@ -383,27 +368,24 @@ extension UIImage {
     }
     
     static func HDRDecoded(_ data: Data) -> UIImage? {
-        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
+        guard let sourceRef = CGImageSourceCreateWithData(data as CFData, nil) else {
             return nil
         }
+        let properties = CGImageSourceCopyPropertiesAtIndex(sourceRef, 0, nil) as? [AnyHashable: Any]
         let exifOrientation = {
-            let defaultOrientation = CGImagePropertyOrientation.up
-            guard let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any] else {
-                return defaultOrientation
+            guard let orientation = properties?[kCGImagePropertyOrientation] as? UInt32 else {
+                return CGImagePropertyOrientation.up
             }
-            guard let exifOrientationValue = properties[kCGImagePropertyOrientation as String] as? NSNumber else {
-                return defaultOrientation
-            }
-            return CGImagePropertyOrientation(rawValue: exifOrientationValue.uint32Value) ?? defaultOrientation
+            return CGImagePropertyOrientation(rawValue: orientation) ?? .up
         }()
         
-        var decodingOptions: [CFString: Any] = [
+        var decodingOptions: [AnyHashable: Any] = [
             kCGImageSourceShouldCacheImmediately: false
         ]
         if #available(macOS 14, iOS 17, tvOS 17, watchOS 10, *) {
-            decodingOptions[kCGImageSourceDecodeRequest] = kCGImageSourceDecodeToHDR as CFString
+            decodingOptions[kCGImageSourceDecodeRequest] = kCGImageSourceDecodeToHDR
         }
-        guard let imageRef = CGImageSourceCreateImageAtIndex(source, 0, decodingOptions as CFDictionary) else {
+        guard let imageRef = CGImageSourceCreateImageAtIndex(sourceRef, 0, decodingOptions as CFDictionary) else {
             return nil
         }
         

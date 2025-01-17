@@ -755,13 +755,7 @@ extension EditorViewController {
                     switch result {
                     case .success(let dataResult):
                         if AssetManager.assetDownloadFinined(for: dataResult.info) || AssetManager.assetCancelDownload(for: dataResult.info) {
-                            let image = {
-                                if asset.isHDRAsset {
-                                    return UIImage.HDRDecoded(dataResult.imageData)
-                                } else {
-                                    return UIImage(data: dataResult.imageData)
-                                }
-                            }()
+                            let image = UIImage(data: dataResult.imageData)
                             guard let image = image else {
                                 self.loadAssetStatus = .failure
                                 PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
