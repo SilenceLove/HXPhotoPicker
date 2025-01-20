@@ -129,8 +129,7 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
     public override func deviceOrientationWillChanged(notify: Notification) {
         orientationDidChange = true
         if let cell = getCell(for: currentPreviewIndex) {
-            if cell.photoAsset.mediaSubType == .livePhoto ||
-                cell.photoAsset.mediaSubType == .localLivePhoto {
+            if cell.photoAsset.mediaSubType.isLivePhoto {
                 if #available(iOS 9.1, *) {
                     cell.scrollContentView.livePhotoView.stopPlayback()
                 }
