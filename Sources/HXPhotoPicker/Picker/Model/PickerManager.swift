@@ -220,7 +220,7 @@ extension PickerManager {
                     }
                 }
                 if self.config.selectOptions.contains(.HDRPhoto) {
-                    if photoAsset.phAsset!.isHDRPhoto {
+                    if photoAsset.mediaSubType == .image && photoAsset.phAsset!.isHDR {
                         photoAsset.mediaSubType = .HDRPhoto
                     }
                 }

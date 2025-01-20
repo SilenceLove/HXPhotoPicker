@@ -200,9 +200,7 @@ public extension Array where Element: PhotoAsset {
                         mediatype = .video
                     }
                     #if HXPICKER_ENABLE_EDITOR
-                    if (photoAsset.mediaSubType == .livePhoto ||
-                        photoAsset.mediaSubType == .localLivePhoto) &&
-                        photoAsset.editedResult != nil {
+                    if photoAsset.mediaSubType.isLivePhoto && photoAsset.editedResult != nil {
                         mediatype = .photo
                     }
                     #endif
@@ -223,8 +221,7 @@ public extension Array where Element: PhotoAsset {
                         toVideoURL = fileConfig.videoURL
                     }
                     if mediatype == .photo {
-                        if photoAsset.mediaSubType == .livePhoto ||
-                            photoAsset.mediaSubType == .localLivePhoto {
+                        if photoAsset.mediaSubType.isLivePhoto {
                             photoAsset.getLivePhotoURL(
                                 imageFileURL: toImageURL,
                                 videoFileURL: toVideoURL,
