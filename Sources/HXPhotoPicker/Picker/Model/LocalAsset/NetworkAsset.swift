@@ -85,8 +85,8 @@ public struct NetworkImageAsset: Codable {
     ) {
         self.thumbnailURL = thumbnailURL
         self.originalURL = originalURL
-        self.thumbailCacheKey = thumbailCacheKey
-        self.originalCacheKey = originalCacheKey
+        self.thumbailCacheKey = thumbailCacheKey ?? thumbnailURL?.cacheKey
+        self.originalCacheKey = originalCacheKey ?? originalURL?.cacheKey
         self.thumbnailLoadMode = thumbnailLoadMode
         self.originalLoadMode = originalLoadMode
         self.isFade = isFade
