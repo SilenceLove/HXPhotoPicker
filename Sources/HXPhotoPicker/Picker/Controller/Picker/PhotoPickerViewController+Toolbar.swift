@@ -93,6 +93,10 @@ extension PhotoPickerViewController: PhotoToolBarDelegate {
     }
     
     public func photoToolbar(_ toolbar: PhotoToolBar, didDeleteAsset asset: PhotoAsset) {
+        deselectedAsset(asset)
+    }
+    
+    public func deselectedAsset(_ asset: PhotoAsset) {
         pickerController.pickerData.remove(asset)
         #if HXPICKER_ENABLE_EDITOR
         if asset.videoEditedResult != nil, pickerConfig.isDeselectVideoRemoveEdited {

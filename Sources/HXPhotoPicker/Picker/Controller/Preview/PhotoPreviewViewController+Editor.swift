@@ -41,6 +41,10 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
                 }
                 if !photoAsset.isSelected {
                     didSelectBoxControlClick()
+                }else {
+                    if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
+                        didSelectBoxControlClick()
+                    }
                 }
             }
             pickerController.didEditAsset(photoAsset: photoAsset, atIndex: currentPreviewIndex)
@@ -67,6 +71,10 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
             }
             if !photoAsset.isSelected {
                 didSelectBoxControlClick()
+            }else {
+                if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
+                    didSelectBoxControlClick()
+                }
             }
             if beforeHasEdit {
                 reloadCell(for: currentPreviewIndex)
