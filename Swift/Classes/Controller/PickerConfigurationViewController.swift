@@ -29,7 +29,11 @@ class PickerConfigurationViewController: UITableViewController {
             target: self,
             action: #selector(openPickerController)
         )
+        #if targetEnvironment(simulator)
+        self.config.selectOptions = [.photo, .gifPhoto, .livePhoto]
+        #else
         self.config.selectOptions = [.photo, .gifPhoto, .livePhoto, .HDRPhoto]
+        #endif
     }
     
     @objc func openPickerController() {

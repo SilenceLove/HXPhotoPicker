@@ -147,6 +147,10 @@ open class PhotoAsset: Equatable {
         }
     }
     
+    public convenience init(image: UIImage) {
+        self.init(localImageAsset: .init(image: image))
+    }
+    
     public convenience init(_ localImageAsset: LocalImageAsset) {
         self.init(localImageAsset: localImageAsset)
     }

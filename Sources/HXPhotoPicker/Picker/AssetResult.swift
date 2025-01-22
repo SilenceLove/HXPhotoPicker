@@ -10,6 +10,7 @@ import UIKit
 
 public struct AssetResult {
     public let image: UIImage
+    public var url: URL { urlReuslt.url }
     public let urlReuslt: AssetURLResult
 }
 

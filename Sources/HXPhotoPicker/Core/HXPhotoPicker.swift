@@ -24,6 +24,26 @@ public enum Photo {
         compression: PhotoAsset.Compression? = nil,
         fromVC: UIViewController? = nil,
         toFile fileConfig: PickerResult.FileConfigHandler? = nil
+    ) async throws -> T {
+        try await PhotoPickerController.picker(
+            config,
+            selectedAssets: selectedAssets,
+            delegate: delegate,
+            compression: compression,
+            fromVC: fromVC,
+            toFile: fileConfig
+        )[0]
+    }
+    
+    @available(iOS 13.0, *)
+    @MainActor
+    public static func picker<T: PhotoAssetObject>(
+        _ config: PickerConfiguration,
+        selectedAssets: [PhotoAsset] = [],
+        delegate: PhotoPickerControllerDelegate? = nil,
+        compression: PhotoAsset.Compression? = nil,
+        fromVC: UIViewController? = nil,
+        toFile fileConfig: PickerResult.FileConfigHandler? = nil
     ) async throws -> [T] {
         try await PhotoPickerController.picker(
             config,

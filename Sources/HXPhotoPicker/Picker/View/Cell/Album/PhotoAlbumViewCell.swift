@@ -146,6 +146,9 @@ fileprivate extension PhotoAssetCollection {
         case .smartAlbumCinematic:
             return .init(systemName: "video.circle")
         default:
+            if collection.assetCollectionSubtype.rawValue == 1000000218 {
+                return .init(systemName: "square.and.arrow.down.badge.clock")
+            }
             return nil
         }
     }

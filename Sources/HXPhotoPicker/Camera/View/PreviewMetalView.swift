@@ -268,7 +268,7 @@ class PreviewMetalView: MTKView {
         let defaultLibrary: MTLLibrary
         PhotoManager.shared.createBundle()
         if let bundle = PhotoManager.shared.bundle,
-           let path = bundle.path(forResource: "metal/default", ofType: "metallib"),
+           let path = bundle.path(forResource: "metal/hx_default", ofType: "metallib"),
            let library = try? device.makeLibrary(filepath: path) {
             defaultLibrary = library
         }else {
