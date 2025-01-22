@@ -65,7 +65,7 @@ public extension PhotoAsset {
             switch result {
             case .success(let dataResult):
                 let image = {
-                    if phAsset.isHDRPhoto {
+                    if self.mediaSubType.isHDRPhoto {
                         return UIImage.HDRDecoded(dataResult.imageData)
                     } else {
                         return UIImage(data: dataResult.imageData)?.normalizedImage()

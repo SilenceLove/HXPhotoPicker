@@ -36,7 +36,7 @@ extension PhotoAsset {
             resultHandler(.failure(.invalidPHAsset))
             return
         }
-        if mediaSubType == .livePhoto {
+        if mediaSubType.isLivePhoto {
             if let exportParameter = exportParameter {
                 AssetManager.exportVideoURL(
                     forVideo: phAsset,

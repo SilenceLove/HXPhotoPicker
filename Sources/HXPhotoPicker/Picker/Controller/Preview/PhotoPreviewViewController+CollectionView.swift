@@ -26,8 +26,7 @@ extension PhotoPreviewViewController: UICollectionViewDataSource {
         }
         let cell: PhotoPreviewViewCell
         if photoAsset.mediaType == .photo {
-            if photoAsset.mediaSubType == .livePhoto ||
-                photoAsset.mediaSubType == .localLivePhoto {
+            if photoAsset.mediaSubType.isLivePhoto {
                 cell = collectionView.dequeueReusableCell(
                     withReuseIdentifier: PreviewLivePhotoViewCell.className,
                     for: indexPath

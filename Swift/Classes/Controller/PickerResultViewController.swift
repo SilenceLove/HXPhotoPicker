@@ -609,8 +609,7 @@ class PickerResultViewController: UIViewController,
                     )
                 }, rightActionTitle: "取消") { (alertAction) in }
         } longPressHandler: { index, photoAsset, photoBrowser in
-            if photoAsset.mediaSubType == .localLivePhoto ||
-               photoAsset.mediaSubType == .livePhoto {
+            if photoAsset.mediaSubType.isLivePhoto {
                 return
             }
             // 长按事件

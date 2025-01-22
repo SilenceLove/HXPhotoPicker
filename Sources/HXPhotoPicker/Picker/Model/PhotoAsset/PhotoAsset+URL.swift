@@ -40,8 +40,7 @@ public extension PhotoAsset {
         completion: @escaping AssetURLCompletion
     ) {
         if mediaType == .photo {
-            if mediaSubType == .livePhoto ||
-                mediaSubType == .localLivePhoto {
+            if mediaSubType.isLivePhoto {
                 getLivePhotoURL(
                     imageFileURL: fileConfig?.imageURL,
                     videoFileURL: fileConfig?.videoURL,

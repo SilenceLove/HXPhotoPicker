@@ -196,8 +196,7 @@ class WeChatViewCell: UITableViewCell {
                     stateLb.text = "GIF"
                     stateMaskLayer.isHidden = false
                 }
-            }else if photoAsset.mediaSubType == .livePhoto ||
-                        photoAsset.mediaSubType == .localLivePhoto {
+            }else if photoAsset.mediaSubType.isLivePhoto {
                 stateLb.text = "Live"
                 stateMaskLayer.isHidden = false
             }else {
