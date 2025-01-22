@@ -650,7 +650,12 @@ extension PhotoPickerListViewController: UICollectionViewDelegate {
                         photoAsset.editedResult = nil
                         cell.updatePhotoAsset(photoAsset)
                     }
-                    self.delegate?.photoList(self, updateAsset: photoAsset)
+                    if photoAsset.isSelected,
+                       !self.pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
+                        self.pickerCell(cell, didSelectControl: photoAsset.isSelected)
+                    }else {
+                        self.delegate?.photoList(self, updateAsset: photoAsset)
+                    }
                 }
                 menus.append(removeEdit)
             }
