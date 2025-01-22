@@ -136,23 +136,23 @@ public struct VideoEditorFilter: Codable {
 
 public struct EditorFilterEditFator: Codable {
     /// 亮度
-    var brightness: Float
+    public var brightness: Float
     /// 对比度
-    var contrast: Float
+    public var contrast: Float
     /// 曝光度
-    var exposure: Float
+    public var exposure: Float
     /// 饱和度
-    var saturation: Float
+    public var saturation: Float
     /// 高光
-    var highlights: Float
+    public var highlights: Float
     /// 阴影
-    var shadows: Float
+    public var shadows: Float
     /// 色温
-    var warmth: Float
+    public var warmth: Float
     /// 暗角
-    var sharpen: Float
+    public var sharpen: Float
     /// 锐化
-    var vignette: Float
+    public var vignette: Float
     
     var isApply: Bool {
         brightness != 0 ||
@@ -191,11 +191,11 @@ public struct EditorFilterEditFator: Codable {
 
 public struct EditorCropSizeFator: Codable {
     /// 是否固定比例
-    let isFixedRatio: Bool
+    public let isFixedRatio: Bool
     /// 裁剪框比例
-    let aspectRatio: CGSize
+    public let aspectRatio: CGSize
     /// 角度刻度值
-    let angle: CGFloat
+    public let angle: CGFloat
     
     public init(isFixedRatio: Bool, aspectRatio: CGSize, angle: CGFloat) {
         self.isFixedRatio = isFixedRatio
