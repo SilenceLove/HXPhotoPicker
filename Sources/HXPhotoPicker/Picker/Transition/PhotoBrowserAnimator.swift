@@ -215,7 +215,7 @@ open class PhotoBrowserAnimator: NSObject, PhotoBrowserAnimationTransitioning {
     
     #if canImport(Kingfisher)
     open func requestNetworkImage(_ networkImage: NetworkImageAsset, completion: @escaping(UIImage?) -> Void) {
-        if let cacheKey = networkImage.originalURL?.cacheKey,
+        if let cacheKey = networkImage.originalCacheKey,
            ImageCache.default.isCached(forKey: cacheKey) {
             ImageCache.default.retrieveImage(
                 forKey: cacheKey,
@@ -231,7 +231,7 @@ open class PhotoBrowserAnimator: NSObject, PhotoBrowserAnimationTransitioning {
             }
             return
         }
-        if let cacheKey = networkImage.thumbnailURL?.cacheKey,
+        if let cacheKey = networkImage.thumbailCacheKey,
            ImageCache.default.isCached(forKey: cacheKey) {
             ImageCache.default.retrieveImage(
                 forKey: cacheKey,

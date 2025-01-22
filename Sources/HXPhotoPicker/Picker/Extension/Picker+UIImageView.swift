@@ -49,13 +49,12 @@ extension UIImageView {
         var loadVideoCover: Bool = false
         var cacheKey: String?
         if let imageAsset = asset.networkImageAsset {
-            let originalCacheKey = imageAsset.originalCacheKey ?? imageAsset.originalURL?.cacheKey
+            let originalCacheKey = imageAsset.originalCacheKey
             if isThumbnail {
                 if imageAsset.thumbnailLoadMode == .varied,
                    let originalCacheKey,
                    ImageCache.default.isCached(forKey: originalCacheKey) {
-                    let thumbnailCacheKey = imageAsset.thumbailCacheKey ?? imageAsset.thumbnailURL?.cacheKey
-                    if let thumbnailCacheKey,
+                    if let thumbnailCacheKey = imageAsset.thumbailCacheKey,
                        ImageCache.default.isCached(forKey: thumbnailCacheKey) {
                         placeholderImage = ImageCache.default.retrieveImageInMemoryCache(
                             forKey: thumbnailCacheKey,

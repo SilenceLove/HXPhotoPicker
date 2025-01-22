@@ -256,11 +256,11 @@ extension PhotoPreviewContentPhotoView {
         if photoAsset.mediaSubType != .networkVideo {
             var key: String = ""
             if let networkImage = photoAsset.networkImageAsset {
-                if let cacheKey = networkImage.thumbnailURL?.cacheKey,
+                if let cacheKey = networkImage.thumbailCacheKey,
                    networkImage.originalLoadMode == .alwaysThumbnail,
                    !loadOriginal {
                     key = cacheKey
-                }else if let cacheKey = networkImage.originalURL?.cacheKey {
+                }else if let cacheKey = networkImage.originalCacheKey {
                     key = cacheKey
                 }
             }else if let livePhoto = photoAsset.localLivePhoto,
