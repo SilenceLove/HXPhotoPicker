@@ -176,7 +176,10 @@ extension EditorAdjusterView {
         var cropRect = rect
         let overlayImage = getOverlayImage(inputImage.size, cropFactor: cropFactor)
         var exportScale = exportScale
-        let maxSize = max(inputImage.size.width, inputImage.size.height)
+        var maxSize = max(inputImage.size.width, inputImage.size.height)
+        if isHEICImage {
+            maxSize *= exportScale
+        }
         if maxSize > 10000 {
             exportScale = 10000 / maxSize
         }
