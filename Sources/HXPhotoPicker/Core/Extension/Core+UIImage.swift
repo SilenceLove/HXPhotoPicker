@@ -297,9 +297,9 @@ extension UIImage {
         }
         return self
     }
-    func merge(_ image: UIImage, origin: CGPoint, scale: CGFloat = UIScreen._scale) -> UIImage? {
+    func merge(_ image: UIImage, origin: CGPoint, opaque: Bool = false, isJPEG: Bool = false, scale: CGFloat = UIScreen._scale) -> UIImage? {
         let format = UIGraphicsImageRendererFormat()
-        format.opaque = false
+        format.opaque = opaque
         format.scale = scale
         let renderer = UIGraphicsImageRenderer(size: size, format: format)
         let mergeImage = renderer.image { context in
@@ -307,14 +307,29 @@ extension UIImage {
         }
         return mergeImage
     }
-    func merge(images: [UIImage], scale: CGFloat = UIScreen._scale) -> UIImage? {
+    func merge(
+        images: [UIImage],
+        opaque: Bool = false,
+        isJPEG: Bool = false,
+        compressionQuality: CGFloat = 1,
+        scale: CGFloat = UIScreen._scale
+    ) -> UIImage? {
         if images.isEmpty {
             return self
         }
         let format = UIGraphicsImageRendererFormat()
-        format.opaque = false
+        format.opaque = opaque
         format.scale = scale
         let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        if isJPEG {
+            let data = renderer.jpegData(withCompressionQuality: compressionQuality) { context in
+                draw(in: CGRect(origin: .zero, size: size))
+                for image in images {
+                    image.draw(in: CGRect(origin: .zero, size: size))
+                }
+            }
+            return .init(data: data)
+        }
         let mergeImage = renderer.image { context in
             draw(in: CGRect(origin: .zero, size: size))
             for image in images {

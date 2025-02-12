@@ -244,6 +244,16 @@ public extension EditorView {
         get { adjusterView.isHEICImage }
         set { adjusterView.isHEICImage = newValue }
     }
+    
+    var isJPEGImage: Bool {
+        get { adjusterView.isJPEGImage }
+        set { adjusterView.isJPEGImage = newValue }
+    }
+    
+    var exportMaxSize: CGFloat {
+        get { adjusterView.exportMaxSize }
+        set { adjusterView.exportMaxSize = newValue }
+    }
 }
 
 // MARK: 绘画
