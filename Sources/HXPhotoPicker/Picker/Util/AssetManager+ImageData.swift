@@ -130,9 +130,7 @@ public extension AssetManager {
                 for: asset,
                 options: options
             ) { (imageData, dataUTI, imageOrientation, info) in
-                let sureOrientation = self.transformImageOrientation(
-                    orientation: imageOrientation
-                )
+                let sureOrientation = imageOrientation.imageOrientation
                 if Thread.isMainThread || options.isSynchronous {
                     result(
                         imageData: imageData,
