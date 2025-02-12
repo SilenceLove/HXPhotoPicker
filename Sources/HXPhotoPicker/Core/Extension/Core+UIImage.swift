@@ -404,9 +404,33 @@ extension UIImage {
             return nil
         }
         
-        let imageOrientation = AssetManager.transformImageOrientation(orientation: exifOrientation)
-        let image = UIImage(cgImage: imageRef, scale: 1.0, orientation: imageOrientation)
+        let image = UIImage(cgImage: imageRef, scale: 1.0, orientation: exifOrientation.imageOrientation)
         return image
     }
     
+}
+
+extension CGImagePropertyOrientation {
+    var imageOrientation: UIImage.Orientation {
+        switch self {
+        case .up:
+            return .up
+        case .upMirrored:
+            return .upMirrored
+        case .down:
+            return .down
+        case .downMirrored:
+            return .downMirrored
+        case .left:
+            return .left
+        case .leftMirrored:
+            return .leftMirrored
+        case .right:
+            return .right
+        case .rightMirrored:
+            return .rightMirrored
+        default:
+            return .up
+        }
+    }
 }

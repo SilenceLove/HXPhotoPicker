@@ -93,30 +93,6 @@ public extension AssetManager {
             resultHandler: resultHandler
         )
     }
-    static func transformImageOrientation(
-        orientation: CGImagePropertyOrientation
-    ) -> UIImage.Orientation {
-        switch orientation {
-        case .up:
-            return .up
-        case .upMirrored:
-            return .upMirrored
-        case .down:
-            return .down
-        case .downMirrored:
-            return .downMirrored
-        case .left:
-            return .left
-        case .leftMirrored:
-            return .leftMirrored
-        case .right:
-            return .right
-        case .rightMirrored:
-            return .rightMirrored
-        default:
-            return .up
-        }
-    }
     /// 请求imageData，注意处理 HEIC格式
     @discardableResult
     static func requestImageData(
