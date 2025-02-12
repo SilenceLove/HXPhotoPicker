@@ -104,14 +104,18 @@ class PhotoPreviewSelectedView: UIView,
         collectionView.reloadData()
     }
     func reloadData(photoAsset: PhotoAsset) {
-        if let index = photoAssetArray.firstIndex(of: photoAsset) {
-            collectionView.reloadItems(at: [IndexPath(item: index, section: 0)])
-            collectionView.selectItem(
-                at: currentSelectedIndexPath,
-                animated: false,
-                scrollPosition: .centeredHorizontally
-            )
+        guard let index = photoAssetArray.firstIndex(of: photoAsset) else {
+            return
         }
+        collectionView.reloadItems(at: [IndexPath(item: index, section: 0)])
+        if isPhotoList {
+           return
+        }
+        collectionView.selectItem(
+            at: currentSelectedIndexPath,
+            animated: false,
+            scrollPosition: .centeredHorizontally
+        )
     }
     
     func insertPhotoAsset(

@@ -761,8 +761,9 @@ extension EditorViewController {
                                 PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: self.view)
                                 return
                             }
-                            if let dataUTI = dataResult.dataUTI, dataUTI.contains("heic") {
-                                self.editorView.isHEICImage = true
+                            if let dataUTI = dataResult.dataUTI {
+                                self.editorView.isHEICImage = dataUTI.contains("heic")
+                                self.editorView.isJPEGImage = dataUTI.contains("jpeg")
                             }
                             if !self.isTransitionCompletion {
                                 self.loadAssetStatus = .succeed(.image(image))

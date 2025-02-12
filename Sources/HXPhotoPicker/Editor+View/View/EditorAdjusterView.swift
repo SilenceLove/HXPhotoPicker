@@ -27,7 +27,7 @@ class EditorAdjusterView: UIView {
             }
         }
     }
-    
+    var exportMaxSize: CGFloat = 3 * 3120 * 1440
     var baseContentSize: CGSize = .zero
     var zoomScale: CGFloat = 1 {
         didSet { contentView.zoomScale = zoomScale * scrollView.zoomScale }
@@ -48,6 +48,7 @@ class EditorAdjusterView: UIView {
         }
     }
     var isHEICImage: Bool = false
+    var isJPEGImage: Bool = false
     var lastRatationMinimumZoomScale: CGFloat = 1
     
     var adjustedFactor: AdjustedFactor = .init()

@@ -174,14 +174,19 @@ extension EditorAdjusterView {
             return
         }
         var cropRect = rect
-        let overlayImage = getOverlayImage(inputImage.size, cropFactor: cropFactor)
-        var exportScale = exportScale
-        var maxSize = max(inputImage.size.width, inputImage.size.height)
-        if isHEICImage {
-            maxSize *= exportScale
+        let imageMaxSize = inputImage.size.width * inputImage.size.height * exportScale
+        let overlayMaxSize: CGFloat = 1920 * 1080 * 3
+        let overlayImageSize: CGSize
+        if imageMaxSize > overlayMaxSize {
+            let scale = overlayMaxSize / imageMaxSize
+            overlayImageSize = .init(width: inputImage.width * scale, height: inputImage.height * scale)
+        }else {
+            overlayImageSize = inputImage.size
         }
-        if maxSize > 10000 {
-            exportScale = 10000 / maxSize
+        let overlayImage = getOverlayImage(overlayImageSize, cropFactor: cropFactor)
+        var exportScale = exportScale
+        if imageMaxSize > exportMaxSize {
+            exportScale = exportMaxSize / imageMaxSize
         }
         if exportScale != inputImage.scale && overlayImage != nil {
             let scale = exportScale / inputImage.scale
@@ -200,7 +205,7 @@ extension EditorAdjusterView {
             return
         }
         if let overlayImage = overlayImage,
-           let image = inputImage.merge(images: [overlayImage], scale: exportScale) {
+           let image = inputImage.merge(images: [overlayImage], opaque: isJPEGImage, isJPEG: isJPEGImage || isHEICImage, compressionQuality: 1, scale: exportScale) {
             inputImage = image
         }
         guard let image = PhotoTools.cropImage(inputImage, cropFactor: cropFactor) else {
@@ -235,7 +240,7 @@ extension EditorAdjusterView {
                 if let config = self.urlConfig {
                     urlConfig = config
                 }else {
-                    let fileName = String.fileName(suffix: data.isGif ? "gif" : "png")
+                    let fileName = String.fileName(suffix: data.isGif ? "gif" : (isJPEGImage ? "jpeg" : "png"))
                     urlConfig = .init(fileName: fileName, type: .temp)
                 }
                 if PhotoTools.write(toFile: urlConfig.url, imageData: data) == nil {
@@ -411,6 +416,7 @@ extension EditorAdjusterView {
         PhotoTools.getImageData(
             image,
             isHEIC: isHEICImage,
+            isJPEG: isJPEGImage,
             queueLabel: "HXPhotoPicker.editor.cropImageQueue"
         ) {
             guard let imageData = $0 else {
