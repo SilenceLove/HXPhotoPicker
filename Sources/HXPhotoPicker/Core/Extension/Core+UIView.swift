@@ -114,6 +114,8 @@ extension UIView: HXPickerCompatible {
 }
 
 extension UIRectCorner {
+    
+    @available(iOS 11.0, *)
     var mask: CACornerMask {
         switch self {
         case .allCorners:

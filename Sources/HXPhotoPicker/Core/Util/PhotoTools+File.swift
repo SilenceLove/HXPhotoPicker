@@ -218,7 +218,7 @@ public extension PhotoTools {
         }
         return nil
     }
-    static func getImageData(_ image: UIImage, isHEIC: Bool = false, isJPEG: Bool = false, queueLabel: String, completion: @escaping (Data?) -> Void) {
+    static func getImageData(_ image: UIImage, isHEIC: Bool = false, isJPEG: Bool = false, compressionQuality: CGFloat = 0.5, queueLabel: String, completion: @escaping (Data?) -> Void) {
         let serialQueue = DispatchQueue(
             label: queueLabel,
             qos: .userInitiated,
@@ -241,7 +241,7 @@ public extension PhotoTools {
                     }
                 }
                 if isJPEG {
-                    data = image.jpegData(compressionQuality: 0.5)
+                    data = image.jpegData(compressionQuality: compressionQuality)
                 }
                 if let data = data {
                     completion(data)

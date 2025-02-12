@@ -214,7 +214,7 @@ extension EditorAdjusterView {
             }
             return
         }
-        getImageData(image) { [weak self] in
+        getImageData(image, compressionQuality: exportScale != self.exportScale ? 0.8 : 0.5) { [weak self] in
             guard let self = self,
                   let imageData = $0
             else {
@@ -412,11 +412,12 @@ extension EditorAdjusterView {
         }
     }
     
-    fileprivate func getImageData(_ image: UIImage, completion: @escaping (Data?) -> Void) {
+    fileprivate func getImageData(_ image: UIImage, compressionQuality: CGFloat = 0.5, completion: @escaping (Data?) -> Void) {
         PhotoTools.getImageData(
             image,
             isHEIC: isHEICImage,
             isJPEG: isJPEGImage,
+            compressionQuality: compressionQuality,
             queueLabel: "HXPhotoPicker.editor.cropImageQueue"
         ) {
             guard let imageData = $0 else {
