@@ -549,6 +549,13 @@ extension PhotoBrowser: PhotoPickerControllerDelegate {
         viewControllersDidAppear viewController: UIViewController
     ) {
         viewDidAppear?(self)
+        if didHidden { return }
+        if let pageIndicator, pageIndicator.alpha != 1 {
+            pageIndicator.alpha = 1
+        }
+        if gradualShadowImageView.alpha != 1 {
+            gradualShadowImageView.alpha = 1
+        }
     }
     
     public func pickerController(
