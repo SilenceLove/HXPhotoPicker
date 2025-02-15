@@ -138,13 +138,8 @@ class PickerResultViewController: UIViewController,
             )
             
             if let localData = FileManager.default.contents(atPath: localURL.path),
-               let datas = try? JSONDecoder().decode([Data].self, from: localData) {
-                var photoAssets: [PhotoAsset] = []
-                for data in datas {
-                    if let photoAsset = PhotoAsset.decoder(data: data) {
-                        photoAssets.append(photoAsset)
-                    }
-                }
+               let datas = try? JSONDecoder().decode([Data].self, from: localData),
+               let photoAssets = try? [PhotoAsset].decode(datas) {
                 selectedAssets = photoAssets
             }
         }else {
@@ -386,13 +381,8 @@ class PickerResultViewController: UIViewController,
             self.removeLocalPhotoAssetFile()
             self.dismiss(animated: true, completion: nil)
         }, rightActionTitle: "保留") { _ in
-            var datas: [Data] = []
-            for photoAsset in self.selectedAssets {
-                if let data = photoAsset.encode() {
-                    datas.append(data)
-                }
-            }
             do {
+                let datas = try self.selectedAssets.encode()
                 if !FileManager.default.fileExists(atPath: self.localCachePath) {
                     try FileManager.default.createDirectory(
                         atPath: self.localCachePath,
