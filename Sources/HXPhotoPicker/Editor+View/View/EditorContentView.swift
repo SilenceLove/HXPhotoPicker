@@ -110,10 +110,9 @@ class EditorContentView: UIView {
     }
     
     var imageData: Data? {
-        get { nil }
-        set {
+        didSet {
             type = .image
-            imageView.setImageData(newValue)
+            imageView.setImageData(imageData)
         }
     }
     
@@ -362,7 +361,7 @@ class EditorContentView: UIView {
     }
     
     // MARK: SubViews
-    var imageView: ImageView!
+    var imageView: HXImageViewProtocol!
     var videoView: EditorVideoPlayerView!
     var canvasView: UIView!
     var drawView: EditorDrawView!
@@ -370,7 +369,7 @@ class EditorContentView: UIView {
     var stickerView: EditorStickersView!
     
     private func initViews() {
-        imageView = ImageView()
+        imageView = PhotoManager.ImageView.init()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.isHidden = true

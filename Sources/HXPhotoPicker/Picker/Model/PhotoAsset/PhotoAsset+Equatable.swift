@@ -24,14 +24,12 @@ public extension PhotoAsset {
         if localAssetIdentifier == photoAsset.localAssetIdentifier {
             return true
         }
-        #if canImport(Kingfisher)
         if let networkImageAsset = networkImageAsset,
            let phNetworkImageAsset = photoAsset.networkImageAsset {
             if networkImageAsset.originalURL == phNetworkImageAsset.originalURL {
                 return true
             }
         }
-        #endif
         if let localImageAsset = localImageAsset,
            let phLocalImageAsset = photoAsset.localImageAsset {
             if let localImage = localImageAsset.image,

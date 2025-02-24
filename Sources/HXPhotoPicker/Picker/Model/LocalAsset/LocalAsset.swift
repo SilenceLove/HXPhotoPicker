@@ -84,7 +84,7 @@ public struct LocalVideoAsset {
 }
 
 public struct LocalLivePhotoAsset {
-    /// 封面图片地址（支持本地、网络/需要Kingfisher）
+    /// 封面图片地址（支持本地、网络）
     public let imageURL: URL
     
     /// 本地图片的唯一标识符

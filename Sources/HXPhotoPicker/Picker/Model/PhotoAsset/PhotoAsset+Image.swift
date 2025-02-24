@@ -8,9 +8,6 @@
 
 import UIKit
 import Photos
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
 public extension PhotoAsset {
     
@@ -29,14 +26,10 @@ public extension PhotoAsset {
                     if livePhoto.imageURL.isFileURL {
                         return UIImage(contentsOfFile: livePhoto.imageURL.path)
                     }else {
-                        #if canImport(Kingfisher)
-                        if ImageCache.default.isCached(forKey: livePhoto.imageURL.cacheKey) {
-                            return ImageCache.default.retrieveImageInMemoryCache(
-                                forKey: livePhoto.imageURL.cacheKey,
-                                options: []
-                            )
+                        let cacheKey = PhotoManager.ImageView.getCacheKey(forURL: livePhoto.imageURL)
+                        if PhotoManager.ImageView.isCached(forKey: cacheKey) {
+                            return PhotoManager.ImageView.getInMemoryCacheImage(forKey: cacheKey)
                         }
-                        #endif
                         return nil
                     }
                 }
@@ -94,7 +87,6 @@ public extension PhotoAsset {
         compressionQuality: CGFloat? = nil,
         completion: @escaping (UIImage?) -> Void
     ) {
-        #if canImport(Kingfisher)
         let hasEdited: Bool
         #if HXPICKER_ENABLE_EDITOR
         hasEdited = editedResult != nil
@@ -102,13 +94,14 @@ public extension PhotoAsset {
         hasEdited = false
         #endif
         if isNetworkAsset && !hasEdited {
-            getNetworkImage { image in
+            getNetworkImage { image, imageData in
                 guard let compressionQuality = compressionQuality else {
                     completion(image)
                     return
                 }
                 DispatchQueue.global().async {
-                    guard let imageData = PhotoTools.getImageData(for: image),
+                    let imageData = imageData ?? PhotoTools.getImageData(for: image)
+                    guard let imageData,
                           let data = PhotoTools.imageCompress(
                             imageData,
                               compressionQuality: compressionQuality
@@ -127,7 +120,6 @@ public extension PhotoAsset {
             }
             return
         }
-        #endif
         requestImage(compressionScale: compressionQuality) { image, _ in
             completion(image)
         }
@@ -143,7 +135,6 @@ public extension PhotoAsset {
         targetMode: HX.ImageTargetMode = .fill,
         completion: @escaping (UIImage?, PhotoAsset) -> Void
     ) {
-        #if canImport(Kingfisher)
         let hasEdited: Bool
         #if HXPICKER_ENABLE_EDITOR
         hasEdited = editedResult != nil
@@ -151,7 +142,7 @@ public extension PhotoAsset {
         hasEdited = false
         #endif
         if isNetworkAsset && !hasEdited {
-            getNetworkImage { image in
+            getNetworkImage { image, _ in
                 DispatchQueue.global().async {
                     let image = image?.scaleToFillSize(size: targetSize, mode: targetMode)
                     DispatchQueue.main.async {
@@ -161,7 +152,6 @@ public extension PhotoAsset {
             }
             return
         }
-        #endif
         requestImage(targetSize: targetSize, targetMode: targetMode) {
             completion($0, $1)
         }

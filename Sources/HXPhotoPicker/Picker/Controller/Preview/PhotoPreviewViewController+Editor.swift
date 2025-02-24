@@ -95,12 +95,8 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
         loadTitleChartlet response: @escaping EditorTitleChartletResponse
     ) {
         guard let pickerDelegate = pickerController.pickerDelegate else {
-            #if canImport(Kingfisher)
             let titles = PhotoTools.defaultTitleChartlet()
             response(titles)
-            #else
-            response([])
-            #endif
             return
         }
         pickerDelegate.pickerController(
@@ -117,12 +113,8 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
         loadChartletList response: @escaping EditorChartletListResponse
     ) {
         guard let pickerDelegate = pickerController.pickerDelegate else {
-            #if canImport(Kingfisher)
             let chartletList = PhotoTools.defaultNetworkChartlet()
             response(titleIndex, chartletList)
-            #else
-            response(titleIndex, [])
-            #endif
             return
         }
         pickerDelegate.pickerController(

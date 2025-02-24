@@ -8,7 +8,7 @@
 
 import UIKit
 
-public struct PickerConfiguration: IndicatorTypeConfig, PhotoDebugLogsConfig, PhotoHUDConfig {
+public struct PickerConfiguration: IndicatorTypeConfig, PhotoDebugLogsConfig, PhotoHUDConfig, ImageViewConfig {
     
     /// 图片资源
     public var imageResource: HX.ImageResource { HX.ImageResource.shared }

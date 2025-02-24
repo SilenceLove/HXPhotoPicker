@@ -9,10 +9,6 @@
 import UIKit
 import PhotosUI
 
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
-
 protocol PhotoPreviewContentViewDelete: AnyObject {
     func contentView(requestSucceed contentView: PhotoPreviewContentViewProtocol)
     func contentView(requestFailed contentView: PhotoPreviewContentViewProtocol)
@@ -42,7 +38,7 @@ protocol PhotoPreviewContentViewProtocol: UIView {
     var isPeek: Bool { get set }
     var isBacking: Bool { get set }
     
-    var imageView: ImageView! { get set }
+    var imageView: HXImageViewProtocol! { get set }
     var livePhotoView: PHLivePhotoView! { get set }
     var videoView: PhotoPreviewVideoView! { get set }
     

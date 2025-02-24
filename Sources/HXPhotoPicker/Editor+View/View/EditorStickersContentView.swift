@@ -57,11 +57,11 @@ extension EditorStickersContentView: UIGestureRecognizerDelegate {
 }
 
 class EditorStickersContentImageView: EditorStickersContentView {
-    var imageView: ImageView!
+    var imageView: HXImageViewProtocol!
     
     override init(item: EditorStickerItem) {
         super.init(item: item)
-        imageView = ImageView()
+        imageView = PhotoManager.ImageView.init()
         if let imageData = item.imageData {
             imageView.setImageData(imageData)
         }else {

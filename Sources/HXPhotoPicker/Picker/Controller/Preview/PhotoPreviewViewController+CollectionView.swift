@@ -237,7 +237,6 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
     }
     
     func photoCell(networkImagedownloadSuccess photoCell: PhotoPreviewViewCell) {
-        #if canImport(Kingfisher)
         if let index = collectionView.indexPath(for: photoCell)?.item {
             pickerController.pickerDelegate?.pickerController(
                 pickerController,
@@ -249,11 +248,9 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
         if config.isShowBottomView {
             photoToolbar.requestOriginalAssetBtyes()
         }
-        #endif
     }
     
     func photoCell(networkImagedownloadFailed photoCell: PhotoPreviewViewCell) {
-        #if canImport(Kingfisher)
         if let index = collectionView.indexPath(for: photoCell)?.item {
             pickerController.pickerDelegate?.pickerController(
                 pickerController,
@@ -261,6 +258,5 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
                 atIndex: index
             )
         }
-        #endif
     }
 }

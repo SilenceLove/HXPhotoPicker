@@ -6,9 +6,6 @@
 //
 
 import UIKit
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
 protocol EditorStickersViewDelegate: AnyObject {
     func stickerView(touchBegan stickerView: EditorStickersView)
@@ -225,20 +222,13 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
         delegate?.stickerView(rotateVideo: self)
         var infos: [Info] = []
         for case let itemView as EditorStickersItemView in subviews {
-            let image: UIImage?
-            if let imageData = itemView.item.imageData {
-                #if canImport(Kingfisher)
-                image = DefaultImageProcessor.default.process(
-                    item: .data(imageData),
-                    options: .init([])
-                )!
-                #else
-                image = UIImage(data: imageData)
-                #endif
+            var image: UIImage?
+            var imageData: Data?
+            if let data = itemView.item.imageData {
+                imageData = data
             }else {
                 image = itemView.item.image
             }
-            
             var audioInfo: AudioInfo?
             if let audio = itemView.item.audio {
                 audioInfo = .init(
@@ -265,6 +255,7 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
             itemView.videoReset(true)
             let info = Info(
                 image: image,
+                imageData: imageData,
                 isText: itemView.item.isText,
                 frameScale: frameScale,
                 angel: itemView.radian.angle,
@@ -742,6 +733,7 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
     
     struct Info {
         let image: UIImage?
+        let imageData: Data?
         let isText: Bool
         let frameScale: FrameScale
         let angel: CGFloat

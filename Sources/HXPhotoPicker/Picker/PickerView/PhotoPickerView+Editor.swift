@@ -57,12 +57,8 @@ extension PhotoPickerView: EditorViewControllerDelegate {
         loadTitleChartlet response: @escaping EditorTitleChartletResponse
     ) {
         guard let delegate = delegate else {
-            #if canImport(Kingfisher)
             let titles = PhotoTools.defaultTitleChartlet()
             response(titles)
-            #else
-            response([])
-            #endif
             return
         }
         delegate.photoPickerView(
@@ -79,12 +75,8 @@ extension PhotoPickerView: EditorViewControllerDelegate {
         loadChartletList response: @escaping EditorChartletListResponse
     ) {
         guard let delegate = delegate else {
-            #if canImport(Kingfisher)
             let chartletList = PhotoTools.defaultNetworkChartlet()
             response(titleIndex, chartletList)
-            #else
-            response(titleIndex, [])
-            #endif
             return
         }
         delegate.photoPickerView(

@@ -261,6 +261,15 @@ extension EditorAdjusterView {
         }
     }
     
+    var imageData: Data? {
+        get {
+            contentView.imageData
+        }
+        set {
+            setImageData(newValue)
+        }
+    }
+    
     var imageSize: CGSize {
         contentView.contentSize
     }

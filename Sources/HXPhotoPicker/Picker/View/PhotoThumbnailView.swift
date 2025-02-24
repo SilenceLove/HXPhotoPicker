@@ -9,14 +9,10 @@ import UIKit
 import Photos
 import AVFoundation
 
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
-
 open class PhotoThumbnailView: UIView {
     
     /// 展示图片
-    public var imageView: UIImageView!
+    public var imageView: HXImageViewProtocol!
     
     /// 占位图
     public var placeholder: UIImage? {
@@ -58,13 +54,10 @@ open class PhotoThumbnailView: UIView {
         )
     }
     
-    /// Kingfisher.DownloadTask
     /// 获取视频封面时为：AVAsset / AVAssetImageGenerator
     public var task: Any?
     
-    #if canImport(Kingfisher)
     public var kf_indicatorColor: UIColor?
-    #endif
     
     private var _image: UIImage?
     private var firstLoadImage: Bool = true
@@ -76,7 +69,7 @@ open class PhotoThumbnailView: UIView {
     public init(_ photoAsset: PhotoAsset? = nil) {
         self.photoAsset = photoAsset
         super.init(frame: .zero)
-        imageView = UIImageView()
+        imageView = PhotoManager.ImageView.init()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         addSubview(imageView)
@@ -111,44 +104,24 @@ open class PhotoThumbnailView: UIView {
         if let livePhoto = photoAsset.localLivePhoto?.imageURL, !livePhoto.isFileURL {
             isNetworkLivePhotoImage = true
         }
-        if photoAsset.isNetworkAsset ||
-            photoAsset.mediaSubType == .localVideo ||
-            isNetworkLivePhotoImage {
+        
+        if photoAsset.isNetworkAsset || photoAsset.mediaSubType == .localVideo || isNetworkLivePhotoImage {
             downloadStatus = .downloading
-            #if canImport(Kingfisher)
             task = imageView.setImage(
                 for: photoAsset,
                 urlType: .thumbnail,
                 indicatorColor: kf_indicatorColor,
                 progressBlock: nil
-            ) { [weak self] downloadTask in
-                self?.task = downloadTask
-            } completionHandler: { [weak self] (image, error, photoAsset) in
+            ) { [weak self] downloadTask, asset in
+                guard let self, self.photoAsset == asset else { return }
+                self.task = downloadTask
+            } completionHandler: { [weak self] image, photoAsset in
                 guard let self = self else { return }
                 if self.photoAsset == photoAsset {
-                    self._image = image
-                    if image != nil {
-                        self.downloadStatus = .succeed
-                    }else {
-                        if let error = error, error.isTaskCancelled {
-                            self.downloadStatus = .canceled
-                        }else {
-                            self.downloadStatus = .failed
-                        }
+                    if photoAsset.mediaSubType == .localVideo || photoAsset.mediaSubType == .networkVideo {
+                        self.imageView.image = image
                     }
-                    self.loadCompletion = true
-                }
-                completion?(image, photoAsset)
-            }
-            #else
-            task = imageView.setVideoCoverImage(
-                for: photoAsset
-            ) { [weak self] imageGenerator in
-                self?.task = imageGenerator
-            } completionHandler: { [weak self] (image, photoAsset) in
-                guard let self = self else { return }
-                if self.photoAsset == photoAsset {
-                    self.requestCompletion(image)
+                    self._image = image
                     if image != nil {
                         self.downloadStatus = .succeed
                     }else {
@@ -158,7 +131,6 @@ open class PhotoThumbnailView: UIView {
                 }
                 completion?(image, photoAsset)
             }
-            #endif
         }else {
             let thumbnailLoadMode = PhotoManager.shared.thumbnailLoadMode
             if thumbnailLoadMode == .complete {
@@ -196,24 +168,13 @@ open class PhotoThumbnailView: UIView {
             PHImageManager.default().cancelImageRequest(requestID)
             self.requestID = nil
         }
-        if task == nil {
-            return
-        }
-        #if canImport(Kingfisher)
-        if let donwloadTask = task as? Kingfisher.DownloadTask {
-            donwloadTask.cancel()
-        }else if let avAsset = task as? AVAsset {
-            avAsset.cancelLoading()
-        }else if let imageGenerator = task as? AVAssetImageGenerator {
-            imageGenerator.cancelAllCGImageGeneration()
-        }
-        #else
         if let avAsset = task as? AVAsset {
             avAsset.cancelLoading()
         }else if let imageGenerator = task as? AVAssetImageGenerator {
             imageGenerator.cancelAllCGImageGeneration()
+        }else if let task = task as? ImageDownloadTask {
+            task.cancelHandler()
         }
-        #endif
         task = nil
     }
 }

@@ -7,9 +7,6 @@
 
 import UIKit
 import AVFoundation
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
 public class EditorStickerAudio: Codable, Equatable {
     

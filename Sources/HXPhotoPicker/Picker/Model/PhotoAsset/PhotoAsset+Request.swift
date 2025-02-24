@@ -7,9 +7,6 @@
 
 import UIKit
 import Photos
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
 // MARK: Request Photo
 public extension PhotoAsset {
@@ -662,9 +659,7 @@ public extension PhotoAsset {
     
     class LocalLivePhotoRequest {
         var videoURL: URL
-        #if canImport(Kingfisher)
-        var imageTask: Kingfisher.DownloadTask?
-        #endif
+        var imageTask: ImageDownloadTask?
         var writer: AVAssetWriter?
         var videoInput: AVAssetWriterInput?
         var videoReader: AVAssetReader?
@@ -680,11 +675,9 @@ public extension PhotoAsset {
         
         public func cancelRequest() {
             isCancel = true
-            #if canImport(Kingfisher)
             if let task = imageTask {
-                task.cancel()
+                task.cancelHandler()
             }
-            #endif
             PhotoManager.shared.removeTask(videoURL)
             writer?.cancelWriting()
             videoInput?.markAsFinished()
@@ -736,11 +729,10 @@ public extension PhotoAsset {
                 failure: failure
             )
         }else if !imageURL.isFileURL && videoURL.isFileURL {
-            #if canImport(Kingfisher)
-            request.imageTask = KingfisherManager.shared.retrieveImage(with: imageURL) { result in
-                switch result {
+            request.imageTask = PhotoManager.ImageView.download(with: .init(downloadURL: imageURL), options: nil, progressHandler: nil) {
+                switch $0 {
                 case .success:
-                    let cachePath = ImageCache.default.cachePath(forKey: imageURL.cacheKey)
+                    let cachePath = PhotoManager.ImageView.getCachePath(forKey: PhotoManager.ImageView.getCacheKey(forURL: imageURL))
                     let cacheURL = URL(fileURLWithPath: cachePath)
                     self.writeLivePhoto(
                         request: request,
@@ -757,12 +749,6 @@ public extension PhotoAsset {
                     failure(self, nil, .imageDownloadFailed)
                 }
             }
-            #else
-            assert(
-                false,
-                "下载网络图片请导入 Kingfisher"
-            )
-            #endif
         }else if imageURL.isFileURL && !videoURL.isFileURL {
             PhotoManager.shared.downloadTask(with: videoURL) { url, _, _ in
                 guard let video_URL = url else {
@@ -782,11 +768,10 @@ public extension PhotoAsset {
                 )
             }
         }else {
-            #if canImport(Kingfisher)
-            request.imageTask = KingfisherManager.shared.retrieveImage(with: imageURL) { result in
-                switch result {
+            request.imageTask = PhotoManager.ImageView.download(with: .init(downloadURL: imageURL), options: nil, progressHandler: nil) {
+                switch $0 {
                 case .success:
-                    let cachePath = ImageCache.default.cachePath(forKey: imageURL.cacheKey)
+                    let cachePath = PhotoManager.ImageView.getCachePath(forKey: PhotoManager.ImageView.getCacheKey(forURL: imageURL))
                     let cacheURL = URL(fileURLWithPath: cachePath)
                     PhotoManager.shared.downloadTask(with: videoURL) { url, _, _ in
                         guard let video_URL = url else {
@@ -810,12 +795,6 @@ public extension PhotoAsset {
                     failure(self, nil, .imageDownloadFailed)
                 }
             }
-            #else
-            assert(
-                false,
-                "下载网络图片请导入 Kingfisher"
-            )
-            #endif
         }
         return request
     }

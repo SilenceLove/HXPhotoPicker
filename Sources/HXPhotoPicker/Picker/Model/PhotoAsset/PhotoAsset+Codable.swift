@@ -15,10 +15,7 @@ extension PhotoAsset {
         let localLivePhoto: LocalLivePhotoAsset?
         let mediaSubType: MediaSubType
         let networkVideoAsset: NetworkVideoAsset?
-        
-        #if canImport(Kingfisher)
         let networkImageAsset: NetworkImageAsset?
-        #endif
         
         #if HXPICKER_ENABLE_EDITOR
         let editedResult: EditedResult?
@@ -30,7 +27,6 @@ extension PhotoAsset {
     public func encode() -> Data? {
         let simplify: Simplify
         #if HXPICKER_ENABLE_EDITOR
-            #if canImport(Kingfisher)
             simplify = Simplify(
                 phLocalIdentifier: phAsset?.localIdentifier,
                 localImageAsset: localImageAsset,
@@ -41,19 +37,7 @@ extension PhotoAsset {
                 networkImageAsset: networkImageAsset,
                 editedResult: editedResult
             )
-            #else
-            simplify = Simplify(
-                phLocalIdentifier: phAsset?.localIdentifier,
-                localImageAsset: localImageAsset,
-                localVideoAsset: localVideoAsset,
-                localLivePhoto: localLivePhoto,
-                mediaSubType: mediaSubType,
-                networkVideoAsset: networkVideoAsset,
-                editedResult: editedResult
-            )
-            #endif
         #else
-            #if canImport(Kingfisher)
             simplify = Simplify(
                 phLocalIdentifier: phAsset?.localIdentifier,
                 localImageAsset: localImageAsset,
@@ -63,16 +47,6 @@ extension PhotoAsset {
                 networkVideoAsset: networkVideoAsset,
                 networkImageAsset: networkImageAsset
             )
-            #else
-            simplify = Simplify(
-                phLocalIdentifier: phAsset?.localIdentifier,
-                localImageAsset: localImageAsset,
-                localVideoAsset: localVideoAsset,
-                localLivePhoto: localLivePhoto,
-                mediaSubType: mediaSubType,
-                networkVideoAsset: networkVideoAsset
-            )
-            #endif
         #endif
         var data: Data?
         do {
@@ -104,11 +78,9 @@ extension PhotoAsset {
             }else if let networkVideoAsset = simplify.networkVideoAsset {
                 photoAsset = PhotoAsset(networkVideoAsset: networkVideoAsset)
             }else {
-                #if canImport(Kingfisher)
                 if let networkImageAsset = simplify.networkImageAsset {
                     photoAsset = PhotoAsset(networkImageAsset: networkImageAsset)
                 }
-                #endif
             }
             photoAsset?.mediaSubType = simplify.mediaSubType
             #if HXPICKER_ENABLE_EDITOR

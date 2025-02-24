@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
 extension URL {
     var isGif: Bool {
@@ -20,12 +17,6 @@ extension URL {
         }
         return fileSize
     }
-    
-    #if canImport(Kingfisher)
-    var isCache: Bool {
-        ImageCache.default.isCached(forKey: cacheKey)
-    }
-    #endif
     
     var fileType: FileType {
         guard let fileData = try? Data(contentsOf: self) else {

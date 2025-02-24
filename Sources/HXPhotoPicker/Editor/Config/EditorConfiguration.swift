@@ -7,7 +7,7 @@
 
 import UIKit
 
-public struct EditorConfiguration: IndicatorTypeConfig, PhotoHUDConfig {
+public struct EditorConfiguration: IndicatorTypeConfig, PhotoHUDConfig, ImageViewConfig {
     
     /// 图片资源
     public var imageResource: HX.ImageResource { HX.ImageResource.shared }

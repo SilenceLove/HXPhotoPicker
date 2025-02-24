@@ -6,24 +6,11 @@
 //
 
 import UIKit
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
-extension UIImage {
-    var ci_Image: CIImage? {
-        guard let cgImage = self.cgImage else {
-            return nil
-        }
-        return CIImage(cgImage: cgImage)
-    }
-    
+extension Data {
     func animateCGImageFrame(
     ) -> (cgImages: [CGImage], delays: [Double], duration: Double)? { // swiftlint:disable:this large_tuple
-        #if canImport(Kingfisher)
-        guard let imageData = kf.gifRepresentation() else {
-            return nil
-        }
+        let imageData = self
         guard let imageSource = CGImageSourceCreateWithData(imageData as CFData, nil) else {
             return nil
         }
@@ -50,9 +37,6 @@ extension UIImage {
             delays.append(delay)
         }
         return (images, delays, gifDuration)
-        #else
-        return nil
-        #endif
     }
     
     func animateImageFrame(
@@ -69,6 +53,14 @@ extension UIImage {
             images.append(image)
         }
         return (images, delays, gifDuration)
+    }
+}
+extension UIImage {
+    var ci_Image: CIImage? {
+        guard let cgImage = self.cgImage else {
+            return nil
+        }
+        return CIImage(cgImage: cgImage)
     }
     
     func convertBlackImage() -> UIImage? {

@@ -57,18 +57,30 @@ public extension PhotoAsset {
             case .success(let response):
                 if response.mediaType == .photo {
                     if response.urlType == .network {
-                        #if canImport(Kingfisher)
-                        PhotoTools.downloadNetworkImage(
-                            with: response.url,
-                            options: [],
-                            completionHandler: { image in
-                            if let image = image {
-                                save(.image(image))
-                            }else {
+                        PhotoManager.ImageView.download(with: .init(downloadURL: response.url), options: nil, progressHandler: nil) {
+                            switch $0 {
+                            case .success(let result):
+                                if let image = result.image {
+                                    save(.image(image))
+                                }else if let imageData = result.imageData {
+                                    DispatchQueue.global().async {
+                                        do {
+                                            let tmpURL = PhotoTools.getTmpURL(for: imageData.imageContentType.rawValue)
+                                            try imageData.write(to: tmpURL)
+                                            DispatchQueue.main.async {
+                                                save(.imageURL(tmpURL))
+                                            }
+                                        }catch {
+                                            DispatchQueue.main.async {
+                                                completion?(.failure(AssetError.imageDownloadFailed))
+                                            }
+                                        }
+                                    }
+                                }
+                            case .failure:
                                 completion?(.failure(AssetError.imageDownloadFailed))
                             }
-                        })
-                        #endif
+                        }
                     }else {
                         save(.imageURL(response.url))
                     }

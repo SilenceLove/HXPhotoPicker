@@ -41,7 +41,7 @@ extension PhotoTools {
         }
         return infos
     }
-    #if canImport(Kingfisher)
+    
     public static func defaultTitleChartlet() -> [EditorChartlet] {
         let title = EditorChartlet(
             url: URL(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/xxy_s_highlighted.png")
@@ -60,7 +60,6 @@ extension PhotoTools {
         }
         return chartletList
     }
-    #endif
     
     /// 默认滤镜
     public static func defaultFilters() -> [PhotoEditorFilterInfo] {

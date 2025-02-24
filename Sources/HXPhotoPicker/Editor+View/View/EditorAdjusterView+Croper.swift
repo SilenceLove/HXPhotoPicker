@@ -78,6 +78,7 @@ extension EditorAdjusterView {
         }
         deselectedSticker()
         let image = self.image
+        let imageData = self.imageData
         let cropRect = getCropRect()
         let cropRatio = getCropOption()
         var canvasImage: UIImage?
@@ -107,6 +108,7 @@ extension EditorAdjusterView {
             if self.contentType == .image {
                 self.cropImage(
                     image,
+                    imageData: imageData,
                     rect: cropRect,
                     cropFactor: cropFactor,
                     completion: completion
@@ -163,6 +165,7 @@ extension EditorAdjusterView {
     
     func cropImage(
         _ image: UIImage?,
+        imageData: Data?,
         rect: CGRect,
         cropFactor: CropFactor,
         completion: @escaping (Result<ImageEditedResult, EditorError>) -> Void
@@ -195,7 +198,7 @@ extension EditorAdjusterView {
             cropRect.size.width *= scale
             cropRect.size.height *= scale
         }
-        if let animateOption = inputImage.animateImageFrame() {
+        if let animateOption = imageData?.animateImageFrame() {
             cropAnimateImage(
                 animateOption,
                 overlayImage: overlayImage,

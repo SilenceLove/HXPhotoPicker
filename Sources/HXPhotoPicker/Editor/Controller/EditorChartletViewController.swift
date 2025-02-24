@@ -6,9 +6,6 @@
 //
 
 import UIKit
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
 protocol EditorChartletViewControllerDelegate: AnyObject {
     func chartletViewController(
@@ -132,15 +129,11 @@ public class EditorChartletViewController: HXBaseViewController, EditorChartletL
             if let image = title.image {
                 titleChartlet = EditorChartletTitle(image: image)
             }else {
-                #if canImport(Kingfisher)
                 if let url = title.url {
                     titleChartlet = EditorChartletTitle(url: url)
                 }else {
                     titleChartlet = .init(image: .imageResource.editor.sticker.albumEmptyCover.image)
                 }
-                #else
-                titleChartlet = .init(image: .imageResource.editor.sticker.albumEmptyCover.image)
-                #endif
             }
             if index == 0 {
                 titleChartlet.isSelected = true
@@ -187,7 +180,6 @@ public class EditorChartletViewController: HXBaseViewController, EditorChartletL
                 let keyWindow = UIApplication.shared.keyWindow
                 let rect = cell.convert(cell.bounds, to: keyWindow)
                 let touchCenter = CGPoint(x: rect.midX, y: rect.midY)
-                #if canImport(Kingfisher)
                 if let image = cell.chartlet.image {
                     previewView = EditorChartletPreviewView(
                         image: image,
@@ -204,16 +196,6 @@ public class EditorChartletViewController: HXBaseViewController, EditorChartletL
                     )
                     keyWindow?.addSubview(previewView!)
                 }
-                #else
-                if let image = cell.chartlet.image {
-                    previewView = EditorChartletPreviewView(
-                        image: image,
-                        touch: touchCenter,
-                        touchView: cell.size
-                    )
-                    keyWindow?.addSubview(previewView!)
-                }
-                #endif
                 cell.showSelectedBgView = true
             }
         case .cancelled, .ended, .failed:

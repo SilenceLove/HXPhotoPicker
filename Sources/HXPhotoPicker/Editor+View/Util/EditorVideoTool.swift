@@ -407,22 +407,35 @@ fileprivate extension EditorVideoTool {
                 textLayer.position = scaleCenter
                 mirrorLayer.addSublayer(textLayer)
                 textLayer.transform = CATransform3DMakeScale(info.scale, info.scale, 1)
-            }else if let image = info.image {
+            }else {
                 let scaleSize = CGSize(
                     width: mirrorSize.width * info.scale,
                     height: mirrorSize.height * info.scale
                 )
-                let imageLayer = animationLayer(
-                    image: image,
-                    beginTime: beginTime,
-                    videoDuration: videoDuration
-                )
-                imageLayer.anchorPoint = .init(x: 0.5, y: 0.5)
-                imageLayer.frame = CGRect(origin: .zero, size: scaleSize)
-                imageLayer.position = scaleCenter
-                imageLayer.shadowOpacity = 0.4
-                imageLayer.shadowOffset = CGSize(width: 0, height: -1)
-                mirrorLayer.addSublayer(imageLayer)
+                var imageLayer: CALayer?
+                if let image = info.image {
+                    imageLayer = animationLayer(
+                        image: image,
+                        imageData: nil ,
+                        beginTime: beginTime,
+                        videoDuration: videoDuration
+                    )
+                }else if let imageData = info.imageData, let image = UIImage(data: imageData) {
+                    imageLayer = animationLayer(
+                        image: image,
+                        imageData: imageData ,
+                        beginTime: beginTime,
+                        videoDuration: videoDuration
+                    )
+                }
+                if let imageLayer {
+                    imageLayer.anchorPoint = .init(x: 0.5, y: 0.5)
+                    imageLayer.frame = CGRect(origin: .zero, size: scaleSize)
+                    imageLayer.position = scaleCenter
+                    imageLayer.shadowOpacity = 0.4
+                    imageLayer.shadowOffset = CGSize(width: 0, height: -1)
+                    mirrorLayer.addSublayer(imageLayer)
+                }
             }
             mirrorLayer.anchorPoint = .init(x: 0.5, y: 0.5)
             mirrorLayer.frame = .init(origin: .zero, size: mirrorSize)
@@ -756,14 +769,15 @@ fileprivate extension EditorVideoTool {
     }
     
     func animationLayer(
-        image: UIImage,
+        image: UIImage?,
+        imageData: Data?,
         beginTime: CFTimeInterval,
         videoDuration: TimeInterval
     ) -> CALayer {
         let animationLayer = CALayer()
         animationLayer.contentsScale = UIScreen._scale
-        animationLayer.contents = image.cgImage
-        guard let gifResult = image.animateCGImageFrame() else {
+        animationLayer.contents = image?.cgImage
+        guard let gifResult = imageData?.animateCGImageFrame() else {
             return animationLayer
         }
         let frames = gifResult.0

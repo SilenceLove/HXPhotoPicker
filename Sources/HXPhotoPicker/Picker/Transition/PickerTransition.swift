@@ -8,9 +8,6 @@
 
 import UIKit
 import Photos
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
 class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
     private let type: PickerTransitionType
@@ -155,58 +152,123 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             pickerVC.photoToolbar.mask = pickerMaskView
         }
         
-        let duration = transitionDuration(using: transitionContext)
-        UIView.animate(withDuration: duration - 0.15) {
-            contentView.backgroundColor = backgroundColor.withAlphaComponent(1)
-        }
-        let alphaDuration: TimeInterval
-        if previewVC.photoToolbar.mask != nil {
-            alphaDuration = 0.15
-            UIView.animate(withDuration: duration - 0.2, delay: 0, options: [.curveEaseIn]) {
-                previewVC.photoToolbar.mask?.frame = CGRect(
-                    x: 0, y: 0,
-                    width: contentView.width, height: previewViewHeight
-                )
-                pickerVC.photoToolbar.mask?.frame = CGRect(
-                    x: 0, y: pickerViewHeight - pickerToolbarHeight,
-                    width: contentView.width, height: pickerToolbarHeight
-                )
+        func animateHandler() {
+            let duration = transitionDuration(using: transitionContext)
+            UIView.animate(withDuration: duration - 0.15) {
+                contentView.backgroundColor = backgroundColor.withAlphaComponent(1)
             }
-        }else {
-            alphaDuration = duration
-        }
-        UIView.animate(withDuration: alphaDuration) {
-            previewVC.photoToolbar.alpha = 1
-            previewVC.navBgView?.alpha = 1
-        }
-        
-        UIView.animate(
-            withDuration: duration,
-            delay: 0,
-            usingSpringWithDamping: 0.8,
-            initialSpringVelocity: 0,
-            options: [.layoutSubviews, .curveEaseOut]
-        ) {
-            self.pushImageView.frame = rect
-            pickerVC.pickerController.pickerDelegate?
-                .pickerController(pickerVC.pickerController, animateTransition: .push)
-        } completion: { _ in
-            pickerVC.photoToolbar.mask = nil
-            previewVC.photoToolbar.mask = nil
-            previewVC.isTransitioning = false
-            if let requestID = self.requestID {
-                PHImageManager.default().cancelImageRequest(requestID)
-                self.requestID = nil
+            let alphaDuration: TimeInterval
+            if previewVC.photoToolbar.mask != nil {
+                alphaDuration = 0.15
+                UIView.animate(withDuration: duration - 0.2, delay: 0, options: [.curveEaseIn]) {
+                    previewVC.photoToolbar.mask?.frame = CGRect(
+                        x: 0, y: 0,
+                        width: contentView.width, height: previewViewHeight
+                    )
+                    pickerVC.photoToolbar.mask?.frame = CGRect(
+                        x: 0, y: pickerViewHeight - pickerToolbarHeight,
+                        width: contentView.width, height: pickerToolbarHeight
+                    )
+                }
+            }else {
+                alphaDuration = duration
             }
-            fromView?.isHidden = false
-            previewVC.setCurrentCellImage(image: self.pushImageView.image)
-            previewVC.collectionView.isHidden = false
-            previewVC.updateColors()
-            self.pushImageView.removeFromSuperview()
-            contentView.removeFromSuperview()
-            transitionContext.completeTransition(true)
-            pickerVC.photoToolbar.alpha = 1
+            UIView.animate(withDuration: alphaDuration) {
+                previewVC.photoToolbar.alpha = 1
+                previewVC.navBgView?.alpha = 1
+            }
+            
+            UIView.animate(
+                withDuration: duration,
+                delay: 0,
+                usingSpringWithDamping: 0.8,
+                initialSpringVelocity: 0,
+                options: [.layoutSubviews, .curveEaseOut]
+            ) {
+                self.pushImageView.frame = rect
+                pickerVC.pickerController.pickerDelegate?
+                    .pickerController(pickerVC.pickerController, animateTransition: .push)
+            } completion: { _ in
+                pickerVC.photoToolbar.mask = nil
+                previewVC.photoToolbar.mask = nil
+                previewVC.isTransitioning = false
+                if let requestID = self.requestID {
+                    PHImageManager.default().cancelImageRequest(requestID)
+                    self.requestID = nil
+                }
+                fromView?.isHidden = false
+                previewVC.setCurrentCellImage(image: self.pushImageView.image)
+                previewVC.collectionView.isHidden = false
+                previewVC.updateColors()
+                self.pushImageView.removeFromSuperview()
+                contentView.removeFromSuperview()
+                transitionContext.completeTransition(true)
+                pickerVC.photoToolbar.alpha = 1
+            }
         }
+        if let networkImage = photoAsset?.networkImageAsset {
+            var isRequest: Bool = false
+            var isChangeImage: Bool = false
+            if networkImage.imageSize.equalTo(.zero) {
+                isRequest = true
+            }else {
+                if let image = pushImageView.image {
+                    let networkScale = networkImage.imageSize.width / networkImage.imageSize.height
+                    let imageScale = image.width / image.height
+                    if networkScale != imageScale {
+                        isRequest = true
+                        isChangeImage = true
+                    }
+                }else {
+                    isRequest = true
+                }
+            }
+            if !isRequest {
+                animateHandler()
+                return
+            }
+            requestNetworkImage(networkImage) { [weak self] image in
+                guard let self, let image else {
+                    animateHandler()
+                    return
+                }
+                if self.pushImageView.image == nil || isChangeImage {
+                    self.pushImageView.image = image
+                }
+                if isChangeImage {
+                    photoAsset?.networkImageAsset?.imageSize = image.size
+                }
+                animateHandler()
+            }
+            return
+        }
+        animateHandler()
+    }
+    
+    func requestNetworkImage(_ networkImage: NetworkImageAsset, completion: @escaping(UIImage?) -> Void) {
+        if let cacheKey = networkImage.originalCacheKey,
+           PhotoManager.ImageView.isCached(forKey: cacheKey) {
+            PhotoManager.ImageView.getCacheImage(forKey: cacheKey) { image in
+                guard let image else {
+                    completion(nil)
+                    return
+                }
+                completion(image)
+            }
+            return
+        }
+        if let cacheKey = networkImage.thumbailCacheKey,
+           PhotoManager.ImageView.isCached(forKey: cacheKey) {
+            PhotoManager.ImageView.getCacheImage(forKey: cacheKey) { image in
+                guard let image else {
+                    completion(nil)
+                    return
+                }
+                completion(image)
+            }
+            return
+        }
+        completion(nil)
     }
     
     func popTransition(_ transitionContext: UIViewControllerContextTransitioning) {

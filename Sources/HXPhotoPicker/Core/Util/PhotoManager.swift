@@ -9,9 +9,6 @@
 import UIKit
 import Photos
 import PhotosUI
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
 public final class PhotoManager: NSObject {
     
@@ -37,7 +34,19 @@ public final class PhotoManager: NSObject {
     }
     public static var HUDView: PhotoHUDProtocol.Type = ProgressHUD.self
     
+    #if canImport(Kingfisher)
+    public static var ImageView: HXImageViewProtocol.Type = KFImageView.self
+    #elseif canImport(SDWebImage)
+    public static var ImageView: HXImageViewProtocol.Type = SDImageView.self
+    #else
+    public static var ImageView: HXImageViewProtocol.Type = HXImageView.self
+    #endif
+    
+    #if DEBUG
+    public var isDebugLogsEnabled: Bool = true
+    #else
     public var isDebugLogsEnabled: Bool = false
+    #endif
     
     /// 当前语言文件，每次创建PhotoPickerController判断是否需要重新创建
     var languageBundle: Bundle?
@@ -53,9 +62,6 @@ public final class PhotoManager: NSObject {
     
     #if HXPICKER_ENABLE_PICKER
     public var pickerResultCompression: PhotoAsset.Compression? = nil
-    #if canImport(Kingfisher)
-    public var imageDownloader: Kingfisher.ImageDownloader?
-    #endif
     
     /// 加载网络视频方式
     public var loadNetworkVideoMode: PhotoAsset.LoadNetworkVideoMode = .download

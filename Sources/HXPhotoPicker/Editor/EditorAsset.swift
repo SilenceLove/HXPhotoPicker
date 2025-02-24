@@ -31,9 +31,7 @@ extension EditorAsset {
         case video(URL)
         case videoAsset(AVAsset)
         case networkVideo(URL)
-        #if canImport(Kingfisher)
         case networkImage(URL)
-        #endif
         #if HXPICKER_ENABLE_PICKER
         case photoAsset(PhotoAsset)
         
@@ -74,7 +72,6 @@ extension EditorAsset {
             }
         }
         
-        #if canImport(Kingfisher)
         public var networkImageURL: URL? {
             switch self {
             case .networkImage(let url):
@@ -83,16 +80,13 @@ extension EditorAsset {
                 return nil
             }
         }
-        #endif
         
         public var contentType: EditorContentViewType {
             switch self {
             case .image, .imageData:
                 return .image
-            #if canImport(Kingfisher)
             case .networkImage:
                 return .image
-            #endif
             case .video, .networkVideo, .videoAsset:
                 return .video
             #if HXPICKER_ENABLE_PICKER

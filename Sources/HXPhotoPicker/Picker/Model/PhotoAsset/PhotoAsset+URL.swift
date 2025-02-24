@@ -81,14 +81,12 @@ public extension PhotoAsset {
         compressionQuality: CGFloat? = nil,
         completion: @escaping AssetURLCompletion
     ) {
-        #if canImport(Kingfisher)
         if isNetworkAsset {
             getNetworkImageURL(
                 resultHandler: completion
             )
             return
         }
-        #endif
         requestImageURL(
             toFile: fileURL,
             compressionQuality: compressionQuality,

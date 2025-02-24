@@ -9,17 +9,14 @@
 import UIKit
 import Photos
 import PhotosUI
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
 class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     
     weak var delegate: PhotoPreviewContentViewDelete?
     
-    var photoAsset: PhotoAsset! { didSet { updateContent() } }
+    var photoAsset: PhotoAsset! { didSet {  updateContent() } }
     
-    var imageView: ImageView!
+    var imageView: HXImageViewProtocol!
     var livePhotoView: PHLivePhotoView!
     var livePhotoPlayType: PhotoPreviewViewController.PlayType = .once
     var isLivePhotoAnimating: Bool = false
@@ -45,7 +42,9 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     }
     
     func initViews() {
-        imageView = ImageView()
+        imageView = PhotoManager.ImageView.init()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         imageView.size = size
         if #available(iOS 17, *) {
             imageView.preferredImageDynamicRange = .high
@@ -54,9 +53,7 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     }
     
     func updateContent() {
-        #if canImport(Kingfisher)
         photoAsset.loadNetworkImageHandler = nil
-        #endif
         requestFailed(info: [PHImageCancelledKey: 1], isICloud: false)
         isAnimatedCompletion = false
         switch photoAsset.mediaSubType {
@@ -75,11 +72,9 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     func requestNetwork() { 
         requestNetworkCompletion = false
         requestNetworkImage()
-        #if canImport(Kingfisher)
         photoAsset.loadNetworkImageHandler = { [weak self] in
             self?.requestNetworkImage(loadOriginal: true, $0)
         }
-        #endif
     }
     
     func requestThumbnail() {
@@ -125,7 +120,6 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     }
     
     func requestPreviewContent(_ canRequest: Bool) {
-        #if canImport(Kingfisher)
         if photoAsset.mediaSubType.isGif && isAnimatedCompletion {
             startAnimated()
         }else {
@@ -133,15 +127,6 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
                 requestOriginalImage()
             }
         }
-        #else
-        if photoAsset.mediaSubType.isGif && imageView.gifImage != nil {
-            imageView.startAnimating()
-        }else {
-            if canRequest {
-                requestOriginalImage()
-            }
-        }
-        #endif
     }
     
     func cancelRequest() {
@@ -174,13 +159,13 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     
     func startAnimated() {
         if photoAsset.mediaSubType.isGif {
-            imageView.startAnimatedImage()
+            imageView._startAnimating()
         }
     }
     
     func stopAnimated() {
         if photoAsset.mediaSubType.isGif {
-            imageView.stopAnimatedImage()
+            imageView._stopAnimating()
         }
     }
     
@@ -252,7 +237,7 @@ extension PhotoPreviewContentPhotoView {
     ) {
         requestCompletion = true
         var isLoaclLivePhoto = false
-        #if canImport(Kingfisher)
+        
         if photoAsset.mediaSubType != .networkVideo {
             var key: String = ""
             if let networkImage = photoAsset.networkImageAsset {
@@ -265,38 +250,34 @@ extension PhotoPreviewContentPhotoView {
                 }
             }else if let livePhoto = photoAsset.localLivePhoto,
                          !livePhoto.imageURL.isFileURL {
-                key = livePhoto.imageURL.cacheKey
+                key = PhotoManager.ImageView.getCacheKey(forURL: livePhoto.imageURL)
                 requestCompletion = false
                 isLoaclLivePhoto = true
             }
-            if !ImageCache.default.isCached(forKey: key) {
+            if !PhotoManager.ImageView.isCached(forKey: key) {
                 showLoadingView(text: nil)
             }
         }
-        imageTask = imageView.setImage(
-            for: photoAsset,
-            urlType: .original,
-            forciblyOriginal: loadOriginal
-        ) { [weak self] (receivedData, totolData) in
-            guard let self = self else { return }
+        imageTask = imageView.setImage(for: photoAsset, urlType: .original, forciblyOriginal: loadOriginal) { [weak self] progress, photoAsset in
+            guard let self, self.photoAsset == photoAsset else { return }
             if self.photoAsset.mediaSubType != .networkVideo {
-                let percentage = Double(receivedData) / Double(totolData)
-                self.updateProgress(progress: percentage, isICloud: false)
+                self.updateProgress(progress: progress, isICloud: false)
             }
-        } downloadTask: { [weak self] downloadTask in
-            self?.imageTask = downloadTask
-        } completionHandler: { [weak self] (image, _, photoAsset) in
-            guard let self = self else { return }
+        } taskHandler: { [weak self] task, photoAsset in
+            guard let self, self.photoAsset == photoAsset else { return }
+            self.imageTask = task
+        } completionHandler: { [weak self] image, photoAsset in
+            guard let self else { return }
             completion?(photoAsset)
             if isLoaclLivePhoto {
-                if let image = image {
+                if let image {
                     self.updateContentSize(image: image)
                 }
                 return
             }
             if self.photoAsset.mediaSubType != .networkVideo {
                 self.requestNetworkCompletion = true
-                if let image = image {
+                if let image {
                     self.requestSucceed()
                     self.updateContentSize(image: image)
                     self.delegate?.contentView(networkImagedownloadSuccess: self)
@@ -304,42 +285,21 @@ extension PhotoPreviewContentPhotoView {
                     self.requestFailed(info: nil, isICloud: false)
                 }
             }else {
-                if let image = image {
+                if let image {
                     self.updateContentSize(image: image)
                 }
             }
         }
-        #else
-        imageTask = imageView.setVideoCoverImage(
-            for: photoAsset
-        ) { [weak self] imageGenerator in
-            self?.imageTask = imageGenerator
-        } completionHandler: { [weak self] (image, photoAsset) in
-            guard let self = self else { return }
-            if let image = image, self.photoAsset == photoAsset {
-                self.imageView.image = image
-                self.updateContentSize(image: image)
-            }
-        }
-        #endif
     }
     
     func cancelImageTask() {
-        #if canImport(Kingfisher)
-        if let donwloadTask = imageTask as? Kingfisher.DownloadTask {
-            donwloadTask.cancel()
-        }else if let avAsset = imageTask as? AVAsset {
-            avAsset.cancelLoading()
-        }else if let imageGenerator = imageTask as? AVAssetImageGenerator {
-            imageGenerator.cancelAllCGImageGeneration()
-        }
-        #else
         if let avAsset = imageTask as? AVAsset {
             avAsset.cancelLoading()
         }else if let imageGenerator = imageTask as? AVAssetImageGenerator {
             imageGenerator.cancelAllCGImageGeneration()
+        }else if let imageTask = imageTask as? ImageDownloadTask {
+            imageTask.cancelHandler()
         }
-        #endif
         imageTask = nil
     }
 }

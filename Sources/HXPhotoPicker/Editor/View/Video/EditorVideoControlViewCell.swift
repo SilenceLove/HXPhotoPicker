@@ -13,9 +13,8 @@ class EditorVideoControlViewCell: UICollectionViewCell {
     
     var image: UIImage? {
         didSet {
-            if let image = image {
-                imageView.setImage(image, animated: true)
-            }
+            guard let image else { return }
+            imageView.setImage(image, animated: true)
         }
     }
     

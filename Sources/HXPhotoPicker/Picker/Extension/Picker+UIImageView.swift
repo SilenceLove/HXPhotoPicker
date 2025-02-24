@@ -7,25 +7,19 @@
 
 import UIKit
 import AVFoundation
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
-extension UIImageView {
+extension HXImageViewProtocol {
     
-    #if canImport(Kingfisher)
-    typealias ImageCompletion = (UIImage?, KingfisherError?, PhotoAsset) -> Void
     // swiftlint:disable function_body_length
-    @discardableResult
     func setImage(
         for asset: PhotoAsset,
         urlType: DonwloadURLType,
         forciblyOriginal: Bool = false,
         indicatorColor: UIColor? = nil,
-        progressBlock: DownloadProgressBlock? = nil,
-        downloadTask: ((Kingfisher.DownloadTask?) -> Void)? = nil,
-        completionHandler: ImageView.ImageCompletion? = nil
-    ) -> Any? {
+        progressBlock: ((CGFloat, PhotoAsset) -> Void)? = nil,
+        taskHandler: ((Any, PhotoAsset) -> Void)? = nil,
+        completionHandler: ((UIImage?, PhotoAsset) -> Void)? = nil
+    ) -> ImageDownloadTask? {
         // swiftlint:enable function_body_length
         #if HXPICKER_ENABLE_EDITOR
         if asset.editedResult != nil {
@@ -34,33 +28,22 @@ extension UIImageView {
         }
         #endif
         let isThumbnail = urlType == .thumbnail
-        if isThumbnail {
-            kf.indicatorType = .activity
-            if let color = indicatorColor {
-                (kf.indicator?.view as? UIActivityIndicatorView)?.color = color
-            }
-        }
         var url: URL?
+        var options: ImageDownloadOptionsInfo = []
         var placeholderImage: UIImage?
-        var options: KingfisherOptionsInfo = []
-        if let imageDonwloader = PhotoManager.shared.imageDownloader {
-            options += [.downloader(imageDonwloader)]
-        }
         var loadVideoCover: Bool = false
         var cacheKey: String?
+        var indicatorColor = indicatorColor
         if let imageAsset = asset.networkImageAsset {
             let originalCacheKey = imageAsset.originalCacheKey
             if isThumbnail {
                 if imageAsset.thumbnailLoadMode == .varied,
                    let originalCacheKey,
-                   ImageCache.default.isCached(forKey: originalCacheKey) {
+                   PhotoManager.ImageView.isCached(forKey: originalCacheKey) {
                     if let thumbnailCacheKey = imageAsset.thumbailCacheKey,
-                       ImageCache.default.isCached(forKey: thumbnailCacheKey) {
-                        placeholderImage = ImageCache.default.retrieveImageInMemoryCache(
-                            forKey: thumbnailCacheKey,
-                            options: []
-                        )
-                        (kf.indicator?.view as? UIActivityIndicatorView)?.color = .white
+                       PhotoManager.ImageView.isCached(forKey: thumbnailCacheKey) {
+                        placeholderImage = PhotoManager.ImageView.getInMemoryCacheImage(forKey: thumbnailCacheKey)
+                        indicatorColor = .white
                     }else {
                         placeholderImage = UIImage.image(for: imageAsset.placeholder)
                     }
@@ -71,26 +54,36 @@ extension UIImageView {
                     cacheKey = imageAsset.thumbailCacheKey
                     placeholderImage = UIImage.image(for: imageAsset.placeholder)
                 }
-                let processor: DownsamplingImageProcessor
+                let processorSize: CGSize
                 if imageAsset.thumbnailSize.equalTo(.zero) {
-                    processor = .init(size: size)
+                    if !asset.imageSize.equalTo(.zero) {
+                        let pWidth = max(size.width, 200)
+                        let pHeight = max(size.height, 200)
+                        if pWidth > pHeight {
+                            processorSize = .init(width: pWidth, height: asset.imageSize.height / asset.imageSize.width * pHeight)
+                        }else {
+                            processorSize = .init(width: pHeight, height: asset.imageSize.height / asset.imageSize.width * pWidth)
+                        }
+                    }else {
+                        processorSize = size
+                    }
                 }else {
-                    processor = .init(size: imageAsset.thumbnailSize)
+                    processorSize = imageAsset.thumbnailSize
                 }
                 options += [
                     .onlyLoadFirstFrame,
-                    .processor(processor),
                     .cacheOriginalImage,
+                    .imageProcessor(processorSize),
                     .scaleFactor(UIScreen._scale)
                 ]
                 if imageAsset.isFade {
-                    options += [.transition(.fade(0.2))]
+                    options += [.fade(0.2)]
                 }
             }else {
                 if imageAsset.originalLoadMode == .alwaysThumbnail,
                    !forciblyOriginal {
                     if let originalCacheKey,
-                       ImageCache.default.isCached(forKey: originalCacheKey) {
+                       PhotoManager.ImageView.isCached(forKey: originalCacheKey) {
                         url = imageAsset.originalURL
                         cacheKey = imageAsset.originalCacheKey
                     }else {
@@ -103,16 +96,16 @@ extension UIImageView {
                     url = imageAsset.originalURL
                     cacheKey = imageAsset.originalCacheKey
                 }
-                options = [.transition(.fade(0.2))]
+                options = [.fade(0.2)]
             }
         }else if let videoAsset = asset.networkVideoAsset {
             if let coverImage = videoAsset.coverImage {
                 image = coverImage
-                completionHandler?(coverImage, nil, asset)
+                completionHandler?(coverImage, asset)
                 return nil
             }else if let coverImageURL = videoAsset.coverImageURL {
                 url = coverImageURL
-                options = [.transition(.fade(0.2))]
+                options = [.fade(0.2)]
                 placeholderImage = UIImage.image(for: videoAsset.coverPlaceholder)
             }else {
                 var videoURL: URL?
@@ -129,7 +122,7 @@ extension UIImageView {
         }else if let videoAsset = asset.localVideoAsset {
             if let coverImage = videoAsset.image {
                 image = coverImage
-                completionHandler?(coverImage, nil, asset)
+                completionHandler?(coverImage, asset)
                 return nil
             }
             loadVideoCover = true
@@ -139,19 +132,14 @@ extension UIImageView {
             url = livePhotoAsset.imageURL
         }
         guard let url = url else {
-            completionHandler?(nil, nil, asset)
+            completionHandler?(nil, asset)
             return nil
         }
         if loadVideoCover {
-            let provider = AVAssetImageDataProvider(assetURL: url, seconds: 0.1)
-            provider.assetImageGenerator.appliesPreferredTrackTransform = true
-            let task = KF.dataProvider(provider)
-                .placeholder(placeholderImage)
-                .onSuccess { [weak asset] (result) in
-                    guard let asset = asset else {
-                        return
-                    }
-                    let image = result.image
+            return setVideoCover(with: url, placeholder: placeholderImage) { [weak asset] in
+                guard let asset else { return }
+                switch $0 {
+                case .success(let image):
                     let videoSize: CGSize?
                     if asset.isNetworkAsset {
                         videoSize = asset.networkVideoAsset?.videoSize
@@ -162,60 +150,41 @@ extension UIImageView {
                         asset.localVideoAsset?.videoSize = image.size
                         asset.networkVideoAsset?.videoSize = image.size
                     }
-                    completionHandler?(image, nil, asset)
+                    completionHandler?(image, asset)
+                case .failure:
+                    completionHandler?(nil, asset)
                 }
-                .onFailure { [weak asset] (error) in
-                    guard let asset = asset else {
-                        return
-                    }
-                    completionHandler?(nil, error, asset)
-                }
-                .set(to: self)
-            return task
+            }
         }
-        let imageResource: Resource
-        #if HXPICKER_ENABLE_PICKER_LITE
-        imageResource = ImageResource(downloadURL: url, cacheKey: cacheKey)
-        #else
-        imageResource = KF.ImageResource(downloadURL: url, cacheKey: cacheKey)
-        #endif
-        return kf.setImage(
-            with: imageResource,
-            placeholder: placeholderImage,
-            options: options,
-            progressBlock: progressBlock
-        ) { [weak asset] result in
-            guard let asset = asset else { return }
-            switch result {
-            case .success(let value):
+        return setImage(with: .init(downloadURL: url, cacheKey: cacheKey, indicatorColor: indicatorColor), placeholder: placeholderImage, options: options) { [weak asset] in
+            guard let asset else { return }
+            progressBlock?($0, asset)
+        } completionHandler: { [weak asset] in
+            guard let asset else { return }
+            switch $0 {
+            case .success(let image):
                 switch asset.mediaSubType {
                 case .networkImage:
-                    let cacheKey = value.originalSource.cacheKey
+                    let cacheKey = PhotoManager.ImageView.getCacheKey(forURL: url)
                     if let networkAsset = asset.networkImageAsset, networkAsset.imageSize.equalTo(.zero) {
-                        ImageCache.default.retrieveImage(forKey: cacheKey, options: []) { [weak asset] result in
-                            guard let asset = asset else { return }
-                            switch result {
-                            case .success(let value):
-                                guard let image = value.image else { return }
-                                asset.networkImageAsset?.imageSize = image.size
-                            case .failure:
-                                return
-                            }
+                        PhotoManager.ImageView.getCacheImage(forKey: cacheKey) { [weak asset] image in
+                            guard let asset, let image else { return }
+                            asset.networkImageAsset?.imageSize = image.size
                         }
                     }
                 case .networkVideo:
-                    asset.networkVideoAsset?.coverImage = value.image
-                    asset.networkVideoAsset?.videoSize = value.image.size
+                    asset.networkVideoAsset?.coverImage = image
+                    asset.networkVideoAsset?.videoSize = image.size
                 case .localLivePhoto:
                     if let livePhoto = asset.localLivePhoto,
                        !livePhoto.imageURL.isFileURL {
-                        asset.localLivePhoto?.size = value.image.size
+                        asset.localLivePhoto?.size = image.size
                     }
                 default: break
                 }
-                completionHandler?(value.image, nil, asset)
-            case .failure(let error):
-                completionHandler?(nil, error, asset)
+                completionHandler?(image, asset)
+            case .failure:
+                completionHandler?(nil, asset)
             }
         }
     }
@@ -224,128 +193,86 @@ extension UIImageView {
     private func getEditedImage(
         _ photoAsset: PhotoAsset,
         urlType: DonwloadURLType,
-        completionHandler: ImageView.ImageCompletion?
+        completionHandler: ((UIImage?, PhotoAsset) -> Void)?
     ) {
         if let photoEdit = photoAsset.photoEditedResult {
             if urlType == .thumbnail {
                 image = photoEdit.image
-                completionHandler?(photoEdit.image, nil, photoAsset)
+                completionHandler?(photoEdit.image, photoAsset)
             }else {
                 do {
                     let imageData = try Data(contentsOf: photoEdit.url)
-                    let img = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))!
-                    let kfView = self as? AnimatedImageView
-                    kfView?.image = img
+                    setImageData(imageData)
                 }catch {
                     image = photoEdit.image
                 }
-                completionHandler?(photoEdit.image, nil, photoAsset)
+                completionHandler?(photoEdit.image, photoAsset)
             }
         }else if let videoEdit = photoAsset.videoEditedResult {
             image = videoEdit.coverImage
-            completionHandler?(videoEdit.coverImage, nil, photoAsset)
+            completionHandler?(videoEdit.coverImage, photoAsset)
         }
     }
     #endif
-    #else
-    @discardableResult
-    func setVideoCoverImage(
-        for asset: PhotoAsset,
-        imageGenerator: ((AVAssetImageGenerator) -> Void)? = nil,
-        completionHandler: ((UIImage?, PhotoAsset) -> Void)? = nil
-    ) -> Any? {
-        #if HXPICKER_ENABLE_EDITOR
-        if let videoEdit = asset.videoEditedResult {
-            completionHandler?(videoEdit.coverImage, asset)
-            return nil
-        }
-        #endif
-        var videoURL: URL?
-        if let videoAsset = asset.networkVideoAsset {
-            if let coverImage = videoAsset.coverImage {
-                if videoAsset.videoSize.equalTo(.zero) {
-                    asset.networkVideoAsset?.videoSize = coverImage.size
-                }
-                completionHandler?(coverImage, asset)
-                return nil
-            }else {
-                if let key = videoAsset.videoURL?.absoluteString,
-                   PhotoTools.isCached(forVideo: key) {
-                    videoURL = PhotoTools.getVideoCacheURL(for: key)
-                }else {
-                    videoURL = videoAsset.videoURL
-                }
-            }
-        }else if let videoAsset = asset.localVideoAsset {
-            if let coverImage = videoAsset.image {
-                if videoAsset.videoSize.equalTo(.zero) {
-                    asset.localVideoAsset?.videoSize = coverImage.size
-                }
-                completionHandler?(coverImage, asset)
-                return nil
-            }
-            videoURL = videoAsset.videoURL
-        }
-        guard let videoURL = videoURL else {
-            completionHandler?(nil, asset)
-            return nil
-        }
-        return PhotoTools.getVideoThumbnailImage(
-            url: videoURL,
-            atTime: 0.1,
-            imageGenerator: imageGenerator
-        ) { _, image, result in
-            if let image = image {
-                if asset.isNetworkAsset {
-                    asset.networkVideoAsset?.videoSize = image.size
-                    asset.networkVideoAsset?.coverImage = image
-                }else {
-                    asset.localVideoAsset?.videoSize = image.size
-                    asset.localVideoAsset?.image = image
-                }
-            }
-            if result == .cancelled { return }
-            completionHandler?(image, asset)
-        }
-    }
-    #endif
-}
-
-//extension ImageView {
-//    
-//    #if canImport(Kingfisher)
-//    typealias ImageCompletion = (UIImage?, KingfisherError?, PhotoAsset) -> Void
-//    
-//    @discardableResult
-//    func setImage(
-//        for asset: PhotoAsset,
-//        urlType: DonwloadURLType,
-//        forciblyOriginal: Bool = false,
-//        progressBlock: DownloadProgressBlock? = nil,
-//        downloadTask: ((Kingfisher.DownloadTask?) -> Void)? = nil,
-//        completionHandler: ImageCompletion? = nil
-//    ) -> Any? {
-//        imageView.setImage(
-//            for: asset,
-//            urlType: urlType,
-//            forciblyOriginal: forciblyOriginal,
-//            progressBlock: progressBlock,
-//            downloadTask: downloadTask,
-//            completionHandler: completionHandler
-//        )
-//    }
-//    #else
+    
 //    @discardableResult
 //    func setVideoCoverImage(
 //        for asset: PhotoAsset,
 //        imageGenerator: ((AVAssetImageGenerator) -> Void)? = nil,
 //        completionHandler: ((UIImage?, PhotoAsset) -> Void)? = nil
 //    ) -> Any? {
-//        imageView.setVideoCoverImage(
-//            for: asset,
-//            imageGenerator: imageGenerator,
-//            completionHandler: completionHandler
-//        )
+//        #if HXPICKER_ENABLE_EDITOR
+//        if let videoEdit = asset.videoEditedResult {
+//            completionHandler?(videoEdit.coverImage, asset)
+//            return nil
+//        }
+//        #endif
+//        var videoURL: URL?
+//        if let videoAsset = asset.networkVideoAsset {
+//            if let coverImage = videoAsset.coverImage {
+//                if videoAsset.videoSize.equalTo(.zero) {
+//                    asset.networkVideoAsset?.videoSize = coverImage.size
+//                }
+//                completionHandler?(coverImage, asset)
+//                return nil
+//            }else {
+//                if let key = videoAsset.videoURL?.absoluteString,
+//                   PhotoTools.isCached(forVideo: key) {
+//                    videoURL = PhotoTools.getVideoCacheURL(for: key)
+//                }else {
+//                    videoURL = videoAsset.videoURL
+//                }
+//            }
+//        }else if let videoAsset = asset.localVideoAsset {
+//            if let coverImage = videoAsset.image {
+//                if videoAsset.videoSize.equalTo(.zero) {
+//                    asset.localVideoAsset?.videoSize = coverImage.size
+//                }
+//                completionHandler?(coverImage, asset)
+//                return nil
+//            }
+//            videoURL = videoAsset.videoURL
+//        }
+//        guard let videoURL = videoURL else {
+//            completionHandler?(nil, asset)
+//            return nil
+//        }
+//        return PhotoTools.getVideoThumbnailImage(
+//            url: videoURL,
+//            atTime: 0.1,
+//            imageGenerator: imageGenerator
+//        ) { _, image, result in
+//            if let image = image {
+//                if asset.isNetworkAsset {
+//                    asset.networkVideoAsset?.videoSize = image.size
+//                    asset.networkVideoAsset?.coverImage = image
+//                }else {
+//                    asset.localVideoAsset?.videoSize = image.size
+//                    asset.localVideoAsset?.image = image
+//                }
+//            }
+//            if result == .cancelled { return }
+//            completionHandler?(image, asset)
+//        }
 //    }
-//    #endif
-//}
+}

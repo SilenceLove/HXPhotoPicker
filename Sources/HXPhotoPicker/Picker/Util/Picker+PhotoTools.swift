@@ -292,9 +292,7 @@ extension PhotoTools {
         config.photoList.cell.selectBox.style = .tick
         config.photoList.cell.selectBox.size = CGSize(width: 23, height: 23)
         
-        #if canImport(Kingfisher)
         config.photoList.cell.kf_indicatorColor = .white
-        #endif
         
         config.photoList.cameraCell.backgroundColor = "#404040".color
         config.photoList.cameraCell.cameraImageName = "hx_picker_photoList_photograph_white"
