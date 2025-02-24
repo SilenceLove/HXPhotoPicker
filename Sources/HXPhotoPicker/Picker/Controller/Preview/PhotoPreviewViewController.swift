@@ -230,9 +230,6 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
 extension PhotoPreviewViewController {
      
     private func initView() {
-        //强制LTR，避免阿语下预览图片内容被镜像
-        view.semanticContentAttribute = .forceLeftToRight
-        
         collectionViewLayout = UICollectionViewFlowLayout()
         collectionViewLayout.scrollDirection = .horizontal
         collectionViewLayout.minimumLineSpacing = 0
@@ -382,6 +379,10 @@ extension PhotoPreviewViewController {
             view.addSubview(navBgView)
             self.navBgView = navBgView
         }
+        
+        //强制LTR，避免阿语下预览图片内容被镜像
+        view.semanticContentAttribute = .forceLeftToRight
+        collectionView.semanticContentAttribute = .forceLeftToRight
     }
     func configBottomViewFrame() {
         if !config.isShowBottomView {
