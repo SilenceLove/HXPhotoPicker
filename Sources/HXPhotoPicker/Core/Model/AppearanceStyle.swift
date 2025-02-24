@@ -15,3 +15,7 @@ public enum AppearanceStyle: Int {
     /// 暗黑风格
     case dark = 2
 }
+
+public func hxPicker_isRTL() -> Bool{
+    return PhotoManager.isRTL
+}

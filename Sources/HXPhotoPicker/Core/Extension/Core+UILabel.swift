@@ -27,3 +27,30 @@ extension UILabel {
         return .zero
     }
 }
+
+extension UILabel {
+    /// 文本对齐方向
+    var hxpicker_alignment: NSTextAlignment {
+        set {
+            switch newValue {
+            case .left:
+                textAlignment = hxPicker_isRTL() ? .right : .left
+            case .right:
+                textAlignment = hxPicker_isRTL() ? .left : .right
+            default:
+                textAlignment = newValue
+            }
+        }
+        
+        get {
+            switch textAlignment {
+            case .left:
+                return hxPicker_isRTL() ? .right : textAlignment
+            case .right:
+                return hxPicker_isRTL() ? .left : textAlignment
+            default:
+                return textAlignment
+            }
+        }
+    }
+}
