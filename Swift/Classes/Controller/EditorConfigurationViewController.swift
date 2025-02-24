@@ -50,7 +50,7 @@ class EditorConfigurationViewController: UITableViewController {
                     vc.delegate = self
                     present(vc, animated: true, completion: nil)
                 }else {
-                    #if canImport(Kingfisher)
+//                    #if canImport(Kingfisher)
                     let networkURL = URL(
                         string:
                             "https://wx4.sinaimg.cn/large/a6a681ebgy1gojng2qw07g208c093qv6.gif"
@@ -58,17 +58,17 @@ class EditorConfigurationViewController: UITableViewController {
                     let vc = EditorViewController(.init(type: .networkImage(networkURL), result: editedResult), config: config)
                     vc.delegate = self
                     present(vc, animated: true, completion: nil)
-                    #else
-                    let image = UIImage(
-                        contentsOfFile: Bundle.main.path(
-                            forResource: "livephoto_image",
-                            ofType: "jpeg"
-                        )!
-                    )!
-                    let vc = EditorViewController(.init(type: .image(image)), config: config)
-                    vc.delegate = self
-                    present(vc, animated: true, completion: nil)
-                    #endif
+//                    #else
+//                    let image = UIImage(
+//                        contentsOfFile: Bundle.main.path(
+//                            forResource: "livephoto_image",
+//                            ofType: "jpeg"
+//                        )!
+//                    )!
+//                    let vc = EditorViewController(.init(type: .image(image)), config: config)
+//                    vc.delegate = self
+//                    present(vc, animated: true, completion: nil)
+//                    #endif
                 }
             }else {
                 if assetType == 0 {
@@ -168,12 +168,10 @@ extension EditorConfigurationViewController: EditorViewControllerDelegate {
                 let photoAsset = PhotoAsset.init(localImageAsset: localImageAsset)
                 photoAsset.editedResult = asset.result
                 pickerResultVC.selectedAssets = [photoAsset]
-            #if canImport(Kingfisher)
             case .networkImage(let url):
                 let photoAsset = PhotoAsset.init(networkImageAsset: .init(thumbnailURL: url, originalURL: url))
                 photoAsset.editedResult = asset.result
                 pickerResultVC.selectedAssets = [photoAsset]
-            #endif
             default:
                 break
             }

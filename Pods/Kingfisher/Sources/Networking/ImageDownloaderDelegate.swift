@@ -25,83 +25,79 @@
 //  THE SOFTWARE.
 
 import Foundation
-#if os(macOS)
-import AppKit
-#else
-import UIKit
-#endif
 
-/// Protocol for handling events for ``ImageDownloader``.
-///
-/// This delegate protocol provides a set of methods related to the stages and rules of the image downloader. You use
-/// the provided methods to inspect the downloader working phases or respond to some events to make decisions.
+/// Protocol of `ImageDownloader`. This protocol provides a set of methods which are related to image downloader
+/// working stages and rules.
 public protocol ImageDownloaderDelegate: AnyObject {
 
-    /// Called when the ``ImageDownloader`` object is about to start downloading an image from a specified URL.
+    /// Called when the `ImageDownloader` object will start downloading an image from a specified URL.
     ///
     /// - Parameters:
-    ///   - downloader: The ``ImageDownloader`` object used for the downloading operation.
-    ///   - url: The URL of the starting request.
+    ///   - downloader: The `ImageDownloader` object which is used for the downloading operation.
+    ///   - url: URL of the starting request.
     ///   - request: The request object for the download process.
+    ///
     func imageDownloader(_ downloader: ImageDownloader, willDownloadImageForURL url: URL, with request: URLRequest?)
 
-    /// Called when the ``ImageDownloader`` completes a downloading request with success or failure.
+    /// Called when the `ImageDownloader` completes a downloading request with success or failure.
     ///
     /// - Parameters:
-    ///   - downloader: The ``ImageDownloader`` object used for the downloading operation.
-    ///   - url: The URL of the original request.
+    ///   - downloader: The `ImageDownloader` object which is used for the downloading operation.
+    ///   - url: URL of the original request URL.
     ///   - response: The response object of the downloading process.
     ///   - error: The error in case of failure.
+    ///
     func imageDownloader(
         _ downloader: ImageDownloader,
         didFinishDownloadingImageForURL url: URL,
         with response: URLResponse?,
-        error: (any Error)?)
-    
-    /// Called when the ``ImageDownloader`` object successfully downloads image data with a specified task.
-    ///
-    /// This is your last chance to verify or modify the downloaded data before Kingfisher attempts to perform
-    /// additional processing on the image data.
+        error: Error?)
+
+    /// Called when the `ImageDownloader` object successfully downloaded image data from specified URL. This is
+    /// your last chance to verify or modify the downloaded data before Kingfisher tries to perform addition
+    /// processing on the image data.
     ///
     /// - Parameters:
-    ///   - downloader: The ``ImageDownloader`` object used for the downloading operation.
+    ///   - downloader: The `ImageDownloader` object which is used for the downloading operation.
     ///   - data: The original downloaded data.
-    ///   - task: The data task containing request and response information for the download.
-    /// - Returns: The data that Kingfisher should use to create an image. You need to provide valid data that is in
-    /// one of the supported image file formats. Kingfisher will process this data and attempt to convert it into an
-    /// image object.
-    func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, with task: SessionDataTask) -> Data?
+    ///   - dataTask: The data task contains request and response information of the download.
+    /// - Note:
+    ///   This can be used to pre-process raw image data before creation of `Image` instance (i.e.
+    ///   decrypting or verification). If `nil` returned, the processing is interrupted and a `KingfisherError` with
+    ///   `ResponseErrorReason.dataModifyingFailed` will be raised. You could use this fact to stop the image
+    ///   processing flow if you find the data is corrupted or malformed.
+    ///
+    ///  If this method is implemented, `imageDownloader(_:didDownload:for:)` will not be called anymore.
+    func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, with dataTask: SessionDataTask) -> Data?
   
-    /// Called when the ``ImageDownloader`` object successfully downloads image data from a specified URL.
-    ///
-    /// This is your last chance to verify or modify the downloaded data before Kingfisher attempts to perform
-    /// additional processing on the image data.
+    /// Called when the `ImageDownloader` object successfully downloaded image data from specified URL. This is
+    /// your last chance to verify or modify the downloaded data before Kingfisher tries to perform addition
+    /// processing on the image data.
     ///
     /// - Parameters:
-    ///   - downloader: The ``ImageDownloader`` object used for the downloading operation.
+    ///   - downloader: The `ImageDownloader` object which is used for the downloading operation.
     ///   - data: The original downloaded data.
-    ///   - url: The URL of the original request.
+    ///   - url: The URL of the original request URL.
+    /// - Returns: The data from which Kingfisher should use to create an image. You need to provide valid data
+    ///            which content is one of the supported image file format. Kingfisher will perform process on this
+    ///            data and try to convert it to an image object.
+    /// - Note:
+    ///   This can be used to pre-process raw image data before creation of `Image` instance (i.e.
+    ///   decrypting or verification). If `nil` returned, the processing is interrupted and a `KingfisherError` with
+    ///   `ResponseErrorReason.dataModifyingFailed` will be raised. You could use this fact to stop the image
+    ///   processing flow if you find the data is corrupted or malformed.
     ///
-    /// - Returns: The data that Kingfisher should use to create an image. You need to provide valid data that is in
-    /// one of the supported image file formats. Kingfisher will process this data and attempt to convert it into an
-    /// image object.
-    ///
-    /// This method can be used to preprocess raw image data before the creation of the `Image` instance (e.g.,
-    /// decrypting or verification). If `nil` is returned, the processing is interrupted and a
-    /// ``KingfisherError/ResponseErrorReason/dataModifyingFailed(task:)`` error will be raised. You can use this fact
-    /// to stop the image processing flow if you find that the data is corrupted or malformed.
-    ///
-    /// > If the ``SessionDataTask`` version of `imageDownloader(_:didDownload:with:)` is implemented, this method will
-    /// > not be called anymore.
+    ///   If `imageDownloader(_:didDownload:with:)` is implemented, this method will not be called anymore.
     func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, for url: URL) -> Data?
 
-    /// Called when the ``ImageDownloader`` object successfully downloads and processes an image from a specified URL.
+    /// Called when the `ImageDownloader` object successfully downloads and processes an image from specified URL.
     ///
     /// - Parameters:
-    ///   - downloader: The ``ImageDownloader`` object used for the downloading operation.
+    ///   - downloader: The `ImageDownloader` object which is used for the downloading operation.
     ///   - image: The downloaded and processed image.
-    ///   - url: The URL of the original request.
+    ///   - url: URL of the original request URL.
     ///   - response: The original response object of the downloading process.
+    ///
     func imageDownloader(
         _ downloader: ImageDownloader,
         didDownload image: KFCrossPlatformImage,
@@ -109,40 +105,17 @@ public protocol ImageDownloaderDelegate: AnyObject {
         with response: URLResponse?)
 
     /// Checks if a received HTTP status code is valid or not.
-    ///
-    /// By default, a status code in the range `200..<400` is considered as valid. If an invalid code is received,
-    /// the downloader will raise a ``KingfisherError/ResponseErrorReason/invalidHTTPStatusCode(response:)`` error.
+    /// By default, a status code in range 200..<400 is considered as valid.
+    /// If an invalid code is received, the downloader will raise an `KingfisherError` with
+    /// `ResponseErrorReason.invalidHTTPStatusCode` as its reason.
     ///
     /// - Parameters:
     ///   - code: The received HTTP status code.
-    ///   - downloader: The ``ImageDownloader`` object requesting validation of the status code.
-    /// - Returns: A value indicating whether this HTTP status code is valid or not.
-    ///
-    /// > If the default range of `200..<400` as valid codes does not suit your needs, you can implement this method to
-    /// change that behavior.
+    ///   - downloader: The `ImageDownloader` object asks for validate status code.
+    /// - Returns: Returns a value to indicate whether this HTTP status code is valid or not.
+    /// - Note: If the default 200 to 400 valid code does not suit your need,
+    ///         you can implement this method to change that behavior.
     func isValidStatusCode(_ code: Int, for downloader: ImageDownloader) -> Bool
-
-    /// Called when the task has received a valid HTTP response after passing other checks such as the status code. 
-    /// You can perform additional checks or verifications on the response to determine if the download should be
-    /// allowed or cancelled.
-    ///
-    /// For example, this is useful if you want to verify some header values in the response before actually starting 
-    /// the download.
-    ///
-    /// If implemented, you have to return a proper response disposition, such as `.allow` to start the actual
-    /// downloading or `.cancel` to cancel the task. If `.cancel` is used as the disposition, the downloader will raise 
-    /// a ``KingfisherError/ResponseErrorReason/cancelledByDelegate(response:)`` error. If not implemented, any response
-    /// that passes other checks will be allowed, and the download will start.
-    ///
-    /// - Parameters:
-    ///   - downloader: The `ImageDownloader` object used for the downloading operation.
-    ///   - response: The original response object of the downloading process.
-    ///
-    /// - Returns: The disposition for the download task. You have to return either `.allow` or `.cancel`.
-    func imageDownloader(
-        _ downloader: ImageDownloader,
-        didReceive response: URLResponse
-    ) async -> URLSession.ResponseDisposition
 }
 
 // Default implementation for `ImageDownloaderDelegate`.
@@ -156,7 +129,7 @@ extension ImageDownloaderDelegate {
         _ downloader: ImageDownloader,
         didFinishDownloadingImageForURL url: URL,
         with response: URLResponse?,
-        error: (any Error)?) {}
+        error: Error?) {}
 
     public func imageDownloader(
         _ downloader: ImageDownloader,
@@ -177,12 +150,5 @@ extension ImageDownloaderDelegate {
   
     public func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, for url: URL) -> Data? {
         return data
-    }
-
-    public func imageDownloader(
-        _ downloader: ImageDownloader,
-        didReceive response: URLResponse
-    ) async -> URLSession.ResponseDisposition {
-        .allow
     }
 }

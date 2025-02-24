@@ -9,7 +9,12 @@
 import UIKit
 import Photos
 import HXPhotoPicker
+#if canImport(Kingfisher)
 import Kingfisher
+#endif
+#if canImport(SDWebImage)
+import SDWebImage
+#endif
 
 class PickerResultViewController: UIViewController,
                                   UICollectionViewDataSource,
@@ -177,7 +182,6 @@ class PickerResultViewController: UIViewController,
             selectedAssets.append(networkVideoAsset)
             localAssetArray.append(networkVideoAsset)
             
-            #if canImport(Kingfisher)
             let networkImageURL = URL(string: "https://wx4.sinaimg.cn/large/a6a681ebgy1gojng2qw07g208c093qv6.gif")!
             let networkImageAsset = PhotoAsset(
                 networkImageAsset: NetworkImageAsset(
@@ -187,7 +191,6 @@ class PickerResultViewController: UIViewController,
             )
             selectedAssets.append(networkImageAsset)
             localAssetArray.append(networkImageAsset)
-            #endif
             
             if let filePath = Bundle.main.path(forResource: "IMG_0168", ofType: "GIF") {
                 let gifAsset = PhotoAsset.init(localImageAsset: .init(imageURL: URL.init(fileURLWithPath: filePath)))
@@ -229,6 +232,15 @@ class PickerResultViewController: UIViewController,
             )
             selectedAssets.append(localLivePhotoAsset1)
             localAssetArray.append(localLivePhotoAsset1)
+            
+            let networkImageAsset3 = PhotoAsset(NetworkImageAsset(
+                thumbnailURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.enterdesk.com%2Fedpic%2Fc9%2F08%2F4a%2Fc9084a6750e3293e6aeaf981f653b734.jpg&refer=http%3A%2F%2Fup.enterdesk.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=22adb67d04d85fa543daeb2f49de3671")!,
+                originalURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.enterdesk.com%2Fedpic_source%2F3d%2F42%2F3e%2F3d423e3cb05d7edc35c38e3173af2a0d.jpg&refer=http%3A%2F%2Fup.enterdesk.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=5ccb00c0328b8ba0d522ac2e17e3a7bd")!,
+                thumbnailLoadMode: .alwaysThumbnail,
+                originalLoadMode: .alwaysThumbnail
+            ))
+            selectedAssets.append(networkImageAsset3)
+            localAssetArray.append(networkImageAsset3)
         }
         // swiftlint:enable line_length
     }
@@ -360,7 +372,12 @@ class PickerResultViewController: UIViewController,
     }
     @objc func didClearButtonClick() {
         PhotoTools.removeCache()
+        #if canImport(Kingfisher)
         ImageCache.default.clearCache()
+        #endif
+        #if canImport(SDWebImage)
+        SDImageCache.shared.clear(with: .all)
+        #endif
     }
     func removeLocalPhotoAssetFile() {
         if FileManager.default.fileExists(atPath: localURL.path) {

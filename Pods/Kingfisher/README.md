@@ -4,10 +4,13 @@
 
 <p align="center">
 <a href="https://github.com/onevcat/Kingfisher/actions?query=workflow%3Abuild"><img src="https://github.com/onevcat/kingfisher/workflows/build/badge.svg?branch=master"></a>
-<a href="https://swiftpackageindex.com/onevcat/Kingfisher/master/documentation/kingfisher"><img src="https://img.shields.io/badge/Swift-Doc-DE5C43.svg?style=flat"></a>
-<a href="https://cocoapods.org/pods/Kingfisher"><img src="https://img.shields.io/github/v/tag/onevcat/Kingfisher.svg?color=blue&include_prereleases=&sort=semver"></a>
+<a href="https://kingfisher.onevcat.com/"><img src="https://img.shields.io/badge/Swift-Doc-DE5C43.svg?style=flat"></a>
+<a href="https://cocoapods.org/pods/Kingfisher"><img src="https://img.shields.io/cocoapods/v/Kingfisher.svg?style=flat"></a>
+<a href="https://github.com/Carthage/Carthage/"><img src="https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat"></a>
 <a href="https://swift.org/package-manager/"><img src="https://img.shields.io/badge/SPM-supported-DE5C43.svg?style=flat"></a>
-<a href="https://raw.githubusercontent.com/onevcat/Kingfisher/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-black"></a>
+<br />
+<a href="https://raw.githubusercontent.com/onevcat/Kingfisher/master/LICENSE"><img src="https://img.shields.io/cocoapods/l/Kingfisher.svg?style=flat"></a>
+<a href="https://kingfisher.onevcat.com/"><img src="https://img.shields.io/cocoapods/p/Kingfisher.svg?style=flat"></a>
 </p>
 
 Kingfisher is a powerful, pure-Swift library for downloading and caching images from the web. It provides you a chance to use a pure-Swift way to work with remote images in your next app.
@@ -22,14 +25,12 @@ Kingfisher is a powerful, pure-Swift library for downloading and caching images 
 - [x] Cancelable downloading and auto-reusing previous downloaded content to improve performance.
 - [x] Independent components. Use the downloader, caching system, and image processors separately as you need.
 - [x] Prefetching images and showing them from the cache to boost your app.
-- [x] Extensions for `UIImageView`, `NSImageView`, `NSButton`, `UIButton`, `NSTextAttachment`, `WKInterfaceImage`, `TVMonogramView` and `CPListItem` to directly set an image from a URL.
+- [x] View extensions for `UIImageView`, `NSImageView`, `NSButton` and `UIButton` to directly set an image from a URL.
 - [x] Built-in transition animation when setting images.
 - [x] Customizable placeholder and indicator while loading images.
 - [x] Extensible image processing and image format easily.
 - [x] Low Data Mode support.
 - [x] SwiftUI support.
-- [x] Swift 6 & Swift Concurrency (strict mode) prepared.
-- [x] Load & cache for Live Photo.
 
 ### Kingfisher 101
 
@@ -43,7 +44,7 @@ imageView.kf.setImage(with: url)
 ```
 
 Kingfisher will download the image from `url`, send it to both memory cache and disk cache, and display it in `imageView`. 
-When you set it with the same URL later, the image will be retrieved from the cache and shown immediately.
+When you set with the same URL later, the image will be retrieved from the cache and shown immediately.
 
 It also works if you use SwiftUI:
 
@@ -132,7 +133,7 @@ KF.url(url)
   .set(to: imageView)
 ```
 
-And even better, if later you want to switch to SwiftUI, just change the `KF` above to `KFImage`, and you've done:
+And even better, if later you want to switch to SwiftUI, just make some trivial changes and you've done.
 
 ```swift
 struct ContentView: View {
@@ -151,72 +152,63 @@ struct ContentView: View {
 }
 ```
 
+### Learn More
+
+To learn the use of Kingfisher by more examples, take a look at the well-prepared [Cheat Sheet](https://github.com/onevcat/Kingfisher/wiki/Cheat-Sheet). T
+here we summarized the most common tasks in Kingfisher, you can get a better idea of what this framework can do. 
+There are also some performance tips, remember to check them too.
+
 ## Requirements
 
-### Kingfisher 8.0
-
-- (UIKit/AppKit) iOS 13.0+ / macOS 10.15+ / tvOS 13.0+ / watchOS 6.0+ / visionOS 1.0+
-- (SwiftUI) iOS 14.0+ / macOS 11.0+ / tvOS 14.0+ / watchOS 7.0+ / visionOS 1.0+
-- Swift 5.9+
-
-### Kingfisher 7.0
-
-- (UIKit/AppKit) iOS 12.0+ / macOS 10.14+ / tvOS 12.0+ / watchOS 5.0+ / visionOS 1.0+
-- (SwiftUI) iOS 14.0+ / macOS 11.0+ / tvOS 14.0+ / watchOS 7.0+ / visionOS 1.0+
-- Swift 5.0+
+- iOS 10.0+ / macOS 10.12+ / tvOS 10.0+ / watchOS 3.0+
+- Swift 4.0+
 
 ### Installation
 
-Refer to one of the following tutorials to install and use the framework:
-
-- [UIKit Tutorial](https://swiftpackageindex.com/onevcat/kingfisher/master/tutorials/kingfisher/gettingstarteduikit)
-- [SwiftUI Tutorial](https://swiftpackageindex.com/onevcat/kingfisher/master/tutorials/kingfisher/gettingstartedswiftui)
-
-Alternatively, you can follow either of the methods below.
+A detailed guide for installation can be found in [Installation Guide](https://github.com/onevcat/Kingfisher/wiki/Installation-Guide).
 
 #### Swift Package Manager
 
 - File > Swift Packages > Add Package Dependency
 - Add `https://github.com/onevcat/Kingfisher.git`
-- Select "Up to Next Major" with "8.0.0"
+- Select "Up to Next Major" with "6.0.0"
 
 #### CocoaPods
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '13.0'
+platform :ios, '10.0'
 use_frameworks!
 
 target 'MyApp' do
-  pod 'Kingfisher', '~> 8.0'
+  pod 'Kingfisher', '~> 6.0'
 end
 ```
 
-#### Pre-built Framework
+#### Carthage
 
-1. Open the release page, download the latest version of Kingfisher from the assets section. 
-2. Drag the `Kingfisher.xcframework` into your project and add it to the target (usually the app target).
-3. Select your target, in the "General" Tab, find the "Frameworks, Libraries, and Embedded Content" section, set the `Embed Without Signing` to Kingfisher.
+```
+github "onevcat/Kingfisher" ~> 6.0
+```
 
-## Documentation
-
-Check the documentation and tutorials:
-
-- [Documentation Home](https://swiftpackageindex.com/onevcat/kingfisher/master/documentation/kingfisher)
-- [Getting Started](https://swiftpackageindex.com/onevcat/kingfisher/master/documentation/kingfisher/gettingstarted)
-    - [UIKit Tutorial](https://swiftpackageindex.com/onevcat/kingfisher/master/tutorials/kingfisher/gettingstarteduikit)
-    - [SwiftUI Tutorial](https://swiftpackageindex.com/onevcat/kingfisher/master/tutorials/kingfisher/gettingstartedswiftui)
-- [Common Tasks - General](https://swiftpackageindex.com/onevcat/kingfisher/master/documentation/kingfisher/commontasks)
-    - [Common Tasks - Cache](https://swiftpackageindex.com/onevcat/kingfisher/master/documentation/kingfisher/commontasks_cache)
-    - [Common Tasks - Downloader](https://swiftpackageindex.com/onevcat/kingfisher/master/documentation/kingfisher/commontasks_downloader)
-    - [Common tasks - Processor](https://swiftpackageindex.com/onevcat/kingfisher/master/documentation/kingfisher/commontasks_processor)
 
 ### Migrating
 
-- [Kingfisher 8.0 Migration](https://swiftpackageindex.com/onevcat/kingfisher/master/documentation/kingfisher/migration-to-8)
-- [Kingfisher 7.0 Migration](https://github.com/onevcat/Kingfisher/wiki/Kingfisher-7.0-Migration-Guide)
+[Kingfisher 6.0 Migration](https://github.com/onevcat/Kingfisher/wiki/Kingfisher-6.0-Migration-Guide) - Kingfisher 6.x is NOT fully compatible with the previous version. However, the migration is not difficult. Depending on your use cases, it may take no effect or several minutes to modify your existing code for the new version. Please follow the [migration guide](https://github.com/onevcat/Kingfisher/wiki/Kingfisher-6.0-Migration-Guide) when you prepare to upgrade Kingfisher in your project.
 
 If you are using an even earlier version, see the guides below to know the steps for migrating.
+
+> - [Kingfisher 5.0 Migration](https://github.com/onevcat/Kingfisher/wiki/Kingfisher-5.0-Migration-Guide) - If you are upgrading to Kingfisher 5.x from 4.x, please read this for more information.
+> - Kingfisher 4.0 Migration - Kingfisher 3.x should be source compatible to Kingfisher 4. The reason for a major update is that we need to specify the Swift version explicitly for Xcode. All deprecated methods in Kingfisher 3 were removed, so please ensure you have no warning left before you migrate from Kingfisher 3 to Kingfisher 4. If you have any trouble when migrating, please open an issue to discuss.
+> - [Kingfisher 3.0 Migration](https://github.com/onevcat/Kingfisher/wiki/Kingfisher-3.0-Migration-Guide) - If you are upgrading to Kingfisher 3.x from an earlier version, please read this for more information.
+
+## Next Steps
+
+We prepared a [wiki page](https://github.com/onevcat/Kingfisher/wiki). You can find tons of useful things there.
+
+* [Installation Guide](https://github.com/onevcat/Kingfisher/wiki/Installation-Guide) - Follow it to integrate Kingfisher into your project.
+* [Cheat Sheet](https://github.com/onevcat/Kingfisher/wiki/Cheat-Sheet)- Curious about what Kingfisher could do and how would it look like when used in your project? See this page for useful code snippets. If you are already familiar with Kingfisher, you could also learn new tricks to improve the way you use Kingfisher!
+* [API Reference](https://kingfisher.onevcat.com/) - Lastly, please remember to read the full whenever you may need a more detailed reference.
 
 ## Other
 
@@ -226,7 +218,7 @@ I want to keep Kingfisher lightweight. This framework focuses on providing a sim
 
 ### Developments and Tests
 
-Any contributing and pull requests are warmly welcome. However, before you plan to implement some features or try to fix an uncertain issue, it is recommended to open a discussion first. It would be appreciated if your pull requests could build with all tests green. :)
+Any contributing and pull requests are warmly welcome. However, before you plan to implement some features or try to fix an uncertain issue, it is recommended to open a discussion first. It would be appreciated if your pull requests could build and with all tests green. :)
 
 ### About the logo
 
@@ -238,18 +230,10 @@ Follow and contact me on [Twitter](http://twitter.com/onevcat) or [Sina Weibo](h
 
 ## Backers & Sponsors
 
-Open-source projects cannot live long without your help. If you find Kingfisher to be useful, please consider supporting this 
+Open-source projects cannot live long without your help. If you find Kingfisher is useful, please consider supporting this 
 project by becoming a sponsor. Your user icon or company logo shows up [on my blog](https://onevcat.com/tabs/about/) with a link to your home page. 
 
-Become a sponsor through [GitHub Sponsors](https://github.com/sponsors/onevcat). :heart:
-
-Special thanks to:
-
-[![imgly](https://user-images.githubusercontent.com/1812216/106253726-271ed000-6218-11eb-98e0-c9c681925770.png)](https://img.ly/)
-
-[![emergetools](https://github-production-user-asset-6210df.s3.amazonaws.com/1019875/254794187-d44f6f50-993f-42e3-b79c-960f69c4adc1.png)](https://www.emergetools.com)
-
-
+Become a sponsor through [GitHub Sponsors](https://github.com/sponsors/onevcat) or [Open Collective](https://opencollective.com/kingfisher#sponsor). :heart:
 
 ### License
 

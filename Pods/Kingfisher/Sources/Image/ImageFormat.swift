@@ -26,8 +26,13 @@
 
 import Foundation
 
-/// Represents the image format.
-public enum ImageFormat: Sendable {
+/// Represents image format.
+///
+/// - unknown: The format cannot be recognized or not supported yet.
+/// - PNG: PNG image format.
+/// - JPEG: JPEG image format.
+/// - GIF: GIF image format.
+public enum ImageFormat {
     /// The format cannot be recognized or not supported yet.
     case unknown
     /// PNG image format.
@@ -38,15 +43,13 @@ public enum ImageFormat: Sendable {
     case GIF
     
     struct HeaderData {
-        static let PNG: [UInt8] = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]
-        static let JPEG_SOI: [UInt8] = [0xFF, 0xD8]
-        static let JPEG_IF: [UInt8] = [0xFF]
-        static let GIF: [UInt8] = [0x47, 0x49, 0x46]
+        static var PNG: [UInt8] = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]
+        static var JPEG_SOI: [UInt8] = [0xFF, 0xD8]
+        static var JPEG_IF: [UInt8] = [0xFF]
+        static var GIF: [UInt8] = [0x47, 0x49, 0x46]
     }
     
-    /// JPEG marker of each sequence of segments.
-    ///
-    /// See also [here](https://www.digicamsoft.com/itu/itu-t81-36.html).
+    /// https://en.wikipedia.org/wiki/JPEG
     public enum JPEGMarker {
         case SOF0           //baseline
         case SOF2           //progressive
@@ -112,12 +115,13 @@ extension KingfisherWrapper where Base == Data {
             return false
         }
         
-        let bytes = [UInt8](base)
-        let markerBytes = marker.bytes
-        for (index, item) in bytes.enumerated() where bytes.count > index + 1 {
+        var buffer = [UInt8](repeating: 0, count: base.count)
+        base.copyBytes(to: &buffer, count: base.count)
+        for (index, item) in buffer.enumerated() {
             guard
-                item == markerBytes.first,
-                bytes[index + 1] == markerBytes[1] else {
+                item == marker.bytes.first,
+                buffer.count > index + 1,
+                buffer[index + 1] == marker.bytes[1] else {
                 continue
             }
             return true

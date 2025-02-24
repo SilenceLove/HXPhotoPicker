@@ -26,32 +26,30 @@
 
 import Foundation
 
-public typealias ExecutionQueue = CallbackQueue
-
-/// Represents the behavior of the callback queue selection when a closure is dispatched.
-public enum CallbackQueue: Sendable {
-    
-    /// Dispatches the closure to `DispatchQueue.main` with an `async` behavior.
+/// Represents callback queue behaviors when an calling of closure be dispatched.
+///
+/// - asyncMain: Dispatch the calling to `DispatchQueue.main` with an `async` behavior.
+/// - currentMainOrAsync: Dispatch the calling to `DispatchQueue.main` with an `async` behavior if current queue is not
+///                       `.main`. Otherwise, call the closure immediately in current main queue.
+/// - untouch: Do not change the calling queue for closure.
+/// - dispatch: Dispatches to a specified `DispatchQueue`.
+public enum CallbackQueue {
+    /// Dispatch the calling to `DispatchQueue.main` with an `async` behavior.
     case mainAsync
-    
-    /// Dispatches the closure to `DispatchQueue.main` with an `async` behavior if the current queue is not `.main`.
-    ///  Otherwise, it calls the closure immediately on the current main queue.
+    /// Dispatch the calling to `DispatchQueue.main` with an `async` behavior if current queue is not
+    /// `.main`. Otherwise, call the closure immediately in current main queue.
     case mainCurrentOrAsync
-    
-    /// Does not change the calling queue for the closure.
+    /// Do not change the calling queue for closure.
     case untouch
-    
-    /// Dispatches the closure to a specified `DispatchQueue`.
+    /// Dispatches to a specified `DispatchQueue`.
     case dispatch(DispatchQueue)
     
-    /// Executes the `block` in a dispatch queue defined by `self`.
-    /// - Parameter block: The block needs to be executed.
-    public func execute(_ block: @Sendable @escaping () -> Void) {
+    public func execute(_ block: @escaping () -> Void) {
         switch self {
         case .mainAsync:
-            CallbackQueueMain.async { block() }
+            DispatchQueue.main.async { block() }
         case .mainCurrentOrAsync:
-            CallbackQueueMain.currentOrAsync { block() }
+            DispatchQueue.main.safeAsync { block() }
         case .untouch:
             block()
         case .dispatch(let queue):
@@ -69,30 +67,15 @@ public enum CallbackQueue: Sendable {
     }
 }
 
-enum CallbackQueueMain {
-    static func currentOrAsync(_ block: @MainActor @Sendable @escaping () -> Void) {
-        if Thread.isMainThread {
-            MainActor.runUnsafely { block() }
+extension DispatchQueue {
+    // This method will dispatch the `block` to self.
+    // If `self` is the main queue, and current thread is main thread, the block
+    // will be invoked immediately instead of being dispatched.
+    func safeAsync(_ block: @escaping ()->()) {
+        if self === DispatchQueue.main && Thread.isMainThread {
+            block()
         } else {
-            DispatchQueue.main.async { block() }
+            async { block() }
         }
-    }
-    
-    static func async(_ block: @MainActor @Sendable @escaping () -> Void) {
-        DispatchQueue.main.async { block() }
-    }
-}
-
-extension MainActor {
-    @_unavailableFromAsync
-    static func runUnsafely<T: Sendable>(_ body: @MainActor () throws -> T) rethrows -> T {
-#if swift(>=5.10)
-        return try MainActor.assumeIsolated(body)
-#else
-        dispatchPrecondition(condition: .onQueue(.main))
-        return try withoutActuallyEscaping(body) { fn in
-            try unsafeBitCast(fn, to: (() throws -> T).self)()
-        }
-#endif
     }
 }
