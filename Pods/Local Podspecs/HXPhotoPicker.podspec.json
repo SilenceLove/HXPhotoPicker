@@ -1,6 +1,6 @@
 {
   "name": "HXPhotoPicker",
-  "version": "4.2.4",
+  "version": "4.2.5",
   "summary": "照片/视频选择器 - 支持LivePhoto、GIF图片选择、自定义编辑照片/视频、3DTouch预览、浏览网络图片/网络视频 功能 - Imitation weibo photo/image picker - support for LivePhoto, GIF image selection, 3DTouch preview, browse the web image function",
   "homepage": "https://github.com/SilenceLove/HXPhotoPicker",
   "license": {
@@ -18,7 +18,7 @@
   },
   "source": {
     "git": "https://github.com/SilenceLove/HXPhotoPicker.git",
-    "tag": "4.2.4"
+    "tag": "4.2.5"
   },
   "frameworks": [
     "UIKit",
@@ -32,9 +32,7 @@
       "name": "Core",
       "source_files": "Sources/HXPhotoPicker/Core/**/*.{swift}",
       "dependencies": {
-        "HXPhotoPicker/Resources": [
-
-        ]
+        "HXPhotoPicker/Resources": []
       }
     },
     {
@@ -53,9 +51,7 @@
           "name": "Lite",
           "source_files": "Sources/HXPhotoPicker/Picker/**/*.{swift}",
           "dependencies": {
-            "HXPhotoPicker/Core": [
-
-            ]
+            "HXPhotoPicker/Core": []
           },
           "pod_target_xcconfig": {
             "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "HXPICKER_ENABLE_PICKER"
@@ -64,9 +60,7 @@
         {
           "name": "KF",
           "dependencies": {
-            "HXPhotoPicker/Picker/Lite": [
-
-            ],
+            "HXPhotoPicker/Picker/Lite": [],
             "Kingfisher": [
               "~> 8.0"
             ]
@@ -81,9 +75,7 @@
           "name": "Lite",
           "source_files": "Sources/HXPhotoPicker/Editor/**/*.{swift}",
           "dependencies": {
-            "HXPhotoPicker/EditorView/Lite": [
-
-            ]
+            "HXPhotoPicker/EditorView/Lite": []
           },
           "pod_target_xcconfig": {
             "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "HXPICKER_ENABLE_EDITOR"
@@ -92,12 +84,8 @@
         {
           "name": "KF",
           "dependencies": {
-            "HXPhotoPicker/EditorView/KF": [
-
-            ],
-            "HXPhotoPicker/Editor/Lite": [
-
-            ],
+            "HXPhotoPicker/EditorView/KF": [],
+            "HXPhotoPicker/Editor/Lite": [],
             "Kingfisher": [
               "~> 8.0"
             ]
@@ -112,9 +100,7 @@
           "name": "Lite",
           "source_files": "Sources/HXPhotoPicker/Editor+View/**/*.{swift}",
           "dependencies": {
-            "HXPhotoPicker/Core": [
-
-            ]
+            "HXPhotoPicker/Core": []
           },
           "pod_target_xcconfig": {
             "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "HXPICKER_ENABLE_EDITOR_VIEW"
@@ -123,9 +109,7 @@
         {
           "name": "KF",
           "dependencies": {
-            "HXPhotoPicker/EditorView/Lite": [
-
-            ],
+            "HXPhotoPicker/EditorView/Lite": [],
             "Kingfisher": [
               "~> 8.0"
             ]
@@ -140,9 +124,7 @@
           "name": "Lite",
           "source_files": "Sources/HXPhotoPicker/Camera/**/*.{swift,metal}",
           "dependencies": {
-            "HXPhotoPicker/Core": [
-
-            ]
+            "HXPhotoPicker/Core": []
           },
           "pod_target_xcconfig": {
             "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "HXPICKER_ENABLE_CAMERA"
@@ -155,9 +137,7 @@
             "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "HXPICKER_ENABLE_CAMERA_LOCATION"
           },
           "dependencies": {
-            "HXPhotoPicker/Camera/Lite": [
-
-            ]
+            "HXPhotoPicker/Camera/Lite": []
           }
         }
       ]
@@ -165,43 +145,25 @@
     {
       "name": "Lite",
       "dependencies": {
-        "HXPhotoPicker/Picker/Lite": [
-
-        ],
-        "HXPhotoPicker/Editor/Lite": [
-
-        ],
-        "HXPhotoPicker/Camera/Lite": [
-
-        ]
+        "HXPhotoPicker/Picker/Lite": [],
+        "HXPhotoPicker/Editor/Lite": [],
+        "HXPhotoPicker/Camera/Lite": []
       }
     },
     {
       "name": "NoLocation",
       "dependencies": {
-        "HXPhotoPicker/Picker": [
-
-        ],
-        "HXPhotoPicker/Editor": [
-
-        ],
-        "HXPhotoPicker/Camera/Lite": [
-
-        ]
+        "HXPhotoPicker/Picker": [],
+        "HXPhotoPicker/Editor": [],
+        "HXPhotoPicker/Camera/Lite": []
       }
     },
     {
       "name": "Full",
       "dependencies": {
-        "HXPhotoPicker/Picker": [
-
-        ],
-        "HXPhotoPicker/Editor": [
-
-        ],
-        "HXPhotoPicker/Camera": [
-
-        ]
+        "HXPhotoPicker/Picker": [],
+        "HXPhotoPicker/Editor": [],
+        "HXPhotoPicker/Camera": []
       }
     }
   ],

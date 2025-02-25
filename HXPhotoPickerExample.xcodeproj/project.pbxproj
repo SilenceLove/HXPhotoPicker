@@ -472,6 +472,8 @@
 		D3B559A02ADD3B4800B35493 /* PhotoNavigationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B5599F2ADD3B4800B35493 /* PhotoNavigationItem.swift */; };
 		D3B6016E2BBCF30600E63C9A /* PhotoHUDProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B6016D2BBCF30600E63C9A /* PhotoHUDProtocol.swift */; };
 		D3B601702BBCF9AF00E63C9A /* PhotoHUDConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B6016F2BBCF9AF00E63C9A /* PhotoHUDConfig.swift */; };
+		D3B7DBC62D6DBCC7009CC2AA /* Core+LayerRTLFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B7DBC42D6DBCC7009CC2AA /* Core+LayerRTLFrame.swift */; };
+		D3B7DBC72D6DBCC7009CC2AA /* Core+UIViewRTLFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B7DBC52D6DBCC7009CC2AA /* Core+UIViewRTLFrame.swift */; };
 		D3B861472BA57E7600DADE92 /* EditorMaskListProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B861462BA57E7600DADE92 /* EditorMaskListProtocol.swift */; };
 		D3BCE8062AE381070044CEBE /* HXLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3BCE8052AE381070044CEBE /* HXLog.swift */; };
 		D3BCE8082AE381700044CEBE /* PhotoDebugLogsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3BCE8072AE381700044CEBE /* PhotoDebugLogsConfig.swift */; };
@@ -957,6 +959,8 @@
 		D3B5599F2ADD3B4800B35493 /* PhotoNavigationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoNavigationItem.swift; sourceTree = "<group>"; };
 		D3B6016D2BBCF30600E63C9A /* PhotoHUDProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoHUDProtocol.swift; sourceTree = "<group>"; };
 		D3B6016F2BBCF9AF00E63C9A /* PhotoHUDConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoHUDConfig.swift; sourceTree = "<group>"; };
+		D3B7DBC42D6DBCC7009CC2AA /* Core+LayerRTLFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Core+LayerRTLFrame.swift"; sourceTree = "<group>"; };
+		D3B7DBC52D6DBCC7009CC2AA /* Core+UIViewRTLFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Core+UIViewRTLFrame.swift"; sourceTree = "<group>"; };
 		D3B861462BA57E7600DADE92 /* EditorMaskListProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorMaskListProtocol.swift; sourceTree = "<group>"; };
 		D3BCE8052AE381070044CEBE /* HXLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXLog.swift; sourceTree = "<group>"; };
 		D3BCE8072AE381700044CEBE /* PhotoDebugLogsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoDebugLogsConfig.swift; sourceTree = "<group>"; };
@@ -1360,6 +1364,8 @@
 		D36878722A399B8C00E70910 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
+				D3B7DBC42D6DBCC7009CC2AA /* Core+LayerRTLFrame.swift */,
+				D3B7DBC52D6DBCC7009CC2AA /* Core+UIViewRTLFrame.swift */,
 				D34417C62AD3DE4000ABFC68 /* Core+NSObject.swift */,
 				D36878812A399B8C00E70910 /* Core+AVAsset.swift */,
 				D36878752A399B8C00E70910 /* Core+Bundle.swift */,
@@ -2802,6 +2808,8 @@
 				D360E7CC2A6B726600740B6B /* EditorVideoControlViewCell.swift in Sources */,
 				D360E7CD2A6B726600740B6B /* EditorVolumeView.swift in Sources */,
 				D32A497E2B0EF5840093D3DB /* PhotoPreviewListViewCell.swift in Sources */,
+				D3B7DBC62D6DBCC7009CC2AA /* Core+LayerRTLFrame.swift in Sources */,
+				D3B7DBC72D6DBCC7009CC2AA /* Core+UIViewRTLFrame.swift in Sources */,
 				D335E6442AB55C0C00BAC8CD /* EditorCanvasView.swift in Sources */,
 				D360E7CE2A6B726600740B6B /* EditorChartlet.swift in Sources */,
 				D360E7CF2A6B726600740B6B /* EditorPlayAuido.swift in Sources */,
