@@ -5,19 +5,15 @@ import PackageDescription
 
 let package = Package(
     name: "HXPhotoPicker",
-    platforms: [.iOS(.v13)],
+    platforms: [.iOS(.v10)],
     products: [
         .library(
             name: "HXPhotoPicker",
             targets: ["HXPhotoPicker"]),
     ],
-    dependencies: [
-        .package(url: "https://github.com/onevcat/Kingfisher.git", from: "8.0.0"),
-    ],
     targets: [
         .target(
             name: "HXPhotoPicker",
-            dependencies: ["Kingfisher"],
             resources: [
                 .process("Resources/HXPhotoPicker.bundle"),
                 .copy("Resources/PrivacyInfo.xcprivacy")
