@@ -24,7 +24,7 @@ extension PhotoAsset {
     
     /// 编码
     /// - Returns: 编码之后的数据
-    public func encode() -> Data? {
+    public func encode() throws -> Data {
         let simplify: Simplify
         #if HXPICKER_ENABLE_EDITOR
             simplify = Simplify(
@@ -48,50 +48,61 @@ extension PhotoAsset {
                 networkImageAsset: networkImageAsset
             )
         #endif
-        var data: Data?
+        return try JSONEncoder().encode(simplify)
+    }
+    
+    public func encodeData() -> Data? {
         do {
-            data = try JSONEncoder().encode(simplify)
+            return try encode()
         } catch {
             HXLog("PhotoAsset 编码失败: \(error)")
+            return nil
         }
-        return data
     }
     
     /// 解码
     /// - Parameter data: 之前编码得到的数据
     /// - Returns: 对应的 PhotoAsset 对象
-    public static func decoder(data: Data) -> PhotoAsset? {
+    public static func decode(data: Data) throws -> PhotoAsset {
         var photoAsset: PhotoAsset?
+        let decoder = JSONDecoder()
+        let simplify = try decoder.decode(Simplify.self, from: data)
+        if let phLocalIdentifier = simplify.phLocalIdentifier {
+            if let phAsset = AssetManager.fetchAsset(with: phLocalIdentifier) {
+                photoAsset = PhotoAsset(asset: phAsset)
+            }
+        }else if let localImageAsset = simplify.localImageAsset {
+            photoAsset = PhotoAsset(localImageAsset: localImageAsset)
+        }else if let localVideoAsset = simplify.localVideoAsset {
+            photoAsset = PhotoAsset(localVideoAsset: localVideoAsset)
+        }else if let localLivePhoto = simplify.localLivePhoto {
+            photoAsset = PhotoAsset(localLivePhoto: localLivePhoto)
+        }else if let networkVideoAsset = simplify.networkVideoAsset {
+            photoAsset = PhotoAsset(networkVideoAsset: networkVideoAsset)
+        }else {
+            if let networkImageAsset = simplify.networkImageAsset {
+                photoAsset = PhotoAsset(networkImageAsset: networkImageAsset)
+            }
+        }
+        guard let photoAsset else {
+            throw NSError(domain: "PhotoAsset为nil, 解码失败", code: 500)
+        }
+        photoAsset.mediaSubType = simplify.mediaSubType
+        #if HXPICKER_ENABLE_EDITOR
+        if let url = simplify.editedResult?.url,
+           FileManager.default.fileExists(atPath: url.path) {
+            photoAsset.editedResult = simplify.editedResult
+        }
+        #endif
+        return photoAsset
+    }
+    
+    public static func decodeData(data: Data) -> PhotoAsset? {
         do {
-            let decoder = JSONDecoder()
-            let simplify = try decoder.decode(Simplify.self, from: data)
-            if let phLocalIdentifier = simplify.phLocalIdentifier {
-                if let phAsset = AssetManager.fetchAsset(with: phLocalIdentifier) {
-                    photoAsset = PhotoAsset(asset: phAsset)
-                }
-            }else if let localImageAsset = simplify.localImageAsset {
-                photoAsset = PhotoAsset(localImageAsset: localImageAsset)
-            }else if let localVideoAsset = simplify.localVideoAsset {
-                photoAsset = PhotoAsset(localVideoAsset: localVideoAsset)
-            }else if let localLivePhoto = simplify.localLivePhoto {
-                photoAsset = PhotoAsset(localLivePhoto: localLivePhoto)
-            }else if let networkVideoAsset = simplify.networkVideoAsset {
-                photoAsset = PhotoAsset(networkVideoAsset: networkVideoAsset)
-            }else {
-                if let networkImageAsset = simplify.networkImageAsset {
-                    photoAsset = PhotoAsset(networkImageAsset: networkImageAsset)
-                }
-            }
-            photoAsset?.mediaSubType = simplify.mediaSubType
-            #if HXPICKER_ENABLE_EDITOR
-            if let url = simplify.editedResult?.url,
-               FileManager.default.fileExists(atPath: url.path) {
-                photoAsset?.editedResult = simplify.editedResult
-            }
-            #endif
+            return try decode(data: data)
         } catch {
             HXLog("PhotoAsset 解码失败: \(error)")
+            return nil
         }
-        return photoAsset
     }
 }
