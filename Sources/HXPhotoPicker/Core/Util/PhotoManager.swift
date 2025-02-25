@@ -48,6 +48,18 @@ public final class PhotoManager: NSObject {
     public var isDebugLogsEnabled: Bool = false
     #endif
     
+    /// 是否阿语RTL布局
+    public static var isRTL: Bool {
+        guard let languageType = PhotoManager.shared.languageType else {
+            return false
+        }
+        if languageType == .system {
+            return PhotoManager.shared.languageStr == "ar"
+        } else {
+            return languageType == .arabic
+        }
+    }
+    
     /// 当前语言文件，每次创建PhotoPickerController判断是否需要重新创建
     var languageBundle: Bundle?
     /// 当前语言类型，每次创建PhotoPickerController时赋值

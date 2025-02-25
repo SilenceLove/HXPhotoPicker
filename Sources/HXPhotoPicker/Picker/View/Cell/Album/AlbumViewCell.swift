@@ -62,6 +62,7 @@ open class AlbumViewCell: AlbumViewBaseCell {
         contentView.addSubview(bottomLineView)
         
         tickView = TickView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        tickView.hxPicker_frame =  CGRect(x: 0, y: 0, width: 30, height: 30)
         contentView.addSubview(tickView)
     }
     
@@ -111,29 +112,35 @@ open class AlbumViewCell: AlbumViewBaseCell {
         let width = contentView.width
         let coverMargin: CGFloat = 5
         let coverWidth = height - (coverMargin * 2)
-        albumCoverView.frame = CGRect(x: coverMargin, y: coverMargin, width: coverWidth, height: coverWidth)
+        albumCoverView.hxPicker_frame = CGRect(x: coverMargin, y: coverMargin, width: coverWidth, height: coverWidth)
         
         if viewController?.splitViewController != nil {
-            tickView.x = width - 12 - tickView.width
+            tickView.hxPicker_x = width - 12 - tickView.width
         }else {
-            tickView.x = width - 12 - tickView.width - UIDevice.rightMargin
+            tickView.hxPicker_x = width - 12 - tickView.width - UIDevice.rightMargin
         }
         tickView.centerY = height * 0.5
-        
-        albumNameLb.x = albumCoverView.frame.maxX + 10
-        albumNameLb.size = CGSize(width: tickView.x - albumNameLb.x - 20, height: 16)
-        
+
+        //设置albumNameLb坐标
+        let albumNameLbX = albumCoverView.hxPicker_maxX + 10
+        //内容size自适应
+        let albumNameLbSize = albumNameLb.sizeThatFits(CGSize(width: tickView.hxPicker_x - albumNameLbX - 20, height: 16))
+        albumNameLb.hxPicker_frame = CGRect(origin: CGPoint(x: albumNameLbX, y: 0), size: albumNameLbSize)
+
         if config.isShowPhotoCount {
             albumNameLb.centerY = height / 2 - albumNameLb.height / 2
             
-            photoCountLb.x = albumCoverView.frame.maxX + 10
-            photoCountLb.y = albumNameLb.frame.maxY + 5
-            photoCountLb.size = CGSize(width: width - photoCountLb.x - 20, height: 14)
+            //设置photoCountL坐标
+            let photoCountLbX = albumNameLb.hxPicker_x
+            let photoCountLbY = albumNameLb.hxPicker_frame.maxY + 5
+            //内容size自适应
+            let photoCountLbSize = photoCountLb.sizeThatFits(CGSize(width: width - photoCountLbX - 20, height: 14))
+            photoCountLb.hxPicker_frame = CGRect(origin: CGPoint(x: photoCountLbX, y: photoCountLbY), size: photoCountLbSize)
         }else {
             albumNameLb.centerY = height / 2
         }
         
-        bottomLineView.frame = CGRect(x: coverMargin, y: height - 0.5, width: width - coverMargin * 2, height: 0.5)
+        bottomLineView.hxPicker_frame = CGRect(x: coverMargin, y: height - 0.5, width: width - coverMargin * 2, height: 0.5)
     }
     
     open override func layoutSubviews() {

@@ -114,15 +114,15 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
         let topMargin = config.selectBoxTopMargin
         let rightMargin = config.selectBoxRightMargin
         let rect = CGRect(x: self.width - rightMargin - width, y: topMargin, width: width, height: height)
-        if selectControl.frame.equalTo(rect) {
+        if selectControl.hxPicker_frame.equalTo(rect) {
             return
         }
         if let photoAsset = photoAsset, photoAsset.isScrolling {
             let x = selectControl.x
-            selectControl.frame = rect
-            selectControl.x = x
+            selectControl.hxPicker_frame = rect
+            selectControl.hxPicker_x = x
         }else {
-            selectControl.frame = rect
+            selectControl.hxPicker_frame = rect
         }
     }
     

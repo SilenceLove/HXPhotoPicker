@@ -52,6 +52,13 @@ public class PhotoAlbumViewController: UIViewController, PhotoAlbumController {
             tableView.sectionHeaderTopPadding = 0
         }
         view.addSubview(tableView)
+        if PhotoManager.isRTL {
+            navigationController?.navigationBar.semanticContentAttribute = .forceRightToLeft
+            tableView.semanticContentAttribute = .forceRightToLeft
+        }else {
+            navigationController?.navigationBar.semanticContentAttribute = .forceLeftToRight
+            tableView.semanticContentAttribute = .forceLeftToRight
+        }
         reloadData()
         updateColors()
     }
@@ -211,7 +218,7 @@ extension PhotoAlbumViewController: UITableViewDataSource, UITableViewDelegate {
             let data = datas[indexPath.section]
             let count = data.assetCollections.count
             let marginCount = rowCount - 1
-            let margin: CGFloat = assetCollections.count > Int(rowCount) * 2 ? 5 : 0
+            let margin: CGFloat = count > Int(rowCount) * 2 ? 5 : 0
             let itemWidth = (view.width - (30 + 12 * marginCount) - UIDevice.leftMargin - UIDevice.rightMargin) / rowCount - margin
             let fontHeight = config.albumController.albumNameFont.lineHeight + config.albumController.photoCountFont.lineHeight + 8
             let itemHeight = itemWidth + fontHeight + 20
