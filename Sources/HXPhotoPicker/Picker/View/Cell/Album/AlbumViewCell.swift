@@ -62,6 +62,7 @@ open class AlbumViewCell: AlbumViewBaseCell {
         contentView.addSubview(bottomLineView)
         
         tickView = TickView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        tickView.hxPicker_frame =  CGRect(x: 0, y: 0, width: 30, height: 30)
         contentView.addSubview(tickView)
     }
     
@@ -119,16 +120,22 @@ open class AlbumViewCell: AlbumViewBaseCell {
             tickView.hxPicker_x = width - 12 - tickView.width - UIDevice.rightMargin
         }
         tickView.centerY = height * 0.5
-        
-        albumNameLb.hxPicker_x = albumCoverView.hxPicker_frame.maxX + 10
-        albumNameLb.size = CGSize(width: tickView.hxPicker_x - albumNameLb.hxPicker_x - 20, height: 16)
-        
+
+        //设置albumNameLb坐标
+        let albumNameLbX = albumCoverView.hxPicker_maxX + 10
+        //内容size自适应
+        let albumNameLbSize = albumNameLb.sizeThatFits(CGSize(width: tickView.hxPicker_x - albumNameLbX - 20, height: 16))
+        albumNameLb.hxPicker_frame = CGRect(origin: CGPoint(x: albumNameLbX, y: 0), size: albumNameLbSize)
+
         if config.isShowPhotoCount {
             albumNameLb.centerY = height / 2 - albumNameLb.height / 2
             
-            photoCountLb.hxPicker_x = albumCoverView.hxPicker_frame.maxX + 10
-            photoCountLb.y = albumNameLb.hxPicker_frame.maxY + 5
-            photoCountLb.size = CGSize(width: width - photoCountLb.hxPicker_x - 20, height: 14)
+            //设置photoCountL坐标
+            let photoCountLbX = albumNameLb.hxPicker_x
+            let photoCountLbY = albumNameLb.hxPicker_frame.maxY + 5
+            //内容size自适应
+            let photoCountLbSize = photoCountLb.sizeThatFits(CGSize(width: width - photoCountLbX - 20, height: 14))
+            photoCountLb.hxPicker_frame = CGRect(origin: CGPoint(x: photoCountLbX, y: photoCountLbY), size: photoCountLbSize)
         }else {
             albumNameLb.centerY = height / 2
         }

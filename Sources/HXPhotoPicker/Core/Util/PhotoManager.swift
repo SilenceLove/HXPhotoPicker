@@ -41,7 +41,11 @@ public final class PhotoManager: NSObject {
     public static var isRTL: Bool {
         var isRTL = false
         if let languageType = PhotoManager.shared.languageType {
-            isRTL = languageType == .arabic
+            if languageType == .system {
+                isRTL = PhotoManager.shared.languageStr == "ar"
+            } else {
+                isRTL = languageType == .arabic
+            }
         }
         return isRTL
     }
