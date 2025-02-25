@@ -434,16 +434,3 @@ extension CGImagePropertyOrientation {
         }
     }
 }
-
-// MARK: RTL safe image
-extension UIImage {
-    var hxPicker_image: UIImage? {
-        guard hxPicker_isRTL(),
-                  imageOrientation != .upMirrored,
-                  let cgImage
-            else { return self }
-            return UIImage(cgImage: cgImage,
-                           scale: scale,
-                           orientation: .upMirrored)
-        }
-}

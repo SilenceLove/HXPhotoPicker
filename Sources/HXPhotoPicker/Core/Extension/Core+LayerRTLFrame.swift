@@ -12,7 +12,7 @@ extension CALayer {
     
     var hxPicker_frame: CGRect {
         set {
-            guard hxPicker_isRTL() else {
+            guard PhotoManager.isRTL else {
                 frame = newValue
                 return
             }
@@ -20,7 +20,7 @@ extension CALayer {
             frame = CGRect(origin: CGPoint(x: x, y: newValue.origin.y), size: newValue.size)
         }
         get {
-            guard hxPicker_isRTL() else {
+            guard PhotoManager.isRTL else {
                 return frame
             }
             let x = hxPicker_refWidth - frame.maxX
@@ -30,7 +30,7 @@ extension CALayer {
     
     var hxPicker_position: CGPoint {
         set {
-            guard hxPicker_isRTL() else {
+            guard PhotoManager.isRTL else {
                 position = newValue
                 return
             }
@@ -38,7 +38,7 @@ extension CALayer {
             position = CGPoint(x: positionX, y: newValue.y)
         }
         get {
-            guard hxPicker_isRTL() else {
+            guard PhotoManager.isRTL else {
                 return position
             }
             let positionX = hxPicker_refWidth - position.x
@@ -48,7 +48,7 @@ extension CALayer {
     
     var hxPicker_x: CGFloat {
         set {
-            guard hxPicker_isRTL() else {
+            guard PhotoManager.isRTL else {
                 frame.origin.x = newValue
                 return
             }
@@ -56,7 +56,7 @@ extension CALayer {
             frame.origin.x = x
         }
         get {
-            guard hxPicker_isRTL() else {
+            guard PhotoManager.isRTL else {
                 return frame.origin.x
             }
             let x = hxPicker_refWidth - frame.maxX
@@ -65,7 +65,7 @@ extension CALayer {
     }
     
     var hxPicker_midX: CGFloat {
-        guard hxPicker_isRTL() else {
+        guard PhotoManager.isRTL else {
             return frame.midX
         }
         let midX = hxPicker_refWidth - frame.midX
@@ -73,7 +73,7 @@ extension CALayer {
     }
     
     var hxPicker_maxX: CGFloat {
-        guard hxPicker_isRTL() else {
+        guard PhotoManager.isRTL else {
             return frame.maxX
         }
         return hxPicker_refWidth - frame.origin.x
@@ -81,19 +81,19 @@ extension CALayer {
     
     /// 相对【自身宽度】的转换值
     func hxPicker_valueFromSelf(_ v: CGFloat) -> CGFloat {
-        hxPicker_isRTL() ? (bounds.width - v) : v
+        PhotoManager.isRTL ? (bounds.width - v) : v
     }
     
     /// 相对【参照宽度】的转换值
     func hxPicker_valueFromRef(_ v: CGFloat) -> CGFloat {
-        hxPicker_isRTL() ? (hxPicker_refWidth - v) : v
+        PhotoManager.isRTL ? (hxPicker_refWidth - v) : v
     }
 }
 
 extension CALayer {
     /// 沿着Y轴180°翻转（水平镜像）
     func hxPicker_flip() {
-        guard hxPicker_isRTL() else { return }
+        guard PhotoManager.isRTL else { return }
         transform = CATransform3DMakeRotation(CGFloat.pi, 0, 1, 0)
     }
 }

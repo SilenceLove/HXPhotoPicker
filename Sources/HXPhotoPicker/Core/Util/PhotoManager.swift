@@ -39,15 +39,14 @@ public final class PhotoManager: NSObject {
     
     /// 是否阿语RTL布局
     public static var isRTL: Bool {
-        var isRTL = false
-        if let languageType = PhotoManager.shared.languageType {
-            if languageType == .system {
-                isRTL = PhotoManager.shared.languageStr == "ar"
-            } else {
-                isRTL = languageType == .arabic
-            }
+        guard let languageType = PhotoManager.shared.languageType else {
+            return false
         }
-        return isRTL
+        if languageType == .system {
+            return PhotoManager.shared.languageStr == "ar"
+        } else {
+            return languageType == .arabic
+        }
     }
     
     public var isDebugLogsEnabled: Bool = false

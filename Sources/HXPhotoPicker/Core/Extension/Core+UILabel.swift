@@ -34,9 +34,9 @@ extension UILabel {
         set {
             switch newValue {
             case .left:
-                textAlignment = hxPicker_isRTL() ? .right : .left
+                textAlignment = PhotoManager.isRTL ? .right : .left
             case .right:
-                textAlignment = hxPicker_isRTL() ? .left : .right
+                textAlignment = PhotoManager.isRTL ? .left : .right
             default:
                 textAlignment = newValue
             }
@@ -45,9 +45,9 @@ extension UILabel {
         get {
             switch textAlignment {
             case .left:
-                return hxPicker_isRTL() ? .right : textAlignment
+                return PhotoManager.isRTL ? .right : textAlignment
             case .right:
-                return hxPicker_isRTL() ? .left : textAlignment
+                return PhotoManager.isRTL ? .left : textAlignment
             default:
                 return textAlignment
             }

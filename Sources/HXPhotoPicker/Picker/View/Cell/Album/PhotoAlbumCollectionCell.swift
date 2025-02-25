@@ -50,6 +50,11 @@ public class PhotoAlbumCollectionCell: UITableViewCell, UICollectionViewDataSour
         collectionView.register(PhotoAlbumCollectionViewCell.self)
         contentView.addSubview(collectionView)
         
+        if PhotoManager.isRTL {
+            collectionView.semanticContentAttribute = .forceRightToLeft
+        }else {
+            collectionView.semanticContentAttribute = .forceLeftToRight
+        }
         lineView = UIView()
         lineView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.15)
         contentView.addSubview(lineView)
@@ -72,13 +77,13 @@ public class PhotoAlbumCollectionCell: UITableViewCell, UICollectionViewDataSour
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        collectionView.frame = contentView.bounds
+        collectionView.hxPicker_frame = contentView.bounds
         let count = rowCount - 1
         let margin: CGFloat = assetCollections.count > Int(rowCount) * 2 ? 5 : 0
         let itemWidth = (contentView.width - (30 + 12 * count)) / rowCount - margin
         let fontHeight = config.albumNameFont.lineHeight + config.photoCountFont.lineHeight + 8
         flowLayout.itemSize = .init(width: itemWidth, height: itemWidth + fontHeight)
-        lineView.frame = .init(x: 15, y: contentView.height - 0.5, width: contentView.width - 15, height: 0.5)
+        lineView.hxPicker_frame = .init(x: 15, y: contentView.height - 0.5, width: contentView.width - 15, height: 0.5)
     }
     
     func updateColors() {
