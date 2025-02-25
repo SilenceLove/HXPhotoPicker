@@ -16,22 +16,24 @@ PODS:
     - HXPhotoPicker/EditorView
   - HXPhotoPicker/EditorView (4.3.0):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/KFImageView (4.3.0):
-    - Kingfisher
-  - HXPhotoPicker/Kingfisher (4.3.0):
-    - HXPhotoPicker/Default
-    - HXPhotoPicker/KFImageView
   - HXPhotoPicker/Picker (4.3.0):
     - HXPhotoPicker/Core
   - HXPhotoPicker/Resources (4.3.0)
-  - Kingfisher (6.3.1)
+  - HXPhotoPicker/SDImageView (4.3.0):
+    - SDWebImage
+  - HXPhotoPicker/SDWebImage (4.3.0):
+    - HXPhotoPicker/Default
+    - HXPhotoPicker/SDImageView
+  - SDWebImage (5.20.0):
+    - SDWebImage/Core (= 5.20.0)
+  - SDWebImage/Core (5.20.0)
 
 DEPENDENCIES:
-  - HXPhotoPicker/Kingfisher (from `./`)
+  - HXPhotoPicker/SDWebImage (from `./`)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
-    - Kingfisher
+    - SDWebImage
 
 EXTERNAL SOURCES:
   HXPhotoPicker:
@@ -39,8 +41,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   HXPhotoPicker: ee96662b3390c6e1138f75a75b21d0c33ea23839
-  Kingfisher: 016c8b653a35add51dd34a3aba36b580041acc74
+  SDWebImage: 73c6079366fea25fa4bb9640d5fb58f0893facd8
 
-PODFILE CHECKSUM: d40dd0de62ecc2abd9529fdd266f15c9786e7057
+PODFILE CHECKSUM: 3571597caa51970ba5e295377b7ee23be5730169
 
 COCOAPODS: 1.16.2
