@@ -111,15 +111,15 @@ public class PhotoAlbumCollectionViewCell: UICollectionViewCell {
     public override func layoutSubviews() {
         super.layoutSubviews()
         imageView.frame = .init(x: 0, y: 0, width: contentView.width, height: contentView.width)
-        titleLb.x = 0
         titleLb.y = imageView.frame.maxY + 4
-        titleLb.width = contentView.width
         titleLb.height = titleLb.font.lineHeight
-        countLb.x = 0
+        titleLb.width = min(titleLb.textWidth, contentView.width)
+        titleLb.hxPicker_x = 0
         countLb.y = titleLb.frame.maxY + 2
-        countLb.width = contentView.width
         countLb.height = countLb.textHeight
-        selectedBgView.frame = imageView.bounds
+        countLb.width = countLb.textWidth
+        countLb.hxPicker_x = 0
+        selectedBgView.hxPicker_frame = imageView.bounds
     }
     
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

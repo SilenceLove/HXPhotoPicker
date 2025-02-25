@@ -219,6 +219,11 @@ open class PhotoPickerController: UINavigationController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        if PhotoManager.isRTL {
+            navigationBar.semanticContentAttribute = .forceRightToLeft
+        }else {
+            navigationBar.semanticContentAttribute = .forceLeftToRight
+        }
         setupDelegate()
         PhotoManager.shared.indicatorType = config.indicatorType
         PhotoManager.shared.loadNetworkVideoMode = config.previewView.loadNetworkVideoMode

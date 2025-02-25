@@ -470,18 +470,18 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
                 contentView.y = height - contentView.height
             }
             if leftMargin > 0 {
-                previewBtn.x = leftMargin
+                previewBtn.hxPicker_x = leftMargin
             }else {
-                previewBtn.x = 12
+                previewBtn.hxPicker_x = 12
             }
             updateFinishButtonFrame()
             updateOriginalViewFrame()
         }else if type == .preview {
             #if HXPICKER_ENABLE_EDITOR
             if UIDevice.leftMargin > 0 {
-                editBtn.x = UIDevice.leftMargin
+                editBtn.hxPicker_x = UIDevice.leftMargin
             }else {
-                editBtn.x = 12
+                editBtn.hxPicker_x = 12
             }
             #endif
             if isShowPreviewList {
@@ -798,6 +798,9 @@ extension PhotoToolBarView {
             originalView.frame = CGRect(x: 0, y: 0, width: originalTitleLb.frame.maxX, height: 50)
         }
         originalView.centerX = width / 2
+        if PhotoManager.isRTL {
+            return
+        }
         let originalMinX: CGFloat
         if type == .picker {
             originalMinX = previewBtn.frame.maxX + 2
@@ -826,18 +829,20 @@ extension PhotoToolBarView {
             ),
             height: 50
         )
-        let leftMargin: CGFloat
-        if type == .picker {
-            leftMargin = previewBtn.frame.maxX
-        }else {
-            #if HXPICKER_ENABLE_EDITOR
-            leftMargin = editBtn.frame.maxX
-            #else
-            leftMargin = 10
-            #endif
-        }
-        if originalTitleLb.width > width - leftMargin - finishBtn.width - 12 {
-            originalTitleLb.width = width - leftMargin - finishBtn.width - 12
+        if !PhotoManager.isRTL {
+            let leftMargin: CGFloat
+            if type == .picker {
+                leftMargin = previewBtn.frame.maxX
+            }else {
+                #if HXPICKER_ENABLE_EDITOR
+                leftMargin = editBtn.frame.maxX
+                #else
+                leftMargin = 10
+                #endif
+            }
+            if originalTitleLb.width > width - leftMargin - finishBtn.width - 12 {
+                originalTitleLb.width = width - leftMargin - finishBtn.width - 12
+            }
         }
         originalBox.centerY = originalTitleLb.height * 0.5
         originalLoadingView.centerY = originalView.height * 0.5
@@ -890,9 +895,9 @@ extension PhotoToolBarView {
         }
         finishBtn.size = .init(width: finishWidth, height: 33)
         if UIDevice.rightMargin > 0 {
-            finishBtn.x = width - UIDevice.rightMargin - finishWidth
+            finishBtn.hxPicker_x = width - UIDevice.rightMargin - finishWidth
         }else {
-            finishBtn.x = width - finishWidth - 12
+            finishBtn.hxPicker_x = width - finishWidth - 12
         }
         finishBtn.centerY = 25
     }

@@ -49,6 +49,11 @@ public class PhotoMyAlbumViewController: UIViewController, UICollectionViewDataS
             automaticallyAdjustsScrollViewInsets = false
         }
         view.addSubview(collectionView)
+        if PhotoManager.isRTL {
+            collectionView.semanticContentAttribute = .forceRightToLeft
+        }else {
+            collectionView.semanticContentAttribute = .forceLeftToRight
+        }
         updateColors()
     }
     

@@ -37,6 +37,18 @@ public final class PhotoManager: NSObject {
     }
     public static var HUDView: PhotoHUDProtocol.Type = ProgressHUD.self
     
+    /// 是否阿语RTL布局
+    public static var isRTL: Bool {
+        guard let languageType = PhotoManager.shared.languageType else {
+            return false
+        }
+        if languageType == .system {
+            return PhotoManager.shared.languageStr == "ar"
+        } else {
+            return languageType == .arabic
+        }
+    }
+    
     public var isDebugLogsEnabled: Bool = false
     
     /// 当前语言文件，每次创建PhotoPickerController判断是否需要重新创建

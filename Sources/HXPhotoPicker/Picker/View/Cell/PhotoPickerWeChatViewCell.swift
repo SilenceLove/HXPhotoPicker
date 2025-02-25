@@ -14,7 +14,7 @@ open class PhotoPickerWeChatViewCell: PhotoPickerSelectableViewCell {
     open override func initView() {
         super.initView()
         titleLb = UILabel()
-        titleLb.textAlignment = .center
+        titleLb.hxpicker_alignment = .center
         titleLb.textColor = .white
         titleLb.font = .semiboldPingFang(ofSize: 15)
         titleLb.isHidden = true
@@ -32,6 +32,6 @@ open class PhotoPickerWeChatViewCell: PhotoPickerSelectableViewCell {
     
     open override func layoutView() {
         super.layoutView()
-        titleLb.x = 10
+        titleLb.hxPicker_x = 10
     }
 }

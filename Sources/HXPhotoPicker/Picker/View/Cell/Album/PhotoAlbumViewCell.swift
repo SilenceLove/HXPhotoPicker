@@ -59,24 +59,25 @@ public class PhotoAlbumViewCell: UITableViewCell {
         if let imageSize = arrowView.image?.size {
             arrowView.size = imageSize
             arrowView.centerY = contentView.height / 2
-            arrowView.x = contentView.width - 15 - arrowView.width
+            arrowView.hxPicker_x = contentView.width - 15 - arrowView.width
+            arrowView.hxPicker_flip()
         }
         
         countLb.y = 0
         countLb.height = contentView.height
         countLb.width = countLb.textWidth
-        countLb.x = arrowView.x - 10 - countLb.width
+        countLb.hxPicker_x = arrowView.hxPicker_x - 10 - countLb.width
         
         if let image = iconView.image {
-            iconView.x = 15
             iconView.size = .init(width: image.width * 1.3, height: image.height * 1.3)
             iconView.centerY = height / 2
-            titleLb.frame = .init(x: 60, y: 0, width: countLb.x - 70, height: height)
+            iconView.hxPicker_x = 15
+            titleLb.hxPicker_frame = .init(x: 60, y: 0, width: countLb.hxPicker_x - 70, height: height)
         }else {
-            titleLb.frame = .init(x: 15, y: 0, width: countLb.x - 20, height: height)
+            titleLb.hxPicker_frame = .init(x: 15, y: 0, width: countLb.hxPicker_x - 20, height: height)
         }
         
-        lineView.frame = .init(x: titleLb.x, y: contentView.height - 0.5, width: contentView.width - 15, height: 0.5)
+        lineView.hxPicker_frame = .init(x: titleLb.hxPicker_x, y: contentView.height - 0.5, width: contentView.width - 15, height: 0.5)
     }
     
     func updateColors() {
