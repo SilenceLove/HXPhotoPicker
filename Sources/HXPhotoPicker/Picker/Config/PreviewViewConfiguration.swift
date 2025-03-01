@@ -12,7 +12,7 @@ import UIKit
 public struct PreviewViewConfiguration {
     
     /// 自定义视频Cell
-    public var customVideoCellClass: PreviewVideoViewCell.Type?
+    public var customVideoCellClass: PreviewVideoViewCell.Type? = PreviewVideoControlViewCell.self
     
     /// 网络视频加载方式
     public var loadNetworkVideoMode: PhotoAsset.LoadNetworkVideoMode = .download {

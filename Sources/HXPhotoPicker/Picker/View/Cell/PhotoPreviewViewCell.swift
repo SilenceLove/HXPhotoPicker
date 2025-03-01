@@ -33,6 +33,7 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
     public var imageView: UIImageView { scrollContentView.imageView }
     public func showScrollContainerSubview() { scrollContentView.showOtherSubview() }
     public func hideScrollContainerSubview() { scrollContentView.hiddenOtherSubview() }
+    public var previewType: PhotoPreviewType = .none
     
     weak var delegate: PhotoPreviewViewCellDelegate?
     
