@@ -9,12 +9,13 @@
 import UIKit
 import AVFoundation
 
+/// GIF 参考 https://github.com/SilenceLove/HXPhotoPicker/tree/master/Sources/ImageView/GIFImageView.swift
 /// 使用 `Kingfisher`
 /// 参考 https://github.com/SilenceLove/HXPhotoPicker/tree/master/Sources/ImageView/KFImageView.swift
-/// PickerConfiguration.imageViewClass  = KFImageView.self
+/// PickerConfiguration.imageViewProtocol  = KFImageView.self
 /// 使用 `SDWebImage`
 /// 参考 https://github.com/SilenceLove/HXPhotoPicker/tree/master/Sources/ImageView/SDImageView.swift
-/// PickerConfiguration.imageViewClass  = SDImageView.self
+/// PickerConfiguration.imageViewProtocol  = SDImageView.self
 public protocol HXImageViewProtocol: UIImageView {
     func setImageData(_ imageData: Data?)
     @discardableResult
@@ -142,12 +143,10 @@ public struct ImageDownloadResult {
 
 public class HXImageView: UIImageView, HXImageViewProtocol {
     
+    /// GIF 参考 https://github.com/SilenceLove/HXPhotoPicker/tree/master/Sources/ImageView/GIFImageView.swift
     public func setImageData(_ imageData: Data?) {
         guard let imageData else { return }
         image = .init(data: imageData)
-        if imageData.isGif {
-            HXLog("默认不支持显示gif图片，如果需要显示请实现 ‘HXImageViewProtocol’ 协议中的 `setImageData` 方法")
-        }
     }
     
     public func _startAnimating() {

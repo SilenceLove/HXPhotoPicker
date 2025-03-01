@@ -148,21 +148,7 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         viewDidAppear = true
-        DispatchQueue.main.async {
-            if let cell = self.getCell(for: self.currentPreviewIndex) {
-                cell.requestPreviewAsset()
-            }else {
-                self.requestPreviewTimer = Timer.scheduledTimer(
-                    withTimeInterval: 0.2,
-                    repeats: false
-                ) { [weak self] _ in
-                    guard let self = self else { return }
-                    let cell = self.getCell(for: self.currentPreviewIndex)
-                    cell?.requestPreviewAsset()
-                }
-            }
-        }
-        
+        requestPreviewAsset()
         let isFullscreen = pickerController.modalPresentationStyle == .fullScreen || (splitViewController?.modalPresentationStyle == .fullScreen)
         let isMacApp: Bool
         if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
@@ -179,6 +165,23 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
         }
         if isShowToolbar {
             photoToolbar.viewDidAppear(self)
+        }
+    }
+    
+    func requestPreviewAsset() {
+        DispatchQueue.main.async {
+            if let cell = self.getCell(for: self.currentPreviewIndex) {
+                cell.requestPreviewAsset()
+            }else {
+                self.requestPreviewTimer = Timer.scheduledTimer(
+                    withTimeInterval: 0.2,
+                    repeats: false
+                ) { [weak self] _ in
+                    guard let self = self else { return }
+                    let cell = self.getCell(for: self.currentPreviewIndex)
+                    cell?.requestPreviewAsset()
+                }
+            }
         }
     }
     

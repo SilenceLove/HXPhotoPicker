@@ -116,12 +116,10 @@ public class SDImageView: SDAnimatedImageView, HXImageViewProtocol {
             SDImageCache.shared.queryImage(forKey: key, options: [], context: nil) { (image, data, _) in
                 if let data = data  {
                     completionHandler?(.success(.init(imageData: data)))
-                } else if let image = image {
-                    if let images = image.images, images.count > 1, let data = image.sd_imageData() {
-                        completionHandler?(.success(.init(imageData: data)))
-                    }else {
-                        completionHandler?(.success(.init(image: image)))
-                    }
+                } else if let image = image as? SDAnimatedImage, let data = image.animatedImageData {
+                    completionHandler?(.success(.init(imageData: data)))
+                } else if let image {
+                    completionHandler?(.success(.init(image: image)))
                 } else {
                     completionHandler?(.failure(.error(nil)))
                 }
@@ -146,7 +144,7 @@ public class SDImageView: SDAnimatedImageView, HXImageViewProtocol {
                 DispatchQueue.global().async {
                     let format = NSData.sd_imageFormat(forImageData: data)
                     if format == SDImageFormat.GIF, let gifImage = SDAnimatedImage(data: data) {
-                        SDImageCache.shared.store(gifImage, imageData: data, forKey: key, cacheType: .all) {
+                        SDImageCache.shared.store(gifImage, imageData: data, forKey: key, options: [], context: nil, cacheType: .all) {
                             DispatchQueue.main.async {
                                 completionHandler?(.success(.init(imageData: data)))
                             }
@@ -154,7 +152,7 @@ public class SDImageView: SDAnimatedImageView, HXImageViewProtocol {
                         return
                     }
                     if let image = image {
-                        SDImageCache.shared.store(image, imageData: data, forKey: key, cacheType: .all) {
+                        SDImageCache.shared.store(image, imageData: data, forKey: key, options: [], context: nil, cacheType: .all) {
                             DispatchQueue.main.async {
                                 completionHandler?(.success(.init(image: image)))
                             }

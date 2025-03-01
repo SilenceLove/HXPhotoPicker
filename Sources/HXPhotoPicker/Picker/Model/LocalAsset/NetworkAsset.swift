@@ -62,6 +62,7 @@ public struct NetworkImageAsset: Codable {
     /// size of the picture
     /// 图片尺寸
     public var imageSize: CGSize
+    public var originalImageSize: CGSize
     
     /// Image file size
     /// 图片文件大小
@@ -79,6 +80,7 @@ public struct NetworkImageAsset: Codable {
         thumbnailSize: CGSize = .zero,
         placeholder: String? = nil,
         imageSize: CGSize = .zero,
+        originalImageSize: CGSize = .zero,
         fileSize: Int = 0
     ) {
         self.thumbnailURL = thumbnailURL
@@ -103,6 +105,7 @@ public struct NetworkImageAsset: Codable {
         self.thumbnailSize = thumbnailSize
         self.placeholder = placeholder
         self.imageSize = imageSize
+        self.originalImageSize = originalImageSize
         self.fileSize = fileSize
     }
 }

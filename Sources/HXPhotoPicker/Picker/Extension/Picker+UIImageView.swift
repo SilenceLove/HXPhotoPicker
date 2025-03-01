@@ -37,6 +37,7 @@ extension HXImageViewProtocol {
         if let imageAsset = asset.networkImageAsset {
             let originalCacheKey = imageAsset.originalCacheKey
             if isThumbnail {
+                let tagerSize: CGSize
                 if imageAsset.thumbnailLoadMode == .varied,
                    let originalCacheKey,
                    PhotoManager.ImageView.isCached(forKey: originalCacheKey) {
@@ -49,16 +50,18 @@ extension HXImageViewProtocol {
                     }
                     url = imageAsset.originalURL
                     cacheKey = imageAsset.originalCacheKey
+                    tagerSize = .init(width: min(200, imageAsset.originalImageSize.width), height: min(200, imageAsset.originalImageSize.height))
                 }else {
                     url = imageAsset.thumbnailURL
                     cacheKey = imageAsset.thumbailCacheKey
                     placeholderImage = UIImage.image(for: imageAsset.placeholder)
+                    tagerSize = imageAsset.thumbnailSize
                 }
                 let processorSize: CGSize
-                if imageAsset.thumbnailSize.equalTo(.zero) {
+                if tagerSize.equalTo(.zero) {
                     if !asset.imageSize.equalTo(.zero) {
-                        let pWidth = max(size.width, 200)
-                        let pHeight = max(size.height, 200)
+                        let pWidth = max(size.width * 2, 200)
+                        let pHeight = max(size.height * 2, 200)
                         if pWidth > pHeight {
                             processorSize = .init(width: pWidth, height: asset.imageSize.height / asset.imageSize.width * pHeight)
                         }else {
@@ -68,7 +71,7 @@ extension HXImageViewProtocol {
                         processorSize = size
                     }
                 }else {
-                    processorSize = imageAsset.thumbnailSize
+                    processorSize = tagerSize
                 }
                 options += [
                     .onlyLoadFirstFrame,
@@ -165,11 +168,21 @@ extension HXImageViewProtocol {
             case .success(let image):
                 switch asset.mediaSubType {
                 case .networkImage:
+                    guard let networkAsset = asset.networkImageAsset else { return }
                     let cacheKey = PhotoManager.ImageView.getCacheKey(forURL: url)
-                    if let networkAsset = asset.networkImageAsset, networkAsset.imageSize.equalTo(.zero) {
-                        PhotoManager.ImageView.getCacheImage(forKey: cacheKey) { [weak asset] image in
-                            guard let asset, let image else { return }
-                            asset.networkImageAsset?.imageSize = image.size
+                    if urlType == .original {
+                        if networkAsset.originalImageSize.equalTo(.zero) {
+                            PhotoManager.ImageView.getCacheImage(forKey: cacheKey) { [weak asset] image in
+                                guard let asset, let image else { return }
+                                asset.networkImageAsset?.originalImageSize = image.size
+                            }
+                        }
+                    }else {
+                        if networkAsset.imageSize.equalTo(.zero) {
+                            PhotoManager.ImageView.getCacheImage(forKey: cacheKey) { [weak asset] image in
+                                guard let asset, let image else { return }
+                                asset.networkImageAsset?.imageSize = image.size
+                            }
                         }
                     }
                 case .networkVideo:

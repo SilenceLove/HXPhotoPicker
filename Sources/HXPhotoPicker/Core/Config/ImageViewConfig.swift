@@ -10,16 +10,16 @@
 import Foundation
 
 public protocol ImageViewConfig {
-    var imageViewClass: HXImageViewProtocol.Type { get set }
-    static var imageViewClass: HXImageViewProtocol.Type { get set }
+    var imageViewProtocol: HXImageViewProtocol.Type { get set }
+    static var imageViewProtocol: HXImageViewProtocol.Type { get set }
 }
 
 public extension ImageViewConfig {
-    var imageViewClass: HXImageViewProtocol.Type {
+    var imageViewProtocol: HXImageViewProtocol.Type {
         get { PhotoManager.ImageView }
         set { PhotoManager.ImageView = newValue }
     }
-    static var imageViewClass: HXImageViewProtocol.Type {
+    static var imageViewProtocol: HXImageViewProtocol.Type {
         get { PhotoManager.ImageView }
         set { PhotoManager.ImageView = newValue }
     }

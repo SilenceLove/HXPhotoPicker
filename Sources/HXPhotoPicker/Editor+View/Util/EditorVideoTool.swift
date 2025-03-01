@@ -420,9 +420,9 @@ fileprivate extension EditorVideoTool {
                         beginTime: beginTime,
                         videoDuration: videoDuration
                     )
-                }else if let imageData = info.imageData, let image = UIImage(data: imageData) {
+                }else if let imageData = info.imageData {
                     imageLayer = animationLayer(
-                        image: image,
+                        image: nil,
                         imageData: imageData ,
                         beginTime: beginTime,
                         videoDuration: videoDuration
@@ -784,6 +784,7 @@ fileprivate extension EditorVideoTool {
         if frames.isEmpty {
             return animationLayer
         }
+        animationLayer.contents = frames.first
         let delayTimes = gifResult.1
          
         var currentTime: Double = 0
