@@ -1,6 +1,6 @@
 {
   "name": "HXPhotoPicker",
-  "version": "4.3.0",
+  "version": "5.0.0",
   "summary": "照片/视频选择器 - 支持LivePhoto、GIF图片选择、自定义编辑照片/视频、3DTouch预览、浏览网络图片/网络视频 功能 - Imitation weibo photo/image picker - support for LivePhoto, GIF image selection, 3DTouch preview, browse the web image function",
   "homepage": "https://github.com/SilenceLove/HXPhotoPicker",
   "license": {
@@ -18,7 +18,7 @@
   },
   "source": {
     "git": "https://github.com/SilenceLove/HXPhotoPicker.git",
-    "tag": "4.3.0"
+    "tag": "5.0.0"
   },
   "frameworks": [
     "UIKit",
@@ -108,6 +108,13 @@
       }
     },
     {
+      "name": "GIFImageView",
+      "source_files": "Sources/ImageView/GIFImageView.swift",
+      "dependencies": {
+        "Gifu": []
+      }
+    },
+    {
       "name": "KFImageView",
       "source_files": "Sources/ImageView/KFImageView.swift",
       "dependencies": {
@@ -119,6 +126,13 @@
       "source_files": "Sources/ImageView/SDImageView.swift",
       "dependencies": {
         "SDWebImage": []
+      }
+    },
+    {
+      "name": "Gifu",
+      "dependencies": {
+        "HXPhotoPicker/Default": [],
+        "HXPhotoPicker/GIFImageView": []
       }
     },
     {
