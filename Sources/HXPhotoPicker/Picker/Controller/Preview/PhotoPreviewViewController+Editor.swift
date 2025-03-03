@@ -83,12 +83,6 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
                 }
             }
         }
-        #if canImport(Gifu)
-        /// 兼容使用Gifu编辑完设置的image未生效的问题
-        if photoAsset.isGifAsset {
-            requestPreviewAsset()
-        }
-        #endif
         delegate?.previewViewController(self, editAssetFinished: photoAsset)
     }
     

@@ -38,7 +38,7 @@ public final class PhotoManager: NSObject {
     public static var ImageView: HXImageViewProtocol.Type = KFImageView.self
     #elseif canImport(SDWebImage)
     public static var ImageView: HXImageViewProtocol.Type = SDImageView.self
-    #elseif canImport(Gifu)
+    #elseif canImport(SwiftyGif)
     public static var ImageView: HXImageViewProtocol.Type = GIFImageView.self
     #else
     public static var ImageView: HXImageViewProtocol.Type = HXImageView.self

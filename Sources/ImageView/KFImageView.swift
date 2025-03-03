@@ -6,7 +6,7 @@
 //  Copyright © 2025 Silence. All rights reserved.
 //
 
-#if canImport(Kingfisher)
+#if canImport(Kingfisher) && HXPICKER_ENABLE_CORE
 import UIKit
 import Kingfisher
 

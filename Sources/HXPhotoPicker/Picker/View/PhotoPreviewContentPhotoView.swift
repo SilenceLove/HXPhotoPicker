@@ -79,6 +79,7 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     
     func requestThumbnail() {
         requestNetworkCompletion = true
+        imageView.setImageData(nil)
         requestID = photoAsset.requestThumImage { [weak self] in
             guard let self = self else { return }
             if let info = $2, info.isCancel { return }
