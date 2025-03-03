@@ -1,5 +1,13 @@
 # Release Notes
 
+## 5.0.0
+
+- Minimum system version upgraded to `iOS 10`
+- Network image loading supports customization[HXImageViewProtocol](https://github.com/SilenceLove/HXPhotoPicker/tree/master/Sources/Core/Config/HXImageViewProtocol.swift)
+  - [Kingfisher](https://github.com/SilenceLove/HXPhotoPicker/tree/master/Sources/ImageView/KFImageView.swift)
+  - [SDWebImage](https://github.com/SilenceLove/HXPhotoPicker/tree/master/Sources/ImageView/SDImageView.swift)
+  
+
 ## 4.2.5
 
 ### Resolved
