@@ -33,6 +33,9 @@
       "source_files": "Sources/HXPhotoPicker/Core/**/*.{swift}",
       "dependencies": {
         "HXPhotoPicker/Resources": []
+      },
+      "pod_target_xcconfig": {
+        "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "HXPICKER_ENABLE_CORE"
       }
     },
     {
@@ -111,7 +114,7 @@
       "name": "GIFImageView",
       "source_files": "Sources/ImageView/GIFImageView.swift",
       "dependencies": {
-        "Gifu": []
+        "SwiftyGif": []
       }
     },
     {
@@ -129,7 +132,7 @@
       }
     },
     {
-      "name": "Gifu",
+      "name": "SwiftyGif",
       "dependencies": {
         "HXPhotoPicker/Default": [],
         "HXPhotoPicker/GIFImageView": []
