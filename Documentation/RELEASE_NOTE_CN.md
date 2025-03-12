@@ -3,7 +3,7 @@
 ## 5.0.0
 
 - 最低系统版本修改为`iOS 10`
-- 默认不支持GIF图片、网络图片加载支持自定义[HXImageViewProtocol](https://github.com/SilenceLove/HXPhotoPicker/tree/master/Sources/Core/Config/HXImageViewProtocol.swift)
+- 默认不支持GIF图片、网络图片加载支持自定义[HXImageViewProtocol](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Sources/HXPhotoPicker/Core/Config/HXImageViewProtocol.swift)
   - [GIF](https://github.com/SilenceLove/HXPhotoPicker/tree/master/Sources/ImageView/GIFImageView.swift)
   - [Kingfisher](https://github.com/SilenceLove/HXPhotoPicker/tree/master/Sources/ImageView/KFImageView.swift)
   - [SDWebImage](https://github.com/SilenceLove/HXPhotoPicker/tree/master/Sources/ImageView/SDImageView.swift)

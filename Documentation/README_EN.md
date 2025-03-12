@@ -104,7 +104,7 @@ pod 'HXPhotoPicker/SwiftyGif'
 /// Use `SDWebImage` to display network images
 pod 'HXPhotoPicker/SDWebImage'
 
-/// Displaying network images using `Kingfisher`
+/// Displaying network images using `Kingfisher v6.0.0`
 pod 'HXPhotoPicker/Kingfisher'
 
 /// Only Picker

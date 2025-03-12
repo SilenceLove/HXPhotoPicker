@@ -122,7 +122,7 @@ pod 'HXPhotoPicker/SwiftyGif'
 /// 使用`SDWebImage`加载GIF/网络图片
 pod 'HXPhotoPicker/SDWebImage'
 
-/// 使用`Kingfisher`加载GIF/网络图片
+/// 使用`Kingfisher v6.0.0`加载GIF/网络图片
 pod 'HXPhotoPicker/Kingfisher'
 
 /// 相机不包含定位功能
