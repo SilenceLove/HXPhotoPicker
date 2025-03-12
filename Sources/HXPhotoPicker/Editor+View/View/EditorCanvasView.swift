@@ -59,6 +59,8 @@ class EditorCanvasView: UIView {
         addSubview(canvasView)
         if let window = UIApplication._keyWindow,
            let toolPicker = PKToolPicker.shared(for: window) {
+            toolPicker.overrideUserInterfaceStyle = .light
+            toolPicker.colorUserInterfaceStyle = .light
             canvasView.tool = toolPicker.selectedTool
             if let tool = toolPicker.selectedTool as? PKInkingTool {
                 toolWidth = tool.width
