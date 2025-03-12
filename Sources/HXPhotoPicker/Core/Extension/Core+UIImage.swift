@@ -320,6 +320,9 @@ extension UIImage {
         let format = UIGraphicsImageRendererFormat()
         format.opaque = opaque
         format.scale = scale
+        if #available(iOS 12.0, *) {
+            format.preferredRange = .standard
+        }
         let renderer = UIGraphicsImageRenderer(size: size, format: format)
         if isJPEG {
             let data = renderer.jpegData(withCompressionQuality: compressionQuality) { context in
@@ -361,6 +364,9 @@ extension UIImage {
         let format = UIGraphicsImageRendererFormat()
         format.opaque = false
         format.scale = _scale
+        if #available(iOS 12.0, *) {
+            format.preferredRange = .standard
+        }
         let renderer = UIGraphicsImageRenderer(size: images.first!.size, format: format)
         let mergeImage = renderer.image { context in
             for image in images {

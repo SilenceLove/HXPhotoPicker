@@ -152,12 +152,14 @@ extension EditorAdjusterView {
             height: rect.height * scrollView.zoomScale
         )
         
-        let centerRatio = CGPoint(x: rect.midX / viewSize.width, y: rect.midY / viewSize.height)
+        let centerRatio = CGPoint(
+            x: CGFloat(Int(rect.midX / viewSize.width * 10000) / 10000),
+            y: CGFloat(Int(rect.midY / viewSize.height * 10000) / 10000))
         
         let cropRect = getCropRect()
         let sizeRatio = CGPoint(
-            x: cropRect.width / viewSize.width,
-            y: cropRect.height / viewSize.height
+            x: CGFloat(Int(cropRect.width / viewSize.width * 10000) / 10000),
+            y: CGFloat(Int(cropRect.height / viewSize.height * 10000) / 10000)
         )
         
         return (centerRatio: centerRatio, sizeRatio: sizeRatio)
@@ -188,8 +190,15 @@ extension EditorAdjusterView {
         }
         let overlayImage = getOverlayImage(overlayImageSize, cropFactor: cropFactor)
         var exportScale = exportScale
-        if imageMaxSize > exportMaxSize {
-            exportScale = exportMaxSize / imageMaxSize
+        if !isJPEGImage, !isHEICImage {
+            let exportMaxSize = exportMaxSize * 0.7
+            if imageMaxSize > exportMaxSize {
+                exportScale = exportMaxSize / imageMaxSize
+            }
+        }else {
+            if imageMaxSize > exportMaxSize {
+                exportScale = exportMaxSize / imageMaxSize
+            }
         }
         if exportScale != inputImage.scale && overlayImage != nil {
             let scale = exportScale / inputImage.scale
