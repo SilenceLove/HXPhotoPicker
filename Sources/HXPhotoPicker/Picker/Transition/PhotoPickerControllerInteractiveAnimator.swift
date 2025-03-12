@@ -31,9 +31,14 @@ public class PhotoPickerControllerInteractiveAnimator: PhotoPickerControllerInte
         pickerController.view.addGestureRecognizer(panGestureRecognizer)
     }
     public override func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
+        guard let pickerController = transitionContext.viewController(forKey: .from) as? PhotoPickerController,
+              let toVC = transitionContext.viewController(forKey: .to) else {
+            cancel()
+            transitionContext.completeTransition(false)
+            return
+        }
         self.transitionContext = transitionContext
-        let pickerController = transitionContext.viewController(forKey: .from) as! PhotoPickerController
-        let toVC = transitionContext.viewController(forKey: .to)!
+        
         pickerControllerBackgroundColor = pickerController.view.backgroundColor
         let containerView = transitionContext.containerView
         let isChartlet: Bool

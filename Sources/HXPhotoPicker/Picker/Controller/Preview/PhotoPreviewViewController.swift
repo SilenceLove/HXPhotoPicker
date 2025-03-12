@@ -615,7 +615,6 @@ extension PhotoPreviewViewController {
     
     @objc func didCancelItemClick() {
         pickerController.cancelCallback()
-        dismiss(animated: true, completion: nil)
     }
     
     func removeSelectedAssetWhenRemovingAssets(_ assets: [PhotoAsset]) {
