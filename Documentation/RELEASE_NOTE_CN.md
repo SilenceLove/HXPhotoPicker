@@ -1,5 +1,11 @@
 # 更新日志
   
+## 5.0.0.2
+
+### 修复
+
+- [[782]](https://github.com/SilenceLove/HXPhotoPicker/issues/782)
+  
 ## 5.0.0.1
 
 ### 修复

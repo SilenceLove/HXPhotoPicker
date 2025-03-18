@@ -1,5 +1,11 @@
 # Release Notes
   
+## 5.0.0.2
+
+### Resolved
+
+- [[782]](https://github.com/SilenceLove/HXPhotoPicker/issues/782)
+  
 ## 5.0.0.1
 
 ### Resolved
