@@ -153,13 +153,13 @@ extension EditorAdjusterView {
         )
         
         let centerRatio = CGPoint(
-            x: CGFloat(Int(rect.midX / viewSize.width * 10000) / 10000),
-            y: CGFloat(Int(rect.midY / viewSize.height * 10000) / 10000))
+            x: CGFloat(floor(rect.midX / viewSize.width * 10000) / 10000),
+            y: CGFloat(floor(rect.midY / viewSize.height * 10000) / 10000))
         
         let cropRect = getCropRect()
         let sizeRatio = CGPoint(
-            x: CGFloat(Int(cropRect.width / viewSize.width * 10000) / 10000),
-            y: CGFloat(Int(cropRect.height / viewSize.height * 10000) / 10000)
+            x: CGFloat(floor(cropRect.width / viewSize.width * 10000) / 10000),
+            y: CGFloat(floor(cropRect.height / viewSize.height * 10000) / 10000)
         )
         
         return (centerRatio: centerRatio, sizeRatio: sizeRatio)
