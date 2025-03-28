@@ -1,48 +1,37 @@
 PODS:
-  - HXPhotoPicker/Camera (5.0.0):
-    - HXPhotoPicker/Camera/Lite (= 5.0.0)
-    - HXPhotoPicker/Camera/Location (= 5.0.0)
-  - HXPhotoPicker/Camera/Lite (5.0.0):
+  - HXPhotoPicker (5.0.0.3):
+    - HXPhotoPicker/Default (= 5.0.0.3)
+  - HXPhotoPicker/Camera (5.0.0.3):
+    - HXPhotoPicker/Camera/Lite (= 5.0.0.3)
+    - HXPhotoPicker/Camera/Location (= 5.0.0.3)
+  - HXPhotoPicker/Camera/Lite (5.0.0.3):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Camera/Location (5.0.0):
+  - HXPhotoPicker/Camera/Location (5.0.0.3):
     - HXPhotoPicker/Camera/Lite
-  - HXPhotoPicker/Core (5.0.0):
+  - HXPhotoPicker/Core (5.0.0.3):
     - HXPhotoPicker/Resources
-  - HXPhotoPicker/Default (5.0.0):
+  - HXPhotoPicker/Default (5.0.0.3):
     - HXPhotoPicker/Camera
     - HXPhotoPicker/Editor
     - HXPhotoPicker/Picker
-  - HXPhotoPicker/Editor (5.0.0):
+  - HXPhotoPicker/Editor (5.0.0.3):
     - HXPhotoPicker/EditorView
-  - HXPhotoPicker/EditorView (5.0.0):
+  - HXPhotoPicker/EditorView (5.0.0.3):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Picker (5.0.0):
+  - HXPhotoPicker/Picker (5.0.0.3):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Resources (5.0.0)
-  - HXPhotoPicker/SDImageView (5.0.0):
-    - SDWebImage
-  - HXPhotoPicker/SDWebImage (5.0.0):
-    - HXPhotoPicker/Default
-    - HXPhotoPicker/SDImageView
-  - SDWebImage (5.20.0):
-    - SDWebImage/Core (= 5.20.0)
-  - SDWebImage/Core (5.20.0)
+  - HXPhotoPicker/Resources (5.0.0.3)
 
 DEPENDENCIES:
-  - HXPhotoPicker/SDWebImage (from `./`)
-
-SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
-    - SDWebImage
+  - HXPhotoPicker (from `./`)
 
 EXTERNAL SOURCES:
   HXPhotoPicker:
     :path: "./"
 
 SPEC CHECKSUMS:
-  HXPhotoPicker: 05560841883788d65b25ad2de79b175c07698293
-  SDWebImage: 73c6079366fea25fa4bb9640d5fb58f0893facd8
+  HXPhotoPicker: 79cf159fa0a0857ce683c49fe4582b6e5bf9f79f
 
-PODFILE CHECKSUM: 297bebc926894ffdedeb001063f4a5f65a70e6a2
+PODFILE CHECKSUM: 47b66091d0be4ddf13eb7bc5c104ff2500227641
 
 COCOAPODS: 1.16.2

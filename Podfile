@@ -8,9 +8,9 @@ warn_for_unused_master_specs_repo: false
 use_frameworks!
 
 target "HXPhotoPickerExample" do
-#  pod 'HXPhotoPicker', :path => './'
+  pod 'HXPhotoPicker', :path => './'
 #  pod 'HXPhotoPicker/Kingfisher', :path => './'
-  pod 'HXPhotoPicker/SDWebImage', :path => './'
+#  pod 'HXPhotoPicker/SDWebImage', :path => './'
   
 #  pod 'SwiftLint' Run Script "${PODS_ROOT}/SwiftLint/swiftlint"
 #  pod 'GDPerformanceView-Swift'
@@ -18,6 +18,6 @@ target "HXPhotoPickerExample" do
 end
 
 target "SwiftUIExample" do
-  pod 'HXPhotoPicker/SDWebImage', :path => './'
+#  pod 'HXPhotoPicker', :path => './'
 end
 
