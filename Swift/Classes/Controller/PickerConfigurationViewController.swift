@@ -972,6 +972,10 @@ extension LanguageType {
             return "法语"
         case .arabic:
             return "阿拉伯"
+        case .spanish:
+            return "西班牙"
+        case .portuguese:
+            return "葡萄牙"
         case .custom:
             return "自定义"
         }
@@ -1120,6 +1124,10 @@ extension LanguageType {
             return .french
         case 12:
             return .arabic
+        case 13:
+            return .spanish
+        case 14:
+            return .portuguese
         default:
             return .system
         }
