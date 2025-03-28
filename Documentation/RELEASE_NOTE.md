@@ -1,5 +1,15 @@
 # Release Notes
-  
+
+## 5.0.0.3
+
+### Add
+
+- Spanish, Portuguese languages
+
+### Resolved
+
+- [[784]](https://github.com/SilenceLove/HXPhotoPicker/issues/784)
+
 ## 5.0.0.2
 
 ### Resolved

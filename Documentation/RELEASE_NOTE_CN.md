@@ -1,5 +1,15 @@
 # 更新日志
   
+## 5.0.0.3
+
+### 新增
+
+- 西班牙、葡萄牙语言
+
+### 修复
+
+- [[784]](https://github.com/SilenceLove/HXPhotoPicker/issues/784)
+  
 ## 5.0.0.2
 
 ### 修复
