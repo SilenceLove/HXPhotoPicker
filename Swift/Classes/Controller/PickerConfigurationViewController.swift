@@ -335,7 +335,9 @@ extension PickerConfigurationViewController {
             "russian",
             "german",
             "french",
-            "Arabic"
+            "Arabic",
+            "Spanish",
+            "Portuguese"
         ]
         for title in titles {
             alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { [weak self] (action) in
