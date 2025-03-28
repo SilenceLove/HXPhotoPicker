@@ -34,11 +34,11 @@ public final class PhotoManager: NSObject {
     }
     public static var HUDView: PhotoHUDProtocol.Type = ProgressHUD.self
     
-    #if canImport(Kingfisher)
+    #if canImport(Kingfisher) && HXPICKER_ENABLE_CORE_IMAGEVIEW_KF
     public static var ImageView: HXImageViewProtocol.Type = KFImageView.self
-    #elseif canImport(SDWebImage)
+    #elseif canImport(SDWebImage) && HXPICKER_ENABLE_CORE_IMAGEVIEW_SD
     public static var ImageView: HXImageViewProtocol.Type = SDImageView.self
-    #elseif canImport(SwiftyGif)
+    #elseif canImport(SwiftyGif) && HXPICKER_ENABLE_CORE_IMAGEVIEW_GIF
     public static var ImageView: HXImageViewProtocol.Type = GIFImageView.self
     #else
     public static var ImageView: HXImageViewProtocol.Type = HXImageView.self
