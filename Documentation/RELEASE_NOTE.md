@@ -1,6 +1,6 @@
 # Release Notes
 
-## 5.0.0.3
+## 5.0.1
 
 ### Add
 
@@ -8,18 +8,9 @@
 
 ### Resolved
 
-- [[784]](https://github.com/SilenceLove/HXPhotoPicker/issues/784)
-
-## 5.0.0.2
-
-### Resolved
-
-- [[782]](https://github.com/SilenceLove/HXPhotoPicker/issues/782)
-  
-## 5.0.0.1
-
-### Resolved
-
+- [[787]](https://github.com/SilenceLove/HXPhotoPicker/issues/787) 
+- [[784]](https://github.com/SilenceLove/HXPhotoPicker/issues/784) 
+- [[782]](https://github.com/SilenceLove/HXPhotoPicker/issues/782) 
 - [[777]](https://github.com/SilenceLove/HXPhotoPicker/issues/777)
 - [[776]](https://github.com/SilenceLove/HXPhotoPicker/issues/776)
 - [[775]](https://github.com/SilenceLove/HXPhotoPicker/issues/775)

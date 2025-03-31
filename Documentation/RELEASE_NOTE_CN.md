@@ -1,6 +1,6 @@
 # 更新日志
   
-## 5.0.0.3
+## 5.0.1
 
 ### 新增
 
@@ -8,18 +8,9 @@
 
 ### 修复
 
-- [[784]](https://github.com/SilenceLove/HXPhotoPicker/issues/784)
-  
-## 5.0.0.2
-
-### 修复
-
-- [[782]](https://github.com/SilenceLove/HXPhotoPicker/issues/782)
-  
-## 5.0.0.1
-
-### 修复
-
+- [[787]](https://github.com/SilenceLove/HXPhotoPicker/issues/787) 
+- [[784]](https://github.com/SilenceLove/HXPhotoPicker/issues/784)  
+- [[782]](https://github.com/SilenceLove/HXPhotoPicker/issues/782) 
 - [[777]](https://github.com/SilenceLove/HXPhotoPicker/issues/777)
 - [[776]](https://github.com/SilenceLove/HXPhotoPicker/issues/776)
 - [[775]](https://github.com/SilenceLove/HXPhotoPicker/issues/775)
