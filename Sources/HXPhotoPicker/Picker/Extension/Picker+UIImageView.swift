@@ -169,19 +169,21 @@ extension HXImageViewProtocol {
                 switch asset.mediaSubType {
                 case .networkImage:
                     guard let networkAsset = asset.networkImageAsset else { return }
-                    let cacheKey = PhotoManager.ImageView.getCacheKey(forURL: url)
-                    if urlType == .original {
-                        if networkAsset.originalImageSize.equalTo(.zero) {
-                            PhotoManager.ImageView.getCacheImage(forKey: cacheKey) { [weak asset] image in
-                                guard let asset, let image else { return }
+                    var isGetCache: Bool = false
+                    if urlType == .original, networkAsset.originalImageSize.equalTo(.zero) {
+                        isGetCache = true
+                    }else if networkAsset.imageSize.equalTo(.zero) {
+                        isGetCache = true
+                    }
+                    if isGetCache {
+                        asset.networkImageAsset?.imageSize = image.size
+                        /// 因为`SDWebImage`获取缩略图时返回的图片比例可能不是原始比例，所以需要重新获取原始的图片比例
+                        let cacheKey = PhotoManager.ImageView.getCacheKey(forURL: url)
+                        PhotoManager.ImageView.getCacheImage(forKey: cacheKey) { [weak asset] image in
+                            guard let asset, let image else { return }
+                            asset.networkImageAsset?.imageSize = image.size
+                            if urlType == .original {
                                 asset.networkImageAsset?.originalImageSize = image.size
-                            }
-                        }
-                    }else {
-                        if networkAsset.imageSize.equalTo(.zero) {
-                            PhotoManager.ImageView.getCacheImage(forKey: cacheKey) { [weak asset] image in
-                                guard let asset, let image else { return }
-                                asset.networkImageAsset?.imageSize = image.size
                             }
                         }
                     }
