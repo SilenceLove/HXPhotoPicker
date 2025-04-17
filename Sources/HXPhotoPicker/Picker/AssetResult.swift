@@ -12,6 +12,11 @@ public struct AssetResult {
     public let image: UIImage
     public var url: URL { urlReuslt.url }
     public let urlReuslt: AssetURLResult
+    
+    public init(image: UIImage, urlReuslt: AssetURLResult) {
+        self.image = image
+        self.urlReuslt = urlReuslt
+    }
 }
 
 @available(iOS 13.0, *)

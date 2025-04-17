@@ -18,7 +18,7 @@ public struct AssetURLResult {
     /// selectOptions 需包含 livePhoto
     public let livePhoto: LivePhoto?
     
-    init(
+    public init(
         url: URL,
         urlType: URLType,
         mediaType: PhotoAsset.MediaType,
