@@ -18,6 +18,10 @@ public struct EditorAsset {
     /// 编辑结果
     public var result: EditedResult?
     
+    public var url: URL? { result?.url }
+    
+    public var image: UIImage? { result?.image }
+    
     public init(type: AssetType, result: EditedResult? = nil) {
         self.type = type
         self.result = result
