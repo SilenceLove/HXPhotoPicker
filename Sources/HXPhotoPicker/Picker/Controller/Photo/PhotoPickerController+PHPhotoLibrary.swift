@@ -42,7 +42,16 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
                 if self.fetchData.cameraAssetCollection?.collection == nil {
                     self.fetchData.fetchCameraAssetCollection()
                 }else {
-                    self.reloadData(assetCollection: nil)
+                    let captureTime = PhotoManager.shared.pickerCaptureTime
+                    if captureTime > 0 {
+                        let time = Date().timeIntervalSince1970 - captureTime
+                        if time > 1 {
+                            self.reloadData(assetCollection: nil)
+                        }
+                        PhotoManager.shared.pickerCaptureTime = 0
+                    }else {
+                        self.reloadData(assetCollection: nil)
+                    }
                 }
             }
         }

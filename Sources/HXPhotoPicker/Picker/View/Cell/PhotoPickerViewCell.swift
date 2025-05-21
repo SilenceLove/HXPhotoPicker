@@ -193,6 +193,7 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
                 }
             }else {
                 if $0.downloadStatus != .canceled {
+                    self.disableMaskLayer.isHidden = false
                     self.loaddingView.isHidden = true
                     self.loaddingView.stopAnimating()
                 }

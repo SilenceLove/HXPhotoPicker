@@ -191,6 +191,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
         ) {
             switch $0 {
             case .success(let phAsset):
+                PhotoManager.shared.pickerCaptureTime = Date().timeIntervalSince1970
                 self.addedCameraPhotoAsset(
                     PhotoAsset(asset: phAsset),
                     isCapture: isCapture,
