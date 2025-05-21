@@ -9,6 +9,7 @@ use_frameworks!
 
 target "HXPhotoPickerExample" do
   pod 'HXPhotoPicker', :path => './'
+  
 #  pod 'HXPhotoPicker/Kingfisher', :path => './'
 #  pod 'HXPhotoPicker/SDWebImage', :path => './'
   
