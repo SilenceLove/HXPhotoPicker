@@ -1,5 +1,12 @@
 # 更新日志
-  
+    
+## 5.0.2
+
+### 修复
+
+- [[797]](https://github.com/SilenceLove/HXPhotoPicker/issues/797)
+- [[792]](https://github.com/SilenceLove/HXPhotoPicker/issues/792)
+
 ## 5.0.1
 
 ### 新增
