@@ -68,9 +68,6 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
             return false
         }
         if let changeResult  = changeInstance.changeDetails(for: result) {
-            if changeResult.insertedObjects.isEmpty, changeResult.removedObjects.isEmpty {
-                return false
-            }
             let fetchAssetCollection = fetchData.config.fetchAssetCollection
             fetchAssetCollection.enumerateAllAlbums(options: nil) { collection, _, stop in
                 if collection.localIdentifier == assetCollection.collection?.localIdentifier {
