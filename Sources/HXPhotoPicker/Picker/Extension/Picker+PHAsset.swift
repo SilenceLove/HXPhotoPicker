@@ -71,10 +71,13 @@ extension PHAsset {
         }
     }
     var isCloudPlaceholder: Bool? {
-        if let isICloud = self.value(forKey: "isCloudPlaceholder") as? Bool {
-            return isICloud
+        guard self.responds(to: NSSelectorFromString("isCloudPlaceholder")) else {
+            return nil
         }
-        return nil
+        guard let isICloud = self.value(forKey: "isCloudPlaceholder") as? Bool else {
+            return nil
+        }
+        return isICloud
     }
     var isLocallayAvailable: Bool {
         if let isCloud = isCloudPlaceholder, isCloud {
