@@ -35,7 +35,7 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell {
             playButton.size = imageSize
         }
         playButton.alpha = 0
-        addSubview(playButton)
+        contentView.addSubview(playButton)
     }
 
     @objc

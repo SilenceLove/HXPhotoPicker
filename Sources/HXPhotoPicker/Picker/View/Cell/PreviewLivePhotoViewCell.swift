@@ -98,7 +98,7 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         label.width = label.textWidth
         liveMarkView.width = label.frame.maxX + 5
         liveMarkView.contentView.addSubview(label)
-        addSubview(liveMarkView)
+        contentView.addSubview(liveMarkView)
     }
     
     override func layoutSubviews() {
