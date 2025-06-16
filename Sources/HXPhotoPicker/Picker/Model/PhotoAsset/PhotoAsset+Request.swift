@@ -150,7 +150,7 @@ public extension PhotoAsset {
                     return
                 }
                 let image = {
-                    if self.mediaSubType.isHDRPhoto {
+                    if self.mediaSubType.isHDRPhoto && !self.isDisableHDR {
                         return UIImage.HDRDecoded(dataResult.imageData)
                     } else {
                         return UIImage(data: dataResult.imageData)?.normalizedImage()

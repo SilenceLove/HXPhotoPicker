@@ -176,6 +176,13 @@ public extension HX.ImageResource {
             public var videoPlay: ImageType = .local("hx_picker_cell_video_play")
             /// 实况图片标签图标
             public var livePhoto: ImageType = .local("hx_picker_livePhoto")
+            public var livePhotoDisable: ImageType = .local("hx_picker_livePhoto_disable")
+            /// 实况图片静音图标
+            public var livePhotoMuted: ImageType = .local("hx_picker_livePhoto_muted")
+            public var livePhotoMutedDisable: ImageType = .local("hx_picker_livePhoto_muted_disable")
+            /// HDR标签图标
+            public var HDR: ImageType = .local("hx_picker_HDR")
+            public var HDRDisable: ImageType = .local("hx_picker_HDR_disable")
         }
     }
     #endif

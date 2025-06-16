@@ -297,7 +297,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             previewView.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             previewView.frame = self.beforePreviewFrame
             previewViewController.collectionView.addSubview(previewView)
-            previewView.scrollContentView.showOtherSubview()
+            previewView.showScrollContainerSubview()
             self.backgroundView.removeFromSuperview()
             self.previewView = nil
             self.toView = nil

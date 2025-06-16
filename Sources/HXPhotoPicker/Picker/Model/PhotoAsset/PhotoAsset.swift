@@ -100,6 +100,15 @@ open class PhotoAsset: Equatable {
     /// 选中时的下标
     public var selectIndex: Int = 0
     
+    /// 禁用HDR
+    public var isDisableHDR: Bool = false
+    
+    /// 禁用LivePhoto
+    public var isDisableLivePhoto: Bool = false
+    
+    /// LivePhoto静音
+    public var isLivePhotoMuted: Bool = false
+    
     public var isGifAsset: Bool { mediaSubType.isGif }
     public var isLocalAsset: Bool { mediaSubType.isLocal }
     public var isNetworkAsset: Bool { mediaSubType.isNetwork }

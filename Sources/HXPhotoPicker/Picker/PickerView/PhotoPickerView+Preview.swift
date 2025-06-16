@@ -8,7 +8,7 @@
 import UIKit
 
 extension PhotoPickerView: PhotoPreviewViewControllerDelegate {
-    
+  
     func pushPreviewViewController(
         previewAssets: [PhotoAsset],
         currentPreviewIndex: Int,
@@ -103,6 +103,16 @@ extension PhotoPickerView: PhotoPreviewViewControllerDelegate {
                 manager.removePhotoAsset(photoAsset: photoAsset)
             }
             updateCellSelectedTitle()
+        }
+    }
+    
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        updatePhotoAsset photoAsset: PhotoAsset,
+        at index: Int
+    ) {
+        if let cell = getCell(for: photoAsset) {
+            cell.updatePhotoAsset(photoAsset)
         }
     }
     

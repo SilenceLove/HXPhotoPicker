@@ -14,7 +14,11 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
     
     weak var delegate: PhotoPreviewContentViewDelete?
     
-    var photoAsset: PhotoAsset! { didSet {  updateContent() } }
+    var photoAsset: PhotoAsset! {
+        didSet {
+            updateContent(oldValue)
+        }
+    }
     
     var imageView: HXImageViewProtocol!
     var livePhotoView: PHLivePhotoView!
@@ -52,7 +56,7 @@ class PhotoPreviewContentPhotoView: UIView, PhotoPreviewContentViewProtocol {
         addSubview(imageView)
     }
     
-    func updateContent() {
+    func updateContent(_ oldAsset: PhotoAsset?) {
         photoAsset.loadNetworkImageHandler = nil
         requestFailed(info: [PHImageCancelledKey: 1], isICloud: false)
         isAnimatedCompletion = false
@@ -335,7 +339,7 @@ extension PhotoPreviewContentPhotoView {
                 guard let self = self, self.photoAsset == asset else {
                     return
                 }
-                if inICloud || asset.mediaSubType.isHDRPhoto {
+                if inICloud || (asset.mediaSubType.isHDRPhoto && !asset.isDisableHDR) {
                     self.requestPreviewImageData()
                 }else {
                     self.requestPreviewImage()
@@ -443,7 +447,7 @@ extension PhotoPreviewContentPhotoView {
                             }
                         }
                     }
-                    if asset.mediaSubType.isHDRPhoto {
+                    if asset.mediaSubType.isHDRPhoto && !asset.isDisableHDR {
                         handler(UIImage.HDRDecoded(dataResult.imageData))
                     } else {
                         let dataCount = CGFloat(dataResult.imageData.count)

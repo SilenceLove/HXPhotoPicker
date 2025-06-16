@@ -71,6 +71,9 @@ public extension PhotoFetchAsset {
                     photoAsset.mediaSubType = .HDRPhoto
                 }
             }
+            photoAsset.isDisableHDR = config.isDisableHDR
+            photoAsset.isDisableLivePhoto = config.isDisableLivePhoto
+            photoAsset.isLivePhotoMuted = config.isLivePhotoMuted
             
             switch photoAsset.mediaType {
             case .photo:

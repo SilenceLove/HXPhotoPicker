@@ -224,6 +224,9 @@ extension PickerManager {
                         photoAsset.mediaSubType = .HDRPhoto
                     }
                 }
+                photoAsset.isDisableHDR = self.config.isDisableHDR
+                photoAsset.isDisableLivePhoto = self.config.isDisableLivePhoto
+                photoAsset.isLivePhotoMuted = self.config.isLivePhotoMuted
                         
                 switch photoAsset.mediaType {
                 case .photo:
