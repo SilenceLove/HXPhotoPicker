@@ -39,6 +39,8 @@ extension PhotoPreviewViewController: UICollectionViewDataSource {
                     withReuseIdentifier: PreviewPhotoViewCell.className,
                     for: indexPath
                 ) as! PreviewPhotoViewCell
+                let photoCell = cell as! PreviewPhotoViewCell
+                photoCell.HDRMarkConfig = config.HDRMark
             }
         }else {
             cell = collectionView.dequeueReusableCell(
@@ -201,7 +203,7 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
                 videoCell?.showToolView()
             }
             if let liveCell = currentCell as? PreviewLivePhotoViewCell {
-                liveCell.showMark()
+                liveCell.showScrollContainerSubview()
             }
         }else {
             if currentCell?.photoAsset.mediaType == .video && config.singleClickCellAutoPlayVideo {
@@ -213,7 +215,7 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
                 videoCell?.hideToolView()
             }
             if let liveCell = currentCell as? PreviewLivePhotoViewCell {
-                liveCell.hideMark()
+                liveCell.hideScrollContainerSubview()
             }
         }
         if isShowToolbar {
@@ -271,4 +273,34 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
             )
         }
     }
+    
+    func photoCell(_ photoCell: PhotoPreviewViewCell, HDRDidDisabled isDisabled: Bool) {
+        if let index = collectionView.indexPath(for: photoCell)?.item, let photoAsset = photoCell.photoAsset {
+            photoAsset.isDisableHDR = isDisabled
+            photoCell.photoAsset = photoAsset
+            photoCell.cancelRequest()
+            photoCell.requestPreviewAsset()
+            
+            delegate?.previewViewController(self, updatePhotoAsset: photoAsset, at: index)
+        }
+    }
+    
+    func photoCell(_ photoCell: PhotoPreviewViewCell, livePhotoDidDisabled isDisabled: Bool) {
+        if let index = collectionView.indexPath(for: photoCell)?.item, let photoAsset = photoCell.photoAsset {
+            photoAsset.isDisableLivePhoto = isDisabled
+            photoCell.photoAsset = photoAsset
+            
+            delegate?.previewViewController(self, updatePhotoAsset: photoAsset, at: index)
+        }
+    }
+    
+    func photoCell(_ photoCell: PhotoPreviewViewCell, livePhotoDidMuted isMuted: Bool) {
+        if let index = collectionView.indexPath(for: photoCell)?.item, let photoAsset = photoCell.photoAsset {
+            photoAsset.isLivePhotoMuted = isMuted
+            photoCell.photoAsset = photoAsset
+            
+            delegate?.previewViewController(self, updatePhotoAsset: photoAsset, at: index)
+        }
+    }
+    
 }
