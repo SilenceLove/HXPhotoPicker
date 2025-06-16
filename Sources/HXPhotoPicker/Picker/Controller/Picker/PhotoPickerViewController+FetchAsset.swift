@@ -24,9 +24,6 @@ extension PhotoPickerViewController {
         }
     }
     func fetchPhotoAssets() {
-        if isFetchPhotoAssets {
-            return
-        }
         guard let assetCollection = assetCollection else {
             if showLoading {
                 PhotoManager.HUDView.dismiss(delay: 0, animated: true, for: view)
@@ -56,7 +53,6 @@ extension PhotoPickerViewController {
             listView.filterOptions = .any
         }
         initNavItems(addFilter)
-        isFetchPhotoAssets = true
         pickerController.fetchData.fetchPhotoAssets(assetCollection: assetCollection) { [weak self] result in
             guard let self = self else { return }
             self.listView.assetResult = result
@@ -80,14 +76,11 @@ extension PhotoPickerViewController {
                      let previewViewController = presentedViewController.previewViewController {
                 previewViewController.updateAsstes(for: result.assets)
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.isFetchPhotoAssets = false
-            }
         }
     }
     
     func updateAssetCollection(_ collection: PhotoAssetCollection?, isShow: Bool = true) {
-        if isShow, !isFetchPhotoAssets {
+        if isShow {
             PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: navigationController?.view)
         }
         if let collection = collection {
