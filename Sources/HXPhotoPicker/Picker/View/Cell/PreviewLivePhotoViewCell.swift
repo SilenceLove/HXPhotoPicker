@@ -204,10 +204,10 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
             )
             liveMuteContainerView.layer.cornerRadius = liveMuteContainerView.frame.height / 2.0
             liveMuteButton.frame = CGRect(
-                x: contentInset.left,
-                y: (liveMuteContainerView.frame.height - buttonSize.height) / 2.0,
-                width: buttonSize.width,
-                height: buttonSize.height
+                x: 0,
+                y: 0,
+                width: liveMuteContainerView.frame.width,
+                height: liveMuteContainerView.frame.height,
             )
         }
     }

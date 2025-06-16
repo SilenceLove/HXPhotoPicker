@@ -128,7 +128,6 @@ extension PreviewViewConfiguration {
         public var blurDarkStyle: UIBlurEffect.Style = .dark
         
         public var imageColor: UIColor = "#666666".hx.color
-        
         public var imageDarkColor: UIColor = "#ffffff".hx.color
         
         public init() {

@@ -202,8 +202,8 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
             }else {
                 videoCell?.showToolView()
             }
-            if let liveCell = currentCell as? PreviewLivePhotoViewCell {
-                liveCell.showScrollContainerSubview()
+            if let photoAsset = currentCell?.photoAsset, photoAsset.mediaSubType.isHDRPhoto || photoAsset.mediaSubType.isLivePhoto {
+                currentCell?.showScrollContainerSubview()
             }
         }else {
             if currentCell?.photoAsset.mediaType == .video && config.singleClickCellAutoPlayVideo {
@@ -214,8 +214,8 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
             }else {
                 videoCell?.hideToolView()
             }
-            if let liveCell = currentCell as? PreviewLivePhotoViewCell {
-                liveCell.hideScrollContainerSubview()
+            if let photoAsset = currentCell?.photoAsset, photoAsset.mediaSubType.isHDRPhoto || photoAsset.mediaSubType.isLivePhoto {
+                currentCell?.hideScrollContainerSubview()
             }
         }
         if isShowToolbar {
