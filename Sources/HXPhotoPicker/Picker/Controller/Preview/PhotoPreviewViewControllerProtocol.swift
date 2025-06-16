@@ -21,7 +21,7 @@ protocol PhotoPreviewViewControllerDelegate: AnyObject {
     func previewViewController(
         _ previewController: PhotoPreviewViewController,
         updatePhotoAsset photoAsset: PhotoAsset,
-        at index: Int,
+        at index: Int
     )
     #if HXPICKER_ENABLE_EDITOR
     func previewViewController(

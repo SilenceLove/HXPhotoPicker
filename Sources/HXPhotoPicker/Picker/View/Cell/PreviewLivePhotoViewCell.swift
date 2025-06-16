@@ -207,7 +207,7 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
                 x: 0,
                 y: 0,
                 width: liveMuteContainerView.frame.width,
-                height: liveMuteContainerView.frame.height,
+                height: liveMuteContainerView.frame.height
             )
         }
     }
