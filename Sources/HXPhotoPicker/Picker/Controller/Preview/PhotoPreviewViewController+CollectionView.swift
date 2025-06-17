@@ -277,7 +277,6 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
     func photoCell(_ photoCell: PhotoPreviewViewCell, HDRDidDisabled isDisabled: Bool) {
         if let index = collectionView.indexPath(for: photoCell)?.item, let photoAsset = photoCell.photoAsset {
             photoAsset.isDisableHDR = isDisabled
-            photoCell.photoAsset = photoAsset
             photoCell.cancelRequest()
             photoCell.requestPreviewAsset()
             
@@ -288,7 +287,10 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
     func photoCell(_ photoCell: PhotoPreviewViewCell, livePhotoDidDisabled isDisabled: Bool) {
         if let index = collectionView.indexPath(for: photoCell)?.item, let photoAsset = photoCell.photoAsset {
             photoAsset.isDisableLivePhoto = isDisabled
-            photoCell.photoAsset = photoAsset
+            if photoAsset.isDisableLivePhoto {
+                photoCell.scrollContentView.livePhotoView.stopPlayback()
+            }
+            photoCell.scrollContentView.livePhotoView.playbackGestureRecognizer.isEnabled = !photoAsset.isDisableLivePhoto
             
             delegate?.previewViewController(self, updatePhotoAsset: photoAsset, at: index)
         }
@@ -297,7 +299,7 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
     func photoCell(_ photoCell: PhotoPreviewViewCell, livePhotoDidMuted isMuted: Bool) {
         if let index = collectionView.indexPath(for: photoCell)?.item, let photoAsset = photoCell.photoAsset {
             photoAsset.isLivePhotoMuted = isMuted
-            photoCell.photoAsset = photoAsset
+            photoCell.scrollContentView.livePhotoView.isMuted = photoAsset.isLivePhotoMuted
             
             delegate?.previewViewController(self, updatePhotoAsset: photoAsset, at: index)
         }

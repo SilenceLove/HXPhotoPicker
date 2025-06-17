@@ -28,8 +28,7 @@ class PhotoPreviewContentLivePhotoView: PhotoPreviewContentPhotoView {
                 requestNetworkImage()
             }
         }
-        livePhotoView.playbackGestureRecognizer.isEnabled = !photoAsset.isDisableLivePhoto
-        livePhotoView.isMuted = photoAsset.isLivePhotoMuted
+        configLivePhotoView()
         
         super.updateContent(oldAsset)
     }
@@ -173,6 +172,11 @@ extension PhotoPreviewContentLivePhotoView {
                 )
             }
         })
+    }
+    
+    private func configLivePhotoView() {
+        livePhotoView.playbackGestureRecognizer.isEnabled = !photoAsset.isDisableLivePhoto
+        livePhotoView.isMuted = photoAsset.isLivePhotoMuted
     }
 }
 

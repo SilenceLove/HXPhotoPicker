@@ -250,11 +250,15 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
     
     @objc
     private func didLiveMarkButtonClick() {
-        self.delegate?.photoCell(self, livePhotoDidDisabled: !self.photoAsset.isDisableLivePhoto)
+        delegate?.photoCell(self, livePhotoDidDisabled: !self.photoAsset.isDisableLivePhoto)
+        
+        configLiveMark()
     }
     
     @objc
     private func didLiveMuteButtonClick() {
-        self.delegate?.photoCell(self, livePhotoDidMuted: !self.photoAsset.isLivePhotoMuted)
+        delegate?.photoCell(self, livePhotoDidMuted: !self.photoAsset.isLivePhotoMuted)
+        
+        configLiveMark()
     }
 }

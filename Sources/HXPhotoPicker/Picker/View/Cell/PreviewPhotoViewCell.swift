@@ -172,7 +172,9 @@ class PreviewPhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDelete 
     
     @objc
     private func didHDRMarkButtonClick() {
-        self.delegate?.photoCell(self, HDRDidDisabled: !self.photoAsset.isDisableHDR)
+        delegate?.photoCell(self, HDRDidDisabled: !photoAsset.isDisableHDR)
+        
+        configHDRMark()
     }
 
 }
