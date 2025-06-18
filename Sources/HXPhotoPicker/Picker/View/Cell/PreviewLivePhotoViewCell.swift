@@ -57,7 +57,7 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         liveMarkLabel = UILabel()
         liveMarkLabel.text = .textManager.picker.preview.livePhotoTitle.text
         liveMarkLabel.textAlignment = .center
-        liveMarkLabel.font = .regularPingFang(ofSize: 14)
+        liveMarkLabel.font = .mediumPingFang(ofSize: 14)
         liveMarkView.contentView.addSubview(liveMarkLabel)
         
         liveMuteContainerView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
@@ -94,11 +94,11 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         delegate?.cell(requestFailed: self)
     }
     
-    func contentView(livePhotoWillBeginPlayback contentView: PhotoPreviewContentViewProtocol) {
-        hideMark()
-    }
-    func contentView(livePhotoDidEndPlayback contentView: PhotoPreviewContentViewProtocol) {
+    func contentView(showLivePhotoMark contentView: PhotoPreviewContentViewProtocol) {
         showMark()
+    }
+    func contentView(hideLivePhotoMark contentView: PhotoPreviewContentViewProtocol) {
+        hideMark()
     }
     
     private func configLiveMark() {
@@ -166,8 +166,8 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         let spacing = 10.0
        
         if liveMarkConfig.allowShow {
-            let contentInset = UIEdgeInsets(top: 2, left: 6, bottom: 2, right: 6)
-            let imageTextSpacing = 5.0
+            let contentInset = UIEdgeInsets(top: 2, left: 4, bottom: 2, right: 4)
+            let imageTextSpacing = 2.0
             let imageSize = liveMarkImageView.sizeThatFits(.zero)
             let textSize = liveMarkLabel.sizeThatFits(.zero)
             liveMarkControl.frame = CGRect(
@@ -213,8 +213,7 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
     }
     
     private func showMark() {
-        if scrollContentView.isLivePhotoAnimating ||
-            scrollContentView.isBacking ||
+        if scrollContentView.isBacking ||
             statusBarShouldBeHidden {
             return
         }

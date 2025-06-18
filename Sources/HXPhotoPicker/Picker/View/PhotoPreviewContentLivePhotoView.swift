@@ -49,11 +49,11 @@ class PhotoPreviewContentLivePhotoView: PhotoPreviewContentPhotoView {
     
     override func showOtherSubview() {
         super.showOtherSubview()
-        delegate?.contentView(livePhotoDidEndPlayback: self)
+        delegate?.contentView(showLivePhotoMark: self)
     }
     override func hiddenOtherSubview() {
         super.hiddenOtherSubview()
-        delegate?.contentView(livePhotoWillBeginPlayback: self)
+        delegate?.contentView(hideLivePhotoMark: self)
     }
     
     override func cancelRequest() {
@@ -186,14 +186,12 @@ extension PhotoPreviewContentLivePhotoView: PHLivePhotoViewDelegate {
         willBeginPlaybackWith playbackStyle: PHLivePhotoViewPlaybackStyle
     ) {
         isLivePhotoAnimating = true
-        delegate?.contentView(livePhotoWillBeginPlayback: self)
     }
     func livePhotoView(
         _ livePhotoView: PHLivePhotoView,
         didEndPlaybackWith playbackStyle: PHLivePhotoViewPlaybackStyle
     ) {
         isLivePhotoAnimating = false
-        delegate?.contentView(livePhotoDidEndPlayback: self)
         if livePhotoPlayType == .auto && livePhotoView.alpha != 0 && !photoAsset.isDisableLivePhoto {
             livePhotoView.startPlayback(with: .full)
         }

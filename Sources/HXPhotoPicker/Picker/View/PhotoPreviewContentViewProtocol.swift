@@ -15,8 +15,8 @@ protocol PhotoPreviewContentViewDelete: AnyObject {
     func contentView(networkImagedownloadSuccess contentView: PhotoPreviewContentViewProtocol)
     func contentView(networkImagedownloadFailed contentView: PhotoPreviewContentViewProtocol)
     func contentView(updateContentSize contentView: PhotoPreviewContentViewProtocol)
-    func contentView(livePhotoWillBeginPlayback contentView: PhotoPreviewContentViewProtocol)
-    func contentView(livePhotoDidEndPlayback contentView: PhotoPreviewContentViewProtocol)
+    func contentView(showLivePhotoMark contentView: PhotoPreviewContentViewProtocol)
+    func contentView(hideLivePhotoMark contentView: PhotoPreviewContentViewProtocol)
 }
 
 extension PhotoPreviewContentViewDelete {
@@ -25,8 +25,8 @@ extension PhotoPreviewContentViewDelete {
     func contentView(networkImagedownloadSuccess contentView: PhotoPreviewContentViewProtocol) { }
     func contentView(networkImagedownloadFailed contentView: PhotoPreviewContentViewProtocol) { }
     func contentView(updateContentSize contentView: PhotoPreviewContentViewProtocol) { }
-    func contentView(livePhotoWillBeginPlayback contentView: PhotoPreviewContentViewProtocol) { }
-    func contentView(livePhotoDidEndPlayback contentView: PhotoPreviewContentViewProtocol) { }
+    func contentView(showLivePhotoMark contentView: PhotoPreviewContentViewProtocol) { }
+    func contentView(hideLivePhotoMark contentView: PhotoPreviewContentViewProtocol) { }
 }
 
 protocol PhotoPreviewContentViewProtocol: UIView {

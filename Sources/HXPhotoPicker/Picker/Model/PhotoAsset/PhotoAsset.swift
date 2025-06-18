@@ -103,7 +103,7 @@ open class PhotoAsset: Equatable {
     /// 禁用HDR
     public var isDisableHDR: Bool = false
     
-    /// 禁用LivePhoto
+    /// 禁用LivePhoto，禁用之后获取AssetURLResult里 livePhoto 会为 nil
     public var isDisableLivePhoto: Bool = false
     
     /// LivePhoto静音

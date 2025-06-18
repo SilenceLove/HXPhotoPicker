@@ -16,6 +16,7 @@ public struct AssetURLResult {
     /// selectOptions needs to include livePhoto
     /// LivePhoto里包含的资源
     /// selectOptions 需包含 livePhoto
+    /// 如果静止播放点击了禁止播放LivePhoto 则为 nil
     public let livePhoto: LivePhoto?
     
     public init(

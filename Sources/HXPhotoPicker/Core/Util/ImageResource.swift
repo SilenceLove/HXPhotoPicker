@@ -121,6 +121,8 @@ public extension HX.ImageResource {
             public struct Cell {
                 /// 视频图标
                 public var video: ImageType = .local("hx_picker_cell_video_icon")
+                /// 实况图标
+                public var livePhoto: ImageType = .local("hx_picker_cell_livephoto_icon")
                 /// 已编辑照片图标
                 public var photoEdited: ImageType = .local("hx_picker_cell_photo_edit_icon")
                 /// 已编辑视频图标
