@@ -28,6 +28,20 @@ extension Data {
         imageContentType == .gif
     }
     
+    var isHEIC: Bool {
+        guard count > 12 else { return false }
+            let magicRange = subdata(in: 4..<12)
+            let magicString = String(data: magicRange, encoding: .ascii) ?? ""
+            // 常见的HEIF/HEIC文件类型
+            let heicKeywords = ["ftypheic", "ftypheix", "ftyphevc", "ftypmif1", "ftypmsf1", "ftypheis"]
+            for keyword in heicKeywords {
+                if magicString.hasPrefix(keyword) {
+                    return true
+                }
+            }
+            return false
+    }
+    
     var fileType: FileType {
         guard let firstByte = first else {
             return .unknown

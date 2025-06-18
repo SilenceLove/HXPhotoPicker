@@ -39,6 +39,7 @@ extension EditorViewController {
                 loadAssetStatus = .succeed(.imageData(imageData))
                 return
             }
+            editorView.isHEICImage = imageData.isHEIC
             editorView.setImageData(imageData)
             let image = self.editorView.image
             DispatchQueue.global().async {
