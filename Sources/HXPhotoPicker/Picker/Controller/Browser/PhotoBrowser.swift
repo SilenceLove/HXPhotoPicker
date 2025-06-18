@@ -306,6 +306,9 @@ open class PhotoBrowser: PhotoPickerController {
         pConfig.livePhotoMark.blurStyle = .dark
         pConfig.livePhotoMark.imageColor = "#ffffff".color
         pConfig.livePhotoMark.textColor = "#ffffff".color
+        pConfig.livePhotoMark.mutedImageColor = "#ffffff".color
+        pConfig.HDRMark.blurStyle = .dark
+        pConfig.HDRMark.imageColor = "#ffffff".color
         
         pConfig.loadNetworkVideoMode = config.loadNetworkVideoMode
         pConfig.customVideoCellClass = config.customVideoCellClass

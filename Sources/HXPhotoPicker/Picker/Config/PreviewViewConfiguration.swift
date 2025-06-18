@@ -47,6 +47,9 @@ public struct PreviewViewConfiguration {
     /// LivePhoto标记
     public var livePhotoMark: LivePhotoMark = .init()
     
+    /// HDR标记
+    public var HDRMark: HDRMark = .init()
+    
     /// 单击cell隐藏/显示导航栏时是否播放/暂停视频
     public var singleClickCellAutoPlayVideo: Bool = true
     
@@ -97,16 +100,35 @@ public struct PreviewViewConfiguration {
 extension PreviewViewConfiguration {
     public struct LivePhotoMark {
         
-        var allowShow: Bool = true
+        public var allowShow: Bool = true
         
-        var blurStyle: UIBlurEffect.Style = .extraLight
-        var blurDarkStyle: UIBlurEffect.Style = .dark
+        public var blurStyle: UIBlurEffect.Style = .extraLight
+        public var blurDarkStyle: UIBlurEffect.Style = .dark
         
-        var imageColor: UIColor = "#666666".hx.color
-        var textColor: UIColor = "#666666".hx.color
+        public var imageColor: UIColor = "#666666".hx.color
+        public var textColor: UIColor = "#666666".hx.color
         
-        var imageDarkColor: UIColor = "#ffffff".hx.color
-        var textDarkColor: UIColor = "#ffffff".hx.color
+        public var imageDarkColor: UIColor = "#ffffff".hx.color
+        public var textDarkColor: UIColor = "#ffffff".hx.color
+        
+        public var allowMutedShow: Bool = true
+        public var mutedImageColor: UIColor = "#666666".hx.color
+        public var mutedImageDarkColor: UIColor = "#ffffff".hx.color
+        
+        public init() {
+            
+        }
+    }
+    
+    public struct HDRMark {
+        
+        public var allowShow: Bool = true
+        
+        public var blurStyle: UIBlurEffect.Style = .extraLight
+        public var blurDarkStyle: UIBlurEffect.Style = .dark
+        
+        public var imageColor: UIColor = "#666666".hx.color
+        public var imageDarkColor: UIColor = "#ffffff".hx.color
         
         public init() {
             

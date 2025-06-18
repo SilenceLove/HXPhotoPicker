@@ -9,7 +9,7 @@ import UIKit
 
 // MARK: PhotoPreviewViewControllerDelegate
 extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
-    
+
     func pushPreviewViewController(
         previewAssets: [PhotoAsset],
         currentPreviewIndex: Int,
@@ -83,6 +83,14 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
         finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
         requestSelectedAssetFileSize()
+    }
+    
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        updatePhotoAsset photoAsset: PhotoAsset,
+        at index: Int
+    ) {
+        listView.updateCell(for: photoAsset)
     }
     
     func previewViewController(

@@ -23,7 +23,7 @@ class EditorVideoControlViewCell: UICollectionViewCell {
         imageView = UIImageView()
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
-        addSubview(imageView)
+        contentView.addSubview(imageView)
     }
     
     required init?(coder: NSCoder) {

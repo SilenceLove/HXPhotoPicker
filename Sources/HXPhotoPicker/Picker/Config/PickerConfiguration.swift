@@ -80,6 +80,15 @@ public struct PickerConfiguration: IndicatorTypeConfig, PhotoDebugLogsConfig, Ph
     /// 选择模式
     public var selectMode: PickerSelectMode = .multiple
     
+    /// 禁用HDR
+    public var isDisableHDR: Bool = false
+    
+    /// 禁用LivePhoto
+    public var isDisableLivePhoto: Bool = false
+    
+    /// LivePhoto静音
+    public var isLivePhotoMuted: Bool = false
+    
     /// Photos and videos can be selected together
     /// 照片和视频可以一起选择
     public var allowSelectedTogether: Bool = true

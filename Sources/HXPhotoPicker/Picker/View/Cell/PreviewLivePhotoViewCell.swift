@@ -9,7 +9,14 @@ import UIKit
 
 class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDelete {
     
+    private var liveMarkControl: UIControl!
     private var liveMarkView: UIVisualEffectView!
+    
+    private var liveMarkImageView: UIImageView!
+    private var liveMarkLabel: UILabel!
+    
+    private var liveMuteContainerView: UIVisualEffectView!
+    private var liveMuteButton: UIButton!
     
     var livePhotoPlayType: PhotoPreviewViewController.PlayType = .once {
         didSet {
@@ -25,38 +32,8 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
     
     override var photoAsset: PhotoAsset! {
         didSet {
-            #if HXPICKER_ENABLE_EDITOR
-            if photoAsset.photoEditedResult != nil {
-                liveMarkView.isHidden = true
-            }
-            else {
-                if liveMarkConfig?.allowShow == true {
-                    liveMarkView.isHidden = false
-                }
-            }
-            #else
-            if liveMarkConfig?.allowShow == true {
-                liveMarkView.isHidden = false
-            }
-            #endif
+            configLiveMark()
         }
-    }
-    func configLiveMark() {
-        guard let liveMarkConfig = liveMarkConfig else {
-            liveMarkView.isHidden = true
-            return
-        }
-        if !liveMarkConfig.allowShow {
-            liveMarkView.isHidden = true
-            return
-        }
-        liveMarkView.effect = UIBlurEffect(
-            style: PhotoManager.isDark ? liveMarkConfig.blurDarkStyle : liveMarkConfig.blurStyle
-        )
-        let imageView = liveMarkView.contentView.subviews.first as? UIImageView
-        imageView?.tintColor = PhotoManager.isDark ? liveMarkConfig.imageDarkColor : liveMarkConfig.imageColor
-        let label = liveMarkView.contentView.subviews.last as? UILabel
-        label?.textColor = PhotoManager.isDark ? liveMarkConfig.textDarkColor : liveMarkConfig.textColor
     }
     
     override init(frame: CGRect) {
@@ -65,40 +42,35 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         scrollContentView.delegate = self
         initView()
         
-        let effect = UIBlurEffect(style: .light)
-        liveMarkView = UIVisualEffectView(effect: effect)
-        if let nav = UIViewController.topViewController?.navigationController, !nav.navigationBar.isHidden {
-            liveMarkView.y = nav.navigationBar.frame.maxY + 5
-        }else {
-            if UIApplication.shared.isStatusBarHidden {
-                liveMarkView.y = UIDevice.navigationBarHeight + UIDevice.generalStatusBarHeight + 5
-            }else {
-                liveMarkView.y = UIDevice.navigationBarHeight + 5
-            }
-        }
-        liveMarkView.x = 5 + UIDevice.leftMargin
-        liveMarkView.height = 24
-        liveMarkView.layer.cornerRadius = 3
-        liveMarkView.layer.masksToBounds = true
-        let imageView = UIImageView(image: .imageResource.picker.preview.livePhoto.image?.withRenderingMode(.alwaysTemplate))
-        imageView.tintColor = "#666666".color
-        if let imageSize = imageView.image?.size {
-            imageView.size = imageSize
-        }
-        imageView.centerY = liveMarkView.height * 0.5
-        imageView.x = 5
-        liveMarkView.contentView.addSubview(imageView)
-        let label = UILabel()
-        label.text = .textManager.picker.preview.livePhotoTitle.text
-        label.textColor = "#666666".color
-        label.textAlignment = .center
-        label.font = .regularPingFang(ofSize: 15)
-        label.x = imageView.frame.maxX + 5
-        label.height = liveMarkView.height
-        label.width = label.textWidth
-        liveMarkView.width = label.frame.maxX + 5
-        liveMarkView.contentView.addSubview(label)
-        addSubview(liveMarkView)
+        liveMarkControl = UIControl()
+        liveMarkControl.layer.masksToBounds = true
+        liveMarkControl.addTarget(self, action: #selector(didLiveMarkButtonClick), for: .touchUpInside)
+        contentView.addSubview(liveMarkControl)
+        
+        liveMarkView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        liveMarkView.isUserInteractionEnabled = false
+        liveMarkControl.addSubview(liveMarkView)
+        
+        liveMarkImageView = UIImageView()
+        liveMarkView.contentView.addSubview(liveMarkImageView)
+        
+        liveMarkLabel = UILabel()
+        liveMarkLabel.text = .textManager.picker.preview.livePhotoTitle.text
+        liveMarkLabel.textAlignment = .center
+        liveMarkLabel.font = .regularPingFang(ofSize: 14)
+        liveMarkView.contentView.addSubview(liveMarkLabel)
+        
+        liveMuteContainerView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        liveMuteContainerView.layer.masksToBounds = true
+        contentView.addSubview(liveMuteContainerView)
+        
+        liveMuteButton = UIButton(type: .custom)
+        liveMuteButton.addTarget(self, action: #selector(didLiveMuteButtonClick), for: .touchUpInside)
+        liveMuteContainerView.contentView.addSubview(liveMuteButton)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func layoutSubviews() {
@@ -106,8 +78,13 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         setupLiveMarkFrame()
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                configLiveMark()
+            }
+        }
     }
     
     func contentView(requestSucceed contentView: PhotoPreviewContentViewProtocol) {
@@ -124,72 +101,164 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         showMark()
     }
     
-    func showMark() {
+    private func configLiveMark() {
+        guard photoAsset != nil else {
+            return
+        }
+#if HXPICKER_ENABLE_EDITOR
+        guard photoAsset.photoEditedResult == nil else {
+            liveMarkControl.isHidden = true
+            liveMuteContainerView.isHidden = true
+            return
+        }
+#endif
+        guard photoAsset.mediaSubType.isLivePhoto else {
+            liveMarkControl.isHidden = true
+            liveMuteContainerView.isHidden = true
+            return
+        }
+        guard let liveMarkConfig = liveMarkConfig else {
+            liveMarkControl.isHidden = true
+            liveMuteContainerView.isHidden = true
+            return
+        }
+        if liveMarkConfig.allowShow {
+            liveMarkControl.isHidden = false
+            liveMarkView.effect = UIBlurEffect(
+                style: PhotoManager.isDark ? liveMarkConfig.blurDarkStyle : liveMarkConfig.blurStyle
+            )
+            liveMarkImageView.tintColor = PhotoManager.isDark ? liveMarkConfig.imageDarkColor : liveMarkConfig.imageColor
+            liveMarkLabel.textColor = PhotoManager.isDark ? liveMarkConfig.textDarkColor : liveMarkConfig.textColor
+            
+            let image = photoAsset.isDisableLivePhoto ? UIImage.imageResource.picker.preview.livePhotoDisable.image : UIImage.imageResource.picker.preview.livePhoto.image
+            liveMarkImageView.image = image?.withRenderingMode(.alwaysTemplate)
+        } else {
+            liveMarkControl.isHidden = true
+        }
+        
+        if liveMarkConfig.allowMutedShow {
+            liveMuteContainerView.isHidden = false
+            liveMuteContainerView.effect = UIBlurEffect(
+                style: PhotoManager.isDark ? liveMarkConfig.blurDarkStyle : liveMarkConfig.blurStyle
+            )
+            liveMuteButton.setImage(.imageResource.picker.preview.livePhotoMutedDisable.image?.withRenderingMode(.alwaysTemplate), for: .normal)
+            liveMuteButton.setImage(.imageResource.picker.preview.livePhotoMuted.image?.withRenderingMode(.alwaysTemplate), for: .selected)
+            liveMuteButton.tintColor = PhotoManager.isDark ? liveMarkConfig.mutedImageDarkColor : liveMarkConfig.mutedImageColor
+            liveMuteButton.isSelected = photoAsset.isLivePhotoMuted
+        } else {
+            liveMuteContainerView.isHidden = true
+        }
+      
+        self.setNeedsLayout()
+    }
+    
+    private func setupLiveMarkFrame() {
         guard let liveMarkConfig = liveMarkConfig else {
             return
         }
-        #if HXPICKER_ENABLE_EDITOR
-        if photoAsset.photoEditedResult != nil {
-            return
+        let safeAreaInsets = {
+            if #available(iOS 11.0, *) {
+                return self.safeAreaInsets
+            } else {
+                return UIEdgeInsets(top: UIDevice.navigationBarHeight, left: 0, bottom: 0, right: 0)
+            }
+        }()
+        let spacing = 10.0
+       
+        if liveMarkConfig.allowShow {
+            let contentInset = UIEdgeInsets(top: 2, left: 6, bottom: 2, right: 6)
+            let imageTextSpacing = 5.0
+            let imageSize = liveMarkImageView.sizeThatFits(.zero)
+            let textSize = liveMarkLabel.sizeThatFits(.zero)
+            liveMarkControl.frame = CGRect(
+                x: safeAreaInsets.left + spacing,
+                y: safeAreaInsets.top + spacing,
+                width: imageSize.width + textSize.width + spacing + contentInset.left + contentInset.right,
+                height: max(imageSize.height, textSize.height) + contentInset.top + contentInset.bottom
+            )
+            liveMarkControl.layer.cornerRadius = liveMarkControl.frame.height / 2.0
+            liveMarkView.frame = liveMarkControl.bounds
+            
+            liveMarkImageView.frame = CGRect(
+                x: contentInset.left,
+                y: (liveMarkView.frame.height - imageSize.height) / 2.0,
+                width: imageSize.width,
+                height: imageSize.height
+            )
+            liveMarkLabel.frame = CGRect(
+                x: liveMarkImageView.frame.maxX + imageTextSpacing,
+                y: (liveMarkView.frame.height - textSize.height) / 2.0,
+                width: textSize.width,
+                height: textSize.height
+            )
         }
-        #endif
-        if !liveMarkConfig.allowShow {
-            return
+        
+        if liveMarkConfig.allowMutedShow {
+            let contentInset = UIEdgeInsets(top: 7, left: 7, bottom: 7, right: 7)
+            let buttonSize = liveMuteButton.currentImage?.size ?? .zero
+            liveMuteContainerView.frame = CGRect(
+                x: self.contentView.bounds.width - safeAreaInsets.right - buttonSize.width - spacing - contentInset.left - contentInset.right,
+                y: safeAreaInsets.top + spacing,
+                width: buttonSize.width + contentInset.left + contentInset.right,
+                height: buttonSize.height + contentInset.top + contentInset.bottom
+            )
+            liveMuteContainerView.layer.cornerRadius = liveMuteContainerView.frame.height / 2.0
+            liveMuteButton.frame = CGRect(
+                x: 0,
+                y: 0,
+                width: liveMuteContainerView.frame.width,
+                height: liveMuteContainerView.frame.height
+            )
         }
+    }
+    
+    private func showMark() {
         if scrollContentView.isLivePhotoAnimating ||
             scrollContentView.isBacking ||
-            statusBarShouldBeHidden { return }
-        if let superView = superview, !(superView is UICollectionView) {
+            statusBarShouldBeHidden {
             return
         }
-        if !liveMarkView.isHidden && liveMarkView.alpha == 1 { return }
-        liveMarkView.isHidden = false
-        UIView.animate(withDuration: 0.25) {
-            self.liveMarkView.alpha = 1
-        }
-    }
-    func setupLiveMarkFrame() {
-        guard let liveMarkConfig = liveMarkConfig, liveMarkConfig.allowShow else {
+        guard let superview = superview, superview is UICollectionView else {
             return
         }
-        if let nav = UIViewController.topViewController?.navigationController, !nav.navigationBar.isHidden {
-            liveMarkView.y = nav.navigationBar.frame.maxY + 5
-        }else {
-            if UIApplication.shared.isStatusBarHidden {
-                liveMarkView.y = UIDevice.navigationBarHeight + UIDevice.generalStatusBarHeight + 5
-            }else {
-                liveMarkView.y = UIDevice.navigationBarHeight + 5
+        if !liveMarkControl.isHidden {
+            liveMarkControl.alpha = 0
+            UIView.animate(withDuration: 0.25) {
+                self.liveMarkControl.alpha = 1
             }
         }
-        liveMarkView.x = 5 + UIDevice.leftMargin
-    }
-    func hideMark() {
-        guard let liveMarkConfig = liveMarkConfig else {
-            return
-        }
-        #if HXPICKER_ENABLE_EDITOR
-        if photoAsset.photoEditedResult != nil {
-            return
-        }
-        #endif
-        if !liveMarkConfig.allowShow {
-            return
-        }
-        if liveMarkView.isHidden { return }
-        UIView.animate(withDuration: 0.25) {
-            self.liveMarkView.alpha = 0
-        } completion: { _ in
-            if self.liveMarkView.alpha == 0 {
-                self.liveMarkView.isHidden = true
+        if !liveMuteContainerView.isHidden {
+            liveMuteContainerView.alpha = 0
+            UIView.animate(withDuration: 0.25) {
+                self.liveMuteContainerView.alpha = 1
             }
         }
     }
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if #available(iOS 13.0, *) {
-            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-                configLiveMark()
+    
+    private func hideMark() {
+        if !liveMarkControl.isHidden {
+            UIView.animate(withDuration: 0.25) {
+                self.liveMarkControl.alpha = 0
             }
         }
+        if !liveMuteContainerView.isHidden {
+            UIView.animate(withDuration: 0.25) {
+                self.liveMuteContainerView.alpha = 0
+            }
+        }
+    }
+    
+    @objc
+    private func didLiveMarkButtonClick() {
+        delegate?.photoCell(self, livePhotoDidDisabled: !self.photoAsset.isDisableLivePhoto)
+        
+        configLiveMark()
+    }
+    
+    @objc
+    private func didLiveMuteButtonClick() {
+        delegate?.photoCell(self, livePhotoDidMuted: !self.photoAsset.isLivePhotoMuted)
+        
+        configLiveMark()
     }
 }
