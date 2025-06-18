@@ -15,7 +15,9 @@ extension Data {
             return nil
         }
         let frameCount = CGImageSourceGetCount(imageSource)
-        
+        if frameCount <= 1, !isGif {
+            return nil
+        }
         var images = [CGImage]()
         var delays = [Double]()
         var gifDuration = 0.0
