@@ -900,6 +900,10 @@ extension PhotoPickerListViewController: PhotoPickerViewCellDelegate {
             cell.canSelect = true
         }
     }
+    
+    public func pickerCell(livePhotoContorlDidChange cell: PhotoPickerBaseViewCell) {
+        delegate?.photoList(self, updateAsset: cell.photoAsset)
+    }
 }
 
 extension PhotoPickerListViewController: PhotoPeekViewControllerDelegate {

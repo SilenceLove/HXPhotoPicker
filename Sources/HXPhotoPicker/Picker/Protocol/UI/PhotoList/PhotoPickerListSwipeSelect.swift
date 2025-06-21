@@ -349,6 +349,7 @@ public extension PhotoPickerListSwipeSelect {
                 }else {
                     let inICloud = photoAsset.checkICloundStatus(
                         allowSyncPhoto: pickerController.config.allowSyncICloudWhenSelectPhoto,
+                        hudAddedTo: view,
                         completion: { _, isSuccess in
                         if isSuccess {
                             addAsset(showTip: true)

@@ -66,6 +66,12 @@ public struct PhotoListCellConfiguration {
     /// 选择框相关配置
     public var selectBox: SelectBoxConfiguration = .init()
     
+    /// 是否显示控制`LivePhoto`禁用按钮
+    public var isShowLivePhotoControl: Bool = true
+    
+    /// 选中`LivePhoto`时是否播放预览
+    public var isPlayLivePhoto: Bool = true
+    
     public var kf_indicatorColor: UIColor?
     
     public init() { 

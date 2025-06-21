@@ -87,13 +87,7 @@ public extension PhotoAsset {
         compressionQuality: CGFloat? = nil,
         completion: @escaping (UIImage?) -> Void
     ) {
-        let hasEdited: Bool
-        #if HXPICKER_ENABLE_EDITOR
-        hasEdited = editedResult != nil
-        #else
-        hasEdited = false
-        #endif
-        if isNetworkAsset && !hasEdited {
+        if isNetworkAsset && !isEdited {
             getNetworkImage { image, imageData in
                 guard let compressionQuality = compressionQuality else {
                     completion(image)
@@ -135,13 +129,7 @@ public extension PhotoAsset {
         targetMode: HX.ImageTargetMode = .fill,
         completion: @escaping (UIImage?, PhotoAsset) -> Void
     ) {
-        let hasEdited: Bool
-        #if HXPICKER_ENABLE_EDITOR
-        hasEdited = editedResult != nil
-        #else
-        hasEdited = false
-        #endif
-        if isNetworkAsset && !hasEdited {
+        if isNetworkAsset && !isEdited {
             getNetworkImage { image, _ in
                 DispatchQueue.global().async {
                     let image = image?.scaleToFillSize(size: targetSize, mode: targetMode)

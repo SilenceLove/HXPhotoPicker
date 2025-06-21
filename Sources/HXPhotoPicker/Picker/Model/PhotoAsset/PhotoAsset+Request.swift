@@ -394,6 +394,7 @@ public extension PhotoAsset {
     @discardableResult
     func requestLivePhoto(
         targetSize: CGSize,
+        deliveryMode: PHImageRequestOptionsDeliveryMode = .highQualityFormat,
         iCloudHandler: PhotoAssetICloudHandler?,
         progressHandler: PhotoAssetProgressHandler?,
         success: ((PhotoAsset, PHLivePhoto, [AnyHashable: Any]?) -> Void)?,
@@ -408,7 +409,8 @@ public extension PhotoAsset {
         }
         return AssetManager.requestLivePhoto(
             for: phAsset,
-            targetSize: targetSize
+            targetSize: targetSize,
+            deliveryMode: deliveryMode
         ) { (iCloudRequestID) in
             iCloudHandler?(self, iCloudRequestID)
         } progressHandler: { (progress, _, _, _) in

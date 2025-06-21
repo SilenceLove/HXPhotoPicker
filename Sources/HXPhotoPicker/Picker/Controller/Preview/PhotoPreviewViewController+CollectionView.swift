@@ -289,9 +289,14 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
             photoAsset.isDisableLivePhoto = isDisabled
             if photoAsset.isDisableLivePhoto {
                 photoCell.scrollContentView.livePhotoView.stopPlayback()
+            }else {
+                photoCell.scrollContentView.livePhotoView.startPlayback(with: .full)
             }
+            photoAsset.pFileSize = nil
             photoCell.scrollContentView.livePhotoView.playbackGestureRecognizer.isEnabled = !photoAsset.isDisableLivePhoto
-            
+            if isShowToolbar {
+                requestSelectedAssetFileSize()
+            }
             delegate?.previewViewController(self, updatePhotoAsset: photoAsset, at: index)
         }
     }

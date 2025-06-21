@@ -83,9 +83,14 @@ extension PhotoAsset {
                     }
                 }else {
                     switch assetResource.type {
-                    case livePhotoType, liveVideoType:
+                    case livePhotoType:
                         if let photoFileSize = assetResource.value(forKey: "fileSize") as? Int {
                             fileSize += photoFileSize
+                        }
+                    case liveVideoType:
+                        if let videoFileSize = assetResource.value(forKey: "fileSize") as? Int,
+                           !isDisableLivePhoto {
+                            fileSize += videoFileSize
                         }
                     default:
                         break

@@ -68,13 +68,16 @@ extension PhotoPickerViewController: PhotoPickerListDelegate {
     public func photoList(_ photoList: PhotoPickerList, updateAsset asset: PhotoAsset) {
         if isShowToolbar {
             photoToolbar.reloadSelectedAsset(asset)
+            requestSelectedAssetFileSize()
         }
     }
     
     public func photoList(selectedAssetDidChanged photoList: PhotoPickerList) {
-        photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+        if isShowToolbar {
+            photoToolbar.selectedAssetDidChanged(pickerController.selectedAssetArray)
+            requestSelectedAssetFileSize()
+        }
         finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
-        requestSelectedAssetFileSize()
     }
     
     public func photoList(_ photoList: PhotoPickerList, openEditor asset: PhotoAsset, with image: UIImage?) {

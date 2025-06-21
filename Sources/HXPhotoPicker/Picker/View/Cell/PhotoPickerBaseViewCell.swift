@@ -11,11 +11,13 @@ import Photos
 public protocol PhotoPickerViewCellDelegate: AnyObject {
     func pickerCell(_ cell: PhotoPickerBaseViewCell, didSelectControl isSelected: Bool)
     func pickerCell(videoRequestDurationCompletion cell: PhotoPickerBaseViewCell)
+    func pickerCell(livePhotoContorlDidChange cell: PhotoPickerBaseViewCell)
 }
 
 public extension PhotoPickerViewCellDelegate {
     func pickerCell(_ cell: PhotoPickerBaseViewCell, didSelectControl isSelected: Bool) { }
     func pickerCell(videoRequestDurationCompletion cell: PhotoPickerBaseViewCell) { }
+    func pickerCell(livePhotoContorlDidChange cell: PhotoPickerBaseViewCell) { }
 }
 
 open class PhotoPickerBaseViewCell: UICollectionViewCell {

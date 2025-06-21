@@ -54,6 +54,14 @@ open class PhotoAsset: Equatable {
         }
     }
     #endif
+    
+    public var isEdited: Bool {
+        #if HXPICKER_ENABLE_EDITOR
+        editedResult != nil
+        #else
+        false
+        #endif
+    }
 
     /// 图片/视频文件大小
     /// 1000 = 1kb
