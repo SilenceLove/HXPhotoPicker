@@ -1053,10 +1053,7 @@ class ResultViewCell: PhotoPickerViewCell {
     override func setupState() {
         super.setupState()
         if photoAsset.mediaSubType.isLivePhoto {
-            livePhotoButton.isHidden = true
-            assetTypeIcon.isHidden = false
-            assetTypeLb.text = "Live"
-            layoutView()
+            assetTypeLb.text = (photoAsset.isDisableLivePhoto || photoAsset.isEdited) ? nil : "Live"
         }
     }
     
