@@ -404,8 +404,17 @@ extension UIImage {
             kCGImageSourceShouldCacheImmediately: false
         ]
         if #available(macOS 14, iOS 17, tvOS 17, watchOS 10, *) {
-            decodingOptions[kCGImageSourceDecodeRequest] = kCGImageSourceDecodeToHDR
-        }
+			let handle = dlopen("/System/Library/Frameworks/ImageIO.framework/ImageIO", RTLD_LAZY)
+			defer { if handle != nil { dlclose(handle) } }
+
+			if let handle = handle,
+			   let keyPtr = dlsym(handle, "kCGImageSourceDecodeRequest"),
+			   let valPtr = dlsym(handle, "kCGImageSourceDecodeToHDR") {
+				let key = unsafeBitCast(keyPtr, to: CFString.self)
+				let value = unsafeBitCast(valPtr, to: CFTypeRef.self)
+				decodingOptions[key] = value
+			}
+		}
         guard let imageRef = CGImageSourceCreateImageAtIndex(sourceRef, 0, decodingOptions as CFDictionary) else {
             return nil
         }
