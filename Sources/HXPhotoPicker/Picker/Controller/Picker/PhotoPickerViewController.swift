@@ -274,9 +274,9 @@ extension PhotoPickerViewController {
                 }
             }
             if isLeft {
-                leftItems.append(.init(customView: view))
+                leftItems.append(.initCustomView(customView: view))
             }else {
-                rightItems.append(.init(customView: view))
+                rightItems.append(.initCustomView(customView: view))
             }
         }
         navigationItem.leftItemsSupplementBackButton = true

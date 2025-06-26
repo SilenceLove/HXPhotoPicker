@@ -66,7 +66,7 @@ class EditorMusicView: UIView {
         flowLayout.scrollDirection = .horizontal
         flowLayout.minimumLineSpacing = 15
         flowLayout.minimumInteritemSpacing = 0
-        collectionView = UICollectionView(
+        collectionView = HXCollectionView(
             frame: CGRect(x: 0, y: 0, width: 0, height: 50),
             collectionViewLayout: flowLayout
         )

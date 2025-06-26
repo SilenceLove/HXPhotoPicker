@@ -68,7 +68,7 @@ class EditorFilterParameterView: UIView {
         flowLayout = UICollectionViewFlowLayout()
         flowLayout.minimumLineSpacing = 0
         flowLayout.minimumInteritemSpacing = 0
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView = HXCollectionView(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.isScrollEnabled = false
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false

@@ -121,6 +121,13 @@ open class PhotoAsset: Equatable {
     public var isLocalAsset: Bool { mediaSubType.isLocal }
     public var isNetworkAsset: Bool { mediaSubType.isNetwork }
     
+    public var identifier: String {
+        if let phAsset = phAsset {
+            return phAsset.localIdentifier
+        }
+        return localAssetIdentifier
+    }
+    
     /// 根据系统相册里对应的 PHAsset 数据初始化
     /// - Parameter asset: 系统相册里对应的 PHAsset 数据
     public init(asset: PHAsset) {
@@ -262,13 +269,6 @@ open class PhotoAsset: Equatable {
     var playerTime: CGFloat = 0
     var isScrolling = false
     var requestVideoDurationId: PHImageRequestID?
-    
-    var identifie: String {
-        if let phAsset = phAsset {
-            return phAsset.localIdentifier
-        }
-        return localAssetIdentifier
-    }
     
     public static func == (lhs: PhotoAsset, rhs: PhotoAsset) -> Bool {
         lhs.isEqual(rhs)

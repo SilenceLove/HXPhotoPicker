@@ -50,8 +50,8 @@ final class EditorStickerTextViewController: HXBaseViewController {
         }
         initViews()
         navigationController?.view.backgroundColor = .clear
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: cancelButton)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: finishButton)
+        navigationItem.leftBarButtonItem = .initCustomView(customView: cancelButton)
+        navigationItem.rightBarButtonItem = .initCustomView(customView: finishButton)
         view.addSubview(bgView)
         view.addSubview(textView)
     }

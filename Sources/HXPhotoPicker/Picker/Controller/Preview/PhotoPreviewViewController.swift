@@ -238,7 +238,7 @@ extension PhotoPreviewViewController {
         collectionViewLayout.minimumLineSpacing = 0
         collectionViewLayout.minimumInteritemSpacing = 0
         collectionViewLayout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: collectionViewLayout)
+        collectionView = HXCollectionView(frame: view.bounds, collectionViewLayout: collectionViewLayout)
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -289,11 +289,11 @@ extension PhotoPreviewViewController {
                         style: .done,
                         target: self,
                         action: #selector(didCancelItemClick)
-                    )
+                    ).hidesShared()
                     navigationItem.leftBarButtonItem = cancelItem
                 }
                 if pickerConfig.isMultipleSelect {
-                    navigationItem.rightBarButtonItem = UIBarButtonItem(customView: selectBoxControl)
+                    navigationItem.rightBarButtonItem = .initCustomView(customView: selectBoxControl)
                 }
             }else {
                 var cancelItem: UIBarButtonItem
@@ -306,14 +306,14 @@ extension PhotoPreviewViewController {
                         style: .done,
                         target: self,
                         action: #selector(didCancelItemClick)
-                    )
+                    ).hidesShared()
                 }else {
                     cancelItem = UIBarButtonItem(
                         title: .textPreview.cancelTitle.text,
                         style: .done,
                         target: self,
                         action: #selector(didCancelItemClick)
-                    )
+                    ).hidesShared()
                 }
                 if config.cancelPosition == .left {
                     navigationItem.leftBarButtonItem = cancelItem
@@ -355,7 +355,7 @@ extension PhotoPreviewViewController {
                     style: .done,
                     target: self,
                     action: #selector(didCancelItemClick)
-                )
+                ).hidesShared()
                 navigationItem.leftBarButtonItem = cancelItem
             }
             if assetCount > 0 && currentPreviewIndex == 0 {
@@ -387,6 +387,7 @@ extension PhotoPreviewViewController {
         view.semanticContentAttribute = .forceLeftToRight
         collectionView.semanticContentAttribute = .forceLeftToRight
     }
+    
     func configBottomViewFrame() {
         if !config.isShowBottomView {
             return

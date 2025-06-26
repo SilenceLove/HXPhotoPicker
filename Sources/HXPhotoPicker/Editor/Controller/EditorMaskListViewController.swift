@@ -34,7 +34,7 @@ public class EditorMaskListViewController: HXBaseViewController, EditorMaskListP
         ) ?? 0
         finishButton.width = finishButtonWidth
         finishButton.height = 30
-        navigationItem.rightBarButtonItem = .init(customView: finishButton)
+        navigationItem.rightBarButtonItem = .initCustomView(customView: finishButton)
         view.addSubview(bgView)
         view.addSubview(collectionView)
     }
@@ -54,7 +54,7 @@ public class EditorMaskListViewController: HXBaseViewController, EditorMaskListP
         flowLayout.minimumLineSpacing = 10
         flowLayout.minimumInteritemSpacing = 10
         
-        collectionView = UICollectionView(
+        collectionView = HXCollectionView(
             frame: view.bounds,
             collectionViewLayout: flowLayout
         )

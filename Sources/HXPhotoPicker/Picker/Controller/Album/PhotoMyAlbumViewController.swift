@@ -35,7 +35,7 @@ public class PhotoMyAlbumViewController: UIViewController, UICollectionViewDataS
         flowLayout.minimumLineSpacing = 12
         flowLayout.minimumInteritemSpacing = 12
         flowLayout.sectionInset = .init(top: 10, left: 15, bottom: 10, right: 15)
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView = HXCollectionView(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.backgroundColor = .clear

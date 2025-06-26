@@ -89,7 +89,7 @@ class EditorMusicViewCell: UICollectionViewCell {
         flowLayout.minimumLineSpacing = 0
         flowLayout.minimumInteritemSpacing = 20
         flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
-        collectionView = UICollectionView(
+        collectionView = HXCollectionView(
             frame: CGRect(x: 0, y: 0, width: 0, height: 50),
             collectionViewLayout: flowLayout
         )

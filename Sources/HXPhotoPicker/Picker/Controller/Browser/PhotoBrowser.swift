@@ -281,7 +281,7 @@ open class PhotoBrowser: PhotoPickerController {
     }
     
     public func addRightItem(customView: UIView) {
-        previewViewController?.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: customView)
+        previewViewController?.navigationItem.rightBarButtonItem = .initCustomView(customView: customView)
     }
     
     @objc

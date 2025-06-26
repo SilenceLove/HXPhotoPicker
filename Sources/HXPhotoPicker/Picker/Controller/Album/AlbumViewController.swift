@@ -98,9 +98,9 @@ public class AlbumViewController: PhotoBaseViewController, PhotoAlbumListDelegat
             let view = item.init(config: pickerConfig)
             view.itemDelegate = self
             if index < config.leftNavigationItems.count {
-                leftItems.append(.init(customView: view))
+                leftItems.append(.initCustomView(customView: view))
             }else {
-                rightItems.append(.init(customView: view))
+                rightItems.append(.initCustomView(customView: view))
             }
         }
         if let titleLabel = titleLabel {

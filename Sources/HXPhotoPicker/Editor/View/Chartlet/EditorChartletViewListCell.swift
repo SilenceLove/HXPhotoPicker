@@ -49,7 +49,7 @@ class EditorChartletViewListCell: UICollectionViewCell,
         flowLayout.scrollDirection = .vertical
         flowLayout.minimumLineSpacing = 5
         flowLayout.minimumInteritemSpacing = 5
-        collectionView = UICollectionView.init(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView = HXCollectionView.init(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self

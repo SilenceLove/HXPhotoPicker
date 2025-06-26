@@ -444,6 +444,9 @@
 		D373DADE2BB111B00028EBD2 /* AssetPermissionsUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D373DADD2BB111B00028EBD2 /* AssetPermissionsUtil.swift */; };
 		D373DAE52BB118C90028EBD2 /* PhotoAsset+Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = D373DAE42BB118C90028EBD2 /* PhotoAsset+Image.swift */; };
 		D37E5D2A2BD108FF005E4C87 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D37E5D292BD108FF005E4C87 /* PrivacyInfo.xcprivacy */; };
+		D382AFC32E08085F001261D1 /* Core+UIBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D382AFC22E080856001261D1 /* Core+UIBarButtonItem.swift */; };
+		D382AFC52E081198001261D1 /* HXCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D382AFC42E08118C001261D1 /* HXCollectionView.swift */; };
+		D382AFC72E0811BA001261D1 /* HXTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D382AFC62E0811BA001261D1 /* HXTableView.swift */; };
 		D3837B2E2AA4312400F4D64E /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3837B2D2AA4312400F4D64E /* Extension.swift */; };
 		D3899BAB2AE621AB0052BAC7 /* PhotoPickerPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3899BAA2AE621AB0052BAC7 /* PhotoPickerPageViewController.swift */; };
 		D38AF2022BB660560094BBF6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D38AF2012BB660560094BBF6 /* Localizable.strings */; };
@@ -935,6 +938,9 @@
 		D373DADD2BB111B00028EBD2 /* AssetPermissionsUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetPermissionsUtil.swift; sourceTree = "<group>"; };
 		D373DAE42BB118C90028EBD2 /* PhotoAsset+Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhotoAsset+Image.swift"; sourceTree = "<group>"; };
 		D37E5D292BD108FF005E4C87 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		D382AFC22E080856001261D1 /* Core+UIBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Core+UIBarButtonItem.swift"; sourceTree = "<group>"; };
+		D382AFC42E08118C001261D1 /* HXCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXCollectionView.swift; sourceTree = "<group>"; };
+		D382AFC62E0811BA001261D1 /* HXTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXTableView.swift; sourceTree = "<group>"; };
 		D3837B2D2AA4312400F4D64E /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		D3899BAA2AE621AB0052BAC7 /* PhotoPickerPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerPageViewController.swift; sourceTree = "<group>"; };
 		D38AF2012BB660560094BBF6 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
@@ -1402,6 +1408,7 @@
 				D368787F2A399B8C00E70910 /* Core+URL.swift */,
 				D34417C82AD3DE8300ABFC68 /* Core+UITableView.swift */,
 				D34417CD2AD3E6FF00ABFC68 /* Core+UICollectionView.swift */,
+				D382AFC22E080856001261D1 /* Core+UIBarButtonItem.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -1466,6 +1473,8 @@
 				D3418DC02AA6D480005EB5FF /* VideoPlayer */,
 				D3418DBB2AA6D0A6005EB5FF /* ProgressHUD */,
 				D36878AF2A399B8C00E70910 /* SelectBoxView.swift */,
+				D382AFC42E08118C001261D1 /* HXCollectionView.swift */,
+				D382AFC62E0811BA001261D1 /* HXTableView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2560,6 +2569,7 @@
 				D360E9392A6BBBD500740B6B /* EditorViewController+Await.swift in Sources */,
 				D34417C72AD3DE4000ABFC68 /* Core+NSObject.swift in Sources */,
 				D360E71B2A6B726500740B6B /* PhotoManager.swift in Sources */,
+				D382AFC72E0811BA001261D1 /* HXTableView.swift in Sources */,
 				D360E71C2A6B726500740B6B /* PhotoManager+Download.swift in Sources */,
 				D360E71D2A6B726500740B6B /* PhotoManager+Language.swift in Sources */,
 				D30D76AC2AD54D4800F1B8EA /* PhotoDeniedAuthorization.swift in Sources */,
@@ -2594,6 +2604,7 @@
 				D3A8243A2BC13C49006226FD /* AssetManager+AVAssetExportSession.swift in Sources */,
 				D360E72F2A6B726500740B6B /* Picker+PHAssetCollection.swift in Sources */,
 				D32647C12AD63CEE00AD6E79 /* PhotoPickerControllerFectch.swift in Sources */,
+				D382AFC32E08085F001261D1 /* Core+UIBarButtonItem.swift in Sources */,
 				D3591D452B8ADC5000F1AEC4 /* PhotoBrowserInteractiveTransition.swift in Sources */,
 				D360E7302A6B726500740B6B /* Core+AVAsset.swift in Sources */,
 				D360E7312A6B726500740B6B /* Core+UIImageView.swift in Sources */,
@@ -2700,6 +2711,7 @@
 				D360E77C2A6B726500740B6B /* PhotoPickerViewCell.swift in Sources */,
 				D341E7AE2D6C5D8600874D74 /* SDImageView.swift in Sources */,
 				D341E7AF2D6C5D8600874D74 /* KFImageView.swift in Sources */,
+				D382AFC52E081198001261D1 /* HXCollectionView.swift in Sources */,
 				D360E77D2A6B726500740B6B /* PhotoPickerWeChatViewCell.swift in Sources */,
 				D360E77E2A6B726500740B6B /* PhotoPreviewSelectedViewCell.swift in Sources */,
 				D360E77F2A6B726500740B6B /* PhotoPreviewViewCell.swift in Sources */,
@@ -3102,7 +3114,7 @@
 					"-Wl",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xfrontend -debug-time-function-bodies";
-				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example30;
+				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example32;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -3163,7 +3175,7 @@
 					"-Wl",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xfrontend -debug-time-function-bodies";
-				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example30;
+				PRODUCT_BUNDLE_IDENTIFIER = com.silence.example32;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

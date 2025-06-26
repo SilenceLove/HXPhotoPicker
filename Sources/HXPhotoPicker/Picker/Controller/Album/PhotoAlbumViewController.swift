@@ -40,7 +40,7 @@ public class PhotoAlbumViewController: UIViewController, PhotoAlbumController {
 //            navigationItem.backBarButtonItem = .init(title: "", style: .plain, target: self, action: #selector(didBackClick))
 //        }
         initItems()
-        tableView = UITableView(frame: .zero, style: .grouped)
+        tableView = HXTableView(frame: .zero, style: .grouped)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.separatorStyle = .none
@@ -71,9 +71,9 @@ public class PhotoAlbumViewController: UIViewController, PhotoAlbumController {
             let view = item.init(config: config)
             view.itemDelegate = self
             if index < config.albumController.leftNavigationItems.count {
-                leftItems.append(.init(customView: view))
+                leftItems.append(.initCustomView(customView: view))
             }else {
-                rightItems.append(.init(customView: view))
+                rightItems.append(.initCustomView(customView: view))
             }
         }
         navigationItem.leftBarButtonItems = leftItems

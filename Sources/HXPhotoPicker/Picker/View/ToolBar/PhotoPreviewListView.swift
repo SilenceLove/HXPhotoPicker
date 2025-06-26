@@ -115,7 +115,7 @@ class PhotoPreviewListView: UIView {
     
     private func setUpViews() {
         let layout = PhotoPreviewListViewLayout(style: .collapsed)
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView = HXCollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.dataSource = self

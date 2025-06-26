@@ -142,7 +142,7 @@ class EditorFilterEditView: UIView {
         flowLayout.minimumLineSpacing = 10
         flowLayout.minimumInteritemSpacing = 0
         flowLayout.itemSize = CGSize(width: 60, height: 90)
-        collectionView = UICollectionView(
+        collectionView = HXCollectionView(
             frame: CGRect(x: 0, y: 0, width: 0, height: 50),
             collectionViewLayout: flowLayout
         )

@@ -188,6 +188,10 @@ public struct PhotoListConfiguration {
     /// 预览样式
     public var previewStyle: PhotoPickerPreviewJumpStyle = .push
     
+    /// 初始滚动到指定`PhotoAsset`对应的标识，为空时 默认滚动到最后一个选中的`PhotoAsset`
+    ///  PHAsset.localIdentifier / PhotoAsset.localAssetIdentifier
+    public var selectedAssetIdentifier: String?
+    
     public init() {
         #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
         if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {

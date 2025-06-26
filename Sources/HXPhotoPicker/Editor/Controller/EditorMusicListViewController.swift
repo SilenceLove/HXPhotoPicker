@@ -101,7 +101,7 @@ class EditorMusicListViewController: HXBaseViewController {
         }
         finishButton.width = finishButtonWidth
         finishButton.height = 30
-        navigationItem.rightBarButtonItem = .init(customView: finishButton)
+        navigationItem.rightBarButtonItem = .initCustomView(customView: finishButton)
         view.addSubview(bgView)
         view.addSubview(searchBgView)
         view.addSubview(searchView)
@@ -169,7 +169,7 @@ class EditorMusicListViewController: HXBaseViewController {
         flowLayout.minimumLineSpacing = 15
         flowLayout.minimumInteritemSpacing = 0
         
-        collectionView = UICollectionView(
+        collectionView = HXCollectionView(
             frame: CGRect(
                 x: 0, y: 0,
                 width: 0, height: 90

@@ -96,7 +96,7 @@ class EditorStickerTextView: UIView {
         flowLayout.scrollDirection = .horizontal
         flowLayout.minimumInteritemSpacing = 5
         flowLayout.itemSize = CGSize(width: 37, height: 37)
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView = HXCollectionView(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self

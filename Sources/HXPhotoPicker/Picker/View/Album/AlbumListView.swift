@@ -69,7 +69,7 @@ open class AlbumListView: UIView, PhotoAlbumList, UITableViewDataSource, UITable
         configColor()
     }
     public func initViews() {
-        tableView = UITableView(frame: .zero, style: .plain)
+        tableView = HXTableView(frame: .zero, style: .plain)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.separatorStyle = .none

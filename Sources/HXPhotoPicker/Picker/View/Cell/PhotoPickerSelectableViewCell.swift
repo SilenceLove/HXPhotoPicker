@@ -224,6 +224,9 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDe
             selectControl.layer.add(keyAnimation, forKey: "SelectControlAnimation")
         }
         if photoAsset.mediaSubType.isLivePhoto {
+            if !isSelected, livePhotoIsPlaying {
+                livePhotoView.stopPlayback()
+            }
             setupLivePhotoState()
         }else {
             livePhotoButton.isHidden = true
