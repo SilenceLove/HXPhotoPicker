@@ -12,10 +12,12 @@ public struct AssetResult {
     public let image: UIImage
     public var url: URL { urlReuslt.url }
     public let urlReuslt: AssetURLResult
+    public let photoAsset: PhotoAsset
     
-    public init(image: UIImage, urlReuslt: AssetURLResult) {
+    public init(image: UIImage, urlReuslt: AssetURLResult, photoAsset: PhotoAsset) {
         self.image = image
         self.urlReuslt = urlReuslt
+        self.photoAsset = photoAsset
     }
 }
 

@@ -218,7 +218,7 @@ public extension PhotoAsset {
         }
         group.notify(queue: .main) {
             if let image = image, let urlResult = urlResult {
-                completion(.success(.init(image: image, urlReuslt: urlResult)))
+                completion(.success(.init(image: image, urlReuslt: urlResult, photoAsset: self)))
             }else {
                 completion(.failure(error))
             }
