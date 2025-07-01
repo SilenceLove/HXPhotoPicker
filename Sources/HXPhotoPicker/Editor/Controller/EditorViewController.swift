@@ -50,6 +50,7 @@ open class EditorViewController: HXBaseViewController {
         editedResult = asset.result
         finishRatioIndex = config.cropSize.isRoundCrop ? -1 : config.cropSize.defaultSeletedIndex
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
     }
     
     var videoControlView: EditorVideoControlView!
@@ -649,20 +650,35 @@ open class EditorViewController: HXBaseViewController {
     var navFrame: CGRect?
     var firstAppear = true
     var isFullScreen: Bool {
-        let isFull = splitViewController?.modalPresentationStyle == .fullScreen
+        let isFull = splitViewController?.modalPresentationStyle == .fullScreen || splitViewController?.modalPresentationStyle == .overFullScreen
         if let nav = navigationController {
             if nav.presentingViewController == nil {
                 return true
             }
-            return nav.modalPresentationStyle == .fullScreen || nav.modalPresentationStyle == .custom || isFull
+            switch nav.modalPresentationStyle {
+            case .fullScreen, .overFullScreen, .custom:
+                return true
+            default:
+                break
+            }
+            return isFull
         }else {
             if presentingViewController == nil {
                 return true
             }
+            let style: UIModalPresentationStyle
             if let navModalStyle {
-                return navModalStyle == .fullScreen || navModalStyle == .custom || isFull
+                style = navModalStyle
+            }else {
+                style = modalPresentationStyle
             }
-            return modalPresentationStyle == .fullScreen || modalPresentationStyle == .custom || isFull
+            switch style {
+            case .fullScreen, .overFullScreen, .custom:
+                return true
+            default:
+                break
+            }
+            return isFull
         }
     }
     public override func viewDidLayoutSubviews() {
