@@ -1,5 +1,19 @@
 # 更新日志
     
+## 5.0.3
+
+### 新增
+
+- Picker
+  - 添加可以控制`LivePhoto`播放/静音
+
+### 修复
+
+- [[809]](https://github.com/SilenceLove/HXPhotoPicker/issues/809)
+- [[805]](https://github.com/SilenceLove/HXPhotoPicker/issues/805)
+- [[803]](https://github.com/SilenceLove/HXPhotoPicker/issues/803)
+- 以及一些bug...
+    
 ## 5.0.2
 
 ### 修复

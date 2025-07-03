@@ -1,5 +1,19 @@
 # Release Notes
     
+## 5.0.3
+
+### 新增
+
+- Picker
+  - Added the ability to control the playback/mute of `LivePhoto`
+
+### Resolved
+
+- [[809]](https://github.com/SilenceLove/HXPhotoPicker/issues/809)
+- [[805]](https://github.com/SilenceLove/HXPhotoPicker/issues/805)
+- [[803]](https://github.com/SilenceLove/HXPhotoPicker/issues/803)
+- And some bugs...
+    
 ## 5.0.2
 
 ### Resolved
