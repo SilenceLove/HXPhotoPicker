@@ -65,7 +65,7 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
     }
     
     open func requestLivePhoto(isPlay: Bool) {
-        guard photoAsset.mediaSubType == .livePhoto,
+        guard photoAsset.mediaSubType.isLivePhoto,
               PhotoManager.shared.thumbnailLoadMode == .complete else {
             return
         }
@@ -159,6 +159,7 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
         }else {
             livePhotoButton?.isHidden = true
             livePhotoView?.isHidden = true
+            removeLivePhotoView()
         }
     }
     
@@ -243,7 +244,7 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
     }
     
     open func createLivePhotoViewIfNeeded() {
-        guard livePhotoView == nil && config.isPlayLivePhoto && photoAsset.mediaSubType == .livePhoto && !photoAsset.isEdited && !photoAsset.isDisableLivePhoto else {
+        guard livePhotoView == nil && config.isPlayLivePhoto && photoAsset.mediaSubType.isLivePhoto && !photoAsset.isEdited && !photoAsset.isDisableLivePhoto else {
             return
         }
         let livePhotoView = PHLivePhotoView()
@@ -257,7 +258,7 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
     }
     
     open func createLivePhotoButtonIfNeeded() {
-        guard livePhotoButton == nil && config.isShowLivePhotoControl && photoAsset.mediaSubType == .livePhoto && !photoAsset.isEdited else {
+        guard livePhotoButton == nil && config.isShowLivePhotoControl && photoAsset.mediaSubType.isLivePhoto && !photoAsset.isEdited else {
             return
         }
         let livePhotoButton = UIButton(type: .custom)
