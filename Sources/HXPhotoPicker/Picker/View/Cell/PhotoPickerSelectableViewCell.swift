@@ -252,9 +252,9 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
         livePhotoView.playbackGestureRecognizer.isEnabled = false
         livePhotoView.delegate = self
         livePhotoView.isHidden = true
-        contentView.insertSubview(livePhotoView, aboveSubview: selectControl)
+        contentView.insertSubview(livePhotoView, aboveSubview: photoView)
         self.livePhotoView = livePhotoView
-        self.setNeedsLayout()
+        livePhotoView.frame = bounds
     }
     
     open func createLivePhotoButtonIfNeeded() {
@@ -277,7 +277,7 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
         livePhotoButton.isHidden = true
         contentView.addSubview(livePhotoButton)
         self.livePhotoButton = livePhotoButton
-        self.setNeedsLayout()
+        setupAssetTypeFrame()
     }
     
     func updateSelectControlSize() {
@@ -304,7 +304,7 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
                 requestLivePhoto(isPlay: !livePhotoButton.isSelected)
             }else {
                 if livePhotoButton.isSelected {
-                    removeLivePhotoView()
+                    livePhotoView.stopPlayback()
                 }else {
                     livePhotoView.startPlayback(with: .full)
                 }
