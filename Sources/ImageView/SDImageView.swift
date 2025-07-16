@@ -6,7 +6,7 @@
 //  Copyright © 2025 Silence. All rights reserved.
 //
 
-#if canImport(SDWebImage) && HXPICKER_ENABLE_CORE
+#if canImport(SDWebImage) && HXPICKER_ENABLE_CORE_IMAGEVIEW_SD
 import UIKit
 import SDWebImage
 import AVFoundation

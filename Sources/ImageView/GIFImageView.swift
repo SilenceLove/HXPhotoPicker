@@ -6,7 +6,7 @@
 //  Copyright © 2025 Silence. All rights reserved.
 //
 
-#if canImport(SwiftyGif) && HXPICKER_ENABLE_CORE
+#if canImport(SwiftyGif) && HXPICKER_ENABLE_CORE_IMAGEVIEW_GIF
 import UIKit
 import SwiftyGif
 

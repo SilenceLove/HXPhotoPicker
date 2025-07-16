@@ -6,7 +6,7 @@
 //  Copyright © 2025 Silence. All rights reserved.
 //
 
-#if canImport(Kingfisher) && HXPICKER_ENABLE_CORE
+#if canImport(Kingfisher) && HXPICKER_ENABLE_CORE_IMAGEVIEW_KF
 import UIKit
 import Kingfisher
 
