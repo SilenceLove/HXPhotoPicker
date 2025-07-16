@@ -257,7 +257,7 @@ public extension Array where Element: PhotoAsset {
                         }
                     }else {
                         photoAsset.getVideoURL(
-                            toFile: toImageURL,
+                            toFile: toVideoURL,
                             exportParameter: compression?.videoExportParameter
                         ) {
                             resultHandler($0)
