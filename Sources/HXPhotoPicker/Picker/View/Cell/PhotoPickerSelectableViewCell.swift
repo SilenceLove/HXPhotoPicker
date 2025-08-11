@@ -8,15 +8,15 @@
 import UIKit
 import PhotosUI
 
-open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDelegate {
+open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
     
     /// 选择按钮
     public var selectControl: SelectBoxView!
     
-    public var livePhotoView: PHLivePhotoView!
-    public var livePhotoRequestID: PHLivePhotoRequestID?
-    public var livePhotoButton: UIButton!
-    public var livePhotoIsPlaying: Bool = false
+    public private(set) var livePhotoView: PHLivePhotoView?
+    public private(set) var livePhotoButton: UIButton?
+    public private(set) var livePhotoRequestID: PHLivePhotoRequestID?
+    public private(set) var livePhotoIsPlaying: Bool = false
     
     /// 配置颜色
     open override func configColor() {
@@ -27,30 +27,6 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDe
     /// 添加视图
     open override func initView() {
         super.initView()
-        
-        livePhotoView = PHLivePhotoView()
-        livePhotoView.isMuted = true
-        livePhotoView.playbackGestureRecognizer.isEnabled = false
-        livePhotoView.delegate = self
-        livePhotoView.isHidden = true
-        contentView.addSubview(livePhotoView)
-        
-        livePhotoButton = UIButton(type: .custom)
-        livePhotoButton.setTitle(.textManager.picker.photoList.cell.LivePhotoTitle.text, for: .normal)
-        livePhotoButton.setTitleColor(.init(hexString: "#171717"), for: .normal)
-        livePhotoButton.setTitleColor(.white, for: .selected)
-        livePhotoButton.titleLabel?.font = .mediumPingFang(ofSize: 12)
-        livePhotoButton.setImage(.imageResource.picker.preview.livePhoto.image?.withRenderingMode(.alwaysTemplate), for: .normal)
-        livePhotoButton.setImage(.imageResource.picker.preview.livePhotoDisable.image?.withRenderingMode(.alwaysTemplate), for: .selected)
-        livePhotoButton.setBackgroundImage(.image(for: .white.withAlphaComponent(0.9), havingSize: .init(width: 50, height: 20), radius: 10), for: .normal)
-        livePhotoButton.setBackgroundImage(.image(for: .init(hexString: "404040"), havingSize: .init(width: 50, height: 20), radius: 10), for: .selected)
-        livePhotoButton.imageView?.tintColor = .init(hexString: "#171717")
-        livePhotoButton.titleEdgeInsets = .init(top: 0, left: 0, bottom: 0, right: 1)
-        livePhotoButton.imageEdgeInsets = .init(top: 0, left: 0, bottom: 0, right: 1)
-        livePhotoButton.addTarget(self, action: #selector(didLivePhotoButtonClick), for: .touchUpInside)
-        livePhotoButton.isHidden = true
-        contentView.addSubview(livePhotoButton)
-        
         selectControl = SelectBoxView(.init())
         selectControl.isHidden = true
         selectControl.backgroundColor = .clear
@@ -88,29 +64,8 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDe
         selectControl.isEnabled = !inICloud
     }
     
-    @objc
-    func didLivePhotoButtonClick() {
-        livePhotoButton.isSelected = !livePhotoButton.isSelected
-        livePhotoButton.imageView?.tintColor = livePhotoButton.isSelected ? .white : .init(hexString: "#171717")
-        photoAsset.isDisableLivePhoto = livePhotoButton.isSelected
-        photoAsset.pFileSize = nil
-        delegate?.pickerCell(livePhotoContorlDidChange: self)
-        if !config.isPlayLivePhoto {
-            return
-        }
-        if livePhotoView.livePhoto == nil {
-            requestLivePhoto(isPlay: !livePhotoButton.isSelected)
-        }else {
-            if livePhotoButton.isSelected {
-                livePhotoView.stopPlayback()
-            }else {
-                livePhotoView.startPlayback(with: .full)
-            }
-        }
-    }
-    
     open func requestLivePhoto(isPlay: Bool) {
-        guard photoAsset.mediaSubType == .livePhoto,
+        guard photoAsset.mediaSubType.isLivePhoto,
               PhotoManager.shared.thumbnailLoadMode == .complete else {
             return
         }
@@ -119,37 +74,12 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDe
             guard let self, self.photoAsset == photoAsset else {
                 return
             }
-            self.livePhotoView.livePhoto = livePhoto
+            self.livePhotoView?.livePhoto = livePhoto
             if isPlay {
-                self.livePhotoView.startPlayback(with: .full)
+                self.livePhotoView?.startPlayback(with: .full)
             }
         } failure: { _, _, _ in
             
-        }
-    }
-    
-    open func livePhotoView(_ livePhotoView: PHLivePhotoView, didEndPlaybackWith playbackStyle: PHLivePhotoViewPlaybackStyle) {
-        livePhotoIsPlaying = false
-        if livePhotoView.isHidden {
-            return
-        }
-        livePhotoView.alpha = 1
-        UIView.animate(withDuration: 0.25) {
-            livePhotoView.alpha = 0
-        } completion: {
-            if $0 {
-                livePhotoView.isHidden = true
-            }
-        }
-    }
-    
-    open func livePhotoView(_ livePhotoView: PHLivePhotoView, willBeginPlaybackWith playbackStyle: PHLivePhotoViewPlaybackStyle) {
-        livePhotoIsPlaying = true
-        livePhotoView.layer.removeAllAnimations()
-        livePhotoView.isHidden = false
-        livePhotoView.alpha = 0
-        UIView.animate(withDuration: 0.2) {
-            livePhotoView.alpha = 1
         }
     }
     
@@ -160,23 +90,21 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDe
             return
         }
         selectedAction(selectControl.isSelected)
-        if photoAsset.mediaSubType == .livePhoto,
-           !photoAsset.isEdited,
-           config.isPlayLivePhoto {
+        
+        createLivePhotoViewIfNeeded()
+        if let livePhotoView = self.livePhotoView {
             if selectControl.isSelected {
-                if !photoAsset.isDisableLivePhoto {
-                    if livePhotoView.livePhoto == nil {
-                        requestLivePhoto(isPlay: true)
-                    }else {
-                        livePhotoView.startPlayback(with: .full)
-                    }
+                if livePhotoView.livePhoto == nil {
+                    requestLivePhoto(isPlay: true)
+                }else {
+                    livePhotoView.startPlayback(with: .full)
                 }
             }else {
                 if livePhotoView.livePhoto == nil {
                     cancelLivePhotoRequest()
                 }
                 if livePhotoIsPlaying {
-                    livePhotoView.stopPlayback()
+                    removeLivePhotoView()
                 }
             }
         }
@@ -225,12 +153,13 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDe
         }
         if photoAsset.mediaSubType.isLivePhoto {
             if !isSelected, livePhotoIsPlaying {
-                livePhotoView.stopPlayback()
+                removeLivePhotoView()
             }
             setupLivePhotoState()
         }else {
-            livePhotoButton.isHidden = true
-            livePhotoView.isHidden = true
+            livePhotoButton?.isHidden = true
+            livePhotoView?.isHidden = true
+            removeLivePhotoView()
         }
     }
     
@@ -257,7 +186,8 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDe
     }
     
     open func cancelLivePhotoRequest() {
-        livePhotoView.stopPlayback()
+        livePhotoView?.stopPlayback()
+        
         guard let livePhotoRequestID else {
             return
         }
@@ -267,17 +197,17 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDe
     
     open override func layoutView() {
         super.layoutView()
-        livePhotoView.frame = bounds
+        livePhotoView?.frame = bounds
         updateSelectControlSize()
     }
     
     open override func setupState() {
         super.setupState()
-        livePhotoButton.isHidden = true
-        livePhotoView.isHidden = true
+        livePhotoButton?.isHidden = true
+        livePhotoView?.isHidden = true
         if photoAsset.mediaSubType.isLivePhoto {
             livePhotoIsPlaying = false
-            livePhotoView.livePhoto = nil
+            livePhotoView?.livePhoto = nil
             setupLivePhotoState()
         }else if photoAsset.mediaSubType.isVideo {
             setupAssetTypeFrame()
@@ -286,10 +216,9 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDe
     
     open override func setupAssetTypeFrame() {
         super.setupAssetTypeFrame()
-        
-        livePhotoButton.size = .init(width: 50, height: 20)
-        livePhotoButton.hxPicker_x = assetTypeIcon.hxPicker_x
-        livePhotoButton.hxPicker_center.y = assetTypeIcon.hxPicker_center.y
+        livePhotoButton?.size = .init(width: 50, height: 20)
+        livePhotoButton?.hxPicker_x = assetTypeIcon.hxPicker_x
+        livePhotoButton?.hxPicker_center.y = assetTypeIcon.hxPicker_center.y
     }
     
     open func setupLivePhotoState() {
@@ -298,17 +227,57 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDe
         }
         assetTypeIcon.image = .imageResource.picker.photoList.cell.livePhoto.image
         assetTypeMaskView.isHidden = false
-        if photoAsset.isSelected, config.isShowLivePhotoControl {
-            livePhotoButton.isHidden = false
-            livePhotoButton.isSelected = photoAsset.isDisableLivePhoto
-            livePhotoButton.imageView?.tintColor = livePhotoButton.isSelected ? .white : .init(hexString: "#171717")
-            assetTypeLb.text = ""
+        if photoAsset.isSelected {
+            createLivePhotoButtonIfNeeded()
+            if let livePhotoButton = livePhotoButton {
+                livePhotoButton.isHidden = false
+                livePhotoButton.isSelected = photoAsset.isDisableLivePhoto
+                livePhotoButton.imageView?.tintColor = livePhotoButton.isSelected ? .white : .init(hexString: "#171717")
+                assetTypeLb.text = ""
+            }
         }else {
-            livePhotoButton.isHidden = true
+            livePhotoButton?.isHidden = true
             assetTypeIcon.isHidden = false
             assetTypeLb.text = .textPhotoList.cell.LivePhotoTitle.text
             setupAssetTypeFrame()
         }
+    }
+    
+    open func createLivePhotoViewIfNeeded() {
+        guard livePhotoView == nil && config.isPlayLivePhoto && photoAsset.mediaSubType.isLivePhoto && !photoAsset.isEdited && !photoAsset.isDisableLivePhoto else {
+            return
+        }
+        let livePhotoView = PHLivePhotoView()
+        livePhotoView.isMuted = true
+        livePhotoView.playbackGestureRecognizer.isEnabled = false
+        livePhotoView.delegate = self
+        livePhotoView.isHidden = true
+        contentView.insertSubview(livePhotoView, aboveSubview: photoView)
+        self.livePhotoView = livePhotoView
+        livePhotoView.frame = bounds
+    }
+    
+    open func createLivePhotoButtonIfNeeded() {
+        guard livePhotoButton == nil && config.isShowLivePhotoControl && photoAsset.mediaSubType.isLivePhoto && !photoAsset.isEdited else {
+            return
+        }
+        let livePhotoButton = UIButton(type: .custom)
+        livePhotoButton.setTitle(.textManager.picker.photoList.cell.LivePhotoTitle.text, for: .normal)
+        livePhotoButton.setTitleColor(.init(hexString: "#171717"), for: .normal)
+        livePhotoButton.setTitleColor(.white, for: .selected)
+        livePhotoButton.titleLabel?.font = .mediumPingFang(ofSize: 12)
+        livePhotoButton.setImage(.imageResource.picker.preview.livePhoto.image?.withRenderingMode(.alwaysTemplate), for: .normal)
+        livePhotoButton.setImage(.imageResource.picker.preview.livePhotoDisable.image?.withRenderingMode(.alwaysTemplate), for: .selected)
+        livePhotoButton.setBackgroundImage(.image(for: .white.withAlphaComponent(0.9), havingSize: .init(width: 50, height: 20), radius: 10), for: .normal)
+        livePhotoButton.setBackgroundImage(.image(for: .init(hexString: "404040"), havingSize: .init(width: 50, height: 20), radius: 10), for: .selected)
+        livePhotoButton.imageView?.tintColor = .init(hexString: "#171717")
+        livePhotoButton.titleEdgeInsets = .init(top: 0, left: 0, bottom: 0, right: 1)
+        livePhotoButton.imageEdgeInsets = .init(top: 0, left: 0, bottom: 0, right: 1)
+        livePhotoButton.addTarget(self, action: #selector(didLivePhotoButtonClick), for: .touchUpInside)
+        livePhotoButton.isHidden = true
+        contentView.addSubview(livePhotoButton)
+        self.livePhotoButton = livePhotoButton
+        setupAssetTypeFrame()
     }
     
     func updateSelectControlSize() {
@@ -317,4 +286,70 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell, PHLivePhotoViewDe
             height: selectControl.height
         )
     }
+    
+    @objc
+    private func didLivePhotoButtonClick() {
+        guard let livePhotoButton = self.livePhotoButton else {
+            return
+        }
+        livePhotoButton.isSelected = !livePhotoButton.isSelected
+        livePhotoButton.imageView?.tintColor = livePhotoButton.isSelected ? .white : .init(hexString: "#171717")
+        photoAsset.isDisableLivePhoto = livePhotoButton.isSelected
+        photoAsset.pFileSize = nil
+        delegate?.pickerCell(livePhotoContorlDidChange: self)
+        
+        createLivePhotoViewIfNeeded()
+        if let livePhotoView = livePhotoView {
+            if livePhotoView.livePhoto == nil {
+                requestLivePhoto(isPlay: !livePhotoButton.isSelected)
+            }else {
+                if livePhotoButton.isSelected {
+                    livePhotoView.stopPlayback()
+                }else {
+                    livePhotoView.startPlayback(with: .full)
+                }
+            }
+        }
+    }
+    
+    private func removeLivePhotoView() {
+        guard let livePhotoView = self.livePhotoView else {
+            return
+        }
+        // 结束播放时移除，避免占用内存或影响滑动帧率
+        livePhotoView.stopPlayback()
+        livePhotoView.removeFromSuperview()
+        self.livePhotoView = nil
+    }
+    
+}
+
+extension PhotoPickerSelectableViewCell: PHLivePhotoViewDelegate {
+    
+    open func livePhotoView(_ livePhotoView: PHLivePhotoView, willBeginPlaybackWith playbackStyle: PHLivePhotoViewPlaybackStyle) {
+        assert(livePhotoView == self.livePhotoView)
+        livePhotoIsPlaying = true
+        livePhotoView.layer.removeAllAnimations()
+        livePhotoView.isHidden = false
+        livePhotoView.alpha = 0
+        UIView.animate(withDuration: 0.2) {
+            livePhotoView.alpha = 1
+        }
+    }
+    
+    open func livePhotoView(_ livePhotoView: PHLivePhotoView, didEndPlaybackWith playbackStyle: PHLivePhotoViewPlaybackStyle) {
+        assert(livePhotoView == self.livePhotoView)
+        livePhotoIsPlaying = false
+        if livePhotoView.isHidden {
+            removeLivePhotoView()
+            return
+        }
+        livePhotoView.alpha = 1
+        UIView.animate(withDuration: 0.25) {
+            livePhotoView.alpha = 0
+        } completion: { _ in
+            self.removeLivePhotoView()
+        }
+    }
+    
 }
