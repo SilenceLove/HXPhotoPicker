@@ -174,7 +174,7 @@ open class PhotoPickerData {
         return canSelect
     }
     
-    open func canSelectPhoto(_ photoAsset: PhotoAsset) -> (Bool, String?) {
+    open func canSelectPhoto(_ photoAsset: PhotoAsset, isFilterMaxCount: Bool = false) -> (Bool, String?) {
         var canSelect = true
         var text: String?
         if photoAsset.mediaType == .photo {
@@ -190,13 +190,15 @@ open class PhotoPickerData {
                     canSelect = false
                 }
             }
-            if config.maximumSelectedPhotoCount > 0, selectedPhotoAssets.count >= config.maximumSelectedPhotoCount {
-                text = String.init(format: .textManager.picker.maximumSelectedPhotoHudTitle.text, arguments: [config.maximumSelectedPhotoCount])
-                canSelect = false
-            }else {
-                if selectedAssets.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0 {
-                    text = .textManager.picker.maximumSelectedHudTitle.text
+            if !isFilterMaxCount {
+                if config.maximumSelectedPhotoCount > 0, selectedPhotoAssets.count >= config.maximumSelectedPhotoCount {
+                    text = String.init(format: .textManager.picker.maximumSelectedPhotoHudTitle.text, arguments: [config.maximumSelectedPhotoCount])
                     canSelect = false
+                }else {
+                    if selectedAssets.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0 {
+                        text = .textManager.picker.maximumSelectedHudTitle.text
+                        canSelect = false
+                    }
                 }
             }
         }
@@ -205,7 +207,8 @@ open class PhotoPickerData {
     
     open func canSelectVideo(
         _ photoAsset: PhotoAsset,
-        isFilterEditor: Bool
+        isFilterEditor: Bool,
+        isFilterMaxCount: Bool = false
     ) -> (Bool, String?) {
         var canSelect = true
         var text: String?
@@ -253,19 +256,21 @@ open class PhotoPickerData {
                     canSelect = false
                 }
             }
-            if !config.allowSelectedTogether {
-                if selectedPhotoAssets.count > 0 {
-                    text = .textManager.picker.videoTogetherSelectHudTitle.text
-                    canSelect = false
+            if !isFilterMaxCount {
+                if !config.allowSelectedTogether {
+                    if selectedPhotoAssets.count > 0 {
+                        text = .textManager.picker.videoTogetherSelectHudTitle.text
+                        canSelect = false
+                    }
                 }
-            }
-            if config.maximumSelectedVideoCount > 0, selectedVideoAssets.count >= config.maximumSelectedVideoCount {
-                text = String.init(format: .textManager.picker.maximumSelectedVideoHudTitle.text, arguments: [config.maximumSelectedVideoCount])
-                canSelect = false
-            }else {
-                if selectedAssets.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0 {
-                    text = .textManager.picker.maximumSelectedHudTitle.text
+                if config.maximumSelectedVideoCount > 0, selectedVideoAssets.count >= config.maximumSelectedVideoCount {
+                    text = String.init(format: .textManager.picker.maximumSelectedVideoHudTitle.text, arguments: [config.maximumSelectedVideoCount])
                     canSelect = false
+                }else {
+                    if selectedAssets.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0 {
+                        text = .textManager.picker.maximumSelectedHudTitle.text
+                        canSelect = false
+                    }
                 }
             }
         }
@@ -280,7 +285,8 @@ open class PhotoPickerData {
     open func canSelect(
         _ photoAsset: PhotoAsset,
         isShowHUD: Bool,
-        isFilterEditor: Bool = false
+        isFilterEditor: Bool = false,
+        isFilterMaxCount: Bool = false
     ) -> Bool {
         if let shouldSelect = delegate?.pickerData(self, canSelectAsset: photoAsset), !shouldSelect {
             return false
@@ -288,11 +294,11 @@ open class PhotoPickerData {
         var canSelect = true
         let text: String?
         if photoAsset.mediaType == .photo {
-            let result = canSelectPhoto(photoAsset)
+            let result = canSelectPhoto(photoAsset, isFilterMaxCount: isFilterMaxCount)
             canSelect = result.0
             text = result.1
         }else {
-            let result = canSelectVideo(photoAsset, isFilterEditor: isFilterEditor)
+            let result = canSelectVideo(photoAsset, isFilterEditor: isFilterEditor, isFilterMaxCount: isFilterMaxCount)
             canSelect = result.0
             text = result.1
         }

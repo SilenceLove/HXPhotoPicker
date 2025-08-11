@@ -42,7 +42,7 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
                 if !photoAsset.isSelected {
                     didSelectBoxControlClick()
                 }else {
-                    if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
+                    if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: true, isFilterMaxCount: true) {
                         didSelectBoxControlClick()
                     }
                 }
@@ -72,7 +72,7 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
             if !photoAsset.isSelected {
                 didSelectBoxControlClick()
             }else {
-                if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
+                if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: true, isFilterMaxCount: true) {
                     didSelectBoxControlClick()
                 }
             }

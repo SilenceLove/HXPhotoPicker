@@ -37,7 +37,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
                     }
                 }
             }else {
-                if pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
+                if pickerController.pickerData.canSelect(photoAsset, isShowHUD: true, isFilterMaxCount: true) {
                     listView.reloadCell(for: photoAsset)
                 }else {
                     deselectedAsset(photoAsset)
@@ -72,7 +72,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
                 finishItem?.selectedAssetDidChanged(pickerController.selectedAssetArray)
                 requestSelectedAssetFileSize()
             }else {
-                if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: true) {
+                if !pickerController.pickerData.canSelect(photoAsset, isShowHUD: true, isFilterMaxCount: true) {
                     deselectedAsset(photoAsset)
                 }
             }
