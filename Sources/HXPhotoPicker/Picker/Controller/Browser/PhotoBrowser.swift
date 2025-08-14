@@ -156,10 +156,11 @@ open class PhotoBrowser: PhotoPickerController {
             pageIndex: pageIndex,
             transitionalImage: transitionalImage
         )
-        browser.transitionAnimator = transitionAnimator
-        browser.transitionCompletion = transitionCompletion
         browser.numberOfPages = numberOfPages
         browser.assetForIndex = assetForIndex
+        browser.transitionAnimator = transitionAnimator
+        browser.transitionCompletion = transitionCompletion
+        browser.cellForIndex = cellForIndex
         browser.cellWillDisplay = cellWillDisplay
         browser.cellDidEndDisplaying = cellDidEndDisplaying
         browser.viewDidScroll = viewDidScroll
@@ -639,32 +640,26 @@ extension PhotoBrowser: PhotoPickerControllerDelegate {
     
     public func pickerController(
         _ pickerController: PhotoPickerController,
-        previewCellWillDisplay photoAsset: PhotoAsset,
+        previewCellWillDisplay cell: PhotoPreviewViewCell,
         at index: Int
     ) {
-        if let cell = getCell(for: index) {
-            cellWillDisplay?(cell, index, self)
-        }
+        cellWillDisplay?(cell, index, self)
     }
     
     public func pickerController(
         _ pickerController: PhotoPickerController,
-        previewCellDidEndDisplaying photoAsset: PhotoAsset,
+        previewCellDidEndDisplaying cell: PhotoPreviewViewCell,
         at index: Int
     ) {
-        if let cell = getCell(for: index) {
-            cellDidEndDisplaying?(cell, index, self)
-        }
+        cellDidEndDisplaying?(cell, index, self)
     }
     
     public func pickerController(
         _ pickerController: PhotoPickerController,
-        previewDidEndDecelerating photoAsset: PhotoAsset,
+        previewDidEndDecelerating cell: PhotoPreviewViewCell,
         at index: Int
     ) {
-        if let cell = getCell(for: index) {
-            viewDidEndDecelerating?(cell, index, self)
-        }
+        viewDidEndDecelerating?(cell, index, self)
     }
     
     // MARK: 单独预览时的自定义转场动画

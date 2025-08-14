@@ -78,6 +78,11 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
             previewCellWillDisplay: myCell.photoAsset,
             at: indexPath.item
         )
+        pickerController.pickerDelegate?.pickerController(
+            pickerController,
+            previewCellWillDisplay: myCell,
+            at: indexPath.item
+        )
     }
     public func collectionView(
         _ collectionView: UICollectionView,
@@ -89,6 +94,11 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
         pickerController.pickerDelegate?.pickerController(
             pickerController,
             previewCellDidEndDisplaying: myCell.photoAsset,
+            at: indexPath.item
+        )
+        pickerController.pickerDelegate?.pickerController(
+            pickerController,
+            previewCellDidEndDisplaying: myCell,
             at: indexPath.item
         )
     }
@@ -154,6 +164,11 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
             pickerController.pickerDelegate?.pickerController(
                 pickerController,
                 previewDidEndDecelerating: cell.photoAsset,
+                at: currentPreviewIndex
+            )
+            pickerController.pickerDelegate?.pickerController(
+                pickerController,
+                previewDidEndDecelerating: cell,
                 at: currentPreviewIndex
             )
         }

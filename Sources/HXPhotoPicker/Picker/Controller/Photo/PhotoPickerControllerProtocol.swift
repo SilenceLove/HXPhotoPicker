@@ -308,6 +308,17 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
         at index: Int
     )
     
+    /// 预览界面cell即将展示
+    /// - Parameters:
+    ///   - pickerController: 对应的 PhotoPickerController
+    ///   - cell: 对应显示的 Cell
+    ///   - index: 对应显示的位置
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        previewCellWillDisplay cell: PhotoPreviewViewCell,
+        at index: Int
+    )
+    
     /// 预览界面cell已经消失
     /// - Parameters:
     ///   - pickerController: 对应的 PhotoPickerController
@@ -319,6 +330,17 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
         at index: Int
     )
     
+    /// 预览界面cell已经消失
+    /// - Parameters:
+    ///   - pickerController: 对应的 PhotoPickerController
+    ///   - cell: 对应显示的 Cell
+    ///   - index: 对应显示的位置
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        previewCellDidEndDisplaying cell: PhotoPreviewViewCell,
+        at index: Int
+    )
+    
     /// 预览界面滚动停止
     /// - Parameters:
     ///   - pickerController: 对应的 PhotoPickerController
@@ -327,6 +349,17 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
     func pickerController(
         _ pickerController: PhotoPickerController,
         previewDidEndDecelerating photoAsset: PhotoAsset,
+        at index: Int
+    )
+    
+    /// 预览界面滚动停止
+    /// - Parameters:
+    ///   - pickerController: 对应的 PhotoPickerController
+    ///   - cell: 对应显示的 Cell
+    ///   - index: 对应显示的位置
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        previewDidEndDecelerating cell: PhotoPreviewViewCell,
         at index: Int
     )
     
@@ -672,13 +705,31 @@ public extension PhotoPickerControllerDelegate {
     
     func pickerController(
         _ pickerController: PhotoPickerController,
+        previewCellWillDisplay cell: PhotoPreviewViewCell,
+        at index: Int
+    ) { }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
         previewCellDidEndDisplaying photoAsset: PhotoAsset,
         at index: Int
     ) { }
     
     func pickerController(
         _ pickerController: PhotoPickerController,
+        previewCellDidEndDisplaying cell: PhotoPreviewViewCell,
+        at index: Int
+    ) { }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
         previewDidEndDecelerating photoAsset: PhotoAsset,
+        at index: Int
+    ) { }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        previewDidEndDecelerating cell: PhotoPreviewViewCell,
         at index: Int
     ) { }
     
