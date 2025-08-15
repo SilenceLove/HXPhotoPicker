@@ -28,10 +28,6 @@ public struct PickerConfiguration: IndicatorTypeConfig, PhotoDebugLogsConfig, Ph
     /// Selector display style, effective when albumShowMode = .popup and fullscreen popup
     /// 选择器展示样式，当 albumShowMode = .popup 并且全屏弹出时有效
     /// rightSwipe: 是否允许右滑手势返回。与微信右滑手势返回一致
-    /// ```swift
-    /// /// 如果返回过程中没有显示背景视图，请将fromVC传入
-    /// config.pickerPresentStyle = .present(rightSwipe: .init(50, viewControlls: [FromVC.self]))
-    /// ```
     public var pickerPresentStyle: PickerPresentStyle = .present()
     
     /// If the built-in language is not enough, you can add a custom language text

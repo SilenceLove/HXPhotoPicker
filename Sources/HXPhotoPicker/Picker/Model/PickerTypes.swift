@@ -65,11 +65,8 @@ public enum PickerPresentStyle {
     public struct RightSwipe {
         /// 右滑返回手势触发范围，距离屏幕左边的距离
         public let triggerRange: CGFloat
-        /// 如果返回过程中没有显示背景视图，请将fromVC传入
-        public let viewControlls: [UIViewController.Type]
-        public init(_ triggerRange: CGFloat, viewControlls: [UIViewController.Type] = []) {
+        public init(_ triggerRange: CGFloat) {
             self.triggerRange = triggerRange
-            self.viewControlls = viewControlls
         }
     }
 }

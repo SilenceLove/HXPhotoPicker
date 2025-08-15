@@ -39,41 +39,14 @@ public final class PhotoPickerControllerAnimator: NSObject, PhotoPickerControlle
         bgView.backgroundColor = .black.withAlphaComponent(0.1)
         if type == .push {
             bgView.alpha = 0
-            containerView.addSubview(fromVC.view)
+            if fromVC.view.superview == nil {
+                containerView.addSubview(fromVC.view)
+            }
             containerView.addSubview(bgView)
             containerView.addSubview(toVC.view)
         }else {
-            let isChartlet: Bool
-            #if HXPICKER_ENABLE_EDITOR
-            isChartlet = toVC is EditorChartletListProtocol
-            #else
-            isChartlet = false
-            #endif
-            if (toVC.transitioningDelegate == nil || toVC is PhotoPickerController) && !isChartlet {
+            if toVC.view.superview == nil {
                 containerView.addSubview(toVC.view)
-            }else {
-                if let vc = fromVC as? PhotoPickerController {
-                    switch vc.config.pickerPresentStyle {
-                    case .push(let rightSwipe):
-                        guard let rightSwipe = rightSwipe else {
-                            break
-                        }
-                        for type in rightSwipe.viewControlls where toVC.isKind(of: type) {
-                            containerView.addSubview(toVC.view)
-                            break
-                        }
-                    case .present(let rightSwipe):
-                        guard let rightSwipe = rightSwipe else {
-                            break
-                        }
-                        for type in rightSwipe.viewControlls where toVC.isKind(of: type) {
-                            containerView.addSubview(toVC.view)
-                            break
-                        }
-                    default:
-                        break
-                    }
-                }
             }
             containerView.addSubview(bgView)
             containerView.addSubview(fromVC.view)
