@@ -98,9 +98,9 @@ open class PhotoPreviewSelectedViewCell: UICollectionViewCell {
         selectedView.frame = bounds
         tickView.center = CGPoint(x: width * 0.5, y: height * 0.5)
          
-        deleteBtn.size = .init(width: 18, height: 18)
-        deleteBtn.y = 0
-        deleteBtn.x = width - deleteBtn.width
+        deleteBtn.size = .init(width: 19, height: 19)
+        deleteBtn.y = -5
+        deleteBtn.x = bounds.width - 14
     }
     
     required public init?(coder: NSCoder) {

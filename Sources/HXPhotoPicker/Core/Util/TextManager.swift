@@ -205,10 +205,10 @@ public extension HX.TextManager {
         public struct BottomView {
             public var permissionsTitle: TextType = .localized("无法访问相册中所有照片，\n请允许访问「照片」中的「所有照片」")
             public var permissionsTitleFont: UIFont = .systemFont(ofSize: 15)
-            public var finishTitle: TextType = .localized("完成")
+            public var finishTitle: TextType = .localized("确认") // FIXME: 还没有改 localized 文件
             public var finishTitleFont: UIFont = HXPickerWrapper<UIFont>.mediumPingFang(ofSize: 16)
             public var previewTitle: TextType = .localized("预览")
-            public var previewTitleFont: UIFont = .systemFont(ofSize: 17)
+            public var previewTitleFont: UIFont = .systemFont(ofSize: 14, weight: .semibold)
             public var editTitle: TextType = .localized("编辑")
             public var editTitleFont: UIFont = .systemFont(ofSize: 17)
             public var originalTitle: TextType = .localized("原图")

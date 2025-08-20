@@ -71,6 +71,9 @@ open class PhotoThumbnailView: UIView {
         super.init(frame: .zero)
         imageView = PhotoManager.ImageView.init()
         imageView.contentMode = .scaleAspectFill
+        
+        imageView.layer.cornerRadius = 8
+        
         imageView.clipsToBounds = true
         addSubview(imageView)
     }

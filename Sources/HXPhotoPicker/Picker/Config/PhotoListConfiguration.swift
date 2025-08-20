@@ -75,7 +75,7 @@ public struct PhotoListConfiguration {
     
     /// Gap between each photo
     /// 每个照片之间的间隙
-    public var spacing: CGFloat = 1
+    public var spacing: CGFloat = 4
     
     /// Allow Haptic Touch preview, iOS13+
     /// 允许 Haptic Touch 预览，iOS13 以上

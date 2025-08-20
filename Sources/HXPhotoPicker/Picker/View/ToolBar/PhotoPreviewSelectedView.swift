@@ -48,8 +48,8 @@ class PhotoPreviewSelectedView: UIView,
         super.init(frame: frame)
         collectionViewLayout = UICollectionViewFlowLayout()
         collectionViewLayout.scrollDirection = .horizontal
-        collectionViewLayout.minimumLineSpacing = 5
-        collectionViewLayout.minimumInteritemSpacing = 5
+        collectionViewLayout.minimumLineSpacing = 8
+        collectionViewLayout.minimumInteritemSpacing = 8
         collectionView = HXCollectionView(frame: bounds, collectionViewLayout: collectionViewLayout)
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
