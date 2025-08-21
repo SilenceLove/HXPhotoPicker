@@ -405,7 +405,7 @@ extension PhotoTools {
         
         config.photoSelectionTapAction = .quickSelect
         
-        let redColor = "#9631FE".color
+        let redColor = UIColor(red: 0.59, green: 0.19, blue: 1, alpha: 1)
         config.albumList.tickColor = redColor
         
         config.albumController.headerButtonTitleColor = redColor
