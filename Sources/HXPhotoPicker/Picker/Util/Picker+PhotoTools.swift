@@ -385,7 +385,7 @@ extension PhotoTools {
         return config
     }
     
-    public static var redBookConfig: PickerConfiguration {
+    public static func getRedBookConfig() -> PickerConfiguration {
         var config = getWXPickerConfig()
         config.languageType = .simplifiedChinese
         config.modalPresentationStyle = .fullScreen
@@ -462,6 +462,9 @@ extension PhotoTools {
         config.notAuthorized.closeButtonColor = redColor
         config.notAuthorized.jumpButtonBackgroundColor = redColor
         return config
-        
+    }
+    
+    public static var redBookConfig: PickerConfiguration {
+        self.getRedBookConfig()
     }
 }
