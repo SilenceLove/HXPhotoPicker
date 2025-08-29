@@ -1,6 +1,7 @@
 "无法访问相册中照片" = "Không thể truy cập ảnh trong album";
 "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。" = "Hiện không có quyền truy cập ảnh. Bạn nên đi tới cài đặt hệ thống,\ncho phép truy cập tất cả ảnh.";
 "前往系统设置" = "Đi tới cài đặt hệ thống";
+"设置" = "Cài đặt";
 "取消" = "Hủy";
 "相册" = "Album ảnh";
 "完成" = "Hoàn thành";
