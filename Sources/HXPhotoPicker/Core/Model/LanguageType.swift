@@ -38,6 +38,42 @@ public enum LanguageType: Equatable {
     case spanish
     /// 葡萄牙
     case portuguese
+    /// 阿姆哈拉语
+    case amharic
+    /// 孟加拉语
+    case bengali
+    /// 迪维希语
+    case divehi
+    /// 波斯语
+    case persian
+    /// 菲律宾语
+    case filipino
+    /// 豪萨语
+    case hausa
+    /// 希伯来语
+    case hebrew
+    /// 印地语
+    case hindi
+    /// 意大利语
+    case italian
+    /// 马来语
+    case malay
+    /// 尼泊尔语
+    case nepali
+    /// 旁遮普语
+    case punjabi
+    /// 僧伽罗语
+    case sinhala
+    /// 斯瓦希里语
+    case swahili
+    /// 叙利亚语
+    case syriac
+    /// 土耳其语
+    case turkish
+    /// 乌克兰语
+    case ukrainian
+    /// 乌尔都语
+    case urdu
     
     case custom(Bundle)
 }
