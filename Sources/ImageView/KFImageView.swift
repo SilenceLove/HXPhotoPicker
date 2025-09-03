@@ -56,7 +56,7 @@ public class KFImageView: AnimatedImageView, HXImageViewProtocol {
             }
         }
         let downloadTask = ImageDownloadTask {
-            task.cancel()
+            task?.cancel()
         }
         return downloadTask
     }
@@ -74,7 +74,7 @@ public class KFImageView: AnimatedImageView, HXImageViewProtocol {
             }
             .set(to: self)
         let downloadTask = ImageDownloadTask {
-            task.cancel()
+            task?.cancel()
         }
         return downloadTask
     }
