@@ -56,7 +56,7 @@ public class KFImageView: AnimatedImageView, HXImageViewProtocol {
             }
         }
         let downloadTask = ImageDownloadTask {
-            task?.cancel()
+            task.cancel()
         }
         return downloadTask
     }
