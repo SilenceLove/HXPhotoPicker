@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class PhotoToolBarView: UIToolbar, PhotoToolBar {
+public class PhotoToolBarView: UIView, PhotoToolBar {
     
     public weak var toolbarDelegate: PhotoToolBarDelegate?
     
@@ -74,6 +74,7 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     private var promptView: PhotoPermissionPromptView!
     private var selectedView: PhotoPreviewSelectedView!
     private var previewListView: PhotoPreviewListView!
+    private var backgroundView: UIVisualEffectView!
     private var contentView: UIView!
     private var previewBtn: UIButton!
     private var originalView: UIControl!
@@ -122,6 +123,9 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
         pickerConfig = config
         self.type = type
         super.init(frame: .zero)
+        
+        backgroundView = UIVisualEffectView()
+        addSubview(backgroundView)
         
         contentView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: 50 + UIDevice.bottomMargin))
         
@@ -444,6 +448,7 @@ public class PhotoToolBarView: UIToolbar, PhotoToolBar {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
+        backgroundView.frame = bounds
         contentView.width = width
         contentView.height = 50 + UIDevice.bottomMargin
         let leftMargin = self.leftMargin
@@ -683,8 +688,16 @@ extension PhotoToolBarView {
         let config = type == .picker ? pickerConfig.photoList.bottomView : pickerConfig.previewView.bottomView
         let isDark = PhotoManager.isDark
         backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
-        barTintColor = isDark ? config.barTintDarkColor : config.barTintColor
-        barStyle = isDark ? config.barDarkStyle : config.barStyle
+        tintColor = isDark ? config.barTintDarkColor : config.barTintColor
+        let style: UIBlurEffect.Style = {
+            if isDark {
+                return config.barDarkStyle == .default ? .light : .dark
+            } else {
+                return config.barStyle == .default ? .light : .dark
+            }
+        }()
+        backgroundView.effect = UIBlurEffect(style: style)
+        
         if type == .picker {
             let previewTitleColor = config.previewButtonTitleColor
             let previewTitleDarkColor = config.previewButtonTitleDarkColor

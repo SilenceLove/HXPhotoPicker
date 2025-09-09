@@ -11,15 +11,6 @@ import UIKit
 extension UIBarButtonItem {
     
     static func initCustomView(customView: UIView) -> UIBarButtonItem {
-//        if #available(iOS 26.0, *) {
-//            let container = UIView(frame: CGRect(x: 0, y: 0, width: customView.width, height: 44))
-//            container.addSubview(customView)
-//            customView.centerY = 22
-//            let barItem = UIBarButtonItem(customView: container)
-//            barItem.hidesSharedBackground = true
-//            barItem.sharesBackground = false
-//            return barItem
-//        }
         return .init(customView: customView).hidesShared()
     }
     

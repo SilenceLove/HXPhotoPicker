@@ -29,6 +29,7 @@ public class PhotoPickerFinishItemView: UIView, PhotoNavigationItem {
         button.isEnabled = false
         button.addTarget(self, action: #selector(didFinishButtonClick), for: .touchUpInside)
         addSubview(button)
+        
         setColor()
     }
     
@@ -67,19 +68,22 @@ public class PhotoPickerFinishItemView: UIView, PhotoNavigationItem {
             button.isEnabled = !config.photoList.bottomView.disableFinishButtonWhenNotSelected
             button.setTitle("完成".localized, for: .normal)
         }
-        updateButtonFrame()
+        self.setNeedsLayout()
     }
     
-    private func updateButtonFrame() {
-        var finishWidth: CGFloat = button.currentTitle!.localized.width(
-            ofFont: button.titleLabel!.font,
-            maxHeight: 50
-        ) + 20
-        if finishWidth < 60 {
-            finishWidth = 60
-        }
-        button.size = .init(width: finishWidth, height: 33)
-        size = button.size
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        let buttonSize = button.sizeThatFits(self.bounds.size)
+        button.frame = CGRect(
+            x: (self.bounds.width - buttonSize.width) / 2,
+            y: (self.bounds.height - buttonSize.height) / 2,
+            width: buttonSize.width,
+            height: buttonSize.height
+        )
+    }
+    
+    public override func sizeThatFits(_ size: CGSize) -> CGSize {
+        return button.sizeThatFits(size)
     }
     
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

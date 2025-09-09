@@ -31,10 +31,7 @@ public class PhotoPickerFilterItemView: UIView, PhotoNavigationItem {
         button.setImage(.imageResource.picker.photoList.filterSelected.image?.withRenderingMode(.alwaysTemplate), for: .selected)
         button.addTarget(self, action: #selector(didFilterClick), for: .touchUpInside)
         addSubview(button)
-        if let btnSize = button.currentImage?.size {
-            button.size = btnSize
-            size = button.size
-        }
+        
         setColor()
     }
     
@@ -52,6 +49,21 @@ public class PhotoPickerFilterItemView: UIView, PhotoNavigationItem {
         } else {
             itemDelegate?.photoItem(presentFilterAssets: self, modalPresentationStyle: .fullScreen)
         }
+    }
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        let buttonSize = button.sizeThatFits(self.bounds.size)
+        button.frame = CGRect(
+            x: (self.bounds.width - buttonSize.width) / 2,
+            y: (self.bounds.height - buttonSize.height) / 2,
+            width: buttonSize.width,
+            height: buttonSize.height
+        )
+    }
+    
+    public override func sizeThatFits(_ size: CGSize) -> CGSize {
+        return button.sizeThatFits(size)
     }
     
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
