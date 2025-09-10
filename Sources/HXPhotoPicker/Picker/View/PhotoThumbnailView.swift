@@ -142,18 +142,18 @@ open class PhotoThumbnailView: UIView {
                 guard let self = self else { return }
                 if let info = info, info.isCancel { return }
                 if self.photoAsset == photoAsset {
-                    if let image = image {
-                        self.requestCompletion(image)
-                        if !AssetManager.assetIsDegraded(for: info) {
-                            self.requestID = nil
-                            if PhotoManager.shared.thumbnailLoadMode == .complete {
-                                self.loadCompletion = true
-                            }
+                    self.requestCompletion(image)
+                    if image != nil, !AssetManager.assetIsDegraded(for: info) {
+                        self.requestID = nil
+                        if PhotoManager.shared.thumbnailLoadMode == .complete {
+                            self.loadCompletion = true
                         }
                     }
                     if PhotoManager.shared.thumbnailLoadMode == .complete {
                         self.completeLoading = false
                     }
+                } else {
+                    self.requestCompletion(nil)
                 }
                 completion?(image, photoAsset)
             }
