@@ -10,18 +10,16 @@ import UIKit
 extension UIImageView {
     
     func setImage(_ image: UIImage?, duration: CFTimeInterval = 0.2, animated: Bool = true) {
-        if let image = image {
-            if animated {
-                UIView.transition(
-                    with: self,
-                    duration: duration,
-                    options: [.transitionCrossDissolve, .curveEaseInOut, .allowUserInteraction]
-                ) {
-                    self.image = image
-                }
-            }else {
+        if let image, animated {
+            UIView.transition(
+                with: self,
+                duration: duration,
+                options: [.transitionCrossDissolve, .curveEaseInOut, .allowUserInteraction]
+            ) {
                 self.image = image
             }
+        } else {
+            self.image = image
         }
     }
 }
