@@ -16,7 +16,7 @@ extension UIDevice {
         if isPad {
             return true
         }
-        let statusBarOrientation = UIApplication.interfaceOrientation
+        let statusBarOrientation = UIApplication.hx_interfaceOrientation
         if  statusBarOrientation == .landscapeLeft ||
             statusBarOrientation == .landscapeRight {
             return false
@@ -100,7 +100,7 @@ extension UIDevice {
             if !Thread.isMainThread {
                 return UIScreen._size
             }
-            if let size = UIApplication._keyWindow?.size {
+            if let size = UIApplication.hx_keyWindow?.size {
                 return size
             }
         }
@@ -119,7 +119,7 @@ extension UIDevice {
     
     class var safeAreaInsets: UIEdgeInsets {
         if #available(iOS 11.0, *) {
-            if let safeAreaInsets = UIApplication._keyWindow?.safeAreaInsets {
+            if let safeAreaInsets = UIApplication.hx_keyWindow?.safeAreaInsets {
                 return safeAreaInsets
             }
         }

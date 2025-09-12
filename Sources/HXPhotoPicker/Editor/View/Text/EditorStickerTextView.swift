@@ -271,7 +271,7 @@ class EditorStickerTextView: UIView {
                 }
                 let buttonRect = convert(
                     .init(x: 0, y: firstTextButtonY, width: 50, height: 50),
-                    to: UIApplication._keyWindow
+                    to: UIApplication.hx_keyWindow
                 )
                 if buttonRect.maxY > keyboardFrame.minY {
                     textButton.y = height - (buttonRect.maxY - keyboardFrame.minY + 50)

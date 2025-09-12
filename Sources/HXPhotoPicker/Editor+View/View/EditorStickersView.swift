@@ -50,7 +50,7 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
         willSet {
             if let selectView = selectView,
                let selectSuperView = selectView.superview,
-               selectSuperView == UIApplication._keyWindow {
+               selectSuperView == UIApplication.hx_keyWindow {
                 endDragging(selectView)
             }
         }
@@ -322,7 +322,7 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
         if let center = delegate?.stickerView(itemCenter: self) {
             itemView.center = center
         }else {
-            if let keyWindow = UIApplication._keyWindow {
+            if let keyWindow = UIApplication.hx_keyWindow {
                 itemView.center = convert(keyWindow.center, from: keyWindow)
             }
         }
@@ -386,10 +386,10 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
         beforeItemArg = itemView.radian
         let radians = angle.radians
         currentItemDegrees = radians
-        if itemView.superview != UIApplication._keyWindow {
-            let rect = convert(itemView.frame, to: UIApplication._keyWindow)
+        if itemView.superview != UIApplication.hx_keyWindow {
+            let rect = convert(itemView.frame, to: UIApplication.hx_keyWindow)
             itemView.frame = rect
-            UIApplication._keyWindow?.addSubview(itemView)
+            UIApplication.hx_keyWindow?.addSubview(itemView)
         }
         let rotation: CGFloat
         if itemView.mirrorScale.x * itemView.mirrorScale.y == 1 {
@@ -421,7 +421,7 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
             return
         }
         let arg = itemView.radian - currentItemArg
-        if superview == UIApplication._keyWindow {
+        if superview == UIApplication.hx_keyWindow {
             let rect = superview.convert(itemView.frame, to: self)
             itemView.frame = rect
         }
@@ -551,7 +551,7 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
             startDragging(itemView)
         }
         if !trashViewIsVisible && (isShowTrash || itemView.item.isAudio) {
-            UIApplication._keyWindow?.addSubview(trashView)
+            UIApplication.hx_keyWindow?.addSubview(trashView)
             showTrashView()
         }
     }
@@ -605,7 +605,7 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
         if !isShowTrash && !itemView.item.isAudio {
             return
         }
-        let point = panGR.location(in: UIApplication._keyWindow)
+        let point = panGR.location(in: UIApplication.hx_keyWindow)
         if trashView.frame.contains(point) && !trashViewDidRemove {
             trashView.inArea = true
             if !hasImpactFeedback {
@@ -692,7 +692,7 @@ class EditorStickersView: UIView, EditorStickersItemViewDelegate {
         if let center = delegate?.stickerView(itemCenter: self) {
             return center
         }else {
-            if let keyWindow = UIApplication._keyWindow {
+            if let keyWindow = UIApplication.hx_keyWindow {
                 return convert(keyWindow.center, from: keyWindow)
             }
         }

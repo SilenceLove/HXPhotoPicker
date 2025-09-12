@@ -304,7 +304,7 @@ open class PhotoPickerData {
         }
         if let text = text, !canSelect, isShowHUD {
             DispatchQueue.main.async {
-                let view = UIViewController.topViewController?.navigationController?.view ?? UIApplication._keyWindow
+                let view = UIViewController.topViewController?.navigationController?.view ?? UIApplication.hx_keyWindow
                 PhotoManager.HUDView.showInfo(
                     with: text,
                     delay: 1.5,

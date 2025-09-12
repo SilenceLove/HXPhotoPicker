@@ -21,6 +21,8 @@ public final class SelectBoxView: UIControl {
         didSet {
             if config.style == .number {
                 textLayer.string = text
+                
+                updateTextLayerFrame()
             }
         }
     }
@@ -41,7 +43,14 @@ public final class SelectBoxView: UIControl {
         }
     }
     
-    var textSize: CGSize = CGSize.zero
+    var textSize: CGSize = CGSize.zero {
+        didSet {
+            guard oldValue != self.textSize else {
+                return
+            }
+            updateTextLayerFrame()
+        }
+    }
     
     private var backgroundLayer: CAShapeLayer!
     private var textLayer: CATextLayer!
@@ -71,16 +80,22 @@ public final class SelectBoxView: UIControl {
         tickLayer.contentsScale = UIScreen._scale
     }
     
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        updateBackgroundLayerFrame()
+        updateTickLayerFrame()
+        updateTextLayerFrame()
+    }
     
     private func backgroundPath() -> CGPath {
         let strokePath: UIBezierPath = .init(
             roundedRect: CGRect(
                 x: 0,
                 y: 0,
-                width: width,
-                height: height
+                width: config.size.width,
+                height: config.size.height
             ),
-            cornerRadius: height / 2
+            cornerRadius: config.size.height / 2
         )
         return strokePath.cgPath
     }
@@ -128,21 +143,6 @@ public final class SelectBoxView: UIControl {
         }
         
         let font: UIFont = .mediumPingFang(ofSize: config.titleFontSize)
-        var textHeight: CGFloat
-        var textWidth: CGFloat
-        if textSize.equalTo(CGSize.zero) {
-            textHeight = text.height(ofFont: font, maxWidth: CGFloat(MAXFLOAT))
-            textWidth = text.width(ofFont: font, maxHeight: textHeight)
-        }else {
-            textHeight = textSize.height
-            textWidth = textSize.width
-        }
-        textLayer.frame = CGRect(
-            x: (width - textWidth) * 0.5,
-            y: (height - textHeight) * 0.5,
-            width: textWidth,
-            height: textHeight
-        )
         textLayer.font = CGFont(font.fontName as CFString)
         textLayer.fontSize = config.titleFontSize
         let color = PhotoManager.isDark ? config.titleDarkColor : config.titleColor
@@ -151,9 +151,9 @@ public final class SelectBoxView: UIControl {
     
     private func tickPath() -> CGPath {
         let tickPath: UIBezierPath = .init()
-        tickPath.move(to: CGPoint(x: scale(8), y: height * 0.5 + scale(1)))
-        tickPath.addLine(to: CGPoint(x: width * 0.5 - scale(2), y: height - scale(8)))
-        tickPath.addLine(to: CGPoint(x: width - scale(7), y: scale(9)))
+        tickPath.move(to: CGPoint(x: scale(8), y: config.size.height * 0.5 + scale(1)))
+        tickPath.addLine(to: CGPoint(x: config.size.width * 0.5 - scale(2), y: config.size.height - scale(8)))
+        tickPath.addLine(to: CGPoint(x: config.size.width - scale(7), y: scale(9)))
         return tickPath.cgPath
     }
     private func drawTickLayer() {
@@ -170,13 +170,53 @@ public final class SelectBoxView: UIControl {
     }
     
     public func updateLayers() {
-        backgroundLayer.frame = bounds
-        if config.style == .tick {
-            tickLayer.frame = bounds
-        }
+        updateBackgroundLayerFrame()
+        updateTickLayerFrame()
+        updateTextLayerFrame()
+        
         drawBackgroundLayer()
         drawTextLayer()
         drawTickLayer()
+    }
+    
+    private func updateBackgroundLayerFrame() {
+        backgroundLayer.frame = CGRect(
+            x: (width - config.size.width) / 2,
+            y: (height - config.size.height) / 2,
+            width: config.size.width,
+            height: config.size.height
+        )
+    }
+    
+    private func updateTickLayerFrame() {
+        guard config.style == .tick else {
+            return
+        }
+        tickLayer.frame = CGRect(
+            x: (width - config.size.width) / 2,
+            y: (height - config.size.height) / 2,
+            width: config.size.width,
+            height: config.size.height
+        )
+    }
+    
+    private func updateTextLayerFrame() {
+        let font: UIFont = .mediumPingFang(ofSize: config.titleFontSize)
+        var textHeight: CGFloat
+        var textWidth: CGFloat
+        if textSize.equalTo(CGSize.zero) {
+            textHeight = text.height(ofFont: font, maxWidth: CGFloat(MAXFLOAT))
+            textWidth = text.width(ofFont: font, maxHeight: textHeight)
+        }else {
+            textHeight = textSize.height
+            textWidth = textSize.width
+        }
+        textLayer.frame = CGRect(
+            x: (width - textWidth) * 0.5,
+            y: (height - textHeight) * 0.5,
+            width: textWidth,
+            height: textHeight
+        )
     }
     
     required init?(coder: NSCoder) {

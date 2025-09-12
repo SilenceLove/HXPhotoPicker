@@ -74,27 +74,15 @@ extension UIDevice {
     
     class var safeAreaInsets: UIEdgeInsets {
         if #available(iOS 11.0, *) {
-            return UIApplication._keyWindow?.safeAreaInsets ?? .zero
+            return UIApplication.hx_keyWindow?.safeAreaInsets ?? .zero
         }
         return .zero
     }
     
     class var screenSize: CGSize {
         if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
-            return UIApplication._keyWindow?.frame.size ?? UIScreen.main.bounds.size
+            return UIApplication.hx_keyWindow?.frame.size ?? UIScreen.main.bounds.size
         }
         return UIScreen.main.bounds.size
-    }
-}
-
-extension UIApplication {
-    class var _keyWindow: UIWindow? {
-        var window: UIWindow?
-        if #available(iOS 13.0, *) {
-            window = shared.windows.filter({ $0.isKeyWindow }).last
-        } else {
-            window = shared.delegate?.window ?? shared.keyWindow
-        }
-        return window
     }
 }
