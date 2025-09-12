@@ -163,7 +163,7 @@ extension HomeViewController {
                 }
             case .camera:
                 if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
-                    PhotoTools.showAlert(viewController: UIApplication._keyWindow?.rootViewController, title: "Mac 不支持", message: nil, leftActionTitle: "确定")
+                    PhotoTools.showAlert(viewController: UIApplication.hx_keyWindow?.rootViewController, title: "Mac 不支持", message: nil, leftActionTitle: "确定")
                     return .init()
                 }
                 #if !targetEnvironment(macCatalyst)
