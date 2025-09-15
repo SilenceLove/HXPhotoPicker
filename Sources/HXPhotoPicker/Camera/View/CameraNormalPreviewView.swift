@@ -170,7 +170,7 @@ class CameraNormalPreviewView: UIView {
         guard let capture = previewLayer?.connection,
               capture.isVideoOrientationSupported else { return }
         let videoOrientation: AVCaptureVideoOrientation
-        let interfaceOrientation = UIApplication.interfaceOrientation
+        let interfaceOrientation = UIApplication.hx_interfaceOrientation
         switch interfaceOrientation {
         case .portrait:
             videoOrientation = .portrait

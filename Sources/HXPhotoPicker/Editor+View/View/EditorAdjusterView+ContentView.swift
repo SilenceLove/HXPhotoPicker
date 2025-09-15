@@ -269,7 +269,7 @@ extension EditorAdjusterView: EditorContentViewDelegate {
     }
     
     func contentView(_ contentView: EditorContentView, stickerItemCenter stickersView: EditorStickersView) -> CGPoint? {
-//        if let window = UIApplication._keyWindow {
+//        if let window = UIApplication.hx_keyWindow {
 //            let windowRect = window.convert(contentView.frame, from: self)
 //            let centerHeight: CGFloat
 //            if windowRect.height < window.height {
