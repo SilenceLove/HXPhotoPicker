@@ -200,6 +200,7 @@ public struct PickerBottomViewConfiguration {
         // The width of the tick when the original image button is selected
         // 原图按钮选中时的勾勾宽度
         boxConfig.tickWidth = 1
+        boxConfig.size = .init(width: 17, height: 17)
         self.originalSelectBox = boxConfig
     }
     
