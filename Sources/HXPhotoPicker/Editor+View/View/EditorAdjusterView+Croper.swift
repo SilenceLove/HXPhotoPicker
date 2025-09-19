@@ -220,69 +220,191 @@ extension EditorAdjusterView {
            let image = inputImage.merge(images: [overlayImage], opaque: isJPEGImage, isJPEG: isJPEGImage || isHEICImage, compressionQuality: 1, scale: exportScale) {
             inputImage = image
         }
-        guard let image = PhotoTools.cropImage(inputImage, cropFactor: cropFactor) else {
+        guard let imageData = cropImage(inputImage, compressionQuality: exportScale != self.exportScale ? 0.8 : 0.5, cropFactor: cropFactor),
+              let image = UIImage(data: imageData) else {
             DispatchQueue.main.async {
                 completion(.failure(EditorError.error(type: .cropImageFailed, message: "裁剪图片时发生错误")))
             }
             return
         }
-        getImageData(image, compressionQuality: exportScale != self.exportScale ? 0.8 : 0.5) { [weak self] in
+        let compressionQuality = cropFactor.isRound ? nil : self.getCompressionQuality(CGFloat(imageData.count), imageSize: image.size)
+        self.compressImageData(
+            imageData,
+            compressionQuality: compressionQuality
+        ) { [weak self] data in
             guard let self = self,
-                  let imageData = $0
-            else {
+                  let data = data,
+                  let image = UIImage(data: data)?.normalizedImage() else {
                 DispatchQueue.main.async {
-                    completion(.failure(EditorError.error(type: .dataAcquisitionFailed, message: "imageData获取失败")))
+                    completion(.failure(EditorError.error(type: .compressionFailed, message: "图片压缩失败")))
                 }
                 return
             }
-            let compressionQuality = cropFactor.isRound ? nil : self.getCompressionQuality(CGFloat(imageData.count), imageSize: image.size)
-            self.compressImageData(
-                imageData,
-                compressionQuality: compressionQuality
-            ) { [weak self] data in
-                guard let self = self,
-                      let data = data,
-                      let image = UIImage(data: data)?.normalizedImage() else {
-                    DispatchQueue.main.async {
-                        completion(.failure(EditorError.error(type: .compressionFailed, message: "图片压缩失败")))
-                    }
-                    return
-                }
-                let urlConfig: EditorURLConfig
-                if let config = self.urlConfig {
-                    urlConfig = config
-                }else {
-                    let fileName = String.fileName(suffix: data.isGif ? "gif" : (isJPEGImage ? "jpeg" : "png"))
-                    urlConfig = .init(fileName: fileName, type: .temp)
-                }
-                if PhotoTools.write(toFile: urlConfig.url, imageData: data) == nil {
-                    DispatchQueue.main.async {
-                        completion(.failure(.error(type: .writeFileFailed, message: "图片写入文件失败：\(urlConfig.url)")))
-                    }
-                    return
-                }
-                let thumbImage: UIImage?
-                if image.width * image.height < 40000 {
-                    thumbImage = image
-                }else {
-                    thumbImage = image.scaleToFillSize(size: .init(width: 200, height: 200))
-                }
+            let urlConfig: EditorURLConfig
+            if let config = self.urlConfig {
+                urlConfig = config
+            }else {
+                let fileName = String.fileName(suffix: data.isGif ? "gif" : (isJPEGImage ? "jpeg" : "png"))
+                urlConfig = .init(fileName: fileName, type: .temp)
+            }
+            if PhotoTools.write(toFile: urlConfig.url, imageData: data) == nil {
                 DispatchQueue.main.async {
-                    if let thumbImage {
-                        completion(
-                            .success(.init(
-                                image: thumbImage,
-                                urlConfig: urlConfig,
-                                imageType: .normal,
-                                data: self.getData()
-                            ))
-                        )
-                    }else {
-                        completion(.failure(.error(type: .compressionFailed, message: "封面图片压缩失败")))
-                    }
+                    completion(.failure(.error(type: .writeFileFailed, message: "图片写入文件失败：\(urlConfig.url)")))
+                }
+                return
+            }
+            let thumbImage: UIImage?
+            if image.width * image.height < 40000 {
+                thumbImage = image
+            }else {
+                thumbImage = image.scaleToFillSize(size: .init(width: 200, height: 200))
+            }
+            DispatchQueue.main.async {
+                if let thumbImage {
+                    completion(
+                        .success(.init(
+                            image: thumbImage,
+                            urlConfig: urlConfig,
+                            imageType: .normal,
+                            data: self.getData()
+                        ))
+                    )
+                }else {
+                    completion(.failure(.error(type: .compressionFailed, message: "封面图片压缩失败")))
                 }
             }
         }
+    }
+    
+    func cropImage(
+        _ inputImage: UIImage?,
+        compressionQuality: CGFloat,
+        cropFactor: EditorAdjusterView.CropFactor
+    ) -> Data? {
+        guard let inputImage = inputImage?.normalizedImage(), let imageRef = inputImage.cgImage else {
+            return nil
+        }
+        if cropFactor.sizeRatio.equalTo(.init(x: 1, y: 1)),
+           cropFactor.mirrorScale.equalTo(.init(x: 1, y: 1)),
+           cropFactor.angle == 0,
+           !cropFactor.isRound,
+           cropFactor.maskImage == nil {
+            if isJPEGImage {
+                return inputImage.jpegData(compressionQuality: compressionQuality)
+            }
+            if isHEICImage {
+                if #available(iOS 17.0, *) {
+                    return inputImage.heicData()
+                } else {
+                    return inputImage.jpegData(compressionQuality: compressionQuality)
+                }
+            }
+            return inputImage.pngData()
+        }
+        let width = CGFloat(imageRef.width)
+        let height = CGFloat(imageRef.height)
+        let rendWidth = width * cropFactor.sizeRatio.x
+        let rendHeight = height * cropFactor.sizeRatio.y
+        
+        let centerX = width * cropFactor.centerRatio.x
+        let centerY = height * cropFactor.centerRatio.y
+        
+        let translationX = -(centerX - width * 0.5)
+        let translationY = -(height * 0.5 - centerY)
+        
+        var bitmapRawValue = CGBitmapInfo.byteOrder32Little.rawValue
+        let alphaInfo = imageRef.alphaInfo
+        var hasAlpha: Bool = false
+        if alphaInfo == .premultipliedLast ||
+            alphaInfo == .premultipliedFirst ||
+            alphaInfo == .last ||
+            alphaInfo == .first ||
+            cropFactor.isRound ||
+            cropFactor.maskImage != nil {
+            bitmapRawValue += CGImageAlphaInfo.premultipliedFirst.rawValue
+            hasAlpha = true
+        } else {
+            bitmapRawValue += CGImageAlphaInfo.noneSkipFirst.rawValue
+            hasAlpha = false
+        }
+        
+        guard let context = CGContext(
+            data: nil,
+            width: Int(rendWidth),
+            height: Int(rendHeight),
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: bitmapRawValue
+        ) else {
+            return nil
+        }
+        context.setShouldAntialias(true)
+        context.setAllowsAntialiasing(true)
+        context.interpolationQuality = .high
+        
+        context.translateBy(x: rendWidth * 0.5, y: rendHeight * 0.5)
+        context.scaleBy(x: cropFactor.mirrorScale.x, y: cropFactor.mirrorScale.y)
+        context.rotate(by: -cropFactor.angle.radians)
+        
+        let transform = CGAffineTransform(translationX: translationX, y: translationY)
+        context.concatenate(transform)
+        if cropFactor.isRound {
+            context.addArc(
+                center: .init(x: -translationX, y: -translationY),
+                radius: max(rendWidth, rendHeight) * 0.5,
+                startAngle: 0,
+                endAngle: .pi * 2,
+                clockwise: true
+            )
+            context.clip()
+        }
+        let rect = CGRect(origin: .init(x: -width * 0.5, y: -height * 0.5), size: CGSize(width: width, height: height))
+        context.draw(imageRef, in: rect)
+        guard var newImageRef = context.makeImage() else {
+            return nil
+        }
+        if let maskImage = cropFactor.maskImage?.convertBlackImage()?.cgImage {
+            guard let context = CGContext(
+                data: nil,
+                width: Int(rendWidth),
+                height: Int(rendHeight),
+                bitsPerComponent: 8,
+                bytesPerRow: 0,
+                space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: bitmapRawValue
+            ) else {
+                return nil
+            }
+            context.setShouldAntialias(true)
+            context.setAllowsAntialiasing(true)
+            context.interpolationQuality = .high
+            context.translateBy(x: rendWidth * 0.5, y: rendHeight * 0.5)
+            context.clip(
+                to: .init(x: -rendWidth * 0.5, y: -rendHeight * 0.5, width: rendWidth, height: rendHeight),
+                mask: maskImage
+            )
+            let rect = CGRect(
+                origin: .init(x: -rendWidth * 0.5, y: -rendHeight * 0.5),
+                size: CGSize(width: rendWidth, height: rendHeight)
+            )
+            context.draw(newImageRef, in: rect)
+            guard let _newImageRef = context.makeImage() else {
+                return nil
+            }
+            newImageRef = _newImageRef
+        }
+        if isHEICImage {
+            return newImageRef.heicData(quality: compressionQuality)
+        }
+        if isJPEGImage {
+            if hasAlpha {
+                return newImageRef.heicData(quality: compressionQuality)
+            }else {
+                return newImageRef.jpegData(quality: compressionQuality)
+            }
+        }
+        return newImageRef.pngData()
     }
 }
 

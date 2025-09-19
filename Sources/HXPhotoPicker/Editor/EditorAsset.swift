@@ -18,6 +18,8 @@ public struct EditorAsset {
     /// 编辑结果
     public var result: EditedResult?
     
+    public var contentType: EditorContentViewType { type.contentType }
+    
     public var url: URL? { result?.url }
     
     public var image: UIImage? { result?.image }
@@ -102,9 +104,5 @@ extension EditorAsset {
             #endif
             }
         }
-    }
-    
-    public var contentType: EditorContentViewType {
-        type.contentType
     }
 }
