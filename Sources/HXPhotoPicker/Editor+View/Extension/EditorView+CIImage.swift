@@ -6,6 +6,9 @@
 //
 
 import UIKit
+import ImageIO
+import MobileCoreServices
+import UniformTypeIdentifiers
 
 extension CIImage {
     
@@ -61,5 +64,49 @@ extension CIImage {
         }
         let retVal = CIImage(cgImage: cgImage)
         return retVal
+    }
+}
+
+extension CGImage {
+    func pngData() -> Data? {
+        let data = NSMutableData()
+        guard let dest = CGImageDestinationCreateWithData(data, kUTTypePNG, 1, nil) else {
+            return nil
+        }
+        CGImageDestinationAddImage(dest, self, nil)
+        CGImageDestinationFinalize(dest)
+        return data as Data
+    }
+    
+    func jpegData(quality: CGFloat) -> Data? {
+        let data = NSMutableData()
+        guard let dest = CGImageDestinationCreateWithData(data, kUTTypeJPEG, 1, nil) else {
+            return nil
+        }
+        let options: [CFString: Any] = [
+            kCGImageDestinationLossyCompressionQuality: quality
+        ]
+        CGImageDestinationAddImage(dest, self, options as CFDictionary)
+        CGImageDestinationFinalize(dest)
+        return data as Data
+    }
+    
+    func heicData(quality: CGFloat) -> Data? {
+        let data = NSMutableData()
+        let utType: CFString
+        if #available(iOS 14.0, *) {
+            utType = UTType.heic.identifier as CFString
+        } else {
+            utType = "public.heic" as CFString
+        }
+        guard let dest = CGImageDestinationCreateWithData(data, utType, 1, nil) else {
+            return nil
+        }
+        let options: [CFString: Any] = [
+            kCGImageDestinationLossyCompressionQuality: quality
+        ]
+        CGImageDestinationAddImage(dest, self, options as CFDictionary)
+        CGImageDestinationFinalize(dest)
+        return data as Data
     }
 }
