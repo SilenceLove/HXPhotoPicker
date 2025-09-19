@@ -85,7 +85,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "5.0.3"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "5.0.4"))
 ]
 ```
 
@@ -733,7 +733,7 @@ let livePhoto = try await photoAsset.requestLivePhoto()
   
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
-| [v5.0.3](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#503) | 2025-07-03 | 16.2.0 | 6.0.0 | 10.0+ | 
+| [v5.0.4](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#504) | 2025-09-19 | 26.0.0 | 6.0.0 | 10.0+ | 
 </details>
 
 <details open id="History record">
@@ -741,6 +741,7 @@ let livePhoto = try await photoAsset.requestLivePhoto()
   
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v5.0.3](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#503) | 2025-07-03 | 16.2.0 | 6.0.0 | 10.0+ | 
 | [v5.0.2](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#502) | 2025-05-21 | 16.2.0 | 6.0.0 | 10.0+ | 
 | [v5.0.1](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#501) | 2025-03-31 | 16.0.0 | 6.0.0 | 10.0+ | 
 | [v5.0.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#500) | 2025-03-03 | 16.0.0 | 6.0.0 | 10.0+ | 
