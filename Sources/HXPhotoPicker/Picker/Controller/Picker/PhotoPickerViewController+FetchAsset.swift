@@ -105,6 +105,13 @@ extension PhotoPickerViewController {
     }
     
     func reloadAlbumData() {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async {
+                self.reloadAlbumData()
+            }
+            return
+        }
+        guard let albumView else { return }
         if pickerConfig.albumShowMode.isPopView, !pickerController.splitType.isSplit {
             albumView.selectedAssetCollection = assetCollection
             albumView.reloadData()

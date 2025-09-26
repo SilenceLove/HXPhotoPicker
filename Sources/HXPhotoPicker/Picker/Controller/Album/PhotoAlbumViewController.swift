@@ -106,7 +106,9 @@ public class PhotoAlbumViewController: UIViewController, PhotoAlbumController {
         if !systemAlbums.isEmpty {
             datas.append(.init(title: .textManager.picker.albumList.mediaSectionTitle.text, assetCollections: systemAlbums))
         }
-        tableView.reloadData()
+        if let tableView {
+            tableView.reloadData()
+        }
     }
     
     func updateColors() {

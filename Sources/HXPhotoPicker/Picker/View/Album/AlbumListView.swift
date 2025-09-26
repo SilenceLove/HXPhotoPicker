@@ -118,6 +118,7 @@ open class AlbumListView: UIView, PhotoAlbumList, UITableViewDataSource, UITable
     }
     
     public func reloadData() {
+        guard let tableView else { return }
         tableView.reloadData()
     }
     

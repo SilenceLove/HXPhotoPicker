@@ -73,7 +73,9 @@ open class PhotoPickerController: UINavigationController {
     /// 刷新相册数据，只对单独控制器展示的有效
     public func reloadAlbumData() {
         if splitType.isSplit {
-            albumViewController?.listView.reloadData()
+            if let listView = albumViewController?.listView {
+                listView.reloadData()
+            }
         }else {
             if config.albumShowMode.isPopView {
                 pickerViewController?.reloadAlbumData()
