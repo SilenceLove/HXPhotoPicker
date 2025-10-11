@@ -46,7 +46,7 @@ Pod::Spec.new do |spec|
     
     spec.subspec 'Camera' do |camera|
         camera.subspec 'Lite' do |lite|
-            lite.source_files   = "Sources/HXPhotoPicker/Camera/**/*.{swift,metal}"
+            lite.source_files   = "Sources/HXPhotoPicker/Camera/**/*.{swift}"
             lite.dependency 'HXPhotoPicker/Core'
             lite.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'HXPICKER_ENABLE_CAMERA' }
         end

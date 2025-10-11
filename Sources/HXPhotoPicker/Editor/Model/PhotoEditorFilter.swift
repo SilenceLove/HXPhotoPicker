@@ -6,8 +6,6 @@
 //
 
 import UIKit
-import MetalKit
-import Metal
 
 /// 需要添加滤镜的原始图片、上一次添加滤镜的图片，滤镜参数，是否是滤镜列表封面
 public typealias PhotoEditorFilterHandler = (CIImage, UIImage?, [PhotoEditorFilterParameterInfo], Bool) -> CIImage?

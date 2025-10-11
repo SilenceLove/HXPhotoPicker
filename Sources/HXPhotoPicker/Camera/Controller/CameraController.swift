@@ -13,11 +13,6 @@ import Photos
 #if !targetEnvironment(macCatalyst)
 open class CameraController: UINavigationController {
     
-    public enum CameraType {
-        case normal
-        case metal
-    }
-    
     /// 相机拍摄类型
     public enum CaptureType {
         // 拍照

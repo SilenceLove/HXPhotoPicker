@@ -53,38 +53,10 @@ class CameraManager: NSObject {
     private var isDevicePortrait = true
     private let context = CIContext(options: nil)
     
-    let videoFilter: CameraRenderer
-    let photoFilter: CameraRenderer
-    var filterIndex: Int {
-        get {
-            videoFilter.filterIndex
-        }
-        set {
-            videoFilter.filterIndex = newValue
-            photoFilter.filterIndex = newValue
-        }
-    }
     
     init(config: CameraConfiguration) {
         self.flashMode = config.flashMode
         self.config = config
-        if config.cameraType == .metal {
-            var photoFilters = self.config.photoFilters
-            photoFilters.insert(OriginalFilter(), at: 0)
-            var videoFilters = self.config.videoFilters
-            videoFilters.insert(OriginalFilter(), at: 0)
-            var index = config.defaultFilterIndex
-            if index == -1 {
-                index = 0
-            }else {
-                index += 1
-            }
-            self.photoFilter = .init(photoFilters, index)
-            self.videoFilter = .init(videoFilters, index)
-        }else {
-            self.photoFilter = .init([], 0)
-            self.videoFilter = .init([], 0)
-        }
         super.init()
         videoOutput = AVCaptureVideoDataOutput()
         videoOutput.videoSettings = [
@@ -428,13 +400,7 @@ extension CameraManager {
         guard let device = activeCamera else {
             return
         }
-        let deviceRect: CGRect
-        if config.cameraType == .metal {
-            let textureRect = CGRect(origin: point, size: .zero)
-            deviceRect = videoOutput.metadataOutputRectConverted(fromOutputRect: textureRect)
-        }else {
-            deviceRect = .init(origin: point, size: .zero)
-        }
+        let deviceRect: CGRect = .init(origin: point, size: .zero)
         let exposureMode = AVCaptureDevice.ExposureMode.continuousAutoExposure
         let focusMode = AVCaptureDevice.FocusMode.continuousAutoFocus
         let canResetFocus = device.isFocusPointOfInterestSupported &&
@@ -645,29 +611,6 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         )
         DispatchQueue.global().async {
             var finalPixelBuffer = photoPixelBuffer
-            if self.config.cameraType == .metal, self.photoFilter.filterIndex > 0 {
-                if !self.photoFilter.isPrepared {
-                    if let formatDescription = photoFormatDescription {
-                        self.photoFilter.prepare(
-                            with: formatDescription,
-                            outputRetainedBufferCountHint: 2,
-                            imageSize: .init(
-                                width: CVPixelBufferGetWidth(photoPixelBuffer),
-                                height: CVPixelBufferGetHeight(photoPixelBuffer)
-                            )
-                        )
-                    }
-                }
-                guard let filteredBuffer = self.photoFilter.render(
-                    pixelBuffer: photoPixelBuffer
-                ) else {
-                    DispatchQueue.main.async {
-                        self.photoCompletion?(nil)
-                    }
-                    return
-                }
-                finalPixelBuffer = filteredBuffer
-            }
             let metadataAttachments = metaData
             let jpegData = PhotoTools.jpegData(
                 withPixelBuffer: finalPixelBuffer,
@@ -719,27 +662,7 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
                 return
             }
             finalVideoPixelBuffer = videoPixelBuffer
-            if config.cameraType == .metal, videoFilter.filterIndex > 0 {
-                if !videoFilter.isPrepared {
-                    videoFilter.prepare(
-                        with: formatDescription,
-                        outputRetainedBufferCountHint: 3,
-                        imageSize: .init(
-                            width: CVPixelBufferGetWidth(videoPixelBuffer),
-                            height: CVPixelBufferGetHeight(videoPixelBuffer)
-                        )
-                    )
-                }
-                guard let filteredBuffer = videoFilter.render(
-                    pixelBuffer: videoPixelBuffer
-                ) else {
-                    return
-                }
-                captureDidOutput?(filteredBuffer)
-                finalVideoPixelBuffer = filteredBuffer
-            }else {
-                captureDidOutput?(videoPixelBuffer)
-            }
+            captureDidOutput?(videoPixelBuffer)
         }
         if captureState == .start && output == videoOutput {
             if !CMSampleBufferDataIsReady(sampleBuffer) {
@@ -972,46 +895,24 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
         
         if isDevicePortrait {
             if currentOrienation == .landscapeRight {
-                if config.cameraType == .metal {
-                    if !isFront {
-                        videoInput.transform = videoInput.transform.rotated(by: .pi * -0.5)
-                    }else {
-                        videoInput.transform = videoInput.transform.rotated(by: .pi * 0.5)
-                    }
-                }else {
-                    if isFront {
-                        videoInput.transform = videoInput.transform.rotated(by: .pi)
-                    }
+                if isFront {
+                    videoInput.transform = videoInput.transform.rotated(by: .pi)
                 }
             }else if currentOrienation == .landscapeLeft {
-                if config.cameraType == .metal {
-                    if !isFront {
-                        videoInput.transform = videoInput.transform.rotated(by: .pi * 0.5)
-                    }else {
-                        videoInput.transform = videoInput.transform.rotated(by: -.pi * 0.5)
-                    }
-                }else {
-                    if !isFront {
-                        videoInput.transform = videoInput.transform.rotated(by: .pi)
-                    }
+                if !isFront {
+                    videoInput.transform = videoInput.transform.rotated(by: .pi)
                 }
             }else {
-                if config.cameraType == .normal {
-                    videoInput.transform = videoInput.transform.rotated(by: .pi * 0.5)
-                }
+                videoInput.transform = videoInput.transform.rotated(by: .pi * 0.5)
             }
         }else {
             if currentOrienation == .landscapeRight {
-                if config.cameraType == .normal {
-                    if isFront {
-                        videoInput.transform = videoInput.transform.rotated(by: .pi)
-                    }
+                if isFront {
+                    videoInput.transform = videoInput.transform.rotated(by: .pi)
                 }
             }else if currentOrienation == .landscapeLeft {
-                if config.cameraType == .normal {
-                    if !isFront {
-                        videoInput.transform = videoInput.transform.rotated(by: .pi)
-                    }
+                if !isFront {
+                    videoInput.transform = videoInput.transform.rotated(by: .pi)
                 }
             }
         }
@@ -1044,13 +945,6 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
         assetWriterVideoInput = inputPixelBufferInput
         assetWriterAudioInput = audioInput
         return true
-    }
-    
-    func resetFilter() {
-        if config.cameraType == .metal {
-            videoFilter.reset()
-            photoFilter.reset()
-        }
     }
 }
 

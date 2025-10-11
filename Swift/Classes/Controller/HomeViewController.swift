@@ -167,15 +167,8 @@ extension HomeViewController {
                     return .init()
                 }
                 #if !targetEnvironment(macCatalyst)
-                #if canImport(GPUImage)
-                var config = CameraConfiguration()
-                config.defaultFilterIndex = 0
-                config.photoFilters = FilterTools.filters()
-                config.videoFilters = FilterTools.filters()
-                #else
                 var config = CameraConfiguration()
                 config.isAutoBack = false
-                #endif
                 return CameraController(config: config, type: .all)
                 #else
                 return .init()

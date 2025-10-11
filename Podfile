@@ -15,7 +15,6 @@ target "HXPhotoPickerExample" do
   
 #  pod 'SwiftLint' Run Script "${PODS_ROOT}/SwiftLint/swiftlint"
 #  pod 'GDPerformanceView-Swift'
-#  pod 'GPUImage'
 end
 
 target "SwiftUIExample" do

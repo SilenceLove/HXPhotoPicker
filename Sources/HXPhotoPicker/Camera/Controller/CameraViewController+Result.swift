@@ -88,12 +88,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
     }
     
     func saveCameraImage(_ image: UIImage) {
-        let previewSize: CGSize
-        if config.cameraType == .metal {
-            previewSize = previewView.size
-        }else {
-            previewSize = normalPreviewView.size
-        }
+        let previewSize = normalPreviewView.size
         DispatchQueue.global().async {
             let thumbImage = image.scaleToFillSize(size: previewSize)
             PhotoManager.shared.cameraPreviewImage = thumbImage

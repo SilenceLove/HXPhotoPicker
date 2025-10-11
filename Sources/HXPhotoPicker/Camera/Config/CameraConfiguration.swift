@@ -71,9 +71,6 @@ public struct CameraConfiguration: IndicatorTypeConfig, PhotoHUDConfig {
     /// 保存到自定义相册的类型
     public var saveSystemAlbumType: AssetSaveUtil.AlbumType = .displayName
     
-    /// 相机类型
-    public var cameraType: CameraController.CameraType = .normal
-    
     /// 相机分辨率
     public var sessionPreset: Preset = .hd1280x720
     
@@ -120,28 +117,6 @@ public struct CameraConfiguration: IndicatorTypeConfig, PhotoHUDConfig {
     
     /// 摄像头最大缩放比例
     public var videoMaxZoomScale: CGFloat = 6
-    
-    /// cameraType == .metal 时才有效
-    /// 默认滤镜对应滤镜数组的下标，为 -1 默认不加滤镜
-    public var defaultFilterIndex: Int = -1
-    
-    /// cameraType == .metal 时才有效
-    /// 切换滤镜显示名称
-    public var changeFilterShowName: Bool = true
-    
-    /// cameraType == .metal 时才有效
-    /// 拍照时的滤镜数组，请与 videoFilters 效果保持一致
-    /// 左滑/右滑切换滤镜
-    public var photoFilters: [CameraFilter] = [
-        InstantFilter(), Apply1977Filter(), ToasterFilter(), TransferFilter()
-    ]
-    
-    /// cameraType == .metal 时才有效
-    /// 录制视频的滤镜数组，请与 photoFilters 效果保持一致
-    /// 左滑/右滑切换滤镜
-    public var videoFilters: [CameraFilter] = [
-        InstantFilter(), Apply1977Filter(), ToasterFilter(), TransferFilter()
-    ]
     
     #if HXPICKER_ENABLE_EDITOR
     /// 允许编辑
