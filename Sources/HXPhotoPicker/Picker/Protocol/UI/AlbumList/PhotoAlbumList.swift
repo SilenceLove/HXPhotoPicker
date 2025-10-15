@@ -20,6 +20,8 @@ public protocol PhotoAlbumList: UIView {
     
     var delegate: PhotoAlbumListDelegate? { get set }
     
+    var scrollView: UIScrollView { get }
+    
     /// 相册集合
     var assetCollections: [PhotoAssetCollection] { get set }
     

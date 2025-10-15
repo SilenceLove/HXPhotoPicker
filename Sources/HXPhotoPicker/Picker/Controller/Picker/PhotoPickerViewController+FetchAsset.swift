@@ -11,7 +11,9 @@ import UIKit
 extension PhotoPickerViewController {
     
     func fetchData() {
-        title = ""
+        if pickerConfig.albumShowMode.isPopView {
+            title = ""
+        }
         if pickerConfig.albumShowMode.isPop || pickerController.splitType.isSplit {
             if assetCollection != nil {
                 fetchPhotoAssets()
@@ -98,6 +100,16 @@ extension PhotoPickerViewController {
     
     func updateAssetCollections(_ collections: [PhotoAssetCollection]) {
         if pickerConfig.albumShowMode.isPopView, !pickerController.splitType.isSplit {
+            titleView.makeAlbumData(collections) { [weak self] assetCollection in
+                guard let self else { return }
+                if self.assetCollection == assetCollection {
+                    return
+                }
+                self.titleView.title = assetCollection.albumName
+                self.assetCollection = assetCollection
+                PhotoManager.HUDView.show(with: nil, delay: 0, animated: true, addedTo: navigationController?.view)
+                self.fetchPhotoAssets()
+            }
             albumView.selectedAssetCollection = assetCollection
             albumView.assetCollections = collections
             updateAlbumViewFrame()

@@ -82,8 +82,18 @@ final class ProgressHUD: UIView {
     private func initView() {
         contentView = UIView()
         
+//        #if canImport(UIKit.UIGlassEffect)
+//        if #available(iOS 26.0, *) {
+//            let effect: UIGlassEffect = .init(style: .regular)
+//            blurEffectView = .init(effect: effect)
+//        } else {
+//            let effect: UIBlurEffect = .init(style: .dark)
+//            blurEffectView = .init(effect: effect)
+//        }
+//        #else
         let effect: UIBlurEffect = .init(style: .dark)
         blurEffectView = .init(effect: effect)
+//        #endif
         
         backgroundView = UIView()
         backgroundView.layer.cornerRadius = 5
@@ -111,7 +121,13 @@ final class ProgressHUD: UIView {
             indicatorView.startAnimating()
             self.indicatorView = indicatorView
         case .system:
-            let indicatorView: UIActivityIndicatorView = .init(style: .whiteLarge)
+            let style: UIActivityIndicatorView.Style
+            if #available(iOS 13.0, *) {
+                style = .medium
+            } else {
+                style = .gray
+            }
+            let indicatorView: UIActivityIndicatorView = .init(style: style)
             indicatorView.hidesWhenStopped = true
             indicatorView.startAnimating()
             self.indicatorView = indicatorView

@@ -29,6 +29,7 @@ public extension AssetManager {
     static func requestThumbnailImage(
         for asset: PHAsset,
         targetWidth: CGFloat,
+        cropRect: CGRect? = nil,
         completion: ImageResultHandler?
     ) -> PHImageRequestID {
         let options = PHImageRequestOptions()
@@ -47,6 +48,9 @@ public extension AssetManager {
         #else
         targetSize = asset.cellThumTargetSize(for: targetWidth)
         #endif
+        if let cropRect {
+            options.normalizedCropRect = cropRect
+        }
         return requestImage(
             for: asset,
             targetSize: targetSize,
@@ -69,13 +73,14 @@ public extension AssetManager {
     static func requestImage(
         for asset: PHAsset,
         targetSize: CGSize,
+        contentMode: PHImageContentMode = .aspectFill,
         options: PHImageRequestOptions,
         resultHandler: @escaping ImageResultHandler
     ) -> PHImageRequestID {
         return PHImageManager.default().requestImage(
             for: asset,
             targetSize: targetSize,
-            contentMode: .aspectFill,
+            contentMode: contentMode,
             options: options,
             resultHandler: resultHandler
         )

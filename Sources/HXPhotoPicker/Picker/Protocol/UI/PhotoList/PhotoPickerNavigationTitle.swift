@@ -21,4 +21,10 @@ public protocol PhotoPickerNavigationTitle: UIView {
     func addTarget(_ target: Any?, action: Selector)
     
     func updateFrame()
+    
+    func makeAlbumData(_ collections: [PhotoAssetCollection], selectHandler: @escaping (PhotoAssetCollection) -> Void)
+}
+
+public extension PhotoPickerNavigationTitle {
+    func makeAlbumData(_ collections: [PhotoAssetCollection], selectHandler: @escaping (PhotoAssetCollection) -> Void) { }
 }

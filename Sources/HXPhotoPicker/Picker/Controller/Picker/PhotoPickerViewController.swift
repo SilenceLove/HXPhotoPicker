@@ -108,6 +108,9 @@ public class PhotoPickerViewController: PhotoBaseViewController {
             appropriatePlaceAsset = nil
             isFirstLayout = false
         }
+        if let topContainerView, let navigationBarHeight {
+            topContainerView.frame = .init(x: 0, y: 0, width: collectionWidth, height: navigationBarHeight)
+        }
     }
     
     func layoutToolbar() {
@@ -147,7 +150,12 @@ public class PhotoPickerViewController: PhotoBaseViewController {
             let bottomIndicatorInset: CGFloat
             if isShowToolbar {
                 let viewHeight = photoToolbar.viewHeight
-                photoToolbar.frame = .init(x: 0, y: view.height - viewHeight, width: view.width, height: viewHeight)
+                if let bottomContainerView, let photoToolbar {
+                    bottomContainerView.frame = .init(x: 0, y: view.height - viewHeight, width: view.width, height: viewHeight)
+                    photoToolbar.frame = bottomContainerView.bounds
+                }else {
+                    photoToolbar.frame = .init(x: 0, y: view.height - viewHeight, width: view.width, height: viewHeight)
+                }
                 bottomInset = photoToolbar.height + 0.5
                 bottomIndicatorInset = viewHeight - UIDevice.bottomMargin
             }else {
@@ -170,7 +178,12 @@ public class PhotoPickerViewController: PhotoBaseViewController {
             var promptHeight: CGFloat = UIDevice.bottomMargin
             if isShowToolbar {
                 promptHeight = photoToolbar.viewHeight
-                photoToolbar.frame = .init(x: 0, y: view.height - promptHeight, width: view.width, height: promptHeight)
+                if let bottomContainerView, let photoToolbar {
+                    bottomContainerView.frame = .init(x: 0, y: view.height - promptHeight, width: view.width, height: promptHeight)
+                    photoToolbar.frame = bottomContainerView.bounds
+                }else {
+                    photoToolbar.frame = .init(x: 0, y: view.height - promptHeight, width: view.width, height: promptHeight)
+                }
             }
             listView.contentInset = UIEdgeInsets(
                 top: collectionTop,
@@ -232,14 +245,18 @@ extension PhotoPickerViewController {
             automaticallyAdjustsScrollViewInsets = false
         }
         initListView()
+        initBottomContainerView(listView.collectionView)
         initToolbar()
+        initTopContainerView(listView.collectionView)
         initAlbumView()
         initTitleView()
         updateTitle()
     }
     
     func initTitleView() {
-        navigationItem.titleView = titleView
+        if pickerConfig.albumShowMode.isPop {
+            navigationItem.titleView = titleView
+        }
     }
     
     func initNavItems(_ addFilter: Bool = true) {
@@ -280,7 +297,7 @@ extension PhotoPickerViewController {
             }
         }
         navigationItem.leftItemsSupplementBackButton = true
-        if pickerConfig.albumShowMode.isPopView {
+        if pickerConfig.albumShowMode.isPop {
             if let splitViewController = splitViewController as? PhotoSplitViewController,
                UIDevice.isPad {
                 if #unavailable(iOS 14.0) {
@@ -330,8 +347,12 @@ extension PhotoPickerViewController {
     }
     
     func updateTitle() {
-        guard let titleView = titleView else { return }
-        titleView.title = assetCollection?.albumName
+        if pickerConfig.albumShowMode.isPop {
+            guard let titleView = titleView else { return }
+            titleView.title = assetCollection?.albumName
+        }else {
+            title = assetCollection?.albumName
+        }
     }
     
     func scrollToAppropriatePlace(photoAsset: PhotoAsset?) {

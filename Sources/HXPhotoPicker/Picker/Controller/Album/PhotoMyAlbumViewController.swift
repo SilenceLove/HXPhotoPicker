@@ -16,7 +16,7 @@ public protocol PhotoMyAlbumViewControllerDelegate: AnyObject {
     func myAlbumViewController(didDisappear myAlbumViewController: PhotoMyAlbumViewController)
 }
 
-public class PhotoMyAlbumViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+public class PhotoMyAlbumViewController: HXBaseViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     public weak var delegate: PhotoMyAlbumViewControllerDelegate?
     
     public var config: PhotoAlbumControllerConfiguration = .init()
@@ -55,6 +55,7 @@ public class PhotoMyAlbumViewController: UIViewController, UICollectionViewDataS
             collectionView.semanticContentAttribute = .forceLeftToRight
         }
         updateColors()
+        initTopContainerView(collectionView)
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -102,6 +103,9 @@ public class PhotoMyAlbumViewController: UIViewController, UICollectionViewDataS
         let fontHeight = config.albumNameFont.lineHeight + config.photoCountFont.lineHeight + 8
         flowLayout.itemSize = .init(width: itemWidth, height: itemWidth + fontHeight)
         collectionView.contentInset = .init(top: navHeight, left: UIDevice.leftMargin, bottom: UIDevice.bottomMargin, right: UIDevice.rightMargin)
+        if let topContainerView {
+            topContainerView.frame = .init(x: 0, y: 0, width: collectionView.width, height: navHeight)
+        }
     }
     
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

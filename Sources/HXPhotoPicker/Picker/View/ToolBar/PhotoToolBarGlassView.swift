@@ -1,14 +1,15 @@
 //
-//  PhotoToolBar.swift
-//  HXPhotoPicker
+//  PhotoToolBarGlassView.swift
+//  HXPhotoPickerExample
 //
-//  Created by Silence on 2023/9/14.
-//  Copyright © 2023 Silence. All rights reserved.
+//  Created by Silence on 2025/10/13.
+//  Copyright © 2025 Silence. All rights reserved.
 //
 
 import UIKit
 
-public class PhotoToolBarView: UIView, PhotoToolBar {
+@available(iOS 26.0, *)
+public class PhotoToolBarGlassView: UIView, PhotoToolBar {
     
     public weak var toolbarDelegate: PhotoToolBarDelegate?
     
@@ -32,15 +33,15 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
                 viewHeight += 70
             }else {
                 if isShowSelectedView, selectedView.assetCount > 0 {
-                    viewHeight += 70
+                    viewHeight += 75
                 }
             }
         }else if type == .preview {
             if isShowPreviewList {
-                viewHeight += 70
+                viewHeight += 75
             }else {
                 if isShowSelectedView, selectedView.assetCount > 0 {
-                    viewHeight += 70
+                    viewHeight += 75
                 }
             }
         }
@@ -66,7 +67,7 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
     private var previewPage: Int?
      
     #if HXPICKER_ENABLE_EDITOR
-    private var editBtn: UIButton!
+    private var editBtn: UIBarButtonItem!
     #endif
     
     private let pickerConfig: PickerConfiguration
@@ -74,16 +75,13 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
     private var promptView: PhotoPermissionPromptView!
     private var selectedView: PhotoPreviewSelectedView!
     private var previewListView: PhotoPreviewListView!
-    private var backgroundView: UIVisualEffectView!
-    private var contentView: UIView!
-    private var previewBtn: UIButton!
-    private var originalView: UIControl!
-    private var originalBox: SelectBoxView!
-    private var originalTitleLb: UILabel!
-    private var originalLoadingView: UIActivityIndicatorView!
-    private var finishBtn: UIButton!
-    private var isOriginalLoading: Bool = false
-    private var originalobserve: NSKeyValueObservation?
+    private var previewShadeView: UIView!
+    private var previewShadeMaskLayer: CAGradientLayer!
+    private var contentView: UIToolbar!
+    private var previewBtn: UIBarButtonItem!
+    private var originalItem: UIBarButtonItem!
+    private var originalBtn: UIButton!
+    private var finishBtn: UIBarButtonItem!
     
     private var isShowPrompt: Bool {
         type == .picker &&
@@ -124,11 +122,7 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
         self.type = type
         super.init(frame: .zero)
         
-        backgroundView = UIVisualEffectView()
-        addSubview(backgroundView)
-        
-        contentView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: 50 + UIDevice.bottomMargin))
-        
+        contentView = UIToolbar(frame: CGRect(x: 0, y: 0, width: width, height: 50 + UIDevice.bottomMargin))
         let viewConfig: PickerBottomViewConfiguration
         if type == .picker {
             if pickerConfig.selectMode != .single {
@@ -142,51 +136,51 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
             if isShowSelectedView {
                 initSelectedView()
             }
-            previewBtn = UIButton(type: .custom)
-            previewBtn.setTitle(.textPhotoList.bottomView.previewTitle.text, for: .normal)
-            previewBtn.titleLabel?.font = .textPhotoList.bottomView.previewTitleFont
+            previewBtn = .init(title: .textPhotoList.bottomView.previewTitle.text, style: .plain, target: self, action: #selector(didPreviewButtonClick))
             previewBtn.isEnabled = false
-            previewBtn.addTarget(self, action: #selector(didPreviewButtonClick), for: .touchUpInside)
-            previewBtn.height = 50
             previewBtn.isHidden = viewConfig.isHiddenPreviewButton
-            let previewWidth: CGFloat = previewBtn.currentTitle!.localized.width(
-                ofFont: previewBtn.titleLabel!.font,
-                maxHeight: 50
-            )
-            previewBtn.width = previewWidth
-            contentView.addSubview(previewBtn)
         }else if type == .preview {
             addSubview(contentView)
             viewConfig = pickerConfig.previewView.bottomView
             if isShowPreviewList {
-                previewListView = PhotoPreviewListView(frame: .init(x: 0, y: 0, width: width, height: 55))
+                previewListView = PhotoPreviewListView()
                 previewListView.dataSource = self
-                addSubview(previewListView)
+                
+                previewShadeMaskLayer = CAGradientLayer()
+                previewShadeMaskLayer.colors = [UIColor.clear.cgColor, UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor, UIColor.clear.cgColor]
+                previewShadeMaskLayer.locations = [0.0, 0.02, 0.075, 0.925, 0.98, 1.0]
+                previewShadeMaskLayer.startPoint = .init(x: 0, y: 0.5)
+                previewShadeMaskLayer.endPoint = .init(x: 1, y: 0.5)
+                
+                previewShadeView = UIView(frame: .init(x: 0, y: 0, width: width, height: 55))
+                previewShadeView.addSubview(previewListView)
+                previewShadeView.layer.mask = previewShadeMaskLayer
+                addSubview(previewShadeView)
             }else {
                 if isShowSelectedView {
                     initSelectedView()
                 }
             }
             #if HXPICKER_ENABLE_EDITOR
-            editBtn = UIButton(type: .custom)
-            editBtn.setTitle(.textPreview.bottomView.editTitle.text, for: .normal)
-            editBtn.titleLabel?.font = .textPreview.bottomView.editTitleFont
-            editBtn.addTarget(self, action: #selector(didEditBtnButtonClick), for: .touchUpInside)
-            editBtn.height = 50
+            editBtn = .init(title: .textPreview.bottomView.editTitle.text, style: .plain, target: self, action: #selector(didEditBtnButtonClick))
             editBtn.isHidden = viewConfig.isHiddenEditButton
-            let editWidth: CGFloat = editBtn.currentTitle!.localized.width(
-                ofFont: editBtn.titleLabel!.font,
-                maxHeight: 50
-            )
-            editBtn.width = editWidth
-            contentView.addSubview(editBtn)
             #endif
         }else {
             viewConfig = pickerConfig.previewView.bottomView
             if isShowPreviewList {
-                previewListView = PhotoPreviewListView(frame: .init(x: 0, y: 0, width: width, height: 55))
+                previewListView = PhotoPreviewListView()
                 previewListView.dataSource = self
-                addSubview(previewListView)
+                
+                previewShadeMaskLayer = CAGradientLayer()
+                previewShadeMaskLayer.colors = [UIColor.clear.cgColor, UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor, UIColor.clear.cgColor]
+                previewShadeMaskLayer.locations = [0.0, 0.02, 0.075, 0.925, 0.98, 1.0]
+                previewShadeMaskLayer.startPoint = .init(x: 0, y: 0.5)
+                previewShadeMaskLayer.endPoint = .init(x: 1, y: 0.5)
+                
+                previewShadeView = UIView(frame: .init(x: 0, y: 0, width: width, height: 55))
+                previewShadeView.addSubview(previewListView)
+                previewShadeView.layer.mask = previewShadeMaskLayer
+                addSubview(previewShadeView)
             }else {
                 if isShowSelectedView {
                     initSelectedView()
@@ -196,61 +190,42 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
         }
         
         if type != .browser {
-            originalView = UIControl()
-            originalView.isHidden = viewConfig.isHiddenOriginalButton
-            contentView.addSubview(originalView)
-            
-            originalTitleLb = UILabel()
+            originalItem = makeCenterItem()
+            originalItem.isHidden = viewConfig.isHiddenOriginalButton
+             
             if type == .picker {
-                originalTitleLb.text = .textPhotoList.bottomView.originalTitle.text
-                originalTitleLb.font = .textPhotoList.bottomView.originalTitleFont
+                finishBtn = .init(title: .textPhotoList.bottomView.finishTitle.text, style: .plain, target: self, action: #selector(didFinishButtonClick))
             }else {
-                originalTitleLb.text = .textPreview.bottomView.originalTitle.text
-                originalTitleLb.font = .textPreview.bottomView.originalTitleFont
+                finishBtn = .init(title: .textPreview.bottomView.finishTitle.text, style: .plain, target: self, action: #selector(didFinishButtonClick))
             }
-            originalTitleLb.lineBreakMode = .byTruncatingHead
-            originalView.addSubview(originalTitleLb)
-            
-            let boxConfig: SelectBoxConfiguration
-            if type == .picker {
-                boxConfig = config.photoList.bottomView.originalSelectBox
-            }else {
-                boxConfig = config.previewView.bottomView.originalSelectBox
-            }
-            originalBox = SelectBoxView(boxConfig, frame: CGRect(x: 0, y: 0, width: 17, height: 17))
-            originalBox.backgroundColor = .clear
-            originalBox.isUserInteractionEnabled = false
-            originalView.addSubview(originalBox)
-            
-            originalLoadingView = UIActivityIndicatorView(style: .white)
-            originalLoadingView.hidesWhenStopped = true
-            originalView.addSubview(originalLoadingView)
-            
-            originalView.addTarget(self, action: #selector(didOriginalButtonClick), for: .touchUpInside)
-            originalobserve = originalView.observe(\.isHighlighted, options: [.new, .old]) { [weak self] control, value in
-                guard let self = self else { return }
-                self.originalBox.isHighlighted = control.isHighlighted
-                let config = self.type == .picker ? self.pickerConfig.photoList.bottomView : self.pickerConfig.previewView.bottomView
-                let textColor = PhotoManager.isDark ? config.originalButtonTitleDarkColor : config.originalButtonTitleColor
-                self.originalTitleLb.textColor = control.isHighlighted ? textColor.withAlphaComponent(0.4) : textColor
-            }
-            
-            finishBtn = UIButton(type: .custom)
-            if type == .picker {
-                finishBtn.setTitle(.textPhotoList.bottomView.finishTitle.text, for: .normal)
-                finishBtn.titleLabel?.font = .textPhotoList.bottomView.finishTitleFont
-            }else {
-                finishBtn.setTitle(.textPreview.bottomView.finishTitle.text, for: .normal)
-                finishBtn.titleLabel?.font = .textPreview.bottomView.finishTitleFont
-            }
-            finishBtn.layer.cornerRadius = 3
-            finishBtn.layer.masksToBounds = true
             if config.selectMode == .multiple {
                 finishBtn.isEnabled = false
             }
-            finishBtn.addTarget(self, action: #selector(didFinishButtonClick), for: .touchUpInside)
-            contentView.addSubview(finishBtn)
         }
+        let leftItem: UIBarButtonItem
+        if let previewBtn {
+            leftItem = previewBtn
+        }else if let editBtn {
+            leftItem = editBtn
+        }else {
+            leftItem = .flexibleSpace()
+        }
+        let centerItem: UIBarButtonItem
+        if let originalItem {
+            centerItem = originalItem
+        }else {
+            centerItem = .flexibleSpace()
+        }
+        
+        let rightItem: UIBarButtonItem
+        if let finishBtn {
+            rightItem = finishBtn
+        }else {
+            rightItem = .flexibleSpace()
+        }
+        let flex = UIBarButtonItem.flexibleSpace()
+        contentView.setItems([leftItem, flex, centerItem, flex, rightItem], animated: false)
+        contentView.insetsLayoutMarginsFromSafeArea = false
         layoutSubviews()
         bringSubviewToFront(contentView)
         if selectedView != nil {
@@ -263,6 +238,41 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
             bringSubviewToFront(promptView)
         }
         configColor()
+    }
+    
+    func makeCenterItem() -> UIBarButtonItem {
+        originalBtn = ExpandButton(type: .system)
+        var cfg = UIButton.Configuration.plain()
+        cfg.background.backgroundColorTransformer = UIConfigurationColorTransformer { _ in .clear }
+        cfg.background.visualEffect = nil
+        cfg.baseForegroundColor = .label
+//        cfg.imageColorTransformer = UIConfigurationColorTransformer { [weak self] color in
+//            guard let self else { return }
+//            if self.originalBtn.isSelected {
+//                return self.pickerConfig.photoList.bottomView.originalSelectBox.selectedBackgroundColor
+//            }else {
+//                return color
+//            }
+//        }
+        cfg.imagePadding = 4
+        cfg.contentInsets = .init(top: 0, leading: 5, bottom: 0, trailing: 5)
+        originalBtn.configuration = cfg
+        
+        if type == .picker {
+            originalBtn.setTitle(.textPhotoList.bottomView.originalTitle.text, for: .normal)
+        }else {
+            originalBtn.setTitle(.textPreview.bottomView.originalTitle.text, for: .normal)
+        }
+        originalBtn.setImage(.init(systemName: "circle")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        originalBtn.setImage(.init(systemName: "checkmark.circle.fill")?.withRenderingMode(.alwaysTemplate), for: .selected)
+        originalBtn.addTarget(self, action: #selector(didOriginalButtonClick), for: .touchUpInside)
+        
+        originalBtn.titleLabel?.numberOfLines = 0
+        originalBtn.titleLabel?.adjustsFontSizeToFitWidth = true
+        originalBtn.titleLabel?.lineBreakMode = .byTruncatingMiddle
+        originalBtn.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        originalBtn.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        return UIBarButtonItem(customView: originalBtn)
     }
     
     private func initSelectedView() {
@@ -284,12 +294,14 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
         addSubview(selectedView)
     }
     public func updateOriginalState(_ isSelected: Bool) {
-        originalBox.isSelected = isSelected
+        guard let originalBtn else { return}
+        originalBtn.isSelected = isSelected
     }
     
     public func requestOriginalAssetBtyes() {
         if type == .browser { return }
-        if !originalBox.isSelected {
+        guard let originalBtn else { return}
+        if !originalBtn.isSelected {
             return
         }
         if isCanLoadOriginal {
@@ -299,7 +311,8 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
     }
     
     public func originalAssetBytes(_ bytes: Int, bytesString: String) {
-        if !originalBox.isSelected || !isCanLoadOriginal {
+        guard let originalBtn else { return}
+        if !originalBtn.isSelected || !isCanLoadOriginal {
             stopOriginalLoading(bytes: 0, bytesString: "")
             return
         }
@@ -381,14 +394,9 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
     
     @objc
     private func didOriginalButtonClick() {
-        originalBox.isSelected = !originalBox.isSelected
-        originalBox.layer.removeAnimation(forKey: "SelectControlAnimation")
-        let keyAnimation = CAKeyframeAnimation.init(keyPath: "transform.scale")
-        keyAnimation.duration = 0.3
-        keyAnimation.values = [1.2, 0.8, 1.1, 0.9, 1.0]
-        originalBox.layer.add(keyAnimation, forKey: "SelectControlAnimation")
-        
-        let isSelected = originalBox.isSelected
+        guard let originalBtn else { return}
+        originalBtn.isSelected = !originalBtn.isSelected
+        let isSelected = originalBtn.isSelected
         if isSelected {
             if isCanLoadOriginal {
                 startOriginalLoading()
@@ -400,19 +408,21 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
     }
     
     private func startOriginalLoading() {
-        isOriginalLoading = true
+        guard let originalBtn else { return}
         if type == .picker {
-            originalTitleLb.text = .textPhotoList.bottomView.originalTitle.text
+            originalBtn.setTitle(.textPhotoList.bottomView.originalTitle.text, for: .normal)
         }else {
-            originalTitleLb.text = .textPreview.bottomView.originalTitle.text
+            originalBtn.setTitle(.textPreview.bottomView.originalTitle.text, for: .normal)
         }
-        originalLoadingView.startAnimating()
-        updateOriginalViewFrame()
+        originalBtn.invalidateIntrinsicContentSize()
+        originalBtn.setNeedsLayout()
+        originalBtn.layoutIfNeeded()
+        contentView.setNeedsLayout()
+        contentView.layoutIfNeeded()
     }
     
     private func stopOriginalLoading(bytes: Int, bytesString: String) {
-        isOriginalLoading = false
-        originalLoadingView.stopAnimating()
+        guard let originalBtn else { return}
         let originalTitle: String
         if type == .picker {
             originalTitle = .textPhotoList.bottomView.originalTitle.text
@@ -420,11 +430,15 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
             originalTitle = .textPreview.bottomView.originalTitle.text
         }
         if bytes > 0 {
-            originalTitleLb.text = originalTitle + " (" + bytesString + ")"
+            originalBtn.setTitle(originalTitle + " (" + bytesString + ")", for: .normal)
         }else {
-            originalTitleLb.text = originalTitle
+            originalBtn.setTitle(originalTitle, for: .normal)
         }
-        updateOriginalViewFrame()
+        originalBtn.invalidateIntrinsicContentSize()
+        originalBtn.setNeedsLayout()
+        originalBtn.layoutIfNeeded()
+        contentView.setNeedsLayout()
+        contentView.layoutIfNeeded()
     }
     
     @objc
@@ -448,10 +462,9 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        backgroundView.frame = bounds
+        contentView.x = 0
         contentView.width = width
         contentView.height = 50 + UIDevice.bottomMargin
-        let leftMargin = self.leftMargin
         if type == .picker {
             if isShowPrompt {
                 if pickerConfig.selectMode != .single {
@@ -466,7 +479,7 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
                 selectedView.width = width
                 if !isShowPrompt {
                     if selectedView.assetCount > 0 {
-                        contentView.y = selectedView.frame.maxY
+                        contentView.y = selectedView.frame.maxY + 5
                     }else {
                         contentView.y = height - contentView.height
                     }
@@ -474,31 +487,19 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
             }else if !isShowPrompt {
                 contentView.y = height - contentView.height
             }
-            if leftMargin > 0 {
-                previewBtn.hxPicker_x = leftMargin
-            }else {
-                previewBtn.hxPicker_x = 12
-            }
-            updateFinishButtonFrame()
-            updateOriginalViewFrame()
         }else if type == .preview {
-            #if HXPICKER_ENABLE_EDITOR
-            if UIDevice.leftMargin > 0 {
-                editBtn.hxPicker_x = UIDevice.leftMargin
-            }else {
-                editBtn.hxPicker_x = 12
-            }
-            #endif
             if isShowPreviewList {
-                previewListView.y = 10
-                previewListView.width = width
-                contentView.y = 70
+                previewShadeView.y = 10
+                previewShadeView.width = width
+                previewShadeMaskLayer.frame = previewShadeView.bounds
+                previewListView.frame = previewShadeView.bounds
+                contentView.y = 75
             }else {
                 if isShowSelectedView {
                     selectedView.y = 0
                     selectedView.width = width
                     if selectedView.assetCount > 0 {
-                        contentView.y = selectedView.frame.maxY
+                        contentView.y = selectedView.frame.maxY + 5
                     }else {
                         contentView.y = height - contentView.height
                     }
@@ -506,12 +507,12 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
                     contentView.y = height - contentView.height
                 }
             }
-            updateFinishButtonFrame()
-            updateOriginalViewFrame()
         }else {
             if isShowPreviewList {
-                previewListView.y = 10
-                previewListView.width = width
+                previewShadeView.y = 10
+                previewShadeView.width = width
+                previewShadeMaskLayer.frame = previewShadeView.bounds
+                previewListView.frame = previewShadeView.bounds
             }else {
                 if isShowSelectedView {
                     selectedView.y = 0
@@ -523,8 +524,7 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
     
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        guard #available(iOS 13.0, *),
-              traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) else {
+        guard traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) else {
             return
         }
         configColor()
@@ -533,13 +533,10 @@ public class PhotoToolBarView: UIView, PhotoToolBar {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    deinit {
-        originalobserve = nil
-    }
 }
 
-extension PhotoToolBarView: PhotoPreviewListViewDataSource {
+@available(iOS 26.0, *)
+extension PhotoToolBarGlassView: PhotoPreviewListViewDataSource {
     func previewListView(_ previewListView: PhotoPreviewListView, thumbnailOnPage page: Int) -> PhotoAsset? {
         if !isShowPreviewList || previewAssets.isEmpty { return nil }
         return previewAssets[page]
@@ -682,68 +679,19 @@ extension PhotoToolBarView: PhotoPreviewListViewDataSource {
         previewPage = index
     }
 }
-extension PhotoToolBarView {
+@available(iOS 26.0, *)
+extension PhotoToolBarGlassView {
     
     func configColor() {
         let config = type == .picker ? pickerConfig.photoList.bottomView : pickerConfig.previewView.bottomView
         let isDark = PhotoManager.isDark
-        backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
-        tintColor = isDark ? config.barTintDarkColor : config.barTintColor
-        let style: UIBlurEffect.Style = {
-            if isDark {
-                return config.barDarkStyle == .default ? .extraLight : .dark
-            } else {
-                return config.barStyle == .default ? .extraLight : .dark
-            }
-        }()
-        backgroundView.effect = UIBlurEffect(style: style)
         
         if type == .picker {
-            let previewTitleColor = config.previewButtonTitleColor
-            let previewTitleDarkColor = config.previewButtonTitleDarkColor
-            previewBtn.setTitleColor(
-                isDark ? previewTitleDarkColor : previewTitleColor,
-                for: .normal
-            )
-            previewBtn.setTitleColor(
-                isDark ? previewTitleDarkColor.withAlphaComponent(0.4) : previewTitleColor.withAlphaComponent(0.4),
-                for: .highlighted
-            )
-            if isDark {
-                if config.previewButtonDisableTitleDarkColor != nil {
-                    previewBtn.setTitleColor(config.previewButtonDisableTitleDarkColor, for: .disabled)
-                }else {
-                    previewBtn.setTitleColor(previewTitleDarkColor.withAlphaComponent(0.6), for: .disabled)
-                }
-            }else {
-                if config.previewButtonDisableTitleColor != nil {
-                    previewBtn.setTitleColor(config.previewButtonDisableTitleColor, for: .disabled)
-                }else {
-                    previewBtn.setTitleColor(previewTitleColor.withAlphaComponent(0.6), for: .disabled)
-                }
-            }
             if isShowSelectedView {
                 selectedView.tickColor = isDark ? config.selectedViewTickDarkColor : config.selectedViewTickColor
             }
         }else if type == .preview {
             #if HXPICKER_ENABLE_EDITOR
-            let editTitleColor = config.editButtonTitleColor
-            let editTitleDarkColor = config.editButtonTitleDarkColor
-            editBtn.setTitleColor(isDark ? editTitleDarkColor : editTitleColor, for: .normal)
-            editBtn.setTitleColor(isDark ? editTitleDarkColor.withAlphaComponent(0.4) : editTitleColor.withAlphaComponent(0.4), for: .highlighted)
-            if isDark {
-                if config.editButtonDisableTitleDarkColor != nil {
-                    editBtn.setTitleColor(config.editButtonDisableTitleDarkColor, for: .disabled)
-                }else {
-                    editBtn.setTitleColor(editTitleDarkColor.withAlphaComponent(0.6), for: .disabled)
-                }
-            }else {
-                if config.editButtonDisableTitleColor != nil {
-                    editBtn.setTitleColor(config.editButtonDisableTitleColor, for: .disabled)
-                }else {
-                    editBtn.setTitleColor(editTitleColor.withAlphaComponent(0.6), for: .disabled)
-                }
-            }
             #endif
             if isShowPreviewList {
                 previewListView.selectColor = isDark ? config.previewListTickDarkColor : config.previewListTickColor
@@ -754,42 +702,7 @@ extension PhotoToolBarView {
             }
         }
         
-        if type != .browser {
-            originalLoadingView.style = isDark ? config.originalLoadingDarkStyle : config.originalLoadingStyle
-            originalTitleLb.textColor = isDark ? config.originalButtonTitleDarkColor : config.originalButtonTitleColor
-            
-            let finishBtnBackgroundColor = isDark ?
-                config.finishButtonDarkBackgroundColor :
-                config.finishButtonBackgroundColor
-            finishBtn.setTitleColor(
-                isDark ?
-                    config.finishButtonTitleDarkColor :
-                    config.finishButtonTitleColor,
-                for: .normal
-            )
-            finishBtn.setTitleColor(
-                isDark ?
-                    config.finishButtonDisableTitleDarkColor :
-                    config.finishButtonDisableTitleColor,
-                for: .disabled
-            )
-            finishBtn.setBackgroundImage(
-                UIImage.image(
-                    for: finishBtnBackgroundColor,
-                    havingSize: CGSize.zero
-                ),
-                for: .normal
-            )
-            finishBtn.setBackgroundImage(
-                UIImage.image(
-                    for: isDark ?
-                        config.finishButtonDisableDarkBackgroundColor :
-                        config.finishButtonDisableBackgroundColor,
-                    havingSize: CGSize.zero
-                ),
-                for: .disabled
-            )
-        }else {
+        if type == .browser {
             if isShowPreviewList {
                 previewListView.selectColor = isDark ? config.previewListTickDarkColor : config.previewListTickColor
                 previewListView.selectBgColor = isDark ? config.previewListTickBgDarkColor : config.previewListTickBgColor
@@ -801,66 +714,8 @@ extension PhotoToolBarView {
     }
 }
 
-extension PhotoToolBarView {
-    
-    func updateOriginalViewFrame() {
-        updateOriginalSubviewFrame()
-        if isOriginalLoading {
-            originalView.frame = CGRect(x: 0, y: 0, width: originalLoadingView.frame.maxX, height: 50)
-        }else {
-            originalView.frame = CGRect(x: 0, y: 0, width: originalTitleLb.frame.maxX, height: 50)
-        }
-        originalView.centerX = width / 2
-        if PhotoManager.isRTL {
-            return
-        }
-        let originalMinX: CGFloat
-        if type == .picker {
-            originalMinX = previewBtn.frame.maxX + 2
-        }else {
-            #if HXPICKER_ENABLE_EDITOR
-            originalMinX = editBtn.frame.maxX + 2
-            #else
-            originalMinX = 10
-            #endif
-        }
-        if originalView.frame.maxX > finishBtn.x || originalView.x < originalMinX {
-            originalView.x = finishBtn.x - originalView.width
-            if originalView.x < originalMinX {
-                originalView.x = originalMinX
-                originalTitleLb.width = finishBtn.x - originalMinX - 5 - originalBox.width
-            }
-        }
-    }
-    private func updateOriginalSubviewFrame() {
-        originalTitleLb.frame = CGRect(
-            x: originalBox.frame.maxX + 5,
-            y: 0,
-            width: originalTitleLb.text!.width(
-                ofFont: originalTitleLb.font,
-                maxHeight: 50
-            ),
-            height: 50
-        )
-        if !PhotoManager.isRTL {
-            let leftMargin: CGFloat
-            if type == .picker {
-                leftMargin = previewBtn.frame.maxX
-            }else {
-                #if HXPICKER_ENABLE_EDITOR
-                leftMargin = editBtn.frame.maxX
-                #else
-                leftMargin = 10
-                #endif
-            }
-            if originalTitleLb.width > width - leftMargin - finishBtn.width - 12 {
-                originalTitleLb.width = width - leftMargin - finishBtn.width - 12
-            }
-        }
-        originalBox.centerY = originalTitleLb.height * 0.5
-        originalLoadingView.centerY = originalView.height * 0.5
-        originalLoadingView.x = originalTitleLb.frame.maxX + 3
-    }
+@available(iOS 26.0, *)
+extension PhotoToolBarGlassView {
     
     private func updateFinishButtonTitle(_ photoAssets: [PhotoAsset]) {
         let count = photoAssets.count
@@ -876,10 +731,7 @@ extension PhotoToolBarView {
             if type == .picker {
                 previewBtn.isEnabled = true
             }
-            finishBtn.setTitle(
-                finishTitle + " (\(count))",
-                for: .normal
-            )
+            finishBtn.title = finishTitle + " (\(count))"
         }else {
             if type == .preview {
                 if pickerConfig.maximumSelectedVideoCount == 1 || pickerConfig.selectMode == .single {
@@ -893,30 +745,13 @@ extension PhotoToolBarView {
             if type == .picker {
                 previewBtn.isEnabled = false
             }
-            finishBtn.setTitle(finishTitle, for: .normal)
+            finishBtn.title = finishTitle
         }
-        updateFinishButtonFrame()
-    }
-    
-    private func updateFinishButtonFrame() {
-        var finishWidth: CGFloat = finishBtn.currentTitle!.localized.width(
-            ofFont: finishBtn.titleLabel!.font,
-            maxHeight: 50
-        ) + 20
-        if finishWidth < 60 {
-            finishWidth = 60
-        }
-        finishBtn.size = .init(width: finishWidth, height: 33)
-        if UIDevice.rightMargin > 0 {
-            finishBtn.hxPicker_x = width - UIDevice.rightMargin - finishWidth
-        }else {
-            finishBtn.hxPicker_x = width - finishWidth - 12
-        }
-        finishBtn.centerY = 25
     }
 }
 
-extension PhotoToolBarView: PhotoPreviewSelectedViewDelegate {
+@available(iOS 26.0, *)
+extension PhotoToolBarGlassView: PhotoPreviewSelectedViewDelegate {
     
     func selectedView(
         _ selectedView: PhotoPreviewSelectedView,

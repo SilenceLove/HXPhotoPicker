@@ -62,6 +62,13 @@ public final class PhotoManager: NSObject {
         }
     }
     
+    static var isIos26Compatibility: Bool {
+        guard let isCompatibility = Bundle.main.object(forInfoDictionaryKey: "UIDesignRequiresCompatibility") as? Bool else {
+            return true
+        }
+        return isCompatibility
+    }
+    
     /// 当前语言文件，每次创建PhotoPickerController判断是否需要重新创建
     var languageBundle: Bundle?
     /// 当前语言类型，每次创建PhotoPickerController时赋值

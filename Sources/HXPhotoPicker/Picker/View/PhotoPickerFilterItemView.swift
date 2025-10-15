@@ -29,9 +29,11 @@ public class PhotoPickerFilterItemView: UIView, PhotoNavigationItem {
         button = UIButton(type: .custom)
         button.setImage(.imageResource.picker.photoList.filterNormal.image?.withRenderingMode(.alwaysTemplate), for: .normal)
         button.setImage(.imageResource.picker.photoList.filterSelected.image?.withRenderingMode(.alwaysTemplate), for: .selected)
+        if #available(iOS 15.0, *), !PhotoManager.isIos26Compatibility {
+            button.configuration = config.photoList.filterButtonConfig
+        }
         button.addTarget(self, action: #selector(didFilterClick), for: .touchUpInside)
         addSubview(button)
-        
         setColor()
     }
     
@@ -53,7 +55,7 @@ public class PhotoPickerFilterItemView: UIView, PhotoNavigationItem {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        let buttonSize = button.sizeThatFits(self.bounds.size)
+        let buttonSize = CGSize(width: button.sizeThatFits(self.bounds.size).width - 4, height: button.sizeThatFits(self.bounds.size).height - 4)
         button.frame = CGRect(
             x: (self.bounds.width - buttonSize.width) / 2,
             y: (self.bounds.height - buttonSize.height) / 2,

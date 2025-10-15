@@ -259,6 +259,15 @@ public enum AlbumShowMode {
             return false
         }
     }
+    
+    public var isPresent: Bool {
+        switch self {
+        case .present:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 public extension PhotoPickerViewController {

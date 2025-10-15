@@ -534,43 +534,48 @@ extension PhotoPickerController {
         if modalPresentationStyle != .custom {
             setupBackgroundColor()
         }
-        let isDark = PhotoManager.isDark
-        let titleTextAttributes: [NSAttributedString.Key : Any] = [
-            .foregroundColor:
-                isDark ? config.navigationTitleDarkColor : config.navigationTitleColor
-        ]
-        navigationBar.titleTextAttributes = titleTextAttributes
-        let tintColor = isDark ? config.navigationDarkTintColor : config.navigationTintColor
-        navigationBar.tintColor = tintColor
-        let barStyle = isDark ? config.navigationBarDarkStyle : config.navigationBarStyle
-        navigationBar.barStyle = barStyle
-        navigationBar.isTranslucent = config.navigationBarIsTranslucent
-        
-        let navigationBackgroundImage = isDark ? config.navigationBackgroundDarkImage : config.navigationBackgroundImage
-        let navigationBackgroundColor = isDark ? config.navigationBackgroundDarkColor : config.navigationBackgroundColor
-        if let image = navigationBackgroundImage {
-            navigationBar.setBackgroundImage(image, for: .default)
-        }
-        if let color = navigationBackgroundColor {
-            navigationBar.backgroundColor = color
-        }
-        if #available(iOS 15.0, *), config.adaptiveBarAppearance {
-            let appearance = UINavigationBarAppearance()
-            appearance.titleTextAttributes = titleTextAttributes
-            switch barStyle {
-            case .`default`:
-                appearance.backgroundEffect = UIBlurEffect(style: .extraLight)
-            default:
-                appearance.backgroundEffect = UIBlurEffect(style: .dark)
-            }
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility {
+        }else {
+            let isDark = PhotoManager.isDark
+            let titleTextAttributes: [NSAttributedString.Key : Any] = [
+                .foregroundColor:
+                    isDark ? config.navigationTitleDarkColor : config.navigationTitleColor
+            ]
+            navigationBar.titleTextAttributes = titleTextAttributes
+            let tintColor = isDark ? config.navigationDarkTintColor : config.navigationTintColor
+            navigationBar.tintColor = tintColor
+            let barStyle = isDark ? config.navigationBarDarkStyle : config.navigationBarStyle
+            navigationBar.barStyle = barStyle
+            navigationBar.isTranslucent = config.navigationBarIsTranslucent
+            
+            let navigationBackgroundImage = isDark ? config.navigationBackgroundDarkImage : config.navigationBackgroundImage
+            let navigationBackgroundColor = isDark ? config.navigationBackgroundDarkColor : config.navigationBackgroundColor
             if let image = navigationBackgroundImage {
-                appearance.backgroundImage = image
+                navigationBar.setBackgroundImage(image, for: .default)
             }
             if let color = navigationBackgroundColor {
-                appearance.backgroundColor = color
+                navigationBar.backgroundColor = color
             }
-            navigationBar.standardAppearance = appearance
-            navigationBar.scrollEdgeAppearance = appearance
+            if #available(iOS 15.0, *), config.adaptiveBarAppearance {
+                let appearance = UINavigationBarAppearance()
+                appearance.titleTextAttributes = titleTextAttributes
+                switch barStyle {
+                case .`default`:
+                    appearance.backgroundEffect = UIBlurEffect(style: .extraLight)
+                default:
+                    appearance.backgroundEffect = UIBlurEffect(style: .dark)
+                }
+                if let image = navigationBackgroundImage {
+                    appearance.backgroundImage = image
+                }
+                if let color = navigationBackgroundColor {
+                    appearance.backgroundColor = color
+                }
+                navigationBar.standardAppearance = appearance
+                navigationBar.scrollEdgeAppearance = appearance
+                navigationBar.compactAppearance = appearance
+                navigationBar.compactScrollEdgeAppearance = appearance
+            }
         }
     }
     

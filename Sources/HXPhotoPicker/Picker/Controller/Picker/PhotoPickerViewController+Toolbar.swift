@@ -27,7 +27,11 @@ extension PhotoPickerViewController: PhotoToolBarDelegate {
         photoToolbar = toolbar.init(pickerConfig, type: .picker)
         photoToolbar.toolbarDelegate = self
         photoToolbar.updateOriginalState(pickerController.isOriginal)
-        view.addSubview(photoToolbar)
+        if let bottomContainerView {
+            bottomContainerView.addSubview(photoToolbar)
+        }else {
+            view.addSubview(photoToolbar)
+        }
         if pickerConfig.isMultipleSelect {
             if pickerController.isOriginal {
                 photoToolbar.requestOriginalAssetBtyes()
@@ -53,6 +57,9 @@ extension PhotoPickerViewController: PhotoToolBarDelegate {
     }
     
     public func photoToolbar(didPreviewClick toolbar: PhotoToolBar) {
+        if pickerController.selectedAssetArray.isEmpty {
+            return
+        }
         pushPreviewViewController(
             previewAssets: pickerController.selectedAssetArray,
             currentPreviewIndex: 0,

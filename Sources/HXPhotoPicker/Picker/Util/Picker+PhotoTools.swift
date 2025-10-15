@@ -286,6 +286,18 @@ extension PhotoTools {
         config.photoList.titleView.arrow.backgroundColor = "#B2B2B2".color
         config.photoList.titleView.arrow.arrowColor = "#2E2F30".color
         
+        #if canImport(UIKit.UIGlassEffect)
+        if #available(iOS 26.0, *) {
+            config.photoList.filterButtonConfig = UIButton.Configuration.clearGlass()
+            config.photoList.cancelButtonConfig = UIButton.Configuration.clearGlass()
+            var titleButtonConfig = UIButton.Configuration.clearGlass()
+            titleButtonConfig.imagePlacement = .trailing
+            titleButtonConfig.imagePadding = 4
+            titleButtonConfig.baseForegroundColor = .label
+            config.photoList.titleButtonConfig = titleButtonConfig
+        }
+        #endif
+        
         config.photoList.cell.customSelectableCellClass = PhotoPickerWeChatViewCell.self
         config.photoList.cell.selectBox.selectedBackgroundColor = wxColor
         config.photoList.cell.selectBox.titleColor = .white

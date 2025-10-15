@@ -12,6 +12,8 @@ open class AlbumListView: UIView, PhotoAlbumList, UITableViewDataSource, UITable
     
     public weak var delegate: PhotoAlbumListDelegate?
     
+    public var scrollView: UIScrollView { tableView }
+    
     public var contentInset: UIEdgeInsets = .zero {
         didSet {
             tableView.contentInset = contentInset

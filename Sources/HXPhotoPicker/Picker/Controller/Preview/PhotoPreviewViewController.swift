@@ -293,7 +293,7 @@ extension PhotoPreviewViewController {
                     navigationItem.leftBarButtonItem = cancelItem
                 }
                 if pickerConfig.isMultipleSelect {
-                    navigationItem.rightBarButtonItem = .initCustomView(customView: selectBoxControl)
+                    navigationItem.rightBarButtonItem = .init(customView: selectBoxControl)
                 }
             }else {
                 var cancelItem: UIBarButtonItem

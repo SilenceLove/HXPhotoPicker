@@ -89,6 +89,11 @@ public struct PreviewViewConfiguration {
         var bottomConfig = PickerBottomViewConfiguration()
         bottomConfig.disableFinishButtonWhenNotSelected = false
         self.bottomView = bottomConfig
+        #if canImport(UIKit.UIGlassEffect)
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility {
+            photoToolbar = PhotoToolBarGlassView.self
+        }
+        #endif
     }
     
     public mutating func setThemeColor(_ color: UIColor) {
