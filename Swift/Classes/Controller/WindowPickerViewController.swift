@@ -129,6 +129,7 @@ class WindowPickerViewController: UIViewController {
     }()
     lazy var boxControl: SelectBoxView = {
         var config = SelectBoxConfiguration()
+        config.size = .init(width: 17, height: 17)
         config.style = .tick
         config.backgroundColor = .clear
         config.borderColor = UIColor(hexString: "#07C160")

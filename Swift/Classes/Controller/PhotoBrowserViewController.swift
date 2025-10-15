@@ -87,22 +87,9 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
         ))
         previewAssets.append(networkImageAsset1)
         
-        let networkImageAsset2 = PhotoAsset(NetworkImageAsset(
-            thumbnailURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.enterdesk.com%2Fedpic%2F75%2Fdc%2F50%2F75dc50577d3d3d2bd5fd8db728e7bf77.jpg&refer=http%3A%2F%2Fup.enterdesk.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=d216c4dae3c9d5f6fee735ec7fbe8771")!,
-            originalURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.enterdesk.com%2Fedpic_source%2Fb0%2Fd1%2Ff3%2Fb0d1f35504e4106d48c84434f2298ada.jpg&refer=http%3A%2F%2Fup.enterdesk.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=4c1031ae2527d6b98a17481ca24058db")!,
-            thumbnailLoadMode: .varied,
-            originalLoadMode: .alwaysThumbnail
-        ))
+        let networkImageURL2 = URL.init(string: "https://p26-sign.douyinpic.com/tos-cn-i-0813c001/ooAA4LYfI8JRGEfA2efIC8DsAMIXCDAQPZSAIE~tplv-dy-vqe2-sr-v2:1440:3113:q80.jpeg?lk3s=138a59ce&x-expires=1762822800&x-signature=5KCrClIGTAFTK6E%2FqAeMsRW11cQ%3D&from=327834062&s=PackSourceEnum_AWEME_DETAIL&se=false&sc=image&biz_tag=aweme_images&l=202510120948500608493F92DEE5D5EDB5")!
+        let networkImageAsset2 = PhotoAsset.init(networkImageAsset: NetworkImageAsset.init(thumbnailURL: networkImageURL2, originalURL: networkImageURL2)) // swiftlint:disable:this line_length
         previewAssets.append(networkImageAsset2)
-        
-        let networkImageAsset3 = PhotoAsset(NetworkImageAsset(
-            thumbnailURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.enterdesk.com%2Fedpic%2Fc9%2F08%2F4a%2Fc9084a6750e3293e6aeaf981f653b734.jpg&refer=http%3A%2F%2Fup.enterdesk.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=22adb67d04d85fa543daeb2f49de3671")!,
-            originalURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.enterdesk.com%2Fedpic_source%2F3d%2F42%2F3e%2F3d423e3cb05d7edc35c38e3173af2a0d.jpg&refer=http%3A%2F%2Fup.enterdesk.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=5ccb00c0328b8ba0d522ac2e17e3a7bd")!,
-            thumbnailLoadMode: .alwaysThumbnail,
-            originalLoadMode: .alwaysThumbnail
-        ))
-        // swiftlint:enable line_length
-        previewAssets.append(networkImageAsset3)
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()

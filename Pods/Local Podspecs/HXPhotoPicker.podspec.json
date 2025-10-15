@@ -82,7 +82,7 @@
       "subspecs": [
         {
           "name": "Lite",
-          "source_files": "Sources/HXPhotoPicker/Camera/**/*.{swift,metal}",
+          "source_files": "Sources/HXPhotoPicker/Camera/**/*.{swift}",
           "dependencies": {
             "HXPhotoPicker/Core": []
           },
