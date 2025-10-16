@@ -34,6 +34,10 @@ class PhotoPreviewListViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+            layer.cornerRadius = 4
+            layer.masksToBounds = true
+        }
         photoView = PhotoThumbnailView()
         photoView.imageView.size = size
         contentView.addSubview(photoView)

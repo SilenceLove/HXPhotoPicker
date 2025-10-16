@@ -72,7 +72,7 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
     
     private let pickerConfig: PickerConfiguration
     private let type: PhotoToolBarType
-    private var promptView: PhotoPermissionPromptView!
+    private var promptBgView: UIToolbar!
     private var selectedView: PhotoPreviewSelectedView!
     private var previewListView: PhotoPreviewListView!
     private var previewShadeView: UIView!
@@ -130,8 +130,10 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
             }
             viewConfig = pickerConfig.photoList.bottomView
             if isShowPrompt {
-                promptView = PhotoPermissionPromptView(config: viewConfig)
-                addSubview(promptView)
+                promptBgView = UIToolbar()
+                let item = makePermissionPromptItem()
+                promptBgView.setItems([item], animated: false)
+                addSubview(promptBgView)
             }
             if isShowSelectedView {
                 initSelectedView()
@@ -147,8 +149,8 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
                 previewListView.dataSource = self
                 
                 previewShadeMaskLayer = CAGradientLayer()
-                previewShadeMaskLayer.colors = [UIColor.clear.cgColor, UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor, UIColor.clear.cgColor]
-                previewShadeMaskLayer.locations = [0.0, 0.02, 0.075, 0.925, 0.98, 1.0]
+                previewShadeMaskLayer.colors = [UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor]
+                previewShadeMaskLayer.locations = [0.0, 0.075, 0.925, 1.0]
                 previewShadeMaskLayer.startPoint = .init(x: 0, y: 0.5)
                 previewShadeMaskLayer.endPoint = .init(x: 1, y: 0.5)
                 
@@ -172,8 +174,8 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
                 previewListView.dataSource = self
                 
                 previewShadeMaskLayer = CAGradientLayer()
-                previewShadeMaskLayer.colors = [UIColor.clear.cgColor, UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor, UIColor.clear.cgColor]
-                previewShadeMaskLayer.locations = [0.0, 0.02, 0.075, 0.925, 0.98, 1.0]
+                previewShadeMaskLayer.colors = [UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor]
+                previewShadeMaskLayer.locations = [0.0, 0.075, 0.925, 1.0]
                 previewShadeMaskLayer.startPoint = .init(x: 0, y: 0.5)
                 previewShadeMaskLayer.endPoint = .init(x: 1, y: 0.5)
                 
@@ -226,6 +228,16 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
         let flex = UIBarButtonItem.flexibleSpace()
         contentView.setItems([leftItem, flex, centerItem, flex, rightItem], animated: false)
         contentView.insetsLayoutMarginsFromSafeArea = false
+        
+        let tmpBtn = UIButton(type: .system)
+        tmpBtn.configuration = .glass()
+        let tmpItem = UIBarButtonItem(customView: tmpBtn).hidesShared()
+        let tmpToolView = UIToolbar()
+        tmpToolView.setItems([tmpItem], animated: false)
+        addSubview(tmpToolView)
+        tmpToolView.x = -UIScreen._width
+        tmpToolView.y = 100
+        
         layoutSubviews()
         bringSubviewToFront(contentView)
         if selectedView != nil {
@@ -234,8 +246,8 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
         if previewListView != nil {
             bringSubviewToFront(previewListView)
         }
-        if promptView != nil {
-            bringSubviewToFront(promptView)
+        if promptBgView != nil {
+            bringSubviewToFront(promptBgView)
         }
         configColor()
     }
@@ -270,9 +282,30 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
         originalBtn.titleLabel?.numberOfLines = 0
         originalBtn.titleLabel?.adjustsFontSizeToFitWidth = true
         originalBtn.titleLabel?.lineBreakMode = .byTruncatingMiddle
-        originalBtn.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        originalBtn.setContentHuggingPriority(.defaultLow, for: .horizontal)
         return UIBarButtonItem(customView: originalBtn)
+    }
+    
+    func makePermissionPromptItem() -> UIBarButtonItem {
+        let button = ExpandButton(type: .system)
+        var cfg = UIButton.Configuration.plain()
+        cfg.background.backgroundColorTransformer = UIConfigurationColorTransformer { _ in .clear }
+        cfg.background.visualEffect = nil
+        cfg.baseForegroundColor = .label
+        cfg.imagePadding = 10
+        cfg.buttonSize = .mini
+        cfg.contentInsets = .init(top: 5, leading: 10, bottom: 5, trailing: 10)
+        button.configuration = cfg
+        
+        button.setTitle(.textPhotoList.bottomView.permissionsTitle.text, for: .normal)
+        button.titleLabel?.font = .textPhotoList.bottomView.permissionsTitleFont
+        button.setImage(.imageResource.picker.photoList.bottomView.permissionsPrompt.image?.withRenderingMode(.alwaysTemplate), for: .normal)
+        button.addTarget(self, action: #selector(didPromptViewClick), for: .touchUpInside)
+        return UIBarButtonItem(customView: button)
+    }
+    
+    @objc
+    private func didPromptViewClick() {
+        PhotoTools.openSettingsURL()
     }
     
     private func initSelectedView() {
@@ -337,7 +370,7 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
             guard let self, self.isShowPrompt else {
                 return
             }
-            self.promptView.alpha = 0
+            self.promptBgView.alpha = 0
         }
     }
     
@@ -347,7 +380,7 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
             guard let self, self.isShowPrompt else {
                 return
             }
-            self.promptView.alpha = 1
+            self.promptBgView.alpha = 1
         }
     }
     
@@ -360,9 +393,9 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
         if !isShowSelectedView { return }
         if isShowPrompt {
             if selectedView.photoAssetArray.isEmpty, !photoAssets.isEmpty {
-                promptView.alpha = 0
+                promptBgView.alpha = 0
             }else if photoAssets.isEmpty {
-                promptView.alpha = 1
+                promptBgView.alpha = 1
             }
         }
         selectedView.reloadData(photoAssets: photoAssets)
@@ -468,11 +501,11 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
         if type == .picker {
             if isShowPrompt {
                 if pickerConfig.selectMode != .single {
-                    promptView.frame = .init(x: 0, y: 0, width: width, height: 70)
+                    promptBgView.frame = .init(x: 0, y: 0, width: width, height: 70)
                 }else {
-                    promptView.frame = .init(x: 0, y: 0, width: width, height: 55)
+                    promptBgView.frame = .init(x: 0, y: 0, width: width, height: 55)
                 }
-                contentView.y = promptView.frame.maxY
+                contentView.y = promptBgView.frame.maxY
             }
             if isShowSelectedView {
                 selectedView.y = 0

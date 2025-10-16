@@ -68,7 +68,7 @@ public class PhotoPickerViewController: PhotoBaseViewController {
         if #available(iOS 14.5, *) {
             initNavItems()
         }
-        photoToolbar.deviceOrientationDidChanged()
+        photoToolbar?.deviceOrientationDidChanged()
     }
     
     public override func viewDidLayoutSubviews() {
@@ -197,14 +197,14 @@ public class PhotoPickerViewController: PhotoBaseViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if isShowToolbar {
-            photoToolbar.viewWillAppear(self)
+            photoToolbar?.viewWillAppear(self)
         }
     }
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if isShowToolbar {
-            photoToolbar.viewDidAppear(self)
+            photoToolbar?.viewDidAppear(self)
         }
         weakController?.setupDelegate()
     }
@@ -212,14 +212,14 @@ public class PhotoPickerViewController: PhotoBaseViewController {
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if isShowToolbar {
-            photoToolbar.viewWillDisappear(self)
+            photoToolbar?.viewWillDisappear(self)
         }
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if isShowToolbar {
-            photoToolbar.viewDidDisappear(self)
+            photoToolbar?.viewDidDisappear(self)
         }
     }
     
@@ -254,9 +254,7 @@ extension PhotoPickerViewController {
     }
     
     func initTitleView() {
-        if pickerConfig.albumShowMode.isPop {
-            navigationItem.titleView = titleView
-        }
+        navigationItem.titleView = titleView
     }
     
     func initNavItems(_ addFilter: Bool = true) {
@@ -283,6 +281,17 @@ extension PhotoPickerViewController {
                     view.width += 10
                 }
                 view.isSelected = listView.filterOptions != .any
+                if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility {
+                    let filterData = PhotoNavigationFilterData(
+                        options: listView.filterOptions,
+                        selectOptions: pickerConfig.selectOptions,
+                        editorOptions: pickerConfig.editorOptions,
+                        selectMode: pickerConfig.selectMode
+                    )
+                    view.makeFilterData(filterData) { [weak self] options in
+                        self?.listView.filterOptions = options
+                    }
+                }
             }
             if view.itemType == .finish {
                 finishItem = view
@@ -347,12 +356,10 @@ extension PhotoPickerViewController {
     }
     
     func updateTitle() {
-        if pickerConfig.albumShowMode.isPop {
-            guard let titleView = titleView else { return }
-            titleView.title = assetCollection?.albumName
-        }else {
-            title = assetCollection?.albumName
+        guard let titleView = titleView else {
+            return
         }
+        titleView.title = assetCollection?.albumName
     }
     
     func scrollToAppropriatePlace(photoAsset: PhotoAsset?) {

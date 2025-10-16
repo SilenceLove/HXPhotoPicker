@@ -31,6 +31,7 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
     var assetForIndex: PhotoBrowser.RequiredAsset?
     
     var selectBoxControl: SelectBoxView!
+    var selectBoxItem: UIBarButtonItem!
     var interactiveTransition: PickerInteractiveTransition?
     weak var beforeNavDelegate: UINavigationControllerDelegate?
     var isPreviewSelect: Bool = false
@@ -70,7 +71,7 @@ public class PhotoPreviewViewController: PhotoBaseViewController {
     }
     
     public func photoAsset(for index: Int) -> PhotoAsset? {
-        if !previewAssets.isEmpty && index > 0 || index < previewAssets.count {
+        if !previewAssets.isEmpty, index >= 0, index < previewAssets.count {
             return previewAssets[index]
         }
         return assetForIndex?(index)
@@ -286,34 +287,45 @@ extension PhotoPreviewViewController {
                     let imageType: HX.ImageResource.ImageType = pickerController.config.photoList.previewStyle == .present ? .imageResource.picker.preview.back : .imageResource.picker.preview.cancel
                     let cancelItem = UIBarButtonItem(
                         image: imageType.image,
-                        style: .done,
+                        style: .plain,
                         target: self,
                         action: #selector(didCancelItemClick)
                     ).hidesShared()
                     navigationItem.leftBarButtonItem = cancelItem
                 }
                 if pickerConfig.isMultipleSelect {
-                    navigationItem.rightBarButtonItem = .init(customView: selectBoxControl)
+                    selectBoxItem = .init(customView: selectBoxControl)
+                    navigationItem.rightBarButtonItem = selectBoxItem
                 }
             }else {
                 var cancelItem: UIBarButtonItem
                 if config.cancelType == .image {
                     let isDark = PhotoManager.isDark
-                    cancelItem = UIBarButtonItem(
+                    let item = UIBarButtonItem(
                         image: UIImage.image(
                             for: isDark ? config.cancelDarkImageName : config.cancelImageName
                         ),
-                        style: .done,
+                        style: .plain,
                         target: self,
                         action: #selector(didCancelItemClick)
-                    ).hidesShared()
+                    )
+                    if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+                        cancelItem = item
+                    }else {
+                        cancelItem = item.hidesShared()
+                    }
                 }else {
-                    cancelItem = UIBarButtonItem(
+                    let item = UIBarButtonItem(
                         title: .textPreview.cancelTitle.text,
-                        style: .done,
+                        style: .plain,
                         target: self,
                         action: #selector(didCancelItemClick)
-                    ).hidesShared()
+                    )
+                    if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+                        cancelItem = item
+                    }else {
+                        cancelItem = item.hidesShared()
+                    }
                 }
                 if config.cancelPosition == .left {
                     navigationItem.leftBarButtonItem = cancelItem
@@ -336,7 +348,11 @@ extension PhotoPreviewViewController {
                     }
                     if previewType != .browser {
                         if photoAsset.mediaType == .video && pickerConfig.isSingleVideo {
-                            selectBoxControl.isHidden = true
+                            if #available(iOS 16.0, *) {
+                                selectBoxItem.isHidden = true
+                            } else {
+                                selectBoxControl.isHidden = true
+                            }
                         } else {
                             updateSelectBox(photoAsset.isSelected, photoAsset: photoAsset)
                             selectBoxControl.isSelected = photoAsset.isSelected
@@ -352,7 +368,7 @@ extension PhotoPreviewViewController {
             if previewType == .picker {
                 let cancelItem = UIBarButtonItem(
                     image: .imageResource.picker.preview.cancel.image,
-                    style: .done,
+                    style: .plain,
                     target: self,
                     action: #selector(didCancelItemClick)
                 ).hidesShared()

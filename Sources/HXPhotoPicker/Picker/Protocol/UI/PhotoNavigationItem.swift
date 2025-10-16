@@ -35,9 +35,20 @@ public protocol PhotoNavigationItem: UIView, PhotoPickerDataStatus {
     
     init(config: PickerConfiguration)
     
+    func makeFilterData(_ data: PhotoNavigationFilterData, handler: @escaping (PhotoPickerFilterSection.Options) -> Void)
 }
 
 public extension PhotoNavigationItem {
     var isSelected: Bool { get { false } set { } }
     func selectedAssetDidChanged(_ photoAssets: [PhotoAsset]) { }
+    
+    func makeFilterData(_ data: PhotoNavigationFilterData, handler: @escaping (PhotoPickerFilterSection.Options) -> Void) { }
+}
+
+
+public struct PhotoNavigationFilterData {
+    public var options: PhotoPickerFilterSection.Options
+    public let selectOptions: PickerAssetOptions
+    public let editorOptions: PickerAssetOptions
+    public let selectMode: PickerSelectMode
 }

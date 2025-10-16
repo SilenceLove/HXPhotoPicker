@@ -138,7 +138,12 @@ public extension HX.ImageResource {
             
             public struct Filter {
                 /// 所有项目图标
-                public var any: ImageType = .local("hx_photo_list_filter_any")
+                public var any: ImageType = {
+                    if #available(iOS 26.0, *) {
+                        return .system("square.grid.3x3")
+                    }
+                    return .local("hx_photo_list_filter_any")
+                }()
                 /// 已编辑图标
                 public var edited: ImageType = .local("hx_photo_list_filter_edited")
                 /// 照片图标

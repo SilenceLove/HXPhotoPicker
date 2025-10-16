@@ -24,11 +24,7 @@ public class AlbumGlassTitleView: UIView, PhotoPickerNavigationTitle {
        }
     }
     
-    public var titleColor: UIColor? {
-       didSet {
-           button.setTitleColor(titleColor, for: .normal)
-       }
-    }
+    public var titleColor: UIColor?
     
     public var isSelected: Bool = false {
         didSet {
@@ -69,7 +65,7 @@ public class AlbumGlassTitleView: UIView, PhotoPickerNavigationTitle {
         if UIDevice.isPad {
             maxWidth = 300
         }else {
-            maxWidth = UIDevice.screenSize.width * 0.5
+            maxWidth = 200
         }
         #else
         maxWidth = 300
@@ -85,13 +81,15 @@ public class AlbumGlassTitleView: UIView, PhotoPickerNavigationTitle {
     
     private func initViews() {
         button = UIButton(type: .system)
-        button.titleLabel?.font = .semiboldPingFang(ofSize: 18)
+        var configuration = config.photoList.titleButtonConfig
+        configuration?.titleLineBreakMode = .byTruncatingTail
+        configuration?.contentInsets = .init(top: 0, leading: 1, bottom: 0, trailing: 1)
+        button.configuration = configuration
         if isPopupAlbum {
-            button.configuration = config.photoList.titleButtonConfig
             button.setImage(.init(systemName: "chevron.down.circle.fill")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        }else {
-            isUserInteractionEnabled = false
         }
+        button.titleLabel?.numberOfLines = 1
+        button.titleLabel?.lineBreakMode = .byTruncatingTail
         
         addSubview(button)
     }
@@ -114,7 +112,7 @@ public class AlbumGlassTitleView: UIView, PhotoPickerNavigationTitle {
                     self.selectHandler?(assetCollection)
                 }
             })
-            _ = collection.requestCoverImage(targetWidth: 24, isFit: true) { [weak self] in
+            _ = collection.requestCoverImage(targetWidth: 24) { [weak self] in
                 guard let self = self else { return }
                 if let info = $2, info.isCancel { return }
                 if let image = $0 {
@@ -153,26 +151,6 @@ public class AlbumGlassTitleView: UIView, PhotoPickerNavigationTitle {
     public override func layoutSubviews() {
         super.layoutSubviews()
         button.frame = bounds
-    }
-    
-    func configColor() {
-        if isPopupAlbum {
-            let color = button.imageView?.tintColor ?? titleColor
-            button.setTitleColor(color, for: .normal)
-        }else {
-            button.setTitleColor(titleColor, for: .normal)
-        }
-    }
-
-    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-       super.traitCollectionDidChange(previousTraitCollection)
-        if isPopupAlbum {
-            configColor()
-        }else {
-            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-                configColor()
-            }
-        }
     }
 
     required init?(coder: NSCoder) {

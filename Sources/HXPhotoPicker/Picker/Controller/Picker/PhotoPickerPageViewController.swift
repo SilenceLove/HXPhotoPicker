@@ -14,9 +14,16 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
     
     public var contentInset: UIEdgeInsets = .zero {
         didSet {
-            headerView.y = contentInset.top
+            let contentTop: CGFloat
+            if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+                segmentedBgView.y = contentInset.top + 5
+                contentTop = segmentedBgView.frame.maxY + 15
+            }else {
+                headerView.y = contentInset.top
+                contentTop = headerView.frame.maxY
+            }
             contentVCs.forEach {
-                $0.contentInset = .init(top: headerView.frame.maxY, left: contentInset.left, bottom: contentInset.bottom, right: contentInset.right)
+                $0.contentInset = .init(top: contentTop, left: contentInset.left, bottom: contentInset.bottom, right: contentInset.right)
             }
         }
     }
@@ -31,14 +38,23 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
     
     public var pickerConfig: PickerConfiguration
     public var config: PhotoListConfiguration
-    public var collectionView: UICollectionView! = .init(frame: .zero, collectionViewLayout: .init())
+    public var collectionView: UICollectionView! {
+        get {
+            contentVCs.first?.collectionView ?? .init(frame: .zero, collectionViewLayout: .init())
+        }
+        set { }
+    }
     
     public var filterOptions: PhotoPickerFilterSection.Options {
         get {
             if contentVCs.isEmpty {
                 return .any
             }
-            return contentVCs[headerView.selectedIndex].filterOptions
+            if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+                return contentVCs[segmentedControl.selectedSegmentIndex].filterOptions
+            }else {
+                return contentVCs[headerView.selectedIndex].filterOptions
+            }
         }
         set {
             contentVCs.forEach {
@@ -90,8 +106,22 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
                 vc.assetResult = assetResult
                 contentVCs.insert(vc, at: 0)
             }
-            headerView.titles = titles
-            headerView.selectedIndex = 0
+            if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+                segmentedControl = .init(items: titles)
+                segmentedControl.selectedSegmentIndex = 0
+                for (index, _) in titles.enumerated() {
+                    segmentedControl.setWidth(88, forSegmentAt: index)
+                }
+                segmentedControl.addTarget(self, action: #selector(didSegmentedControlClick), for: .valueChanged)
+                let item = UIBarButtonItem(customView: segmentedControl)
+                #if canImport(UIKit.UIGlassEffect)
+                item.hidesSharedBackground = true
+                #endif
+                segmentedBgView.setItems([item], animated: false)
+            }else {
+                headerView.titles = titles
+                headerView.selectedIndex = 0
+            }
             
             scrollView.subviews.forEach { $0.removeFromSuperview() }
             children.forEach { $0.removeFromParent() }
@@ -109,7 +139,11 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
             if contentVCs.isEmpty {
                 return []
             }
-            return contentVCs[headerView.selectedIndex].assets
+            if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+                return contentVCs[segmentedControl.selectedSegmentIndex].assets
+            }else {
+                return contentVCs[headerView.selectedIndex].assets
+            }
         }
         set { }
     }
@@ -119,7 +153,11 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
             if contentVCs.isEmpty {
                 return 0
             }
-            return contentVCs[headerView.selectedIndex].photoCount
+            if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+                return contentVCs[segmentedControl.selectedSegmentIndex].photoCount
+            }else {
+                return contentVCs[headerView.selectedIndex].photoCount
+            }
         }
         set { }
     }
@@ -129,7 +167,11 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
             if contentVCs.isEmpty {
                 return 0
             }
-            return contentVCs[headerView.selectedIndex].videoCount
+            if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+                return contentVCs[segmentedControl.selectedSegmentIndex].videoCount
+            }else {
+                return contentVCs[headerView.selectedIndex].videoCount
+            }
         }
         set { }
     }
@@ -138,6 +180,8 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
     
     var contentVCs: [PhotoPickerListViewController] = []
     var headerView: PhotoPickerPageHeaderView!
+    var segmentedControl: UISegmentedControl!
+    var segmentedBgView: UIToolbar!
     var scrollView: UIScrollView!
     
     public required init(config: PickerConfiguration) {
@@ -163,13 +207,18 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
             scrollView.panGestureRecognizer.require(toFail: gesture)
         }
         view.addSubview(scrollView)
-        headerView = PhotoPickerPageHeaderView()
-        headerView.delegate = self
-        view.addSubview(headerView)
+        
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+            segmentedBgView = UIToolbar()
+            view.addSubview(segmentedBgView)
+        }else {
+            headerView = PhotoPickerPageHeaderView()
+            headerView.delegate = self
+            view.addSubview(headerView)
+        }
     }
-    
-    public func scrollTo(_ asset: PhotoAsset?) {
-        contentVCs.forEach { $0.scrollTo(asset) }
+    public func scrollTo(_ asset: PhotoAsset?, animated: Bool) {
+        contentVCs.forEach { $0.scrollTo(asset, animated: animated) }
     }
     public func scrollToCenter(for photoAsset: PhotoAsset?) {
         contentVCs.forEach { $0.scrollToCenter(for: photoAsset) }
@@ -198,7 +247,11 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
         if contentVCs.isEmpty {
             return nil
         }
-        return contentVCs[headerView.selectedIndex].getCell(for: asset)
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+            return contentVCs[segmentedControl.selectedSegmentIndex].getCell(for: asset)
+        }else {
+            return contentVCs[headerView.selectedIndex].getCell(for: asset)
+        }
     }
     public func updateCellSelectedTitle() {
         contentVCs.forEach { $0.updateCellSelectedTitle() }
@@ -217,11 +270,19 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
     
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        headerView.frame = .init(x: 0, y: contentInset.top, width: view.width, height: 40)
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+            segmentedBgView.frame = .init(x: 0, y: contentInset.top + 5, width: view.width, height: 40)
+        }else {
+            headerView.frame = .init(x: 0, y: contentInset.top, width: view.width, height: 40)
+        }
         scrollView.frame = view.bounds
         layoutViews()
         if isDeviceOrientation {
-            headerView(headerView, didSelectedButton: headerView.selectedIndex)
+            if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+                
+            }else {
+                headerView(headerView, didSelectedButton: headerView.selectedIndex)
+            }
             isDeviceOrientation = false
         }
     }
@@ -233,7 +294,13 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
         )
         for (index, controller) in contentVCs.enumerated() {
             controller.view.frame = .init(x: view.width * CGFloat(index), y: 0, width: view.width, height: view.height)
-            controller.contentInset = .init(top: headerView.frame.maxY, left: contentInset.left, bottom: contentInset.bottom, right: contentInset.right)
+            let contentTop: CGFloat
+            if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+                contentTop = segmentedBgView.frame.maxY + 15
+            }else {
+                contentTop = headerView.frame.maxY
+            }
+            controller.contentInset = .init(top: contentTop, left: contentInset.left, bottom: contentInset.bottom, right: contentInset.right)
         }
     }
     
@@ -244,19 +311,31 @@ public class PhotoPickerPageViewController: HXBaseViewController, PhotoPickerLis
 
 extension PhotoPickerPageViewController: UIScrollViewDelegate, PhotoPickerPageHeaderViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetX = scrollView.contentOffset.x
-        let value = offsetX / (scrollView.contentSize.width - scrollView.width)
-        headerView.offsetValue = value
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+        }else {
+            let offsetX = scrollView.contentOffset.x
+            let value = offsetX / (scrollView.contentSize.width - scrollView.width)
+            headerView.offsetValue = value
+        }
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let offsetX = scrollView.contentOffset.x
         let index = Int(offsetX / scrollView.width)
-        headerView.selectedIndex = Int(index)
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+            segmentedControl.selectedSegmentIndex = Int(index)
+        }else {
+            headerView.selectedIndex = Int(index)
+        }
     }
     
     func headerView(_ headerView: PhotoPickerPageHeaderView, didSelectedButton index: Int) {
         scrollView.setContentOffset(.init(x: scrollView.width * CGFloat(index), y: 0), animated: true)
+    }
+    
+    @objc
+    func didSegmentedControlClick() {
+        scrollView.setContentOffset(.init(x: scrollView.width * CGFloat(segmentedControl.selectedSegmentIndex), y: 0), animated: true)
     }
 }
 

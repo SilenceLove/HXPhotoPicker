@@ -42,7 +42,8 @@ open class PhotoPickerListViewController:
             allAssets = assetResult.assets
             assets = assetResult.assets
             if let collectionView {
-                collectionView.reloadData()
+                reloadAll()
+//                collectionView.reloadData()
             }
             updateEmptyView()
         }
@@ -204,8 +205,9 @@ open class PhotoPickerListViewController:
             assets = allAssets
             photoCount = assetResult.photoCount
             videoCount = assetResult.videoCount
-            collectionView.reloadData()
-            scrollTo(nil)
+//            collectionView.reloadData()
+            reloadAll()
+            scrollTo(nil, animated: true)
             updateEmptyView()
             return
         }
@@ -253,9 +255,18 @@ open class PhotoPickerListViewController:
         self.assets = assets
         self.photoCount = photoCount
         self.videoCount = videoCount
-        collectionView.reloadData()
-        scrollTo(nil)
+//        collectionView.reloadData()
+        reloadAll()
+        scrollTo(nil, animated: true)
         updateEmptyView()
+    }
+    
+    func reloadAll(duration: TimeInterval = 0.15) {
+        UIView.transition(with: collectionView,
+                          duration: duration,
+                          options: .transitionCrossDissolve) {
+            self.collectionView.reloadData()
+        }
     }
     
     func updateEmptyView() {

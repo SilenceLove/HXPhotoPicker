@@ -119,6 +119,14 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         beganPoint = gestureRecognizer.location(in: gestureRecognizer.view)
         canInteration = true
         canTransition = true
+        
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+            if let viewControllers = previewViewController.navigationController?.viewControllers,
+               viewControllers.count > 1,
+               let vc = viewControllers[viewControllers.count - 2] as? PhotoPickerViewController {
+                vc.titleView?.alpha = 0
+            }
+        }
         previewViewController.navigationController?.popViewController(animated: true)
     }
     

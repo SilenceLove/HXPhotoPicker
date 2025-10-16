@@ -68,13 +68,14 @@ class PhotoPreviewSelectedView: UIView,
         }
         reloadSectionInset()
         
-        shadeMaskLayer = CAGradientLayer()
-        shadeMaskLayer.colors = [UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor]
-        shadeMaskLayer.locations = [0.0, 0.075, 0.925, 1.0]
-        
         shadeView = UIView()
         shadeView.addSubview(collectionView)
-        shadeView.layer.mask = shadeMaskLayer
+        shadeMaskLayer = CAGradientLayer()
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+            shadeMaskLayer.colors = [UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor]
+            shadeMaskLayer.locations = [0.0, 0.075, 0.925, 1.0]
+            shadeView.layer.mask = shadeMaskLayer
+        }
         addSubview(shadeView)
     }
     

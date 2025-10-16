@@ -290,6 +290,25 @@ public class PhotoPickerFilterSection {
             self.options = options
             self.isSelected = isSelected
         }
+        
+        var image: UIImage? {
+            switch options {
+            case .any:
+                return .imageResource.picker.photoList.filter.any.image?.withRenderingMode(.alwaysTemplate)
+            case .edited:
+                return .imageResource.picker.photoList.filter.edited.image?.withRenderingMode(.alwaysTemplate)
+            case .photo:
+                return .imageResource.picker.photoList.filter.photo.image?.withRenderingMode(.alwaysTemplate)
+            case .gif:
+                return .imageResource.picker.photoList.filter.gif.image?.withRenderingMode(.alwaysTemplate)
+            case .livePhoto:
+                return .imageResource.picker.photoList.filter.livePhoto.image?.withRenderingMode(.alwaysTemplate)
+            case .video:
+                return .imageResource.picker.photoList.filter.video.image?.withRenderingMode(.alwaysTemplate)
+            default:
+                return nil
+            }
+        }
     }
     
     public struct Options: OptionSet {

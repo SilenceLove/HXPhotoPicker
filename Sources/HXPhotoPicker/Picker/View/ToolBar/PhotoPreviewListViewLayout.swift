@@ -60,7 +60,13 @@ class PhotoPreviewListViewLayout: UICollectionViewLayout {
         let expandedItemWidth = self.expandedItemWidth ?? expandingItemWidth(in: collectionView)
         self.expandedItemWidth = expandedItemWidth
         
-        let collapsedItemSpacing = 1.0
+        
+        let collapsedItemSpacing: CGFloat
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility  {
+            collapsedItemSpacing = 3.0
+        }else {
+            collapsedItemSpacing = 1.0
+        }
         let expandedItemSpacing = 12.0
         
         // Calculate frames for each item

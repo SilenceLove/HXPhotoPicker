@@ -67,7 +67,7 @@ public protocol PhotoPickerList:
     init(config: PickerConfiguration)
     
     func scrollTo(at indexPath: IndexPath, at scrollPosition: UICollectionView.ScrollPosition, animated: Bool)
-    func scrollTo(_ asset: PhotoAsset?)
+    func scrollTo(_ asset: PhotoAsset?, animated: Bool)
     func scrollToCenter(for photoAsset: PhotoAsset?)
     func scrollCellToVisibleArea(_ cell: PhotoPickerBaseViewCell)
     
@@ -88,7 +88,7 @@ public extension PhotoPickerList {
         }
     }
     
-    func scrollTo(_ asset: PhotoAsset?) {
+    func scrollTo(_ asset: PhotoAsset?, animated: Bool = false) {
         if assets.isEmpty {
             return
         }
@@ -120,7 +120,7 @@ public extension PhotoPickerList {
             self.collectionView.scrollToItem(
                 at: indexPath,
                 at: scrollPosition,
-                animated: false
+                animated: animated
             )
         }
     }

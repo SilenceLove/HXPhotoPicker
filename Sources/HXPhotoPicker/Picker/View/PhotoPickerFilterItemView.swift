@@ -29,10 +29,11 @@ public class PhotoPickerFilterItemView: UIView, PhotoNavigationItem {
         button = UIButton(type: .custom)
         button.setImage(.imageResource.picker.photoList.filterNormal.image?.withRenderingMode(.alwaysTemplate), for: .normal)
         button.setImage(.imageResource.picker.photoList.filterSelected.image?.withRenderingMode(.alwaysTemplate), for: .selected)
-        if #available(iOS 15.0, *), !PhotoManager.isIos26Compatibility {
+        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility {
             button.configuration = config.photoList.filterButtonConfig
+        }else {
+            button.addTarget(self, action: #selector(didFilterClick), for: .touchUpInside)
         }
-        button.addTarget(self, action: #selector(didFilterClick), for: .touchUpInside)
         addSubview(button)
         setColor()
     }
@@ -51,6 +52,122 @@ public class PhotoPickerFilterItemView: UIView, PhotoNavigationItem {
         } else {
             itemDelegate?.photoItem(presentFilterAssets: self, modalPresentationStyle: .fullScreen)
         }
+    }
+    
+    var filterDada: PhotoNavigationFilterData?
+    var handler: ((PhotoPickerFilterSection.Options) -> Void)?
+    public func makeFilterData(_ data: PhotoNavigationFilterData, handler: @escaping (PhotoPickerFilterSection.Options) -> Void) {
+        if #available(iOS 26.0, *) {
+            filterDada = data
+            self.handler = handler
+            button.menu = makeMenu()
+            button.showsMenuAsPrimaryAction = true
+        }
+    }
+    
+    @available(iOS 26.0, *)
+    func makeMenu() -> UIMenu? {
+        guard let data = filterDada else {
+            return nil
+        }
+        let options = data.options
+        let selectOptions = data.selectOptions
+        let selectMode = data.selectMode
+        let editorOptions = data.editorOptions
+        var sections: [PhotoPickerFilterSection] = []
+        sections.append(.init(rows: [.init(title: .textPhotoList.filter.anyTitle.text, options: .any, isSelected: options == .any)]))
+        var rows: [PhotoPickerFilterSection.Row] = []
+        if selectOptions.isPhoto && selectOptions.isVideo {
+            if !editorOptions.isEmpty, selectMode == .multiple {
+                rows.append(.init(title: .textPhotoList.filter.editedTitle.text, options: .edited, isSelected: options.contains(.edited)))
+            }
+            rows.append(.init(title: .textPhotoList.filter.photoTitle.text, options: .photo, isSelected: options.contains(.photo)))
+            if selectOptions.contains(.gifPhoto) {
+                rows.append(.init(title: .textPhotoList.filter.gifTitle.text, options: .gif, isSelected: options.contains(.gif)))
+            }
+            if selectOptions.contains(.livePhoto) {
+                rows.append(.init(title: .textPhotoList.filter.livePhotoTitle.text, options: .livePhoto, isSelected: options.contains(.livePhoto)))
+            }
+            rows.append(.init(title: .textPhotoList.filter.videoTitle.text, options: .video, isSelected: options.contains(.video)))
+        }else if selectOptions.isPhoto {
+            if editorOptions.isPhoto, selectMode == .multiple {
+                rows.append(.init(title: .textPhotoList.filter.editedTitle.text, options: .edited, isSelected: options.contains(.edited)))
+            }
+            rows.append(.init(title: .textPhotoList.filter.photoTitle.text, options: .photo, isSelected: options.contains(.photo)))
+            if selectOptions.contains(.gifPhoto) {
+                rows.append(.init(title: .textPhotoList.filter.gifTitle.text, options: .gif, isSelected: options.contains(.gif)))
+            }
+            if selectOptions.contains(.livePhoto) {
+                rows.append(.init(title: .textPhotoList.filter.livePhotoTitle.text, options: .livePhoto, isSelected: options.contains(.livePhoto)))
+            }
+        }else if selectOptions.isVideo {
+            if editorOptions.isVideo, selectMode == .multiple {
+                rows.append(.init(title: .textPhotoList.filter.editedTitle.text.localized, options: .edited, isSelected: options.contains(.edited)))
+            }
+            rows.append(.init(title: .textPhotoList.filter.videoTitle.text.localized, options: .video, isSelected: options.contains(.video)))
+        }
+        if !rows.isEmpty {
+            sections.append(.init(title: .textPhotoList.filter.sectionTitle.text, rows: rows))
+        }
+        var menus: [UIMenu] = []
+        for section in sections {
+            var actions: [UIAction] = []
+            for row in section.rows {
+                let id = UIAction.Identifier("\(row.options.rawValue)")
+                let action = UIAction(title: row.title, image: row.image, identifier: id, state: row.isSelected ? .on : .off, handler: { [weak self] action in
+                    guard let self else { return }
+                    if let optionsRow = Int(action.identifier.rawValue) {
+                        let options = PhotoPickerFilterSection.Options.init(rawValue: optionsRow)
+                        switch options {
+                        case .any:
+                            if action.state == .on {
+                                return
+                            }
+                            self.filterDada?.options = .any
+                        default:
+                            if action.state == .off {
+                                if let _options = self.filterDada?.options, _options == .any {
+                                    self.filterDada?.options = []
+                                }
+                                self.filterDada?.options.insert(options)
+                            }else {
+                                self.filterDada?.options.remove(options)
+                                if let _options = filterDada?.options {
+                                    var isAllUnselect = true
+                                    if _options.contains(.edited) {
+                                        isAllUnselect = false
+                                    }
+                                    if _options.contains(.photo) {
+                                        isAllUnselect = false
+                                    }
+                                    if _options.contains(.gif) {
+                                        isAllUnselect = false
+                                    }
+                                    if _options.contains(.livePhoto) {
+                                        isAllUnselect = false
+                                    }
+                                    if _options.contains(.video) {
+                                        isAllUnselect = false
+                                    }
+                                    if isAllUnselect {
+                                        self.filterDada?.options = .any
+                                    }
+                                }
+                            }
+                        }
+                        if let options = self.filterDada?.options {
+                            self.isSelected = options != .any
+                            self.handler?(options)
+                        }
+                        self.button.menu = self.makeMenu()
+                    }
+                })
+                action.attributes.insert(.keepsMenuPresented)
+                actions.append(action)
+            }
+            menus.append(.init(options: .displayInline, children: actions))
+        }
+        return UIMenu(title: .textPhotoList.filter.title.text, children: menus)
     }
     
     public override func layoutSubviews() {

@@ -17,7 +17,7 @@ extension UIBarButtonItem {
     @discardableResult
     func hidesShared() -> UIBarButtonItem {
 #if canImport(UIKit.UIGlassEffect)
-        if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility {
+        if #available(iOS 26.0, *) {
             hidesSharedBackground = true
             sharesBackground = false
         }

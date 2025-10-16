@@ -40,6 +40,15 @@ open class HXBaseViewController: UIViewController {
             interaction.scrollView = scrollView
             interaction.edge = .top
             topContainerView.addInteraction(interaction)
+            
+            let tmpBtn = UIButton(type: .system)
+            tmpBtn.configuration = .glass()
+            let tmpItem = UIBarButtonItem(customView: tmpBtn).hidesShared()
+            let tmpToolView = UIToolbar()
+            tmpToolView.setItems([tmpItem], animated: false)
+            topContainerView.addSubview(tmpToolView)
+            tmpToolView.x = -UIScreen._width
+            tmpToolView.y = -100
         }
         #endif
     }

@@ -14,7 +14,7 @@ extension PhotoPickerViewController: PhotoToolBarDelegate {
             photoToolbar = PhotoToolBarEmptyView(pickerConfig, type: .picker)
             return
         }
-        if photoToolbar?.superview == view {
+        if photoToolbar?.superview == view || (photoToolbar?.superview == bottomContainerView && bottomContainerView != nil) {
             return
         }
         if !isShowToolbar {
