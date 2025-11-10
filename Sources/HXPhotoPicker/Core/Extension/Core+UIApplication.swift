@@ -47,11 +47,23 @@ extension UIApplication {
     }
     
     public static var hx_keyWindow: UIWindow? {
-        var window = self.hx_windows.first(where: { $0.isKeyWindow && !$0.isHidden })
-        if window == nil {
-            window = self.hx_delegateWindow
+        var keyWindow: UIWindow?
+        if #available(iOS 13.0, *) {
+            for scene in shared.connectedScenes {
+                guard let windowScene = scene as? UIWindowScene, windowScene.session.role == .windowApplication else {
+                    continue
+                }
+                keyWindow = windowScene.windows.first(where: { $0.isKeyWindow && !$0.isHidden })
+                break
+            }
         }
-        return window
+        if keyWindow == nil {
+            keyWindow = shared.keyWindow
+        }
+        if keyWindow == nil {
+            keyWindow = self.hx_delegateWindow
+        }
+        return keyWindow
     }
     
     public static var hx_interfaceOrientation: UIInterfaceOrientation {
