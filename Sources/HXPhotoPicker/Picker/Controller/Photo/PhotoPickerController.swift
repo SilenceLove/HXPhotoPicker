@@ -177,7 +177,7 @@ open class PhotoPickerController: UINavigationController {
     /// 当前处于的外部预览
     public let previewType: PhotoPreviewType
     
-    public override var modalPresentationStyle: UIModalPresentationStyle {
+    open override var modalPresentationStyle: UIModalPresentationStyle {
         didSet {
             if previewType != .none && modalPresentationStyle == .custom && !splitType.isSplit {
                 transitioningDelegate = self
@@ -186,14 +186,14 @@ open class PhotoPickerController: UINavigationController {
         }
     }
     
-    public override var preferredStatusBarStyle: UIStatusBarStyle {
+    open override var preferredStatusBarStyle: UIStatusBarStyle {
         if PhotoManager.isDark {
             return .lightContent
         }
         return config.statusBarStyle
     }
     
-    public override var prefersStatusBarHidden: Bool {
+    open override var prefersStatusBarHidden: Bool {
         if config.prefersStatusBarHidden {
             return true
         }else {
@@ -212,14 +212,14 @@ open class PhotoPickerController: UINavigationController {
         config.supportedInterfaceOrientations
     }
     
-    public override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+    open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         if let animation = topViewController?.preferredStatusBarUpdateAnimation {
             return animation
         }
         return .fade
     }
     
-    public override func viewDidLoad() {
+    open override func viewDidLoad() {
         super.viewDidLoad()
         if PhotoManager.isRTL {
             navigationBar.semanticContentAttribute = .forceRightToLeft
@@ -241,7 +241,7 @@ open class PhotoPickerController: UINavigationController {
         setupInteractiveTransition()
     }
     
-    public override func viewDidLayoutSubviews() {
+    open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let status = AssetPermissionsUtil.authorizationStatus
         if status.rawValue >= 1 && status.rawValue < 3 {
@@ -253,7 +253,7 @@ open class PhotoPickerController: UINavigationController {
         }
     }
     
-    public override func present(
+    open override func present(
         _ viewControllerToPresent: UIViewController,
         animated flag: Bool,
         completion: (() -> Void)? = nil
@@ -301,7 +301,7 @@ open class PhotoPickerController: UINavigationController {
         super.dismiss(animated: flag, completion: completion)
     }
     
-    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    open override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
@@ -310,7 +310,7 @@ open class PhotoPickerController: UINavigationController {
         }
     }
     
-    public override func viewDidDisappear(_ animated: Bool) {
+    open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if previewType == .none && presentingViewController == nil {
             didDismiss()
