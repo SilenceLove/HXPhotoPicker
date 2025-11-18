@@ -319,7 +319,7 @@ open class PhotoPickerListViewController:
         }
     }
     
-    public override func deviceOrientationWillChanged(notify: Notification) {
+    open override func deviceOrientationWillChanged(notify: Notification) {
         orientationDidChange = true
         let items = collectionView.indexPathsForVisibleItems.sorted { $0.item < $1.item }
         if !items.isEmpty {

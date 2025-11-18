@@ -278,6 +278,8 @@ extension PhotoPreviewViewController {
         selectBoxControl.backgroundColor = .clear
         selectBoxControl.addTarget(self, action: #selector(didSelectBoxControlClick), for: UIControl.Event.touchUpInside)
         
+        selectBoxItem = .init(customView: selectBoxControl)
+        
         if previewType != .none && pickerController.modalPresentationStyle != .custom {
             updateColors()
         }
@@ -294,7 +296,6 @@ extension PhotoPreviewViewController {
                     navigationItem.leftBarButtonItem = cancelItem
                 }
                 if pickerConfig.isMultipleSelect {
-                    selectBoxItem = .init(customView: selectBoxControl)
                     navigationItem.rightBarButtonItem = selectBoxItem
                 }
             }else {
