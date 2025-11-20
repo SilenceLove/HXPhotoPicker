@@ -107,7 +107,7 @@ public class AlbumGlassTitleView: UIView, PhotoPickerNavigationTitle {
             let action = UIAction(title: albumName, identifier: id, state: collection.isSelected ? .on: .off, handler: { [weak self] action in
                 guard let self else { return }
                 if let idString = action.identifier.rawValue.split(separator: "_").last,
-                   let idx = Int(idString) {
+                   let idx = Int(idString), idx < self.assetCollections.count {
                     let assetCollection = self.assetCollections[idx]
                     self.selectHandler?(assetCollection)
                 }
@@ -115,13 +115,12 @@ public class AlbumGlassTitleView: UIView, PhotoPickerNavigationTitle {
             _ = collection.requestCoverImage(targetWidth: 24) { [weak self] in
                 guard let self = self else { return }
                 if let info = $2, info.isCancel { return }
-                if let image = $0 {
-                    if let index = self.assetCollections.firstIndex(of: $1) {
-                        let action = self.actions[index]
-                        action.image = image
-                        if let old = self.button.menu {
-                            self.button.menu = old.replacingChildren(self.actions)
-                        }
+                if let index = self.assetCollections.firstIndex(of: $1), index < self.actions.count,
+                   let image = $0?.scaleToFillSize(size: CGSize(width: 24, height: 24), mode: .center, scale: UIScreen.main.scale) {
+                    let action = self.actions[index]
+                    action.image = image
+                    if let old = self.button.menu {
+                        self.button.menu = old.replacingChildren(self.actions)
                     }
                 }
             }
