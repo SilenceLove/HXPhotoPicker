@@ -1463,6 +1463,7 @@
 				D36878AF2A399B8C00E70910 /* SelectBoxView.swift */,
 				D382AFC42E08118C001261D1 /* HXCollectionView.swift */,
 				D382AFC62E0811BA001261D1 /* HXTableView.swift */,
+				D32C44612AD26DC3009FED15 /* ExpandButton.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1883,7 +1884,6 @@
 			children = (
 				D36879AC2A399B8D00E70910 /* EditorCollectionView.swift */,
 				D36879A52A399B8D00E70910 /* EditorToolsView.swift */,
-				D32C44612AD26DC3009FED15 /* ExpandButton.swift */,
 				D38090232ABE872C00D806E3 /* Chartlet */,
 				D38090222ABE871A00D806E3 /* Text */,
 				D38090212ABE86FB00D806E3 /* Video */,
