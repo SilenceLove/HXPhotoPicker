@@ -259,7 +259,7 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
         cfg.background.visualEffect = nil
         cfg.baseForegroundColor = .label
 //        cfg.imageColorTransformer = UIConfigurationColorTransformer { [weak self] color in
-//            guard let self else { return }
+//            guard let self else { return color }
 //            if self.originalBtn.isSelected {
 //                return self.pickerConfig.photoList.bottomView.originalSelectBox.selectedBackgroundColor
 //            }else {

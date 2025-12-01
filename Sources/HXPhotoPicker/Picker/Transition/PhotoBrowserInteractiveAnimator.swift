@@ -73,12 +73,6 @@ public class PhotoBrowserInteractiveAnimator: PhotoBrowserInteractiveTransition,
         // 转场容器 添加 自定义背景view
         containerView.addSubview(backgroundView)
         
-        // 转场容器添加 拾取器vc 的 视图
-        // 其实这步操作是多余的，经过检验，在 iOS 18.7.2 及 iOS 26.1 中，容器view 中已经包含了
-        if pickerController.view.superview == nil {
-            containerView.addSubview(pickerController.view)
-        }
-        
         // 获取 目标view
         // 然后记录给 toView
         // 这里很重要，因为最终要落到 toView 上，这个 view 是“落点”
@@ -115,6 +109,9 @@ public class PhotoBrowserInteractiveAnimator: PhotoBrowserInteractiveTransition,
             // 转场容器 添加 预览view
             containerView.addSubview(previewView)
         }
+        
+        // 转场容器添加 拾取器vc 的 视图
+        containerView.addSubview(pickerController.view)
         
         // 禁用 预览vc 和 预览小view 的触摸事件
         previewViewController.collectionView.isScrollEnabled = false
