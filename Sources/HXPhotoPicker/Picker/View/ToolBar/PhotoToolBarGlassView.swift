@@ -207,10 +207,16 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
         let leftItem: UIBarButtonItem
         if let previewBtn {
             leftItem = previewBtn
-        }else if let editBtn {
-            leftItem = editBtn
         }else {
+            #if HXPICKER_ENABLE_EDITOR
+            if let editBtn {
+                leftItem = editBtn
+            }else {
+                leftItem = .flexibleSpace()
+            }
+            #else
             leftItem = .flexibleSpace()
+            #endif
         }
         let centerItem: UIBarButtonItem
         if let originalItem {

@@ -282,10 +282,14 @@ extension PhotoPickerViewController {
                 }
                 view.isSelected = listView.filterOptions != .any
                 if #available(iOS 26.0, *), !PhotoManager.isIos26Compatibility {
+                    var editorOptions: PickerAssetOptions = [.photo, .video]
+                    #if HXPICKER_ENABLE_EDITOR
+                    editorOptions = pickerConfig.editorOptions
+                    #endif
                     let filterData = PhotoNavigationFilterData(
                         options: listView.filterOptions,
                         selectOptions: pickerConfig.selectOptions,
-                        editorOptions: pickerConfig.editorOptions,
+                        editorOptions: editorOptions,
                         selectMode: pickerConfig.selectMode
                     )
                     view.makeFilterData(filterData) { [weak self] options in
