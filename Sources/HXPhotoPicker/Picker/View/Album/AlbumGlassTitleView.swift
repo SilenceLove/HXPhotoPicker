@@ -111,10 +111,10 @@ public class AlbumGlassTitleView: UIView, PhotoPickerNavigationTitle {
                     self.selectHandler?(assetCollection)
                 }
             })
-            _ = collection.requestCoverImage(targetWidth: 24) { [weak self] in
+            _ = collection.requestCoverImage() { [weak self] in
                 guard let self = self else { return }
                 if let info = $2, info.isCancel { return }
-                if index < self.actions.count, let image = $0?.scaleToFillSize(size: CGSize(width: 24, height: 24), mode: .center, scale: UIScreen.main.scale) {
+                if index < self.actions.count, let image = $0?.scaleToFillSize(size: CGSize(width: 50, height: 50), mode: .center, scale: UIScreen.main.scale) {
                     let action = self.actions[index]
                     action.image = image
                     if let old = self.button.menu {

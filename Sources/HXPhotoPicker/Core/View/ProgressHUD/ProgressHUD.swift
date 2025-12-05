@@ -128,6 +128,7 @@ final class ProgressHUD: UIView {
                 style = .gray
             }
             let indicatorView: UIActivityIndicatorView = .init(style: style)
+            indicatorView.color = .white
             indicatorView.hidesWhenStopped = true
             indicatorView.startAnimating()
             self.indicatorView = indicatorView
