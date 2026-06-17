@@ -276,7 +276,7 @@ extension EditorView {
     }
     
     func setContent() {
-        if size.equalTo(.zero) || contentScale == 0 {
+        if size.equalTo(.zero) || contentScale == 0 || !contentScale.isFinite {
             layoutContent = true
             return
         }

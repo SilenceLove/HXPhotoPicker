@@ -86,22 +86,22 @@ class EditorContentView: UIView {
     }
     
     var contentScale: CGFloat {
+        var scale: CGFloat = 0
         switch type {
         case .image:
-            if let image = imageView.image {
-                return image.width / image.height
+            if let image = imageView.image, image.height > 0 {
+                scale = image.width / image.height
             }
         case .video:
-            if let image = videoView.coverImageView.image {
-                return image.width / image.height
-            }
-            if !videoView.videoSize.equalTo(.zero) {
-                return videoView.videoSize.width / videoView.videoSize.height
+            if let image = videoView.coverImageView.image, image.height > 0 {
+                scale = image.width / image.height
+            } else if !videoView.videoSize.equalTo(.zero), videoView.videoSize.height > 0 {
+                scale = videoView.videoSize.width / videoView.videoSize.height
             }
         default:
             break
         }
-        return 0
+        return scale.isFinite ? scale : 0
     }
     
     var videoCover: UIImage? {

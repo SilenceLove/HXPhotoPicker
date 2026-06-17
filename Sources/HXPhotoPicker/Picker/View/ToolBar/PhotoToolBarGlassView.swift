@@ -236,7 +236,10 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
         contentView.insetsLayoutMarginsFromSafeArea = false
         
         let tmpBtn = UIButton(type: .system)
+#if canImport(UIKit.UIGlassEffect)
+
         tmpBtn.configuration = .glass()
+#endif
         let tmpItem = UIBarButtonItem(customView: tmpBtn).hidesShared()
         let tmpToolView = UIToolbar()
         tmpToolView.setItems([tmpItem], animated: false)
@@ -259,7 +262,7 @@ public class PhotoToolBarGlassView: UIView, PhotoToolBar {
     }
     
     func makeCenterItem() -> UIBarButtonItem {
-        originalBtn = ExpandButton(type: .system)
+		originalBtn = ExpandButton(type: .system)
         var cfg = UIButton.Configuration.plain()
         cfg.background.backgroundColorTransformer = UIConfigurationColorTransformer { _ in .clear }
         cfg.background.visualEffect = nil
