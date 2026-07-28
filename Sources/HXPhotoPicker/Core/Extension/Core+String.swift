@@ -82,7 +82,7 @@ extension String: HXPickerCompatibleValue {
         var fileName = uuid
         let nowDate = Date().timeIntervalSince1970
         
-        fileName.append(String(format: "%d", arguments: [nowDate]))
+        fileName.append(String(format: "%d", arguments: [Int(nowDate)]))
         fileName.append(String(format: "%d", arguments: [Int.random(in: 0..<10000)]))
         return suffix.isEmpty ? fileName.md5 : fileName.md5 + "." + suffix
     }
